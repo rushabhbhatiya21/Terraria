@@ -41,6 +41,10 @@ bool initGame()
 	gameData.gameMap.getBlockUnsafe(5, 11).type = Block::woodLog;
 	gameData.gameMap.getBlockUnsafe(5, 12).type = Block::woodLog;
 
+	gameData.gameMap.getBlockUnsafe(4, 13).type = Block::grassBlock;
+	gameData.gameMap.getBlockUnsafe(5, 13).type = Block::grassBlock;
+	gameData.gameMap.getBlockUnsafe(6, 13).type = Block::grassBlock;
+
 	gameData.camera.target = { 0,0 };
 	gameData.camera.rotation = 0.f;
 	gameData.camera.zoom = 100.f;
@@ -111,15 +115,51 @@ bool updateGame()
 		{
 			auto& b = gameData.gameMap.getBlockUnsafe(x, y);
 
+			float size = 1;
+			float posX = x * size;
+			float posY = y * size;
+
 			if (b.type != Block::air)
 			{
-				float size = 1;
-				float posX = x * size;
-				float posY = y * size;
+				Block* upperBlock = gameData.gameMap.getBlockSafe(x, y - 1);
+				Block* belowBlock = gameData.gameMap.getBlockSafe(x, y + 1);
+
+				if (!upperBlock || !belowBlock) continue;
+
+				if (b.type == Block::woodLog)
+				{
+					if (belowBlock->type == Block::grassBlock)
+					{
+						DrawTexturePro(
+							assetManager.treeTextures,
+							getTextureAtlas(7, 3, 32, 32), //source (in sprite)
+							{ posX,posY,size,size }, //dest
+							{ 0,0 }, //origin (top-left)
+							0.f,     //rotation
+							WHITE    //tint
+						);
+					}
+
+					if (upperBlock->type == Block::leaves && b.type == Block::woodLog)
+					{
+						DrawTexturePro(
+							assetManager.treeTextures,
+							getTextureAtlas(5, 3, 32, 32), //source (in sprite)
+							{ posX,posY,size,size }, //dest
+							{ 0,0 }, //origin (top-left)
+							0.f,     //rotation
+							WHITE    //tint
+						);
+						continue;
+					}
+				}
+
+				int atlasX = b.type;
+				int atlasY = 0;
 
 				DrawTexturePro(
 					assetManager.textures,
-					getTextureAtlas(b.type, 0, 32, 32), //source (in sprite)
+					getTextureAtlas(atlasX, atlasY, 32, 32), //source (in sprite)
 					{ posX,posY,size,size }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
