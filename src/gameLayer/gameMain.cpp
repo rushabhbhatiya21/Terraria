@@ -1,16 +1,50 @@
 #include <iostream>
 #include <fstream>
 #include <raylib.h>
+#include <raymath.h>
+
 #include "gameMain.h"
+#include <assetManager.h>
+#include <gameMap.h>
+#include <helper.h>
 
 struct GameData
 {
-	float posX = 100;
-	float posY = 100;
+	GameMap gameMap = {};
+	Camera2D camera = {};
+
 } gameData;
+
+AssetManager assetManager;
+
 
 bool initGame()
 {
+	assetManager.loadAll();
+
+	gameData.gameMap.create(700, 500);
+
+	gameData.gameMap.getBlockUnsafe(5, 7).type = Block::leaves;
+	gameData.gameMap.getBlockUnsafe(5, 8).type = Block::leaves;
+	gameData.gameMap.getBlockUnsafe(5, 9).type = Block::leaves;
+
+	gameData.gameMap.getBlockUnsafe(4, 8).type = Block::leaves;
+	gameData.gameMap.getBlockUnsafe(4, 9).type = Block::leaves;
+	gameData.gameMap.getBlockUnsafe(4, 10).type = Block::leaves;
+
+	gameData.gameMap.getBlockUnsafe(6, 8).type = Block::leaves;
+	gameData.gameMap.getBlockUnsafe(6, 9).type = Block::leaves;
+	gameData.gameMap.getBlockUnsafe(6, 10).type = Block::leaves;
+
+
+	gameData.gameMap.getBlockUnsafe(5, 10).type = Block::woodLog;
+	gameData.gameMap.getBlockUnsafe(5, 11).type = Block::woodLog;
+	gameData.gameMap.getBlockUnsafe(5, 12).type = Block::woodLog;
+
+	gameData.camera.target = { 0,0 };
+	gameData.camera.rotation = 0.f;
+	gameData.camera.zoom = 100.f;
+
 	return true;
 }
 
@@ -19,12 +53,97 @@ bool updateGame()
 	float deltaTime = GetFrameTime();
 	if (deltaTime > 1.f / 5.f) deltaTime = 1 / 5.f;
 
-	DrawRectangle(gameData.posX, gameData.posY, 50, 50, { 255,0,200,255 });
+	gameData.camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
 
-	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) gameData.posY -= 200.f * deltaTime;
-	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) gameData.posY += 200.f * deltaTime;
-	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) gameData.posX -= 200.f * deltaTime;
-	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) gameData.posX += 200.f * deltaTime;
+	ClearBackground({ 75,75,150,255 });
+
+#pragma region camera movement
+
+	if (IsKeyDown(KEY_LEFT)) gameData.camera.target.x -= 7.f * deltaTime;
+	if (IsKeyDown(KEY_RIGHT)) gameData.camera.target.x += 7.f * deltaTime;
+	if (IsKeyDown(KEY_UP)) gameData.camera.target.y -= 7.f * deltaTime;
+	if (IsKeyDown(KEY_DOWN)) gameData.camera.target.y += 7.f * deltaTime;
+
+#pragma endregion
+
+	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
+	int blockX = (int)floor(worldPos.x);
+	int blockY = (int)floor(worldPos.y);
+
+	if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+	{
+		auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
+		if (b)
+		{
+			*b = {};
+		}
+	}
+	if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+	{
+		auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
+		if (b)
+		{
+			b->type = Block::gold;
+		}
+	}
+
+#pragma region draw world
+
+	BeginMode2D(gameData.camera);
+
+	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, gameData.camera);
+	Vector2 bottomRightView = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, gameData.camera);
+
+	int startXView = (int)floorf(topLeftView.x - 1);
+	int endXView = (int)floorf(bottomRightView.x + 1);
+	int startYView = (int)floorf(topLeftView.y - 1);
+	int endYView = (int)floorf(bottomRightView.y + 1);
+
+	startXView = Clamp(startXView, 0, gameData.gameMap.w - 1);
+	endXView = Clamp(endXView, 0, gameData.gameMap.w - 1);
+
+	startYView = Clamp(startYView, 0, gameData.gameMap.h - 1);
+	endYView = Clamp(endYView, 0, gameData.gameMap.h - 1);
+
+	for (int y = startYView; y <= endYView; y++)
+	{
+		for (int x = startXView; x <= endXView; x++)
+		{
+			auto& b = gameData.gameMap.getBlockUnsafe(x, y);
+
+			if (b.type != Block::air)
+			{
+				float size = 1;
+				float posX = x * size;
+				float posY = y * size;
+
+				DrawTexturePro(
+					assetManager.textures,
+					getTextureAtlas(b.type, 0, 32, 32), //source (in sprite)
+					{ posX,posY,size,size }, //dest
+					{ 0,0 }, //origin (top-left)
+					0.f,     //rotation
+					WHITE    //tint
+				);
+			}
+		}
+	}
+
+	//draw selected block
+	DrawTexturePro(
+		assetManager.frame,
+		{ 0,0,(float)assetManager.frame.width,(float)assetManager.frame.height },
+		{ (float)blockX, (float)blockY, 1, 1 },
+		{},
+		0.f,
+		WHITE
+	);
+
+	EndMode2D();
+
+#pragma endregion
+
+	DrawFPS(10, 10);
 
 	return true;
 }

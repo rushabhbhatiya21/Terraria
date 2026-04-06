@@ -1,9 +1,29 @@
 #include <iostream>
+#include <vector>
 #include <raylib.h>
 
 #include <imgui.h>
 #include <rlImGui.h>
+
 #include <gameMain.h>
+
+//Texture2D atlas = LoadTexture(RESOURCES_PATH "textures.png");
+//
+//ImVec2 getUV0(int x, int y, int tileSize, int atlasW, int atlasH)
+//{
+//	return ImVec2(
+//		(x * tileSize) / (float)atlasW,
+//		(y * tileSize) / (float)atlasH
+//	);
+//}
+//
+//ImVec2 getUV1(int x, int y, int tileSize, int atlasW, int atlasH)
+//{
+//	return ImVec2(
+//		((x + 1) * tileSize) / (float)atlasW,
+//		((y + 1) * tileSize) / (float)atlasH
+//	);
+//}
 
 int main()
 {
@@ -46,6 +66,41 @@ int main()
 #pragma endregion
 
 #pragma region imgui windows
+
+		//struct Item {
+		//	const char* name;
+		//	Texture tex;
+		//};
+
+
+		//int tileSize = 32;
+		//int atlasW = atlas.width;
+		//int atlasH = atlas.height;
+
+		ImGui::Begin("Tiles");
+
+		//for (int y = 0; y < 3; y++)
+		//{
+		//	for (int x = 0; x < 3; x++)
+		//	{
+		//		ImVec2 uv0 = getUV0(x, y, tileSize, atlasW, atlasH);
+		//		ImVec2 uv1 = getUV1(x, y, tileSize, atlasW, atlasH);
+
+		//		if (ImGui::ImageButton(
+		//			(ImTextureID)&atlas,   // rlImGui uses Texture2D*
+		//			ImVec2(32, 32),
+		//			uv0,
+		//			uv1
+		//		))
+		//		{
+		//			// clicked tile (x, y)
+		//		}
+
+		//		ImGui::SameLine();
+		//	}
+		//}
+
+		ImGui::End();
 
 #pragma endregion
 
