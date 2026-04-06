@@ -70,6 +70,8 @@ bool updateGame()
 	if (IsKeyDown(KEY_UP)) gameData.camera.target.y -= 7.f * deltaTime;
 	if (IsKeyDown(KEY_DOWN)) gameData.camera.target.y += 7.f * deltaTime;
 
+	if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
+
 #pragma endregion
 
 	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
