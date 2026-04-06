@@ -1,0 +1,37 @@
+Challenge, render trees more nicely
+So right now, if you build a tree, it would look like this:
+
+
+
+
+But it would be nicer if it looked like this:
+
+
+
+
+
+
+You see how we render the sprites differently depending on what blocks are to the left/right of it?
+
+
+
+Your task is to implement this, and in the resources, you will find a treetextures.png texture.
+
+
+So you will need to load this texture separately and make a separate texture atlas for it. And whenever you would render a woodLog block, you render this texture instead.
+
+
+This texture atlas works like this. So it has four rows as the normal blocks texture atlas, out of which you can select a random one to choose. But then it has eight columns. So the first one is just a normal tree trunk texture. Then the next one is a tree trunk that has leaves on both the left side and the right side of it. Then the third one is a tree texture that has leaves only to the right. Then the next one is a tree texture that has leaves only on the left. Then the next one is the lower portion of a tree, so basically the part of the tree that's on the ground. Then the sixth one is a tree that has leaves on top of it, on top of the tree. Then the next one is a log that doesn't have another tree log, nor leaves on top of it, like it's the last piece. And the final one is again a tree log that has nothing on top of it, but has ground under it (something other than tree leaves/tree log).
+
+
+
+Super importantly, to implement this, don't create new block types. You will only use the normal woodLog block, but you will have the code that checks for these variations directly in the rendering code. So whenever you render a woodLog, you check the blocks to the up, down, left, and right of it and see what version to render. Make sure you use the getBlockSafe method so you don't get bugs. And make sure you test your code in all possible configurations to make sure it renders the right version. You will quickly find out that you basically only have to write a few if statements to implement this, but the order in which you write them is super important, so getting this right will be a great exercise!
+
+
+
+And after you finish, as an extra challenge, maybe implement some different colored leaves if you feel brave enough, by using that trick I showed you to change the color of the textures and add new blocks!
+
+
+
+And as an extra hard challenge, how would you handle a tree trunk that has leaves of different colors attached to it? You would need to change this system a little.
+
