@@ -5,6 +5,7 @@
 
 #include "gameMain.h"
 #include <assetManager.h>
+#include <editorState.h>
 #include <gameMap.h>
 #include <helper.h>
 
@@ -16,6 +17,7 @@ struct GameData
 } gameData;
 
 AssetManager assetManager;
+
 
 
 bool initGame()
@@ -87,7 +89,7 @@ bool updateGame()
 		auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 		if (b)
 		{
-			b->type = Block::gold;
+			b->type = editorState.selectedTile;
 		}
 	}
 
@@ -103,11 +105,11 @@ bool updateGame()
 	int startYView = (int)floorf(topLeftView.y - 1);
 	int endYView = (int)floorf(bottomRightView.y + 1);
 
-	startXView = Clamp(startXView, 0, gameData.gameMap.w - 1);
-	endXView = Clamp(endXView, 0, gameData.gameMap.w - 1);
+	startXView = Clamp((float)startXView, 0.f, (float)gameData.gameMap.w - 1);
+	endXView = Clamp((float)endXView, 0.f, (float)gameData.gameMap.w - 1);
 
-	startYView = Clamp(startYView, 0, gameData.gameMap.h - 1);
-	endYView = Clamp(endYView, 0, gameData.gameMap.h - 1);
+	startYView = Clamp((float)startYView, 0.f, (float)gameData.gameMap.h - 1);
+	endYView = Clamp((float)endYView, 0.f, (float)gameData.gameMap.h - 1);
 
 	for (int y = startYView; y <= endYView; y++)
 	{
@@ -118,6 +120,9 @@ bool updateGame()
 			float size = 1;
 			float posX = x * size;
 			float posY = y * size;
+
+			//int atlasX = 0;
+			//int atlasY = 0;
 
 			if (b.type != Block::air)
 			{
@@ -154,6 +159,19 @@ bool updateGame()
 					}
 				}
 
+				Color color = WHITE;
+
+				if (b.type == Block::leaves)
+				{
+					if (x % 2 == 0)
+						color = DARKBLUE;
+					else
+						color = GREEN;
+
+					if (y % 2 == 0)
+						color.a = 127;
+				}
+
 				int atlasX = b.type;
 				int atlasY = 0;
 
@@ -163,7 +181,7 @@ bool updateGame()
 					{ posX,posY,size,size }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
-					WHITE    //tint
+					color    //tint
 				);
 			}
 		}

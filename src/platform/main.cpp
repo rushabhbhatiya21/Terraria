@@ -6,24 +6,8 @@
 #include <rlImGui.h>
 
 #include <gameMain.h>
+#include <editorState.h>
 
-//Texture2D atlas = LoadTexture(RESOURCES_PATH "textures.png");
-//
-//ImVec2 getUV0(int x, int y, int tileSize, int atlasW, int atlasH)
-//{
-//	return ImVec2(
-//		(x * tileSize) / (float)atlasW,
-//		(y * tileSize) / (float)atlasH
-//	);
-//}
-//
-//ImVec2 getUV1(int x, int y, int tileSize, int atlasW, int atlasH)
-//{
-//	return ImVec2(
-//		((x + 1) * tileSize) / (float)atlasW,
-//		((y + 1) * tileSize) / (float)atlasH
-//	);
-//}
 
 int main()
 {
@@ -50,6 +34,8 @@ int main()
 		return 0; 
 	}
 
+	Texture atlas = LoadTexture(RESOURCES_PATH "textures.png");
+
 	while (!WindowShouldClose())
 	{
 		BeginDrawing();
@@ -67,38 +53,52 @@ int main()
 
 #pragma region imgui windows
 
-		//struct Item {
-		//	const char* name;
-		//	Texture tex;
-		//};
-
-
-		//int tileSize = 32;
-		//int atlasW = atlas.width;
-		//int atlasH = atlas.height;
+		int tileSize = 32;
+		int atlasW = atlas.width;
+		int atlasH = atlas.height;
 
 		ImGui::Begin("Tiles");
+		int tilesPerRow = atlas.width / tileSize;
 
-		//for (int y = 0; y < 3; y++)
-		//{
-		//	for (int x = 0; x < 3; x++)
-		//	{
-		//		ImVec2 uv0 = getUV0(x, y, tileSize, atlasW, atlasH);
-		//		ImVec2 uv1 = getUV1(x, y, tileSize, atlasW, atlasH);
+		for (int x = 1; x < tilesPerRow; x++)
+		{
+			ImGui::PushID(x);
+			int tileId = x;
+			int y = 0; // always base row
 
-		//		if (ImGui::ImageButton(
-		//			(ImTextureID)&atlas,   // rlImGui uses Texture2D*
-		//			ImVec2(32, 32),
-		//			uv0,
-		//			uv1
-		//		))
-		//		{
-		//			// clicked tile (x, y)
-		//		}
+			float u0 = (x * tileSize) / (float)atlas.width;
+			float v0 = 0.0f;
 
-		//		ImGui::SameLine();
-		//	}
-		//}
+			float u1 = ((x + 1) * tileSize) / (float)atlas.width;
+			float v1 = (tileSize) / (float)atlas.height;
+
+			// decide appearance
+			bool isSelected = (tileId == editorState.selectedTile);
+
+			ImVec4 bgColor = isSelected
+				? ImVec4(0.8f, 0.8f, 0.0f, 1.0f)   // bright yellow
+				: ImVec4(0.05f, 0.05f, 0.05f, 1.0f);
+
+			ImVec4 tintColor = isSelected
+				? ImVec4(1.0f, 1.0f, 1.0f, 1.0f)   // full color
+				: ImVec4(0.3f, 0.3f, 0.3f, 1.0f);  // heavily dimmed
+
+			if (ImGui::ImageButton(
+				(ImTextureID)(intptr_t)atlas.id,
+				ImVec2(32, 32),
+				{ u0, v0 },
+				{ u1, v1 },
+				-1,
+				bgColor,
+				tintColor
+			))
+			{
+				editorState.selectedTile = tileId;
+			}
+
+			ImGui::PopID();
+			if ((x) % 3 != 0) ImGui::SameLine(); // wrap UI
+		}
 
 		ImGui::End();
 
