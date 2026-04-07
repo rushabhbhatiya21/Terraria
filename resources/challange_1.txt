@@ -1,0 +1,24 @@
+Challenge, wall blocks
+You know how Terraria has normal blocks and wall blocks? They are placed in the background, like before the blocks.
+
+
+
+
+
+
+
+Your challenge is to implement these blocks!
+
+If you look inside the resources of the game, you will find texturesWithBackgroundVersion.png. They have some extra blocks that you can use as walls.
+
+
+
+
+
+
+Those are: dirtWall, stoneWall, woodWall, sandStoneWall, brickWall, glassWall,  copperBlockWall, silverBlockWall, goldBlockWall, snowWall, sandWall, stoneBricksWall, rubyBlockWall, heroglyphWall, blueRubyWall, plankedWall, snowBrickWall, boneBrickWall.
+
+
+
+Now, to implement them, I recommend you use another 2D array to store them. Like it should be possible for a place in the map to have both a block and the wall behind it. This should not be hard at all, but keep in mind that all the future systems will need to account for this. And this is a great exercise. For example, I will show you how to save the map, and you will also have to save these background blocks as well! Or if you added an extra block already, also add it to this new texture, maybe make new walls! And so on! Good luck!
+

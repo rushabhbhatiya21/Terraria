@@ -1,0 +1,35 @@
+Challenge with random numbers!
+I have 2 coding challenges for you! The first one you will implement in the game. So you probably noticed that in the texture atlas, each block has 5 variations (except the door):
+
+
+
+
+The bottom one is for items, the first 4 ones are random variations of the same block. So your challenge is to randomly render items using a random variation. You have 2 options here. The first one is to compute a random number based on the x and y positions in the map. You can search online for a hash function that takes in 2 numbers and use the output as the seed for a prng, or just simply mod the result by 4. So this means, for each position in the map, you will always have the same random variation. The other option is to store a random number in the block (from 0 to  3), and you just pick a different random number every time you place a block. This will allow the player to select what block variation he wants.
+
+
+
+
+
+The second challenge is to implement a visualizer for random numbers. You can implement this in a different Raylib project. The idea is simple. Create a 2D array of random values (0 or 1) to be able to visually see how good a random number generator. Simply generate the random numbers once and then display them on the screen. A bad random number generator will look like this:
+
+
+While a good one will look like this:
+
+
+
+
+
+
+Here are some things to try out:
+
+Make the matrix square and a power of 2. So, for example, make it have the sizes 128, 128. This will sometimes expose more problems with PRNGs. So try it with different matrix sizes and see how that affects things. Maybe use an ImGui slider to change the matrix size (and make sure you recreate the random numbers).
+
+
+Also, try the rand function, and try to see how different bits of it look. The least significant bit is less random than the most significant bit. Maybe make an ImGui slider to be able to select the bit that you look at for a harder challenge? (Hint: use the bit shift >> operator and then % 2 to select what bit you want) Also, maybe do this same thing for a C++ random number generator. You can use a normal C++ random number generator without a distribution by simply calling that struct as a function. Like rng(); will give you a random number. Try to see if that is worse than using a distribution (it may be especially in the lower bits).
+
+You can also try these functions:
+
+(not availalbe on ARM, but only on x64 machines)
+https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html#cats=Random
+
+But make sure you include <intrin.h>

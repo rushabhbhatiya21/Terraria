@@ -1,0 +1,142 @@
+Challenge + New concepts: biasing random numbers!
+Even though I showed you a ton of things with random numbers, there are a ton of things to learn. So here is an exercise for you. Let's say you kill an enemy, and you want that enemy to drop a random item. And there are multiple random items it can drop. Here is the thing: you want to somehow be easily able to specify how rare some items are. For example, let's say I want to specify that dropping gold is the most common thing, but then dropping a weapon or a tool is roughly 2 times rarer, and dropping a legendary item is 10 times rarer. There are so many solutions, so try to think for yourself how you would do this. Remember, the idea for this system is to be easy to use and versatile. You should try to spend some time on these challenges, maybe even write some code, test it in-game somehow (maybe by spawning random blocks in the world using this system so you can visually see how good it is), don't just go to the solutions without trying.
+
+
+
+After you try then make sure you read the solutions because I want to teach you some new stuff there, and then I have another exercise!
+
+
+
+Solutions in
+
+
+
+
+
+3
+
+
+
+
+
+
+
+2
+
+
+
+
+
+
+
+1
+
+
+
+
+
+So the easiest way to implement this is to make a vector of items. So let's say you add in that vector 5 items of gold, one tool, and one weapon. And then you just randomly select an index into that vector. Clearly, the resulting item will be more likely to be gold, and also, the tool and the weapon have the same rarity. The problem is that it's hard to make items that are super rare, like one in 100. How would you do that?
+
+
+
+
+
+Solution in
+
+
+
+
+
+3
+
+
+
+
+
+
+
+2
+
+
+
+
+
+
+
+
+
+1
+
+
+
+
+
+
+
+Ok, so there are multiple options here. Instead of using a vector, you can, for example, associate each item with a number that represents how likely it will be for that item to exist. So in the end, you sum up all of those numbers to get to a big total, and pick a random number that's smaller than that total. That number will give us the result. Here is an example:
+
+Here are the items
+
+(gold 10), (sword 1), (copper 5), (tool 1).
+
+So we sum up all of those numbers, and we get 17. So we select a random number up to 17.
+
+To get gold, you would need to select from 0-9,  to get a sword, you need to select 10, to get copper, you need to select 11-15, and to get the too,l you need to select 16.
+
+
+
+You can also use this system with floats, so that you do something like (gold 0.8) (sword 0.1) (tool 0.1), which means that gold has a 80% chance, and the sword and tool both have a 10% chance.
+
+
+
+Now I have a second similar challenge for you!
+
+Let's say you have an enemy, and you need to randomly select how long it will take until he starts moving. Some random float number between 3 and 10 representing seconds. Here is the challenge. How do you make it more likely to select a number closer to the middle of the range? And we want to use floats, we want to be able to get numbers like 4.45. There are multiple solutions here. To make your life easier, here is a simplified version of this challenge: how do you make the enemy more biased to pick a bigger number between 3 and 10? So it can pick any number, but it will be more likely to pick a bigger number and less likely to pick a smaller number.
+
+
+
+
+
+Solution in
+
+
+
+
+
+
+
+3
+
+
+
+
+
+
+
+2
+
+
+
+
+
+
+
+1
+
+
+
+
+
+Ok, so let's do the easy challenge first. How do you bias the numbers to be bigger? Well, you could select 2 random numbers and just select the bigger one. Similarly, you can just pick 3 numbers and select the bigger one, and that will make it super likely to get a big number, but not impossible to get a small one. You can pick the smaller one if you want to be more likely to get smaller numbers. And to get a number closer to the center of the range, you can just take 2 random numbers and compute their average. This will make it more likely to result in a number closer to the middle of the range.
+
+
+
+Now there is always the hardcoded version, you can just do an if that has a 0.7 chance, and if it is true, we hardcode it to pick some random numbers close to the middle like 5 and 7, and if it is false, we pick a random number close to big numbers, and one close to small numbers, and then pick randomly one of this 2 numbers. While this is not elegant, it is a super good solution because it's super easy for you to specify the exact chance we get numbers close to the middle.
+
+
+
+Here is a super cool video on the topic:
+
+https://www.youtube.com/shorts/Pny70rNPJLk
+
+(Keep in mind the numbers here are from 0 to 1, that's important for that thing).
