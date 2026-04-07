@@ -59,10 +59,29 @@ struct Block
 		boneWordrobe,
 		boneBookShelf,
 		bonePlatform,
+		dirtWall,
+		stoneWall, 
+		woodWall, 
+		sandStoneWall, 
+		brickWall, 
+		glassWall, 
+		copperBlockWall, 
+		silverBlockWall, 
+		goldBlockWall, 
+		snowWall, 
+		sandWall, 
+		stoneBricksWall, 
+		rubyBlockWall, 
+		heroglyphWall, 
+		blueRubyWall, 
+		plankedWall, 
+		snowBrickWall, 
+		boneBrickWall,
 
 		BLOCKS_COUNT,
 
 	};
 
 	std::uint16_t type = 0;
+	int variation = -1;
 };
