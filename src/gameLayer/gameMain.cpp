@@ -12,12 +12,15 @@
 #include <gameMap.h>
 #include <worldGenerator.h>
 #include <helper.h>
+#include <randomStuff.h>
 
 struct GameData
 {
+	GameMap backgroundMap = {};
 	GameMap gameMap = {};
 	Camera2D camera = {};
 
+	std::unordered_set<int> randomisedItems = {};
 } gameData;
 
 AssetManager assetManager;
@@ -26,7 +29,14 @@ AssetManager assetManager;
 
 bool initGame()
 {
+	gameData.randomisedItems = generateRandomItemArray(100);
+	for (auto& i : gameData.randomisedItems)
+	{
+		printf("%d\n", i);
+	}
+
 	assetManager.loadAll();
+	int w = 700, h = 500;
 
 	generateWorld(gameData.gameMap);
 
@@ -91,12 +101,54 @@ bool updateGame()
 			*b = {};
 		}
 	}
-	if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+	if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
 	{
 		auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 		if (b)
 		{
-			b->type = editorState.selectedTile;
+			//b->type = editorState.selectedTile;
+			if (gameData.randomisedItems.empty())
+			{
+				gameData.randomisedItems = generateRandomItemArray(100);
+			}
+			else
+			{
+				auto i = gameData.randomisedItems.begin();
+				int val = *i;
+				gameData.randomisedItems.erase(i);
+				std::cout << "Popped: " << val << std::endl;
+
+				//common 0-39 40
+				//uncommon 40-69 30
+				//rare 70-88 19
+				//epic 89-97 9
+				//legendary 98-99 2
+
+				if (val < 40)
+					b->type = Block::dirt;
+
+				else if (val >= 40 && val < 70)
+					b->type = Block::bricks;
+
+				else if (val >= 70 && val < 89)
+					b->type = Block::silverBlockWall;
+
+				else if (val >= 89 && val < 98)
+					b->type = Block::goldBlock;
+
+				else if (val == 98 || val == 99)
+				{
+					b->type = Block::rubyBlock;
+					printf("congrats! you found legendary loot! resetting...");
+					gameData.randomisedItems = generateRandomItemArray(100);
+				}
+
+				else
+				{
+					printf("\n\nDANGER: value out of bounds, not allowed\n\n");
+					b->type = Block::air;
+				}
+			}
 		}
 	}
 
@@ -122,14 +174,35 @@ bool updateGame()
 	{
 		for (int x = startXView; x <= endXView; x++)
 		{
-			auto& b = gameData.gameMap.getBlockUnsafe(x, y);
-
 			float size = 1;
 			float posX = x * size;
 			float posY = y * size;
 
-			//int atlasX = 0;
-			//int atlasY = 0;
+			int atlasX = 0;
+
+			auto& bb = gameData.backgroundMap.getBlockUnsafe(x, y);
+
+			if (bb.type != Block::air)
+			{
+				atlasX = bb.type;
+
+				if (bb.variation == -1)
+				{
+					bb.variation = rand() % 4;
+				}
+
+				DrawTexturePro(
+					assetManager.textures,
+					getTextureAtlas(atlasX, bb.variation, 32, 32),
+					{ posX,posY,size,size }, //dest
+					{ 0,0 }, //origin (top-left)
+					0.f,     //rotation
+					WHITE    //tint
+				);
+			}
+
+			auto& b = gameData.gameMap.getBlockUnsafe(x, y);
+
 
 			if (b.type != Block::air)
 			{
@@ -181,12 +254,16 @@ bool updateGame()
 				//}
 #pragma endregion
 
-				int atlasX = b.type;
-				int atlasY = 0;
+				atlasX = b.type;
+
+				if (b.variation == -1)
+				{
+					b.variation = rand() % 4;
+				}
 
 				DrawTexturePro(
 					assetManager.textures,
-					getTextureAtlas(atlasX, atlasY, 32, 32), //source (in sprite)
+					getTextureAtlas(atlasX, b.variation, 32, 32), //source (in sprite)
 					{ posX,posY,size,size }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
