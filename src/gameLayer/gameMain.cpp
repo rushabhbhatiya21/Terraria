@@ -3,10 +3,14 @@
 #include <raylib.h>
 #include <raymath.h>
 
+#include <imgui.h>
+#include <rlImGui.h>
+
 #include "gameMain.h"
 #include <assetManager.h>
 #include <editorState.h>
 #include <gameMap.h>
+#include <worldGenerator.h>
 #include <helper.h>
 
 struct GameData
@@ -24,32 +28,32 @@ bool initGame()
 {
 	assetManager.loadAll();
 
-	gameData.gameMap.create(700, 500);
+	generateWorld(gameData.gameMap);
 
-	gameData.gameMap.getBlockUnsafe(5, 7).type = Block::leaves;
-	gameData.gameMap.getBlockUnsafe(5, 8).type = Block::leaves;
-	gameData.gameMap.getBlockUnsafe(5, 9).type = Block::leaves;
+	//gameData.gameMap.getBlockUnsafe(5, 7).type = Block::leaves;
+	//gameData.gameMap.getBlockUnsafe(5, 8).type = Block::leaves;
+	//gameData.gameMap.getBlockUnsafe(5, 9).type = Block::leaves;
 
-	gameData.gameMap.getBlockUnsafe(4, 8).type = Block::leaves;
-	gameData.gameMap.getBlockUnsafe(4, 9).type = Block::leaves;
-	gameData.gameMap.getBlockUnsafe(4, 10).type = Block::leaves;
+	//gameData.gameMap.getBlockUnsafe(4, 8).type = Block::leaves;
+	//gameData.gameMap.getBlockUnsafe(4, 9).type = Block::leaves;
+	//gameData.gameMap.getBlockUnsafe(4, 10).type = Block::leaves;
 
-	gameData.gameMap.getBlockUnsafe(6, 8).type = Block::leaves;
-	gameData.gameMap.getBlockUnsafe(6, 9).type = Block::leaves;
-	gameData.gameMap.getBlockUnsafe(6, 10).type = Block::leaves;
+	//gameData.gameMap.getBlockUnsafe(6, 8).type = Block::leaves;
+	//gameData.gameMap.getBlockUnsafe(6, 9).type = Block::leaves;
+	//gameData.gameMap.getBlockUnsafe(6, 10).type = Block::leaves;
 
 
-	gameData.gameMap.getBlockUnsafe(5, 10).type = Block::woodLog;
-	gameData.gameMap.getBlockUnsafe(5, 11).type = Block::woodLog;
-	gameData.gameMap.getBlockUnsafe(5, 12).type = Block::woodLog;
+	//gameData.gameMap.getBlockUnsafe(5, 10).type = Block::woodLog;
+	//gameData.gameMap.getBlockUnsafe(5, 11).type = Block::woodLog;
+	//gameData.gameMap.getBlockUnsafe(5, 12).type = Block::woodLog;
 
-	gameData.gameMap.getBlockUnsafe(4, 13).type = Block::grassBlock;
-	gameData.gameMap.getBlockUnsafe(5, 13).type = Block::grassBlock;
-	gameData.gameMap.getBlockUnsafe(6, 13).type = Block::grassBlock;
+	//gameData.gameMap.getBlockUnsafe(4, 13).type = Block::grassBlock;
+	//gameData.gameMap.getBlockUnsafe(5, 13).type = Block::grassBlock;
+	//gameData.gameMap.getBlockUnsafe(6, 13).type = Block::grassBlock;
 
 	gameData.camera.target = { 0,0 };
 	gameData.camera.rotation = 0.f;
-	gameData.camera.zoom = 100.f;
+	gameData.camera.zoom = 10.f;
 
 	return true;
 }
@@ -65,10 +69,11 @@ bool updateGame()
 
 #pragma region camera movement
 
-	if (IsKeyDown(KEY_LEFT)) gameData.camera.target.x -= 7.f * deltaTime;
-	if (IsKeyDown(KEY_RIGHT)) gameData.camera.target.x += 7.f * deltaTime;
-	if (IsKeyDown(KEY_UP)) gameData.camera.target.y -= 7.f * deltaTime;
-	if (IsKeyDown(KEY_DOWN)) gameData.camera.target.y += 7.f * deltaTime;
+	static float CAMERA_SPEED = 150.f;
+	if (IsKeyDown(KEY_LEFT)) gameData.camera.target.x -= CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_RIGHT)) gameData.camera.target.x += CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_UP)) gameData.camera.target.y -= CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_DOWN)) gameData.camera.target.y += CAMERA_SPEED * GetFrameTime();
 
 	if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
 
@@ -128,51 +133,53 @@ bool updateGame()
 
 			if (b.type != Block::air)
 			{
-				Block* upperBlock = gameData.gameMap.getBlockSafe(x, y - 1);
-				Block* belowBlock = gameData.gameMap.getBlockSafe(x, y + 1);
+#pragma region draw tree
+				//Block* upperBlock = gameData.gameMap.getBlockSafe(x, y - 1);
+				//Block* belowBlock = gameData.gameMap.getBlockSafe(x, y + 1);
 
-				if (!upperBlock || !belowBlock) continue;
+				//if (!upperBlock || !belowBlock) continue;
 
-				if (b.type == Block::woodLog)
-				{
-					if (belowBlock->type == Block::grassBlock)
-					{
-						DrawTexturePro(
-							assetManager.treeTextures,
-							getTextureAtlas(7, 3, 32, 32), //source (in sprite)
-							{ posX,posY,size,size }, //dest
-							{ 0,0 }, //origin (top-left)
-							0.f,     //rotation
-							WHITE    //tint
-						);
-					}
+				//if (b.type == Block::woodLog)
+				//{
+				//	if (belowBlock->type == Block::grassBlock)
+				//	{
+				//		DrawTexturePro(
+				//			assetManager.treeTextures,
+				//			getTextureAtlas(7, 3, 32, 32), //source (in sprite)
+				//			{ posX,posY,size,size }, //dest
+				//			{ 0,0 }, //origin (top-left)
+				//			0.f,     //rotation
+				//			WHITE    //tint
+				//		);
+				//	}
 
-					if (upperBlock->type == Block::leaves && b.type == Block::woodLog)
-					{
-						DrawTexturePro(
-							assetManager.treeTextures,
-							getTextureAtlas(5, 3, 32, 32), //source (in sprite)
-							{ posX,posY,size,size }, //dest
-							{ 0,0 }, //origin (top-left)
-							0.f,     //rotation
-							WHITE    //tint
-						);
-						continue;
-					}
-				}
+				//	if (upperBlock->type == Block::leaves && b.type == Block::woodLog)
+				//	{
+				//		DrawTexturePro(
+				//			assetManager.treeTextures,
+				//			getTextureAtlas(5, 3, 32, 32), //source (in sprite)
+				//			{ posX,posY,size,size }, //dest
+				//			{ 0,0 }, //origin (top-left)
+				//			0.f,     //rotation
+				//			WHITE    //tint
+				//		);
+				//		continue;
+				//	}
+				//}
 
-				Color color = WHITE;
+				//Color color = WHITE;
 
-				if (b.type == Block::leaves)
-				{
-					if (x % 2 == 0)
-						color = DARKBLUE;
-					else
-						color = GREEN;
+				//if (b.type == Block::leaves)
+				//{
+				//	if (x % 2 == 0)
+				//		color = DARKBLUE;
+				//	else
+				//		color = GREEN;
 
-					if (y % 2 == 0)
-						color.a = 127;
-				}
+				//	if (y % 2 == 0)
+				//		color.a = 127;
+				//}
+#pragma endregion
 
 				int atlasX = b.type;
 				int atlasY = 0;
@@ -183,7 +190,7 @@ bool updateGame()
 					{ posX,posY,size,size }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
-					color    //tint
+					WHITE    //tint
 				);
 			}
 		}
@@ -204,6 +211,13 @@ bool updateGame()
 #pragma endregion
 
 	DrawFPS(10, 10);
+
+	ImGui::Begin("Camera");
+
+	ImGui::SliderFloat("Camera Zoom: ", &gameData.camera.zoom, 10, 150);
+	ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 30);
+
+	ImGui::End();
 
 	return true;
 }
