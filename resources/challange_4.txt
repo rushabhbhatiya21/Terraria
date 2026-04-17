@@ -1,0 +1,15 @@
+Challenge Read/Write entire file
+I have another easy challenge for you. Implement the readEntireFile and writeEntireFile functions. They are very useful. So here are some tips. First of all, simply open the file in the binary format when you implement them.
+
+So these functions should basically read/write an entire file. The write one is simple, I would make it like so:
+
+bool writeEntireFile(const char *fileName, const void *data, size_t size);
+So it basically returns 0 on fail. And because I take as a parameter a void pointer and a size, I can basically write anything I want, from any type of container I want. Just know that to write with fstream, you will need to cast the data to a (char*), otherwise you will get a compile error.
+
+
+
+For the readEntireFile, you will have to think about some more things. There are multiple ways to write it. First of all, I don't like returning simple heap-allocated pointers. You should either return a std::string or an std::vector<unsigned char> of data. In fact, I would implement both versions so that you can choose how to get the data. And maybe even a version where you have to supply yourself with a buffer and a size in which the function will write the data. Make sure you don't write more than the max buffer size. This means you may also need to implement a getFileSize version.  But you can also return a bool instead to say if the function failed or not, and then take in a vector or a string as a reference to write the data into them. If you have any problem implementing them, here is how I did it in an older project! But instead of returning that Errors thing I do there, just return a bool true or false.
+
+
+
+Also, unrelated to this, but what happens if the save file gets corrupted? How can you recover the world if the save file gets corrupted, or how can you prevent it? I will show you all of this in some later lessons, but for now, just think about this problem.

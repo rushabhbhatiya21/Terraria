@@ -1,0 +1,19 @@
+#pragma once
+#include <vector>
+#include <blocks.h>
+
+#include <gameMap.h>
+#include <raylib.h>
+
+struct Structure
+{
+	int w = 0;
+	int h = 0;
+
+	std::vector<Block> mapData = {};
+
+	void create(int w, int h);
+
+	Block& getBlockUnsafe(int x, int y);
+	Block* getBlockSafe(int x, int y);
+};

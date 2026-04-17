@@ -60,22 +60,22 @@ struct Block
 		boneBookShelf,
 		bonePlatform,
 		dirtWall,
-		stoneWall, 
-		woodWall, 
-		sandStoneWall, 
-		brickWall, 
-		glassWall, 
-		copperBlockWall, 
-		silverBlockWall, 
-		goldBlockWall, 
-		snowWall, 
-		sandWall, 
-		stoneBricksWall, 
-		rubyBlockWall, 
-		heroglyphWall, 
-		blueRubyWall, 
-		plankedWall, 
-		snowBrickWall, 
+		stoneWall,
+		woodWall,
+		sandStoneWall,
+		brickWall,
+		glassWall,
+		copperBlockWall,
+		silverBlockWall,
+		goldBlockWall,
+		snowWall,
+		sandWall,
+		stoneBricksWall,
+		rubyBlockWall,
+		heroglyphWall,
+		blueRubyWall,
+		plankedWall,
+		snowBrickWall,
 		boneBrickWall,
 
 		BLOCKS_COUNT,
@@ -84,4 +84,12 @@ struct Block
 
 	std::uint16_t type = 0;
 	int variation = -1;
+
+	void sanitize()
+	{
+		if (type >= BLOCKS_COUNT)
+		{
+			type = 0;
+		}
+	}
 };

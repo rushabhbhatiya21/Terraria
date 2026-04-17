@@ -16,28 +16,32 @@
 
 struct GameData
 {
-	GameMap backgroundMap = {};
+	GameMap backgroundMap = {}; 
 	GameMap gameMap = {};
 	Camera2D camera = {};
 
+	int creativeSelectedBlock = Block::air;
+
 	std::unordered_set<int> randomisedItems = {};
+
 } gameData;
 
 AssetManager assetManager;
 
-
+bool showImgui = false;
 
 bool initGame()
 {
 	gameData.randomisedItems = generateRandomItemArray(100);
-	for (auto& i : gameData.randomisedItems)
-	{
-		printf("%d\n", i);
-	}
+	//for (auto& i : gameData.randomisedItems)
+	//{
+	//	printf("%d\n", i);
+	//}
 
 	assetManager.loadAll();
-	int w = 700, h = 500;
+	int w = 900, h = 500;
 
+	gameData.backgroundMap.create(w, h);
 	generateWorld(gameData.gameMap);
 
 	//gameData.gameMap.getBlockUnsafe(5, 7).type = Block::leaves;
@@ -61,9 +65,9 @@ bool initGame()
 	//gameData.gameMap.getBlockUnsafe(5, 13).type = Block::grassBlock;
 	//gameData.gameMap.getBlockUnsafe(6, 13).type = Block::grassBlock;
 
-	gameData.camera.target = { 0,0 };
+	gameData.camera.target = { 20,70 };
 	gameData.camera.rotation = 0.f;
-	gameData.camera.zoom = 10.f;
+	gameData.camera.zoom = 30.f;
 
 	return true;
 }
@@ -77,9 +81,11 @@ bool updateGame()
 
 	ClearBackground({ 75,75,150,255 });
 
+	if (IsKeyPressed(KEY_F10)) { showImgui = !showImgui; }
+
 #pragma region camera movement
 
-	static float CAMERA_SPEED = 150.f;
+	static float CAMERA_SPEED = 40.f;
 	if (IsKeyDown(KEY_LEFT)) gameData.camera.target.x -= CAMERA_SPEED * GetFrameTime();
 	if (IsKeyDown(KEY_RIGHT)) gameData.camera.target.x += CAMERA_SPEED * GetFrameTime();
 	if (IsKeyDown(KEY_UP)) gameData.camera.target.y -= CAMERA_SPEED * GetFrameTime();
@@ -93,64 +99,86 @@ bool updateGame()
 	int blockX = (int)floor(worldPos.x);
 	int blockY = (int)floor(worldPos.y);
 
-	if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+	if (gameData.creativeSelectedBlock < 0) { gameData.creativeSelectedBlock = 0; }
+	if (gameData.creativeSelectedBlock >= Block::BLOCKS_COUNT) { gameData.creativeSelectedBlock = Block::BLOCKS_COUNT - 1; }
+
+#pragma region mouse input
+
+	if (!showImgui)
 	{
-		auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
-		if (b)
+		if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_MIDDLE))
 		{
-			*b = {};
-		}
-	}
-	if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
-	{
-		auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
-		if (b)
-		{
-			//b->type = editorState.selectedTile;
-			if (gameData.randomisedItems.empty())
+			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
+
+			if (b)
 			{
-				gameData.randomisedItems = generateRandomItemArray(100);
-			}
-			else
-			{
-				auto i = gameData.randomisedItems.begin();
-				int val = *i;
-				gameData.randomisedItems.erase(i);
-				std::cout << "Popped: " << val << std::endl;
-
-				//common 0-39 40
-				//uncommon 40-69 30
-				//rare 70-88 19
-				//epic 89-97 9
-				//legendary 98-99 2
-
-				if (val < 40)
-					b->type = Block::dirt;
-
-				else if (val >= 40 && val < 70)
-					b->type = Block::bricks;
-
-				else if (val >= 70 && val < 89)
-					b->type = Block::silverBlockWall;
-
-				else if (val >= 89 && val < 98)
-					b->type = Block::goldBlock;
-
-				else if (val == 98 || val == 99)
-				{
-					b->type = Block::rubyBlock;
-					printf("congrats! you found legendary loot! resetting...");
-					gameData.randomisedItems = generateRandomItemArray(100);
-				}
-
-				else
-				{
-					printf("\n\nDANGER: value out of bounds, not allowed\n\n");
-					b->type = Block::air;
-				}
+				gameData.creativeSelectedBlock = b->type;
 			}
 		}
+
+		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+		{
+			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
+			if (b)
+			{
+				*b = {};
+			}
+		}
+		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+		{
+			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
+			if (b)
+			{
+				b->type = gameData.creativeSelectedBlock;
+
+				//b->type = editorState.selectedTile;
+				//if (gameData.randomisedItems.empty())
+				//{
+				//	gameData.randomisedItems = generateRandomItemArray(100);
+				//}
+				//else
+				//{
+				//	auto i = gameData.randomisedItems.begin();
+				//	int val = *i;
+				//	gameData.randomisedItems.erase(i);
+				//	//std::cout << "Popped: " << val << std::endl;
+
+				//	//common 0-39 40
+				//	//uncommon 40-69 30
+				//	//rare 70-88 19
+				//	//epic 89-97 9
+				//	//legendary 98-99 2
+
+				//	if (val < 40)
+				//		b->type = Block::dirt;
+
+				//	else if (val >= 40 && val < 70)
+				//		b->type = Block::bricks;
+
+				//	else if (val >= 70 && val < 89)
+				//		b->type = Block::silverBlockWall;
+
+				//	else if (val >= 89 && val < 98)
+				//		b->type = Block::goldBlock;
+
+				//	else if (val == 98 || val == 99)
+				//	{
+				//		b->type = Block::rubyBlock;
+				//		printf("congrats! you found legendary loot! resetting...");
+				//		gameData.randomisedItems = generateRandomItemArray(100);
+				//	}
+
+				//	else
+				//	{
+				//		printf("\n\nDANGER: value out of bounds, not allowed\n\n");
+				//		b->type = Block::air;
+				//	}
+				//}
+			}
+		}
 	}
+
+#pragma endregion
 
 #pragma region draw world
 
@@ -180,6 +208,7 @@ bool updateGame()
 
 			int atlasX = 0;
 
+			//printf("%d %d %d %d\n", x, y, gameData.backgroundMap.w, gameData.backgroundMap.h);
 			auto& bb = gameData.backgroundMap.getBlockUnsafe(x, y);
 
 			if (bb.type != Block::air)
@@ -283,18 +312,61 @@ bool updateGame()
 		WHITE
 	);
 
+	DrawTexturePro(
+		assetManager.textures,
+		getTextureAtlas(gameData.creativeSelectedBlock, 0, 32, 32),
+		{ (float)blockX, (float)blockY, 1, 1 },
+		{},
+		0.f,
+		{ 255,255,255,127 }
+	);
+
 	EndMode2D();
 
 #pragma endregion
 
+	if (showImgui)
+	{
+		ImGui::Begin("Game Control");
+
+		ImGui::SliderFloat("Camera Zoom: ", &gameData.camera.zoom, 10, 150);
+		ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 100);
+
+		ImGui::Separator();
+
+		for (int i = 0; i < Block::BLOCKS_COUNT; i++)
+		{
+			auto atlas = getTextureAtlas(i, 0, 32, 32);
+			atlas.x /= assetManager.textures.width;
+			atlas.width /= assetManager.textures.width;
+			atlas.y /= assetManager.textures.height;
+			atlas.height /= assetManager.textures.height;
+
+			ImGui::PushID(i);
+
+			ImTextureID tex = (ImTextureID)(intptr_t)assetManager.textures.id;
+			if (ImGui::ImageButton(
+				tex,
+				{ 35,35 },
+				{ atlas.x,atlas.y },
+				{ atlas.x + atlas.width,atlas.y + atlas.height }
+			))
+			{
+				gameData.creativeSelectedBlock = i;
+			}
+
+			ImGui::PopID();
+
+			if (i % 10 != 0)
+			{
+				ImGui::SameLine();
+			}
+		}
+
+		ImGui::End();
+	}
+
 	DrawFPS(10, 10);
-
-	ImGui::Begin("Camera");
-
-	ImGui::SliderFloat("Camera Zoom: ", &gameData.camera.zoom, 10, 150);
-	ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 30);
-
-	ImGui::End();
 
 	return true;
 }
