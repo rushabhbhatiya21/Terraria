@@ -35,8 +35,8 @@ bool loadBlockDataFromFile(std::vector<Block>& blocks, int& w, int& h, const cha
 	if (!f.is_open()) { return false; }
 
 	// Read Dimentions
-	f.read((const char*)&w, sizeof(w));
-	f.read((const char*)&h, sizeof(h));
+	f.read((char*)&w, sizeof(w));
+	f.read((char*)&h, sizeof(h));
 
 	if (!f || w <= 0 || h <= 0) { f.close(); return false; }
 
@@ -47,7 +47,7 @@ bool loadBlockDataFromFile(std::vector<Block>& blocks, int& w, int& h, const cha
 	size_t blockCount = w * h;
 	blocks.resize(blockCount);
 
-	f.read((const char*)blocks.data(), sizeof(Block) * blockCount);
+	f.read((char*)blocks.data(), sizeof(Block) * blockCount);
 
 	if (!f)
 	{

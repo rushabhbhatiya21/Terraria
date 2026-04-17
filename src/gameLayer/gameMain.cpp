@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <string>
 #include <raylib.h>
 #include <raymath.h>
 
@@ -14,6 +15,9 @@
 #include <helper.h>
 #include <randomStuff.h>
 
+#include <structure.h>
+#include <saveMap.h>
+
 struct GameData
 {
 	GameMap backgroundMap = {}; 
@@ -21,6 +25,9 @@ struct GameData
 	Camera2D camera = {};
 
 	int creativeSelectedBlock = Block::air;
+
+	Vector2 selectionStart = {};
+	Vector2 selectionEnd = {};
 
 	std::unordered_set<int> randomisedItems = {};
 
@@ -103,6 +110,30 @@ bool updateGame()
 	if (gameData.creativeSelectedBlock >= Block::BLOCKS_COUNT) { gameData.creativeSelectedBlock = Block::BLOCKS_COUNT - 1; }
 
 #pragma region mouse input
+
+	// selection
+
+	if (showImgui)
+	{
+		if (IsKeyPressed(KEY_ONE)) 
+		{
+			gameData.selectionStart = Vector2{ float(blockX), float(blockY) };
+		}
+		if (IsKeyPressed(KEY_TWO))
+		{
+			gameData.selectionStart = Vector2{ float(blockX), float(blockY) };
+		}
+
+		if (gameData.selectionStart.x > gameData.selectionStart.x)
+		{
+			std::swap(gameData.selectionStart.x, gameData.selectionStart.x);
+		}
+		if (gameData.selectionStart.y > gameData.selectionStart.y)
+		{
+			std::swap(gameData.selectionStart.y, gameData.selectionStart.y);
+		}
+
+	}
 
 	if (!showImgui)
 	{
@@ -320,6 +351,26 @@ bool updateGame()
 		0.f,
 		{ 255,255,255,127 }
 	);
+
+	// show structure selection
+	// rectangle lines not working properly - debug
+	if (showImgui)
+	{
+		Rectangle rect;
+		rect.x = gameData.selectionStart.x;
+		rect.y = gameData.selectionStart.y;
+		rect.width = gameData.selectionEnd.x - gameData.selectionStart.x;
+		rect.height = gameData.selectionEnd.y - gameData.selectionStart.y;
+
+		rect.width++;
+		rect.height++;
+
+		DrawRectangleLinesEx(
+			rect,
+			0.1,
+			{ 20,101,250,145 }
+		);
+	}
 
 	EndMode2D();
 
