@@ -29,7 +29,11 @@ struct GameData
 	Vector2 selectionStart = {};
 	Vector2 selectionEnd = {};
 
+	Structure copyStructure;
+
 	std::unordered_set<int> randomisedItems = {};
+
+	char saveName[100] = {};
 
 } gameData;
 
@@ -72,7 +76,7 @@ bool initGame()
 	//gameData.gameMap.getBlockUnsafe(5, 13).type = Block::grassBlock;
 	//gameData.gameMap.getBlockUnsafe(6, 13).type = Block::grassBlock;
 
-	gameData.camera.target = { 20,70 };
+	gameData.camera.target = { 30,80 };
 	gameData.camera.rotation = 0.f;
 	gameData.camera.zoom = 30.f;
 
@@ -121,16 +125,20 @@ bool updateGame()
 		}
 		if (IsKeyPressed(KEY_TWO))
 		{
-			gameData.selectionStart = Vector2{ float(blockX), float(blockY) };
+			gameData.selectionEnd = Vector2{ float(blockX), float(blockY) };
+		}
+		if (IsKeyPressed(KEY_THREE)) 
+		{ 
+			gameData.copyStructure.pasteIntoMap(gameData.gameMap, Vector2{ float(blockX), float(blockY) }); 
 		}
 
-		if (gameData.selectionStart.x > gameData.selectionStart.x)
+		if (gameData.selectionStart.x > gameData.selectionEnd.x)
 		{
-			std::swap(gameData.selectionStart.x, gameData.selectionStart.x);
+			std::swap(gameData.selectionStart.x, gameData.selectionEnd.x);
 		}
-		if (gameData.selectionStart.y > gameData.selectionStart.y)
+		if (gameData.selectionStart.y > gameData.selectionEnd.y)
 		{
-			std::swap(gameData.selectionStart.y, gameData.selectionStart.y);
+			std::swap(gameData.selectionStart.y, gameData.selectionEnd.y);
 		}
 
 	}
@@ -161,6 +169,8 @@ bool updateGame()
 			if (b)
 			{
 				b->type = gameData.creativeSelectedBlock;
+
+#pragma region random item
 
 				//b->type = editorState.selectedTile;
 				//if (gameData.randomisedItems.empty())
@@ -205,6 +215,9 @@ bool updateGame()
 				//		b->type = Block::air;
 				//	}
 				//}
+
+#pragma endregion
+
 			}
 		}
 	}
@@ -214,6 +227,15 @@ bool updateGame()
 #pragma region draw world
 
 	BeginMode2D(gameData.camera);
+
+	DrawTexturePro(
+		assetManager.player,
+		{ 0,0,(float)assetManager.player.width,(float)assetManager.player.height },
+		{ (float)gameData.camera.target.x, (float)gameData.camera.target.y, 1, 1 },
+		{},
+		0.f,
+		WHITE
+	);
 
 	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, gameData.camera);
 	Vector2 bottomRightView = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, gameData.camera);
@@ -382,6 +404,43 @@ bool updateGame()
 
 		ImGui::SliderFloat("Camera Zoom: ", &gameData.camera.zoom, 10, 150);
 		ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 100);
+
+		if (ImGui::Button("Copy"))
+		{
+			gameData.copyStructure.copyFromMap(gameData.gameMap, gameData.selectionStart, gameData.selectionEnd);
+		}
+
+		ImGui::InputText("File name", gameData.saveName, sizeof(gameData.saveName));
+
+		if (ImGui::Button("Save to file"))
+		{
+			std::string path = RESOURCES_PATH "structures/";
+			path += gameData.saveName;
+			path += ".bin";
+
+			saveBlockDataToFile(
+				gameData.copyStructure.mapData,
+				gameData.copyStructure.w,
+				gameData.copyStructure.h,
+				path.c_str()
+			);
+		}
+
+		if (ImGui::Button("Load from file"))
+		{
+			std::string path = RESOURCES_PATH "structures/";
+			path += gameData.saveName;
+			path += ".bin";
+
+			bool d = loadBlockDataFromFile(
+				gameData.copyStructure.mapData,
+				gameData.copyStructure.w,
+				gameData.copyStructure.h,
+				path.c_str()
+			);
+
+			printf("load: %d", d);
+		}
 
 		ImGui::Separator();
 
