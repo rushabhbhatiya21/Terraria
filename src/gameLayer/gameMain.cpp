@@ -17,6 +17,7 @@
 
 #include <structure.h>
 #include <saveMap.h>
+#include <physics.h>
 
 struct GameData
 {
@@ -30,6 +31,8 @@ struct GameData
 	Vector2 selectionEnd = {};
 
 	Structure copyStructure;
+
+	PhysicalEntity player;
 
 	std::unordered_set<int> randomisedItems = {};
 
@@ -55,30 +58,13 @@ bool initGame()
 	gameData.backgroundMap.create(w, h);
 	generateWorld(gameData.gameMap);
 
-	//gameData.gameMap.getBlockUnsafe(5, 7).type = Block::leaves;
-	//gameData.gameMap.getBlockUnsafe(5, 8).type = Block::leaves;
-	//gameData.gameMap.getBlockUnsafe(5, 9).type = Block::leaves;
-
-	//gameData.gameMap.getBlockUnsafe(4, 8).type = Block::leaves;
-	//gameData.gameMap.getBlockUnsafe(4, 9).type = Block::leaves;
-	//gameData.gameMap.getBlockUnsafe(4, 10).type = Block::leaves;
-
-	//gameData.gameMap.getBlockUnsafe(6, 8).type = Block::leaves;
-	//gameData.gameMap.getBlockUnsafe(6, 9).type = Block::leaves;
-	//gameData.gameMap.getBlockUnsafe(6, 10).type = Block::leaves;
-
-
-	//gameData.gameMap.getBlockUnsafe(5, 10).type = Block::woodLog;
-	//gameData.gameMap.getBlockUnsafe(5, 11).type = Block::woodLog;
-	//gameData.gameMap.getBlockUnsafe(5, 12).type = Block::woodLog;
-
-	//gameData.gameMap.getBlockUnsafe(4, 13).type = Block::grassBlock;
-	//gameData.gameMap.getBlockUnsafe(5, 13).type = Block::grassBlock;
-	//gameData.gameMap.getBlockUnsafe(6, 13).type = Block::grassBlock;
-
-	gameData.camera.target = { 30,80 };
+	gameData.camera.target = { 20, 120 };
 	gameData.camera.rotation = 0.f;
 	gameData.camera.zoom = 30.f;
+
+	gameData.player.teleport({ 20, 60 });
+	gameData.player.transform.w = 0.9f;
+	gameData.player.transform.h = 1.8f;
 
 	return true;
 }
@@ -97,12 +83,24 @@ bool updateGame()
 #pragma region camera movement
 
 	static float CAMERA_SPEED = 40.f;
-	if (IsKeyDown(KEY_LEFT)) gameData.camera.target.x -= CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_RIGHT)) gameData.camera.target.x += CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_UP)) gameData.camera.target.y -= CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_DOWN)) gameData.camera.target.y += CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) gameData.player.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) gameData.player.transform.pos.x += CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) gameData.player.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) gameData.player.transform.pos.y += CAMERA_SPEED * GetFrameTime();
 
 	if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
+
+#pragma endregion
+
+
+#pragma region entities
+
+	//gameData.player.applyGravity();
+	gameData.player.updateForces(deltaTime);
+	gameData.player.resolveConstrains(gameData.gameMap);
+	//gameData.player.checkCollisionOnce(gameData.gameMap, gameData.player.getPosition());
+	gameData.camera.target = gameData.player.getPosition();
+	gameData.player.updateFinal();
 
 #pragma endregion
 
@@ -114,6 +112,15 @@ bool updateGame()
 	if (gameData.creativeSelectedBlock >= Block::BLOCKS_COUNT) { gameData.creativeSelectedBlock = Block::BLOCKS_COUNT - 1; }
 
 #pragma region mouse input
+
+	//// calculate dist from player to mouse pos (NOTE: currently player is camera target)
+	//Vector2 dist = {
+	//gameData.camera.target.x - (blockX + 0.5),
+	//gameData.camera.target.y - (blockY + 0.5)
+	//};
+	//float magnitude = std::sqrt(((dist.x * dist.x) + (dist.y * dist.y)));
+
+	//printf("dist: %f, %f\nmagnitude: %f\n", dist.x, dist.y, magnitude);
 
 	// selection
 
@@ -145,7 +152,7 @@ bool updateGame()
 
 	if (!showImgui)
 	{
-		if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_MIDDLE))
+		if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_MIDDLE))
 		{
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 
@@ -163,8 +170,13 @@ bool updateGame()
 				*b = {};
 			}
 		}
-		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+		if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
 		{
+			//if (magnitude <= 5)
+			//{
+				//// place block only if its withing reach
+			//}
+
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 			if (b)
 			{
@@ -228,15 +240,6 @@ bool updateGame()
 
 	BeginMode2D(gameData.camera);
 
-	DrawTexturePro(
-		assetManager.player,
-		{ 0,0,(float)assetManager.player.width,(float)assetManager.player.height },
-		{ (float)gameData.camera.target.x, (float)gameData.camera.target.y, 1, 1 },
-		{},
-		0.f,
-		WHITE
-	);
-
 	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, gameData.camera);
 	Vector2 bottomRightView = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, gameData.camera);
 
@@ -261,7 +264,6 @@ bool updateGame()
 
 			int atlasX = 0;
 
-			//printf("%d %d %d %d\n", x, y, gameData.backgroundMap.w, gameData.backgroundMap.h);
 			auto& bb = gameData.backgroundMap.getBlockUnsafe(x, y);
 
 			if (bb.type != Block::air)
@@ -374,6 +376,27 @@ bool updateGame()
 		{ 255,255,255,127 }
 	);
 
+	Transform2D playerSprite = gameData.player.transform;
+	playerSprite.w = 1;
+	playerSprite.h = 2;
+
+	playerSprite.pos.y -= (playerSprite.h - gameData.player.transform.h) / 2;
+
+	DrawTexturePro(
+		assetManager.player,
+		{ 0,0,(float)assetManager.player.width,(float)assetManager.player.height },
+		playerSprite.getAABB(),
+		{ 0,0 },
+		0.f,
+		WHITE
+	);
+
+	DrawRectangleLinesEx(
+		gameData.player.transform.getAABB(),
+		0.1f,
+		{ 20,101,250,120 }
+	);
+
 	// show structure selection
 	// rectangle lines not working properly - debug
 	if (showImgui)
@@ -393,6 +416,43 @@ bool updateGame()
 			{ 20,101,250,145 }
 		);
 	}
+
+#pragma region test physics intersect
+
+	//Transform2D test;
+	//test.pos = { 20.5, 120.5 };
+	//test.w = 1;
+	//test.h = 1;
+
+	//Transform2D test2;
+	//test2.pos = worldPos;
+	//test2.w = 1;
+	//test2.h = 1;
+
+	//// point intersect test
+	//if (test.intersectPoint(worldPos))
+	//{
+	//	DrawRectangleLinesEx(test.getAABB(), 0.1, GREEN);
+	//}
+	//else
+	//{
+	//	DrawRectangleLinesEx(test.getAABB(), 0.1, BLUE);
+	//}
+
+	//// transform vs transform intersect test
+	//if (test.intersectTransform(test2))
+	//{
+	//	DrawRectangleLinesEx(test.getAABB(), 0.1, GREEN);
+	//	DrawRectangleLinesEx(test2.getAABB(), 0.1, GREEN);
+	//}
+	//else
+	//{
+	//	DrawRectangleLinesEx(test.getAABB(), 0.1, BLUE);
+	//	DrawRectangleLinesEx(test2.getAABB(), 0.1, BLUE);
+	//}
+
+#pragma endregion
+	
 
 	EndMode2D();
 
