@@ -205,6 +205,16 @@ struct PhysicalEntity
 		acceleration += {0, 20.f};
 	}
 
+	void jump(float force)
+	{
+		// dont use acceleration because it is affected by deltaTime
+		// directly change velocity because we want jump to happen in one frame
+		if (downTouch)
+		{
+			velocity.y = -force;
+		}
+	}
+
 	Vector2& getPosition()
 	{
 		return transform.pos;

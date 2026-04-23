@@ -19,6 +19,10 @@
 #include <saveMap.h>
 #include <physics.h>
 
+#include <entityHolder.h>
+#include <entities/slime.h>
+#include <entities/droppedItem.h>
+
 struct GameData
 {
 	GameMap backgroundMap = {}; 
@@ -33,7 +37,8 @@ struct GameData
 	Structure copyStructure;
 
 	PhysicalEntity player;
-
+	EntityHolder entityHolder;
+	
 	std::unordered_set<int> randomisedItems = {};
 
 	char saveName[100] = {};
@@ -43,6 +48,25 @@ struct GameData
 AssetManager assetManager;
 
 bool showImgui = false;
+
+void spawnSlime(Vector2 position)
+{
+	Slime slime;
+	slime.teleport(position);
+
+	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
+	gameData.entityHolder.entities[id] = std::make_unique<Slime>(slime);
+}
+
+void spawnDroppedItem(Vector2 positon, int type)
+{
+	DroppedItem droppedItem;
+	droppedItem.teleport(positon);
+	droppedItem.itemType = type;
+
+	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
+	gameData.entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+}
 
 bool initGame()
 {
@@ -60,11 +84,13 @@ bool initGame()
 
 	gameData.camera.target = { 20, 120 };
 	gameData.camera.rotation = 0.f;
-	gameData.camera.zoom = 30.f;
+	gameData.camera.zoom = 50.f;
 
 	gameData.player.teleport({ 20, 60 });
 	gameData.player.transform.w = 0.9f;
 	gameData.player.transform.h = 1.8f;
+
+	spawnSlime({ 18,60 });
 
 	return true;
 }
@@ -82,25 +108,43 @@ bool updateGame()
 
 #pragma region camera movement
 
-	static float CAMERA_SPEED = 40.f;
+	static float CAMERA_SPEED = 20.f;
 	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) gameData.player.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
 	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) gameData.player.transform.pos.x += CAMERA_SPEED * GetFrameTime();
 	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) gameData.player.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
 	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) gameData.player.transform.pos.y += CAMERA_SPEED * GetFrameTime();
 
 	if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
+	if (IsKeyPressed(KEY_SPACE)) gameData.player.jump(10);
 
 #pragma endregion
 
 
 #pragma region entities
 
-	//gameData.player.applyGravity();
+	gameData.player.applyGravity();
 	gameData.player.updateForces(deltaTime);
 	gameData.player.resolveConstrains(gameData.gameMap);
-	//gameData.player.checkCollisionOnce(gameData.gameMap, gameData.player.getPosition());
 	gameData.camera.target = gameData.player.getPosition();
 	gameData.player.updateFinal();
+
+	// update all entities
+	std::ranlux24_base rng(std::random_device{}());
+
+	EntityUpdateData entityUpdateData
+	{
+		gameData.player.getPosition(),
+		rng
+	};
+
+	for (auto& e : gameData.entityHolder.entities)
+	{
+		e.second->update(deltaTime, entityUpdateData);
+		e.second->physics.applyGravity();
+		e.second->physics.updateForces(deltaTime);
+		e.second->physics.resolveConstrains(gameData.gameMap);
+		e.second->physics.updateFinal();
+	}
 
 #pragma endregion
 
@@ -167,6 +211,10 @@ bool updateGame()
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 			if (b)
 			{
+				if (b->type)
+				{
+					spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
+				}
 				*b = {};
 			}
 		}
@@ -357,6 +405,10 @@ bool updateGame()
 		}
 	}
 
+#pragma endregion
+
+#pragma region draw frame and selected block
+
 	//draw selected block
 	DrawTexturePro(
 		assetManager.frame,
@@ -375,6 +427,19 @@ bool updateGame()
 		0.f,
 		{ 255,255,255,127 }
 	);
+
+#pragma endregion
+
+#pragma region draw slime
+
+	for (auto& e : gameData.entityHolder.entities)
+	{
+		e.second->render(assetManager);
+	}
+
+#pragma endregion
+
+#pragma region draw player
 
 	Transform2D playerSprite = gameData.player.transform;
 	playerSprite.w = 1;
@@ -397,8 +462,11 @@ bool updateGame()
 		{ 20,101,250,120 }
 	);
 
+#pragma endregion
+
+#pragma region show structure selection
+
 	// show structure selection
-	// rectangle lines not working properly - debug
 	if (showImgui)
 	{
 		Rectangle rect;
@@ -416,6 +484,8 @@ bool updateGame()
 			{ 20,101,250,145 }
 		);
 	}
+
+#pragma endregion
 
 #pragma region test physics intersect
 
@@ -453,10 +523,9 @@ bool updateGame()
 
 #pragma endregion
 	
-
 	EndMode2D();
 
-#pragma endregion
+#pragma region ImGui Madness
 
 	if (showImgui)
 	{
@@ -464,6 +533,11 @@ bool updateGame()
 
 		ImGui::SliderFloat("Camera Zoom: ", &gameData.camera.zoom, 10, 150);
 		ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 100);
+
+		if (ImGui::Button("Spawn slime"))
+		{
+			spawnSlime({ 18,60 });
+		}
 
 		if (ImGui::Button("Copy"))
 		{
@@ -536,12 +610,22 @@ bool updateGame()
 		ImGui::End();
 	}
 
+#pragma endregion
+
+#pragma region display fps
+
 	DrawFPS(10, 10);
+
+#pragma endregion
 
 	return true;
 }
+
+#pragma region close game logic
 
 void closeGame()
 {
 	std::cout << "\n\nCLOSED!!!!!!!!!\n\n";
 }
+
+#pragma endregion

@@ -1,0 +1,15 @@
+Challenge, make a texture pack loader
+I have a super cool challenge that's unrelated to the current topic. Make a texture pack loader feature into the game. And I made a texture pack for you to test this system!
+
+
+You can download them from this lesson's resources.
+
+So the idea is simple, you will have a textruePacks folder that will sit outside the resources folder, so in the same folder as the resources folder. Meaning RESOURCES_PATH "../" . We do this so that the texture packs are separate from the game files, so the player can edit them while we can easily update the game files separately. So then, inside this texturePacks folder, each folder inside will be a texture pack. In the future, once we do some UI stuff, you can make a nice selector in the game. For now, just hardcode an ImGui button to load/unload the only texture pack there is in that folder. Now, with the system that we have, loading a different texture pack while the game is running is super easy. First of all, unload all the textures with UnloadTexture (and then also reset the texture object, like t = {};). Then, load the textures, but using the texture pack path. The textures inside the texture pack have the same name. Next, load all the default textures, but only those that failed to load. Most texture packs will have only some textures changed, so for the others, we want to load the default textures. And that's it! Try not to repeat code: have a single loadAll method that will load the textures. And add a parameter to specify from what path to load them, and also make them only load files that are not already loaded.
+
+
+
+You can also add the option to combine multiple texture packs, and basically load them one after the other.
+
+
+
+Good Luck!
