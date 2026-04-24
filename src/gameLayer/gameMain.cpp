@@ -183,6 +183,15 @@ bool updateGame()
 
 		if (shouldKill)
 		{
+			Slime* s = dynamic_cast<Slime*>(it->second.get());
+
+			// check if entity is slime
+			if (s != nullptr)
+			{
+				auto b = gameData.gameMap.getBlockSafe(s->getPosition().x - 0.5f, s->getPosition().y - 0.5f);
+				b->type = Block::woodenChest;
+			}
+
 			// erase returns next valid iterator
 			it = gameData.entityHolder.entities.erase(it);
 		}
@@ -255,8 +264,22 @@ bool updateGame()
 			}
 		}
 
-		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 		{
+			for (auto& e : gameData.entityHolder.entities)
+			{
+				Slime* s = dynamic_cast<Slime*>(e.second.get());
+
+				// check if entity is slime
+				if (s != nullptr)
+				{
+					if (s->physics.transform.intersectPoint(worldPos))
+					{
+						s->hit(gameData.player.damage);
+					}
+				}
+			}
+
 			std::ranlux24_base rng;
 
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
@@ -392,7 +415,9 @@ bool updateGame()
 
 			if (b.type != Block::air)
 			{
+
 #pragma region draw tree
+
 				//Block* upperBlock = gameData.gameMap.getBlockSafe(x, y - 1);
 				//Block* belowBlock = gameData.gameMap.getBlockSafe(x, y + 1);
 

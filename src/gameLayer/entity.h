@@ -26,6 +26,7 @@ struct Entity
 {
 	PhysicalEntity physics;
 	float life = 1;
+	float isRedTimer = 0.f;
 
 	Vector2& getPosition()
 	{
@@ -44,4 +45,10 @@ struct Entity
 	virtual int getEntityType() = 0;
 
 	virtual float getMaxLife() = 0;
+
+	void hit(float damage)
+	{
+		isRedTimer = 0.5f;
+		life -= damage;
+	}
 };
