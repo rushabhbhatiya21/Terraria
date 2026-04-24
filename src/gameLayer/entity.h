@@ -9,7 +9,8 @@ enum EntityType
 {
 	EnityType_Player = 0,
 	EntityType_Slime,
-	EntityType_DroppedItem
+	EntityType_DroppedItem,
+	EntityType_Player
 };
 
 struct EntityUpdateData
