@@ -1,14 +1,21 @@
 Challenge Make this world generator your own!
-Now it's time for you to continue working on this world generator for as long as you like! You could literally spend one month on it, adding features and trying things out. If you do that, the result will probably be at least 90% as cool as the Terraria world generator. Not to say that you have to spend that much, just spend as much as you like on it.
+Now it's time for you to continue working on this world generator for as long as you like! You could literally spend one month on it,
+adding features and trying things out. If you do that, the result will probably be at least 90% as cool as the Terraria world generator. 
+Not to say that you have to spend that much, just spend as much as you like on it.
 
-One more thing to mention, in Terraria, the player is 3 blocks tall and 2 wide (roughly), in this game, it is 2 blocks tall and 1 wide. If you want, you can make the game like in Terraria with a bigger player. This will influience how you tune your world generator!
+One more thing to mention, in Terraria, the player is 3 blocks tall and 2 wide (roughly), in this game, it is 2 blocks tall and 1 wide. 
+If you want, you can make the game like in Terraria with a bigger player. This will influience how you tune your world generator!
 
 
-Now, here are some things to do. First, refactor the world generation a little so it is done in separate steps, so that you can call them with functions / lambdas / methods. So you would have, for example, a lambda that generates a mountain shape that you can call, or you can have one that places a biome somewhere. And so on. Then you can easily implement the final world generator code with them.
+Now, here are some things to do. First, refactor the world generation a little so it is done in separate steps,
+so that you can call them with functions / lambdas / methods. So you would have, for example, a lambda that generates a mountain shape that you can call, 
+or you can have one that places a biome somewhere. And so on. Then you can easily implement the final world generator code with them.
 
 
 
-I will give you some ideas for you to implement in just a seccond but first, if you are ever out of ideas, the easiest way to improve the world gen is to look at it and see one thing that looks bad or is missing and add it! For example, there is no block variation in the world; maybe add some random stone/clay /dirt block patches in the stone/dirt. And sometimes the dirt is too flat, maybe add small hills there or something?
+I will give you some ideas for you to implement in just a seccond but first, if you are ever out of ideas, the easiest way to improve the world gen is to look at it
+and see one thing that looks bad or is missing and add it! For example, there is no block variation in the world; 
+maybe add some random stone/clay /dirt block patches in the stone/dirt. And sometimes the dirt is too flat, maybe add small hills there or something?
 
 These 3 videos should give you some cool ideas:
 
@@ -20,16 +27,12 @@ https://www.youtube.com/watch?v=ob3VwY4JyzE
 
 
 
-Next, you can also try some more procedural structures. The easiest option is to make some random tree variations. Like how tall the tree gets should be random, and also the shape of the leaves. Or you can go all in, making random houses and dungeons, by premaking a few square rooms, and then you just pick a starting point to place a room, and place some other random rooms to the sides. You can have entrance rooms and side rooms and stuff like that.
-
-
-
-
-
+Next, you can also try some more procedural structures. The easiest option is to make some random tree variations. 
+Like how tall the tree gets should be random, and also the shape of the leaves. Or you can go all in, making random houses and dungeons, 
+by premaking a few square rooms, and then you just pick a starting point to place a room, and place some other random rooms to the sides. 
+You can have entrance rooms and side rooms and stuff like that.
 
 And now here are some other ideas:
-
-
 
 More types of caves
 
