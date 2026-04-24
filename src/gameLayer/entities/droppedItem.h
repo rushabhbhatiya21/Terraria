@@ -23,4 +23,6 @@ struct DroppedItem : public Entity
 	int getEntityType() { return EntityType_DroppedItem; }
 
 	float getMaxLife() { return 1; }
+
+	int getMaxStackSize(int type);
 };

@@ -24,6 +24,9 @@
 #include <entities/droppedItem.h>
 #include <player.h>
 
+
+#pragma region global variables
+
 struct GameData
 {
 	GameMap backgroundMap = {}; 
@@ -40,7 +43,7 @@ struct GameData
 	Player player;
 	EntityHolder entityHolder;
 	
-	std::unordered_set<int> randomisedItems = {};
+	//std::unordered_set<int> randomisedItems = {};
 
 	char saveName[100] = {};
 
@@ -49,6 +52,11 @@ struct GameData
 AssetManager assetManager;
 
 bool showImgui = false;
+
+#pragma endregion
+
+
+#pragma region helper imgui functions
 
 void spawnSlime(Vector2 position)
 {
@@ -69,9 +77,12 @@ void spawnDroppedItem(Vector2 positon, int type)
 	gameData.entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
 }
 
+#pragma endregion
+
+
 bool initGame()
 {
-	gameData.randomisedItems = generateRandomItemArray(100);
+	//gameData.randomisedItems = generateRandomItemArray(100);
 	//for (auto& i : gameData.randomisedItems)
 	//{
 	//	printf("%d\n", i);
@@ -98,16 +109,32 @@ bool initGame()
 
 bool updateGame()
 {
+
+#pragma region delta time
+
 	float deltaTime = GetFrameTime();
 	if (deltaTime > 1.f / 5.f) deltaTime = 1 / 5.f;
 
-	gameData.camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
+#pragma endregion
+
+
+#pragma region clear background
 
 	ClearBackground({ 75,75,150,255 });
 
+#pragma endregion
+
+
+#pragma region f10
+
 	if (IsKeyPressed(KEY_F10)) { showImgui = !showImgui; }
 
+#pragma endregion
+
+
 #pragma region camera movement
+
+	gameData.camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
 
 	static float CAMERA_SPEED = 20.f;
 	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) gameData.player.physics.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
@@ -230,12 +257,16 @@ bool updateGame()
 
 		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 		{
+			std::ranlux24_base rng;
+
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 			if (b)
 			{
 				if (b->type)
 				{
-					spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
+					float xOffset = getRandomFloat(rng, -1, 1);
+					float yOffset = getRandomFloat(rng, -1, 1);
+					spawnDroppedItem({ (float)blockX + xOffset, (float)blockY + yOffset }, b->type);
 				}
 				*b = {};
 			}
