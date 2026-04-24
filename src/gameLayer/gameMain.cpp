@@ -22,6 +22,7 @@
 #include <entityHolder.h>
 #include <entities/slime.h>
 #include <entities/droppedItem.h>
+#include <player.h>
 
 struct GameData
 {
@@ -36,7 +37,7 @@ struct GameData
 
 	Structure copyStructure;
 
-	PhysicalEntity player;
+	Player player;
 	EntityHolder entityHolder;
 	
 	std::unordered_set<int> randomisedItems = {};
@@ -87,8 +88,8 @@ bool initGame()
 	gameData.camera.zoom = 50.f;
 
 	gameData.player.teleport({ 20, 60 });
-	gameData.player.transform.w = 0.9f;
-	gameData.player.transform.h = 1.8f;
+	gameData.player.physics.transform.w = 0.9f;
+	gameData.player.physics.transform.h = 1.8f;
 
 	spawnSlime({ 18,60 });
 
@@ -109,44 +110,67 @@ bool updateGame()
 #pragma region camera movement
 
 	static float CAMERA_SPEED = 20.f;
-	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) gameData.player.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) gameData.player.transform.pos.x += CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) gameData.player.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) gameData.player.transform.pos.y += CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) gameData.player.physics.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) gameData.player.physics.transform.pos.x += CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) gameData.player.physics.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
+	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) gameData.player.physics.transform.pos.y += CAMERA_SPEED * GetFrameTime();
 
 	if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
-	if (IsKeyPressed(KEY_SPACE)) gameData.player.jump(10);
+	if (IsKeyPressed(KEY_SPACE)) gameData.player.physics.jump(10);
 
 #pragma endregion
 
 
 #pragma region entities
 
-	gameData.player.applyGravity();
-	gameData.player.updateForces(deltaTime);
-	gameData.player.resolveConstrains(gameData.gameMap);
-	gameData.camera.target = gameData.player.getPosition();
-	gameData.player.updateFinal();
+	auto updateEntityPhysics = [&](auto& entity, bool applyGravity = true)
+		{
+			if (applyGravity) { entity.physics.applyGravity(); }
+			entity.physics.updateForces(deltaTime);
+			entity.physics.resolveConstrains(gameData.gameMap);
+			entity.physics.updateFinal();
+		};
 
-	// update all entities
+	updateEntityPhysics(gameData.player);
+	gameData.camera.target = gameData.player.getPosition();
+
 	std::ranlux24_base rng(std::random_device{}());
 
-	EntityUpdateData entityUpdateData
+	// update all entities
+	for (auto it = gameData.entityHolder.entities.begin(); it != gameData.entityHolder.entities.end();)
 	{
-		gameData.player.getPosition(),
-		rng
-	};
+		EntityUpdateData entityUpdateData
+		{
+			gameData.player.getPosition(),
+			rng,
+			gameData.entityHolder,
+			it->first
+		};
 
-	for (auto& e : gameData.entityHolder.entities)
-	{
-		e.second->update(deltaTime, entityUpdateData);
-		e.second->physics.applyGravity();
-		e.second->physics.updateForces(deltaTime);
-		e.second->physics.resolveConstrains(gameData.gameMap);
-		e.second->physics.updateFinal();
+		bool shouldKill = false;
+
+		if (!it->second->update(deltaTime, entityUpdateData) || it->second->life <= 0)
+		{
+			shouldKill = true;
+		}
+
+		if (shouldKill)
+		{
+			// erase returns next valid iterator
+			it = gameData.entityHolder.entities.erase(it);
+		}
+		else
+		{
+			// physics
+			updateEntityPhysics(*it->second);
+			++it;
+		}
 	}
 
 #pragma endregion
+
+
+#pragma region mouse input
 
 	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
 	int blockX = (int)floor(worldPos.x);
@@ -154,8 +178,6 @@ bool updateGame()
 
 	if (gameData.creativeSelectedBlock < 0) { gameData.creativeSelectedBlock = 0; }
 	if (gameData.creativeSelectedBlock >= Block::BLOCKS_COUNT) { gameData.creativeSelectedBlock = Block::BLOCKS_COUNT - 1; }
-
-#pragma region mouse input
 
 	//// calculate dist from player to mouse pos (NOTE: currently player is camera target)
 	//Vector2 dist = {
@@ -284,6 +306,7 @@ bool updateGame()
 
 #pragma endregion
 
+
 #pragma region draw world
 
 	BeginMode2D(gameData.camera);
@@ -407,6 +430,7 @@ bool updateGame()
 
 #pragma endregion
 
+
 #pragma region draw frame and selected block
 
 	//draw selected block
@@ -430,6 +454,7 @@ bool updateGame()
 
 #pragma endregion
 
+
 #pragma region draw slime
 
 	for (auto& e : gameData.entityHolder.entities)
@@ -439,30 +464,19 @@ bool updateGame()
 
 #pragma endregion
 
+
 #pragma region draw player
 
-	Transform2D playerSprite = gameData.player.transform;
+	Transform2D playerSprite = gameData.player.physics.transform;
 	playerSprite.w = 1;
 	playerSprite.h = 2;
 
-	playerSprite.pos.y -= (playerSprite.h - gameData.player.transform.h) / 2;
+	playerSprite.pos.y -= (playerSprite.h - gameData.player.physics.transform.h) / 2;
 
-	DrawTexturePro(
-		assetManager.player,
-		{ 0,0,(float)assetManager.player.width,(float)assetManager.player.height },
-		playerSprite.getAABB(),
-		{ 0,0 },
-		0.f,
-		WHITE
-	);
-
-	DrawRectangleLinesEx(
-		gameData.player.transform.getAABB(),
-		0.1f,
-		{ 20,101,250,120 }
-	);
+	gameData.player.render(assetManager);
 
 #pragma endregion
+
 
 #pragma region show structure selection
 
@@ -486,6 +500,7 @@ bool updateGame()
 	}
 
 #pragma endregion
+
 
 #pragma region test physics intersect
 
@@ -523,7 +538,9 @@ bool updateGame()
 
 #pragma endregion
 	
+
 	EndMode2D();
+
 
 #pragma region ImGui Madness
 
@@ -537,6 +554,18 @@ bool updateGame()
 		if (ImGui::Button("Spawn slime"))
 		{
 			spawnSlime({ 18,60 });
+		}
+
+		if (ImGui::Button("Hurt a slime"))
+		{
+			for (auto& e : gameData.entityHolder.entities)
+			{
+				if (e.second->getEntityType() == EntityType::EntityType_Slime)
+				{
+					e.second->life -= 3;
+					break;
+				}
+			}
 		}
 
 		if (ImGui::Button("Copy"))
@@ -611,6 +640,7 @@ bool updateGame()
 	}
 
 #pragma endregion
+
 
 #pragma region display fps
 

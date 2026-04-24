@@ -1,0 +1,16 @@
+Now that we have enemies, you should write some code to spawn/despawn enemies in-game.
+Here is how it should work. Enemies that are far away from the player should despawn after a short time.
+Also, if any entity leaves the world boundaries (even though this should not be possible), you should despawn it.
+
+Now, spawning random enemies is not as easy as it might seem, but it is not hard either. 
+First of all, you should have a max enemy counter, and if there are more enemies than this max counter, 
+you should not naturally spawn more random enemies anymore. (Note that not all entities are enemies). 
+Now, if you can spawn enemies, from time to time, try to search for a place that is at least some number of blocks 
+far from the player to spawn an enemy. Try to look if you can place an enemy in a place from where it can reach the player. 
+For example, if you start from the player and go either left or right, climbing blocks if you find any, 
+you may get a good spawn point. You should also use a ton of randomness. If the process of searching the map 
+for a place to spawn enemies gets too expensive (it probably won't), you can optimize it by spawning only one enemy per frame,
+or only searching a portion of the map to spawn it. For example, based on a random number,
+you can try to spawn an enemy either to the left of the player or to the right of the player. 
+If you can't find a good place to spawn it, try next frame again. And because the process is random, 
+you may get luckier the second time!

@@ -1,0 +1,9 @@
+Let's write some code logic for hitting enemies. You can make it so that if the player clicks on an enemy, he will hit it. Now, if an enemy is hit, 
+make it turn red for like half a second. You can probably implement this small system in the base class 
+since most entities will be able to be hit, and add a hit method or something that will set a isRedTimer or 
+something like that.
+
+
+
+Also, make the slimes drop some loot when they die. In the next video, we will add items, including slime, but for now, 
+you can just make them drop a block as a placeholder.
