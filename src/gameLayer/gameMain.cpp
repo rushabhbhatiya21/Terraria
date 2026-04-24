@@ -149,7 +149,7 @@ bool updateGame()
 
 		bool shouldKill = false;
 
-		if (!it->second->update(deltaTime, entityUpdateData))
+		if (!it->second->update(deltaTime, entityUpdateData) || it->second->life <= 0)
 		{
 			shouldKill = true;
 		}
@@ -554,6 +554,18 @@ bool updateGame()
 		if (ImGui::Button("Spawn slime"))
 		{
 			spawnSlime({ 18,60 });
+		}
+
+		if (ImGui::Button("Hurt a slime"))
+		{
+			for (auto& e : gameData.entityHolder.entities)
+			{
+				if (e.second->getEntityType() == EntityType::EntityType_Slime)
+				{
+					e.second->life -= 3;
+					break;
+				}
+			}
 		}
 
 		if (ImGui::Button("Copy"))
