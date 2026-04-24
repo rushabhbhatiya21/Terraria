@@ -1,0 +1,9 @@
+I have a super simple challenge: when you spawn a dropped item, add a random offset to it so they don't all spawn in the center of the block.
+
+
+
+Next, implement a maxStackSize. This represents how many items of the same type can be stacked into a single item. You should have it as a function that takes in the itemType and returns the max stack size. For example, all blocks can have a maxStackSize of 64, or maybe 999. And then, tools and weapons will have a maxStackSize of 1.
+
+
+
+Then, use it in the DroppedItemEntity. Make sure that when a DroppedItemEntity donates items to another, the new items count won't exceed the maxStackSize. Also, now that we have this limit, it's possible that item A and item B will continuously swap items without either of them getting to 0 items. To avoid that, make sure you donate items only from the DroppedItemEntity that has fewer or equal items than the other entity.

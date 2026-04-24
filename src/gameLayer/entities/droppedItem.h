@@ -18,7 +18,7 @@ struct DroppedItem : public Entity
 
 	void render(AssetManager& assetManager) override;
 
-	void update(float deltaTime, EntityUpdateData entityUpdateData) override;
+	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
 
 	int getEntityType() { return EntityType_DroppedItem; }
 };

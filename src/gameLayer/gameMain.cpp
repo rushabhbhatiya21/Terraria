@@ -128,22 +128,41 @@ bool updateGame()
 	gameData.camera.target = gameData.player.getPosition();
 	gameData.player.updateFinal();
 
-	// update all entities
 	std::ranlux24_base rng(std::random_device{}());
 
-	EntityUpdateData entityUpdateData
+	// update all entities
+	for (auto it = gameData.entityHolder.entities.begin(); it != gameData.entityHolder.entities.end();)
 	{
-		gameData.player.getPosition(),
-		rng
-	};
+		EntityUpdateData entityUpdateData
+		{
+			gameData.player.getPosition(),
+			rng,
+			gameData.entityHolder,
+			it->first
+		};
 
-	for (auto& e : gameData.entityHolder.entities)
-	{
-		e.second->update(deltaTime, entityUpdateData);
-		e.second->physics.applyGravity();
-		e.second->physics.updateForces(deltaTime);
-		e.second->physics.resolveConstrains(gameData.gameMap);
-		e.second->physics.updateFinal();
+		bool shouldKill = false;
+
+		if (!it->second->update(deltaTime, entityUpdateData))
+		{
+			shouldKill = true;
+		}
+
+		if (shouldKill)
+		{
+			// erase returns next valid iterator
+			it = gameData.entityHolder.entities.erase(it);
+		}
+		else
+		{
+			// physics
+			it->second->physics.applyGravity();
+			it->second->physics.updateForces(deltaTime);
+			it->second->physics.resolveConstrains(gameData.gameMap);
+			it->second->physics.updateFinal();
+
+			++it;
+		}
 	}
 
 #pragma endregion
