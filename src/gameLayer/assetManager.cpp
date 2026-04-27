@@ -1,8 +1,14 @@
 #pragma once
 #include <assetManager.h>
+#include <filesystem>
 
 void AssetManager::loadAll()
 {
+	//for (auto& t : allTextures)
+	//{
+	//	t.second = LoadTexture((RESOURCES_PATH + t.first).c_str());
+	//}
+
 	dirt = LoadTexture(RESOURCES_PATH "dirt.png");
 	textures = LoadTexture(RESOURCES_PATH "texturesWithBackgroundVersion.png");
 	treeTextures = LoadTexture(RESOURCES_PATH "treetextures.png");

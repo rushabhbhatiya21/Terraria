@@ -6,6 +6,9 @@
 void Slime::render(AssetManager& assetManager)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
+	Color color = WHITE;
+
+	if (isRedTimer > 0) { color = { 255,0,0,255 }; }
 
 	float facingValue = isFacingRight ? 32 : -32;
 
@@ -15,12 +18,17 @@ void Slime::render(AssetManager& assetManager)
 		aabb, // dest
 		{0, 0}, // origin top-left corner
 		0.f, // rotation
-		WHITE // tint
+		color // tint
 	);
 }
 
 bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
+	if (isRedTimer > 0)
+	{
+		isRedTimer -= deltaTime;
+	}
+
 	changeStateTimer -= deltaTime;
 
 	if (changeStateTimer < 0)

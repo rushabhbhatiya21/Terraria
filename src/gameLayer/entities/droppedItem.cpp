@@ -1,7 +1,9 @@
 #include "droppedItem.h"
+#include <asserts.h>
 #include <helper.h>
 #include <assetManager.h>
 #include <entityHolder.h>
+#include <blocks.h>
 
 void DroppedItem::render(AssetManager& assetManager)
 {
@@ -31,8 +33,26 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData entityUpdateData)
 				{
 					if (Vector2Distance(getPosition(), other->getPosition()) < 0.7f)
 					{
-						other->itemCounter += itemCounter;
-						return false;
+						int otherMaxStackSize = getMaxStackSize(other->itemType);
+
+						if (other->itemCounter >= itemCounter)
+						{
+							if (other->itemCounter + itemCounter <= otherMaxStackSize)
+							{
+								other->itemCounter += itemCounter;
+								return false;
+							}
+							else if (otherMaxStackSize - other->itemCounter == 0)
+							{
+								return true;
+							}
+							else
+							{
+								int partialAdd = otherMaxStackSize - other->itemCounter;
+								other->itemCounter += partialAdd;
+								itemCounter -= partialAdd;
+							}
+						}
 					}
 
 				}
@@ -41,4 +61,11 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData entityUpdateData)
 	}
 
 	return true;
+}
+
+int DroppedItem::getMaxStackSize(int type)
+{
+	if (type <= 0) { permaAssertDevelopement("item type should not be less or equal to 0 to get max stack size!"); return -1; }
+	if (type < Block::BLOCKS_COUNT) { return 64; }
+	return 1;
 }

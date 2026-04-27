@@ -11,6 +11,8 @@ struct Player : public Entity
 		life = getMaxLife();
 	}
 
+	float damage = 3.f;
+
 	Vector2& getPosition()
 	{
 		return physics.getPosition();

@@ -15,8 +15,21 @@ int main()
 	SetTraceLogLevel(LOG_NONE); //no log output to the console by raylib
 #endif
 
-	SetConfigFlags(FLAG_WINDOW_RESIZABLE);
-	InitWindow(800, 600, "First Window");
+	bool isProdTest = false;
+
+	int flagScreenMode = FLAG_WINDOW_RESIZABLE;
+	int w = 1024, h = 720;
+
+	if (isProdTest) 
+	{
+		w = 0, h = 0;
+		flagScreenMode = FLAG_FULLSCREEN_MODE; 
+	}
+
+	SetConfigFlags(flagScreenMode);
+	InitWindow(w, h, "Terraria");
+	//MaximizeWindow();
+	//MaximizeWindow();
 	//SetExitKey(KEY_NULL);
 	SetTargetFPS(240);
 
