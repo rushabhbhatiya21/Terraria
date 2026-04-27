@@ -12,6 +12,9 @@ void Zombie::render(AssetManager& assetManager)
 	zombieSprite.pos.y -= (zombieSprite.h - physics.transform.h) / 2;
 
 	auto aabb = getRectangleForEntity(zombieSprite, 1, 2);
+	Color color = WHITE;
+
+	if (isRedTimer > 0) { color = { 255,0,0,255 }; }
 
 	float facingValue = isFacingRight ? 32 : -32;
 
@@ -21,7 +24,7 @@ void Zombie::render(AssetManager& assetManager)
 		aabb, // dest
 		{ 0, 0 }, // origin top-left corner
 		0.f, // rotation
-		WHITE // tint
+		color // tint
 	);
 
 	//DrawTextureRec(
@@ -35,6 +38,11 @@ void Zombie::render(AssetManager& assetManager)
 
 bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
+	if (isRedTimer > 0)
+	{
+		isRedTimer -= deltaTime;
+	}
+
 	if (abs(entityUpdateData.playerPosition.x - getPosition().x) >= 1.f)
 	{
 		moveSpeed = 1.f;

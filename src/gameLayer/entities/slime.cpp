@@ -16,7 +16,7 @@ void Slime::render(AssetManager& assetManager)
 		assetManager.slime,
 		getTextureAtlas(animation.positionX, animation.positionY, facingValue, 32),
 		aabb, // dest
-		{0, 0}, // origin top-left corner
+		{ 0, 0 }, // origin top-left corner
 		0.f, // rotation
 		color // tint
 	);

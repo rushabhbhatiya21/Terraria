@@ -202,19 +202,6 @@ bool updateGame()
 	{
 		if (it->second->getEntityType() == EntityType::EntityType_Zombie)
 		{
-		//	shouldApplyGravity = false;
-		//	float groundY = it->second->getPosition().y; // fallback
-
-		//	for (int y = (int)it->second->getPosition().y; y < gameData.gameMap.h; y++)
-		//	{
-		//		auto b = gameData.gameMap.getBlockSafe(it->second->getPosition().x, y);
-		//		if (b && b->type != Block::air && b->type != Block::leaves && b->type != Block::woodLog)
-		//		{
-		//			groundDistance = groundY = (float)y;
-		//			break;
-		//		}
-		//	}
-
 			Vector2 zTotPlayerDirection = gameData.player.getPosition() - it->second->getPosition();
 
 			int nextX = int(it->second->getPosition().x) + 1;
@@ -292,8 +279,6 @@ bool updateGame()
 	//};
 	//float magnitude = std::sqrt(((dist.x * dist.x) + (dist.y * dist.y)));
 
-	//printf("dist: %f, %f\nmagnitude: %f\n", dist.x, dist.y, magnitude);
-
 	// selection
 
 	if (showImgui)
@@ -338,16 +323,18 @@ bool updateGame()
 		{
 			for (auto& e : gameData.entityHolder.entities)
 			{
-				Slime* s = dynamic_cast<Slime*>(e.second.get());
+				e.second->hit(gameData.player.damage);
 
-				// check if entity is slime
-				if (s != nullptr)
-				{
-					if (s->physics.transform.intersectPoint(worldPos))
-					{
-						s->hit(gameData.player.damage);
-					}
-				}
+				//Slime* s = dynamic_cast<Slime*>(e.second.get());
+
+				//// check if entity is slime
+				//if (s != nullptr)
+				//{
+				//	if (s->physics.transform.intersectPoint(worldPos))
+				//	{
+				//		s->hit(gameData.player.damage);
+				//	}
+				//}
 			}
 
 			std::ranlux24_base rng;
