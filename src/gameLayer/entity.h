@@ -7,10 +7,13 @@ struct EntityHolder;
 
 enum EntityType
 {
-	EnityType_Player = 0,
-	EntityType_Slime,
+	EntityType_Player = 0,
 	EntityType_DroppedItem,
-	EntityType_Player
+	EntityType_Slime,
+	EntityType_DesertSlime,
+	EntityType_EvilEye,
+	EntityType_Zombie,
+
 };
 
 struct EntityUpdateData
@@ -20,12 +23,16 @@ struct EntityUpdateData
 	EntityHolder& entityHolder;
 
 	std::uint64_t ownId = 0;
+	float groundDistance = 0;
+	bool shouldStepUp = false; // add this
+
 };
 
 struct Entity
 {
 	PhysicalEntity physics;
 	float life = 1;
+	bool isFacingRight = true;
 
 	Vector2& getPosition()
 	{

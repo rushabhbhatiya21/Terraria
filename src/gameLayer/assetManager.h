@@ -10,6 +10,9 @@ struct AssetManager
 	Texture2D frame = {};
 	Texture2D player = {};
 	Texture2D slime = {};
+	Texture2D desertSlime = {};
+	Texture2D evilEye = {};
+	Texture2D zombie = {};
 
 	void loadAll();
 };

@@ -18,11 +18,14 @@
 #include <structure.h>
 #include <saveMap.h>
 #include <physics.h>
-
 #include <entityHolder.h>
-#include <entities/slime.h>
-#include <entities/droppedItem.h>
+
 #include <player.h>
+#include <entities/droppedItem.h>
+#include <entities/slime.h>
+#include <entities/desetSlime.h>
+#include <entities/evilEye.h>
+#include <entities/zombie.h>
 
 struct GameData
 {
@@ -59,6 +62,33 @@ void spawnSlime(Vector2 position)
 	gameData.entityHolder.entities[id] = std::make_unique<Slime>(slime);
 }
 
+void spawnDesertSlime(Vector2 position)
+{
+	DesertSlime desertSlime;
+	desertSlime.teleport(position);
+
+	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
+	gameData.entityHolder.entities[id] = std::make_unique<DesertSlime>(desertSlime);
+}
+
+void spawnEvilEye(Vector2 position)
+{
+	EvilEye evilEye;
+	evilEye.teleport(position);
+
+	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
+	gameData.entityHolder.entities[id] = std::make_unique<EvilEye>(evilEye);
+}
+
+void spawnZombie(Vector2 position)
+{
+	Zombie zombie;
+	zombie.teleport(position);
+
+	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
+	gameData.entityHolder.entities[id] = std::make_unique<Zombie>(zombie);
+}
+
 void spawnDroppedItem(Vector2 positon, int type)
 {
 	DroppedItem droppedItem;
@@ -91,7 +121,7 @@ bool initGame()
 	gameData.player.physics.transform.w = 0.9f;
 	gameData.player.physics.transform.h = 1.8f;
 
-	spawnSlime({ 18,60 });
+	spawnZombie({ 18,60 });
 
 	return true;
 }
@@ -131,20 +161,59 @@ bool updateGame()
 			entity.physics.updateFinal();
 		};
 
-	updateEntityPhysics(gameData.player);
+	updateEntityPhysics(gameData.player, false);
 	gameData.camera.target = gameData.player.getPosition();
 
 	std::ranlux24_base rng(std::random_device{}());
+	bool shouldApplyGravity = true;
+	float groundDistance = 0;
+	bool shouldStepUp = false;
 
 	// update all entities
 	for (auto it = gameData.entityHolder.entities.begin(); it != gameData.entityHolder.entities.end();)
 	{
+		if (it->second->getEntityType() == EntityType::EntityType_Zombie)
+		{
+		//	shouldApplyGravity = false;
+		//	float groundY = it->second->getPosition().y; // fallback
+
+		//	for (int y = (int)it->second->getPosition().y; y < gameData.gameMap.h; y++)
+		//	{
+		//		auto b = gameData.gameMap.getBlockSafe(it->second->getPosition().x, y);
+		//		if (b && b->type != Block::air && b->type != Block::leaves && b->type != Block::woodLog)
+		//		{
+		//			groundDistance = groundY = (float)y;
+		//			break;
+		//		}
+		//	}
+
+			Vector2 zTotPlayerDirection = gameData.player.getPosition() - it->second->getPosition();
+
+			int nextX = int(it->second->getPosition().x) + 1;
+			int prevX = int(it->second->getPosition().x) - 1;
+
+			auto bNext = gameData.gameMap.getBlockSafe(nextX, it->second->getPosition().y);
+			auto bPrev = gameData.gameMap.getBlockSafe(prevX, it->second->getPosition().y);
+
+			if (bNext && zTotPlayerDirection.x >= 0 && bNext->type != Block::air && bNext->type != Block::leaves && bNext->type != Block::woodLog)
+			{
+				shouldStepUp = true;
+			}
+
+			if (bPrev && zTotPlayerDirection.x < 0 && bPrev->type != Block::air && bPrev->type != Block::leaves && bPrev->type != Block::woodLog)
+			{
+				shouldStepUp = true;
+			}
+		}
+
 		EntityUpdateData entityUpdateData
 		{
 			gameData.player.getPosition(),
 			rng,
 			gameData.entityHolder,
-			it->first
+			it->first,
+			groundDistance,
+			shouldStepUp
 		};
 
 		bool shouldKill = false;
@@ -162,7 +231,7 @@ bool updateGame()
 		else
 		{
 			// physics
-			updateEntityPhysics(*it->second);
+			updateEntityPhysics(*it->second, shouldApplyGravity);
 			++it;
 		}
 	}
@@ -455,7 +524,7 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region draw slime
+#pragma region draw entities
 
 	for (auto& e : gameData.entityHolder.entities)
 	{
@@ -466,12 +535,6 @@ bool updateGame()
 
 
 #pragma region draw player
-
-	Transform2D playerSprite = gameData.player.physics.transform;
-	playerSprite.w = 1;
-	playerSprite.h = 2;
-
-	playerSprite.pos.y -= (playerSprite.h - gameData.player.physics.transform.h) / 2;
 
 	gameData.player.render(assetManager);
 

@@ -1,25 +1,26 @@
 #pragma once
-#include "slime.h"
+#include "desetSlime.h"
 #include <assetManager.h>
 #include <helper.h>
+#include <randomStuff.h>
 
-void Slime::render(AssetManager& assetManager)
+void DesertSlime::render(AssetManager& assetManager)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
 
 	float facingValue = isFacingRight ? 32 : -32;
 
 	DrawTexturePro(
-		assetManager.slime,
+		assetManager.desertSlime,
 		getTextureAtlas(animation.positionX, animation.positionY, facingValue, 32),
-		aabb, // dest
-		{0, 0}, // origin top-left corner
-		0.f, // rotation
-		WHITE // tint
+		aabb,
+		{ 0,0 },
+		0.f,
+		WHITE
 	);
 }
 
-bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
+bool DesertSlime::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
 	changeStateTimer -= deltaTime;
 
@@ -60,34 +61,34 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 
 	switch (currentState)
 	{
-		case STATE_WONDERING:
-			if (jumpTimer < 0)
+	case STATE_WONDERING:
+		if (jumpTimer < 0)
+		{
+			jumpTimer = getRandomFloat(entityUpdateData.rng, 3, 12);
+			physics.jump(10);
+			moveSpeed = getRandomFloat(entityUpdateData.rng, -7, 7);
+		}
+		break;
+
+	case STATE_CHASING:
+		if (jumpTimer < 0)
+		{
+			jumpTimer = getRandomFloat(entityUpdateData.rng, 2, 7);
+			physics.jump(10);
+
+			if (entityUpdateData.playerPosition.x > getPosition().x)
 			{
-				jumpTimer = getRandomFloat(entityUpdateData.rng, 3, 12);
-				physics.jump(10);
-				moveSpeed = getRandomFloat(entityUpdateData.rng, -7, 7);
+				moveSpeed = getRandomFloat(entityUpdateData.rng, 1, 7);
 			}
-			break;
-
-		case STATE_CHASING:
-			if (jumpTimer < 0)
+			else
 			{
-				jumpTimer = getRandomFloat(entityUpdateData.rng, 2, 7);
-				physics.jump(10);
-
-				if (entityUpdateData.playerPosition.x > getPosition().x)
-				{
-					moveSpeed = getRandomFloat(entityUpdateData.rng, 1, 7);
-				}
-				else
-				{
-					moveSpeed = -getRandomFloat(entityUpdateData.rng, 1, 7);
-				}
+				moveSpeed = -getRandomFloat(entityUpdateData.rng, 1, 7);
 			}
-			break;
+		}
+		break;
 
-		default:
-			break;
+	default:
+		break;
 	}
 
 	if (moveSpeed)
@@ -98,5 +99,4 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 	animation.update(deltaTime, 0.08f, 7);
 
 	return true;
-
 }

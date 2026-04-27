@@ -5,11 +5,19 @@
 
 void Player::render(AssetManager& assetManager)
 {
-	auto aabb = physics.transform.getAABB();
+	Transform2D playerSprite = physics.transform;
+	playerSprite.w = 1;
+	playerSprite.h = 2;
+
+	playerSprite.pos.y -= (playerSprite.h - physics.transform.h) / 2;
+
+	auto aabb = playerSprite.getAABB();
+
+	float facingDirValue = (float)assetManager.player.width * (isFacingRight ? 1 : -1);
 
 	DrawTexturePro(
 		assetManager.player,
-		{ 0,0,(float)assetManager.player.width,(float)assetManager.player.height },
+		{ 0,0,facingDirValue,(float)assetManager.player.height },
 		aabb,
 		{ 0,0 },
 		0.f,
