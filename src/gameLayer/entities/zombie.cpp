@@ -15,8 +15,6 @@ void Zombie::render(AssetManager& assetManager)
 
 	float facingValue = isFacingRight ? 32 : -32;
 
-	printf("isfacingright: %d\n", isFacingRight);
-
 	DrawTexturePro(
 		assetManager.zombie,
 		getTextureAtlas(animation.positionX, animation.positionY, facingValue, 64),

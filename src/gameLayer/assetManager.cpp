@@ -1,21 +1,43 @@
 #pragma once
 #include <assetManager.h>
 #include <filesystem>
+#include <unordered_map>
+
 
 void AssetManager::loadAll()
 {
-	//for (auto& t : allTextures)
-	//{
-	//	t.second = LoadTexture((RESOURCES_PATH + t.first).c_str());
-	//}
 
-	dirt = LoadTexture(RESOURCES_PATH "dirt.png");
-	textures = LoadTexture(RESOURCES_PATH "texturesWithBackgroundVersion.png");
-	treeTextures = LoadTexture(RESOURCES_PATH "treetextures.png");
-	frame = LoadTexture(RESOURCES_PATH "frame.png");
-	player = LoadTexture(RESOURCES_PATH "player.png");
-	slime = LoadTexture(RESOURCES_PATH "slime.png");
-	desertSlime = LoadTexture(RESOURCES_PATH "desertSlime.png");
-	evilEye = LoadTexture(RESOURCES_PATH "evilEye.png");
-	zombie = LoadTexture(RESOURCES_PATH "zombie.png");
+	for (auto& t : texList)
+	{
+		*t.tex = LoadTexture((std::string(RESOURCES_PATH) + t.path).c_str());
+	}
+}
+
+void AssetManager::loadTexturePack(const std::string& pack)
+{
+	unloadTexturePack();
+
+	std::string packPath = std::string(RESOURCES_PATH) + "../" + "texturePacks/" + pack + "/";
+
+	for (auto& t : texList)
+	{
+		if (FileExists((packPath + t.path).c_str()))
+		{
+			*t.tex = LoadTexture((packPath + t.path).c_str());
+		}
+		else
+		{
+			*t.tex = LoadTexture((std::string(RESOURCES_PATH) + t.path).c_str());
+		}
+
+	}
+}
+
+void AssetManager::unloadTexturePack()
+{
+	for (auto& t : texList)
+	{
+		UnloadTexture(*t.tex);
+		*t.tex = {};
+	}
 }

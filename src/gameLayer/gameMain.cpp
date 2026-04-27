@@ -47,6 +47,7 @@ struct GameData
 	EntityHolder entityHolder;
 	
 	//std::unordered_set<int> randomisedItems = {};
+	char texturePackName[128] = "default";
 
 	char saveName[100] = {};
 
@@ -356,9 +357,10 @@ bool updateGame()
 			{
 				if (b->type)
 				{
-					float xOffset = getRandomFloat(rng, -1, 1);
-					float yOffset = getRandomFloat(rng, -1, 1);
-					spawnDroppedItem({ (float)blockX + xOffset, (float)blockY + yOffset }, b->type);
+					spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
+					//float xOffset = getRandomFloat(rng, -1, 1) + .5f;
+					//float yOffset = getRandomFloat(rng, -1, 1) + .5f;
+					//spawnDroppedItem({ (float)blockX + xOffset, (float)blockY + yOffset }, b->type);
 				}
 				*b = {};
 			}
@@ -686,6 +688,14 @@ bool updateGame()
 				}
 			}
 		}
+
+		ImGui::InputText(("Texture Pack"), gameData.texturePackName, sizeof(gameData.texturePackName));
+		if (ImGui::Button("Load Texture"))
+		{
+			assetManager.loadTexturePack(gameData.texturePackName);
+		}
+
+		ImGui::Separator();
 
 		if (ImGui::Button("Copy"))
 		{
