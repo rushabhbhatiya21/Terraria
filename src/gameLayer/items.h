@@ -10,10 +10,11 @@ bool isBlock(int type);
 
 struct Item
 {
+	static const int firstItem = 6001;
 
 	enum
 	{
-		woodPickaxe = Block::BLOCKS_COUNT,
+		woodPickaxe = firstItem,
 		woodAxe,
 		woodHammer,
 		stonePickaxe,

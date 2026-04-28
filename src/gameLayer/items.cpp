@@ -4,7 +4,7 @@
 
 Texture2D getTextureForItemType(int itemType, AssetManager& assetManager)
 {
-	if (itemType < Block::BLOCKS_COUNT)
+	if (itemType < Item::firstItem)
 	{
 		// is a block
 		return assetManager.textures;
@@ -18,20 +18,21 @@ Texture2D getTextureForItemType(int itemType, AssetManager& assetManager)
 
 Rectangle getTextureCoordinatesForItemType(int itemType)
 {
-	if (itemType < Block::BLOCKS_COUNT)
+	if (itemType < Item::firstItem)
 	{
 		// is a block
 		return getTextureAtlas(itemType, 4, 32, 32);
 	}
 	else
 	{
-		return getTextureAtlas(itemType - Block::BLOCKS_COUNT, 0, 32, 32);
+		// is an item
+		return getTextureAtlas(itemType - Item::firstItem, 0, 32, 32);
 	}
 }
 
 bool isItem(int type)
 {
-	return type >= Block::BLOCKS_COUNT;
+	return type >= Item::firstItem;
 }
 
 bool isBlock(int type)

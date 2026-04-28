@@ -30,3 +30,26 @@ Block* GameMap::getBlockSafe(int x, int y)
 
 	return &mapData[x + y * w];
 }
+
+bool GameMap::isAdjacentBlock(int x, int y)
+{
+	permaAssertCommentDevelopement(mapData.size() == w * h, "MapData variable not initialized");
+
+	for (int i = -1; i <= 1; i++)
+	{
+		for (int j = -1; j <= 1; j++)
+		{
+			if (i == 0 && j == 0)
+				continue;
+
+			auto b = getBlockSafe(x + i, y + j);
+
+			if (b && b->type != Block::air)
+			{
+				return true;
+			}
+		}
+	}
+
+	return false;
+}

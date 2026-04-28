@@ -7,7 +7,19 @@
 
 void DroppedItem::render(AssetManager& assetManager)
 {
-	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
+	float size = 1.f;
+
+	if (isItem(itemType))
+	{
+		// item rendered smaller
+		size = .8f;
+	}
+	else
+	{
+		size = 1.f;
+	}
+
+	auto aabb = getRectangleForEntity(physics.transform, size, size);
 
 	Texture2D texture = getTextureForItemType(itemType, assetManager);
 	Rectangle rectangle = getTextureCoordinatesForItemType(itemType);
@@ -39,26 +51,26 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData entityUpdateData)
 						other->itemCounter += itemCounter;
 						return false;
 
-						//int otherMaxStackSize = getMaxStackSize(other->itemType);
+						int otherMaxStackSize = getMaxStackSize(other->itemType);
 
-						//if (other->itemCounter >= itemCounter)
-						//{
-						//	if (other->itemCounter + itemCounter <= otherMaxStackSize)
-						//	{
-						//		other->itemCounter += itemCounter;
-						//		return false;
-						//	}
-						//	else if (otherMaxStackSize - other->itemCounter == 0)
-						//	{
-						//		return true;
-						//	}
-						//	else
-						//	{
-						//		int partialAdd = otherMaxStackSize - other->itemCounter;
-						//		other->itemCounter += partialAdd;
-						//		itemCounter -= partialAdd;
-						//	}
-						//}
+						if (other->itemCounter >= itemCounter)
+						{
+							if (other->itemCounter + itemCounter <= otherMaxStackSize)
+							{
+								other->itemCounter += itemCounter;
+								return false;
+							}
+							else if (otherMaxStackSize - other->itemCounter == 0)
+							{
+								return true;
+							}
+							else
+							{
+								int partialAdd = otherMaxStackSize - other->itemCounter;
+								other->itemCounter += partialAdd;
+								itemCounter -= partialAdd;
+							}
+						}
 					}
 
 				}
@@ -72,6 +84,6 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData entityUpdateData)
 int DroppedItem::getMaxStackSize(int type)
 {
 	if (type <= 0) { permaAssertDevelopement("item type should not be less or equal to 0 to get max stack size!"); return -1; }
-	if (type < Block::BLOCKS_COUNT) { return 64; }
+	if (type < Item::firstItem) { return 64; }
 	return 1;
 }

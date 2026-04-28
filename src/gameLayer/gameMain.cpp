@@ -305,7 +305,7 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region mouse input
+#pragma region handle input
 
 	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
 	int blockX = (int)floor(worldPos.x);
@@ -363,25 +363,18 @@ bool updateGame()
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 		{
+			// hit entities
 			for (auto& e : gameData.entityHolder.entities)
 			{
-				if (e.second->physics.transform.intersectPoint(worldPos))
+				DroppedItem* droppedItem = dynamic_cast<DroppedItem*>(e.second.get());
+
+				if (droppedItem == nullptr && e.second->physics.transform.intersectPoint(worldPos))
 				{
 					e.second->hit(gameData.player.damage);
 				}
-
-				//Slime* s = dynamic_cast<Slime*>(e.second.get());
-
-				//// check if entity is slime
-				//if (s != nullptr)
-				//{
-				//	if (s->physics.transform.intersectPoint(worldPos))
-				//	{
-				//		s->hit(gameData.player.damage);
-				//	}
-				//}
 			}
 
+			// spawn block
 			std::ranlux24_base rng;
 
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
@@ -390,73 +383,24 @@ bool updateGame()
 				if (b->type)
 				{
 					spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
-					//float xOffset = getRandomFloat(rng, -1, 1) + .5f;
-					//float yOffset = getRandomFloat(rng, -1, 1) + .5f;
-					//spawnDroppedItem({ (float)blockX + xOffset, (float)blockY + yOffset }, b->type);
 				}
 				*b = {};
 			}
 		}
+
 		if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
 		{
-			//if (magnitude <= 5)
-			//{
-				//// place block only if its withing reach
-			//}
-
-			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
-			if (b)
+			float magnitude = Vector2Distance(gameData.player.getPosition(), worldPos);
+			if (magnitude <= 5)
 			{
-				b->type = gameData.creativeSelectedBlock;
-
-#pragma region random item
-
-				//b->type = editorState.selectedTile;
-				//if (gameData.randomisedItems.empty())
-				//{
-				//	gameData.randomisedItems = generateRandomItemArray(100);
-				//}
-				//else
-				//{
-				//	auto i = gameData.randomisedItems.begin();
-				//	int val = *i;
-				//	gameData.randomisedItems.erase(i);
-				//	//std::cout << "Popped: " << val << std::endl;
-
-				//	//common 0-39 40
-				//	//uncommon 40-69 30
-				//	//rare 70-88 19
-				//	//epic 89-97 9
-				//	//legendary 98-99 2
-
-				//	if (val < 40)
-				//		b->type = Block::dirt;
-
-				//	else if (val >= 40 && val < 70)
-				//		b->type = Block::bricks;
-
-				//	else if (val >= 70 && val < 89)
-				//		b->type = Block::silverBlockWall;
-
-				//	else if (val >= 89 && val < 98)
-				//		b->type = Block::goldBlock;
-
-				//	else if (val == 98 || val == 99)
-				//	{
-				//		b->type = Block::rubyBlock;
-				//		printf("congrats! you found legendary loot! resetting...");
-				//		gameData.randomisedItems = generateRandomItemArray(100);
-				//	}
-
-				//	else
-				//	{
-				//		printf("\n\nDANGER: value out of bounds, not allowed\n\n");
-				//		b->type = Block::air;
-				//	}
-				//}
-
-#pragma endregion
-
+				// place block only if its withing reach, 
+				// no existing blocks and 
+				// adjecent block exists
+				auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
+				if (b && b->type == Block::air && gameData.gameMap.isAdjacentBlock(blockX, blockY))
+				{
+					b->type = gameData.creativeSelectedBlock;
+				}
 			}
 		}
 	}

@@ -13,4 +13,5 @@ struct GameMap
 
 	Block& getBlockUnsafe(int x, int y);
 	Block* getBlockSafe(int x, int y);
+	bool isAdjacentBlock(int x, int y);
 };
