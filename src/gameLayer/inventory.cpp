@@ -11,7 +11,7 @@ int Inventory::getEmptySlot()
 
 }
 
-bool Inventory::storeItem(DroppedItem& droppedItem)
+bool Inventory::storeItem(ItemStack& droppedItem)
 {
 	for (auto& i : items)
 	{
@@ -60,15 +60,13 @@ bool Inventory::storeItem(DroppedItem& droppedItem)
 	{
 		if (droppedItem.itemCounter > 999)
 		{
-			DroppedItem newDroppedItem = droppedItem;
-			newDroppedItem.itemCounter = 999;
 			droppedItem.itemCounter -= 999;
-			items[emptySlot] = newDroppedItem;
+			items[emptySlot] = { droppedItem.itemType, 999 };
 			return true;
 		}
 		else
 		{
-			items[emptySlot] = droppedItem;
+			items[emptySlot] = { droppedItem.itemType, droppedItem.itemCounter };
 			return false;
 		}
 	}

@@ -297,7 +297,12 @@ bool updateGame()
 			if (it->second->physics.transform.intersectTransform(gameData.player.physics.transform))
 			{
 				DroppedItem* d = reinterpret_cast<DroppedItem*>(it->second.get());
-				shouldKill = !gameData.inventory.storeItem(*d);
+				ItemStack itemStack
+				{
+					d->itemType,
+					d->itemCounter
+				};
+				shouldKill = !gameData.inventory.storeItem(itemStack);
 			}
 		}
 
@@ -646,6 +651,7 @@ bool updateGame()
 
 			ImGui::PushID(i);
 
+			// draw image button
 			ImTextureID tex = (ImTextureID)(intptr_t)assetManager.textures.id;
 			if (ImGui::ImageButton(
 				tex,
@@ -655,6 +661,26 @@ bool updateGame()
 			))
 			{
 				gameData.creativeSelectedBlock = gameData.inventory.items[i].itemType;
+			}
+
+			// get button position
+			ImVec2 min = ImGui::GetItemRectMin();
+			ImVec2 max = ImGui::GetItemRectMax();
+
+			// draw text on top (bottom-right corner)
+			if (gameData.inventory.items[i].itemType != 0)
+			{
+				std::string count = std::to_string(gameData.inventory.items[i].itemCounter);
+
+				ImDrawList* drawList = ImGui::GetWindowDrawList();
+
+				ImVec2 textSize = ImGui::CalcTextSize(count.c_str());
+				ImVec2 textPos = ImVec2(
+					max.x - textSize.x - 2,
+					max.y - textSize.y - 2
+				);
+
+				drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), count.c_str());
 			}
 
 			ImGui::PopID();
