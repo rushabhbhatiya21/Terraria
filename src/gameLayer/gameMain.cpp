@@ -196,19 +196,6 @@ bool updateGame()
 
 	std::ranlux24_base rng(std::random_device{}());
 
-	//EntityUpdateData eud
-	//{
-	//	{},
-	//	rng,
-	//	gameData.entityHolder,
-	//	gameData.inventory,
-	//	0,
-	//	0,
-	//	false
-	//};
-
-	//gameData.player.update(deltaTime, eud);
-
 	if (gameData.shakeDuration > 0)
 	{
 		gameData.shakeDuration -= deltaTime;
@@ -309,21 +296,8 @@ bool updateGame()
 		{
 			if (it->second->physics.transform.intersectTransform(gameData.player.physics.transform))
 			{
-				//printf("intersected, before items: ");
-
-				//for (auto& i : gameData.inventory.items)
-				//{
-				//	printf("%d\n", i.itemType);
-				//}
-
 				DroppedItem* d = reinterpret_cast<DroppedItem*>(it->second.get());
 				shouldKill = !gameData.inventory.storeItem(*d);
-				//printf("------------------\nintersected, after items: ");
-
-				//for (auto& i : gameData.inventory.items)
-				//{
-				//	printf("%d\n", i.itemType);
-				//}
 			}
 		}
 
@@ -369,6 +343,19 @@ bool updateGame()
 #pragma endregion
 
 
+#pragma region inventory
+
+	for (int i = 0; i < gameData.inventory.items.size(); i++)
+	{
+		if (gameData.inventory.items[i].itemType != 0 && gameData.inventory.items[i].itemCounter <= 0)
+		{
+			gameData.inventory.removeItem(i);
+		}
+	}
+
+#pragma endregion
+
+
 #pragma region handle input
 
 	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
@@ -378,15 +365,7 @@ bool updateGame()
 	if (gameData.creativeSelectedBlock < 0) { gameData.creativeSelectedBlock = 0; }
 	if (gameData.creativeSelectedBlock >= Block::BLOCKS_COUNT) { gameData.creativeSelectedBlock = Block::BLOCKS_COUNT - 1; }
 
-	//// calculate dist from player to mouse pos (NOTE: currently player is camera target)
-	//Vector2 dist = {
-	//gameData.camera.target.x - (blockX + 0.5),
-	//gameData.camera.target.y - (blockY + 0.5)
-	//};
-	//float magnitude = std::sqrt(((dist.x * dist.x) + (dist.y * dist.y)));
-
 	// selection
-
 	if (showImgui)
 	{
 		if (IsKeyPressed(KEY_ONE)) 
@@ -467,7 +446,15 @@ bool updateGame()
 				auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 				if (b && b->type == Block::air && gameData.gameMap.isAdjacentBlock(blockX, blockY))
 				{
-					b->type = gameData.creativeSelectedBlock;
+					for (auto& i : gameData.inventory.items)
+					{
+						// check inventory to see if we have same type of item and have more than 0
+						if (gameData.creativeSelectedBlock == i.itemType && i.itemCounter > 0)
+						{
+							b->type = i.itemType;
+							i.itemCounter -= 1;
+						}
+					}
 				}
 			}
 		}
@@ -639,6 +626,43 @@ bool updateGame()
 #pragma region draw player
 
 	gameData.player.render(assetManager);
+
+#pragma endregion
+
+
+#pragma region draw inventory
+
+	if (!showImgui)
+	{
+		ImGui::Begin("Inventory");
+
+		for (int i = 0; i < gameData.inventory.slots; i++)
+		{
+			auto atlas = getTextureAtlas(gameData.inventory.items[i].itemType, 0, 32, 32);
+			atlas.x /= assetManager.textures.width;
+			atlas.width /= assetManager.textures.width;
+			atlas.y /= assetManager.textures.height;
+			atlas.height /= assetManager.textures.height;
+
+			ImGui::PushID(i);
+
+			ImTextureID tex = (ImTextureID)(intptr_t)assetManager.textures.id;
+			if (ImGui::ImageButton(
+				tex,
+				{ 35,35 },
+				{ atlas.x,atlas.y },
+				{ atlas.x + atlas.width,atlas.y + atlas.height }
+			))
+			{
+				gameData.creativeSelectedBlock = gameData.inventory.items[i].itemType;
+			}
+
+			ImGui::PopID();
+			ImGui::SameLine();
+		}
+
+		ImGui::End();
+	}
 
 #pragma endregion
 

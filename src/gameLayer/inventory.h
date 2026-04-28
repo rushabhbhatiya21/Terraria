@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <unordered_map>
 #include <entities/droppedItem.h>
 
 struct Inventory
@@ -16,4 +17,5 @@ struct Inventory
 
 	int getEmptySlot();
 	bool storeItem(DroppedItem& droppedItem);
+	void removeItem(int index);
 };
