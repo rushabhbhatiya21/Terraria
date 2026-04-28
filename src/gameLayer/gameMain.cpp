@@ -51,6 +51,11 @@ struct GameData
 	Player player;
 	EntityHolder entityHolder;
 	Inventory inventory;
+
+	// camera shake
+	Vector2 cameraTarget = { 0, 0 };
+	float shakeDuration = 0.f;
+	float shakeIntesity = .1f;
 	
 	//std::unordered_set<int> randomisedItems = {};
 	char texturePackName[128] = "default";
@@ -112,6 +117,11 @@ void spawnDroppedItem(Vector2 positon, int type)
 
 	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
 	gameData.entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+}
+
+void shakeCamera(float offsetX, float offsetY)
+{
+	gameData.camera.target = { gameData.cameraTarget.x + offsetX, gameData.cameraTarget.y + offsetY };
 }
 
 #pragma endregion
@@ -199,6 +209,18 @@ bool updateGame()
 
 	//gameData.player.update(deltaTime, eud);
 
+	if (gameData.shakeDuration > 0)
+	{
+		gameData.shakeDuration -= deltaTime;
+		float offsetX = getRandomFloat(rng, -1, 1) * gameData.shakeIntesity;
+		float offsetY = getRandomFloat(rng, -1, 1) * gameData.shakeIntesity;
+		shakeCamera(offsetX, offsetY);
+	}
+	else
+	{
+		gameData.camera.target = gameData.cameraTarget;
+	}
+
 #pragma endregion
 
 
@@ -213,7 +235,7 @@ bool updateGame()
 		};
 
 	updateEntityPhysics(gameData.player, false);
-	gameData.camera.target = gameData.player.getPosition();
+	gameData.cameraTarget = gameData.player.getPosition();
 
 	// clamp camera
 	{
@@ -287,21 +309,21 @@ bool updateGame()
 		{
 			if (it->second->physics.transform.intersectTransform(gameData.player.physics.transform))
 			{
-				printf("intersected, before items: ");
+				//printf("intersected, before items: ");
 
-				for (auto& i : gameData.inventory.items)
-				{
-					printf("%d\n", i.itemType);
-				}
+				//for (auto& i : gameData.inventory.items)
+				//{
+				//	printf("%d\n", i.itemType);
+				//}
 
 				DroppedItem* d = reinterpret_cast<DroppedItem*>(it->second.get());
 				shouldKill = !gameData.inventory.storeItem(*d);
-				printf("------------------\nintersected, after items: ");
+				//printf("------------------\nintersected, after items: ");
 
-				for (auto& i : gameData.inventory.items)
-				{
-					printf("%d\n", i.itemType);
-				}
+				//for (auto& i : gameData.inventory.items)
+				//{
+				//	printf("%d\n", i.itemType);
+				//}
 			}
 		}
 
@@ -405,7 +427,7 @@ bool updateGame()
 
 		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 		{
-			// hit entities
+			// hit entities (enemies)
 			for (auto& e : gameData.entityHolder.entities)
 			{
 				DroppedItem* droppedItem = dynamic_cast<DroppedItem*>(e.second.get());
@@ -413,6 +435,10 @@ bool updateGame()
 				if (droppedItem == nullptr && e.second->physics.transform.intersectPoint(worldPos))
 				{
 					e.second->hit(gameData.player.damage);
+
+					// camera shake
+					gameData.shakeDuration = .1f;
+					gameData.shakeIntesity = .1f;
 				}
 			}
 
