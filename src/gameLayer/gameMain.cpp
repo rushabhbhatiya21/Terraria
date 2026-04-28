@@ -22,6 +22,7 @@
 
 #include <items.h>
 #include <player.h>
+#include <inventory.h>
 #include <entities/droppedItem.h>
 #include <entities/slime.h>
 #include <entities/desetSlime.h>
@@ -49,6 +50,7 @@ struct GameData
 
 	Player player;
 	EntityHolder entityHolder;
+	Inventory inventory;
 	
 	//std::unordered_set<int> randomisedItems = {};
 	char texturePackName[128] = "default";
@@ -182,6 +184,21 @@ bool updateGame()
 	if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
 	if (IsKeyPressed(KEY_SPACE)) gameData.player.physics.jump(10);
 
+	std::ranlux24_base rng(std::random_device{}());
+
+	//EntityUpdateData eud
+	//{
+	//	{},
+	//	rng,
+	//	gameData.entityHolder,
+	//	gameData.inventory,
+	//	0,
+	//	0,
+	//	false
+	//};
+
+	//gameData.player.update(deltaTime, eud);
+
 #pragma endregion
 
 
@@ -234,7 +251,6 @@ bool updateGame()
 		}
 	}
 
-	std::ranlux24_base rng(std::random_device{}());
 	bool shouldApplyGravity = true;
 	float groundDistance = 0;
 	bool shouldStepUp = false;
@@ -242,6 +258,9 @@ bool updateGame()
 	// update all entities
 	for (auto it = gameData.entityHolder.entities.begin(); it != gameData.entityHolder.entities.end();)
 	{
+		bool shouldKill = false;
+
+		// zombie specific logic
 		if (it->second->getEntityType() == EntityType::EntityType_Zombie)
 		{
 			Vector2 zTotPlayerDirection = gameData.player.getPosition() - it->second->getPosition();
@@ -263,17 +282,40 @@ bool updateGame()
 			}
 		}
 
+		// dropped item specific logic
+		if (it->second->getEntityType() == EntityType::EntityType_DroppedItem)
+		{
+			if (it->second->physics.transform.intersectTransform(gameData.player.physics.transform))
+			{
+				printf("intersected, before items: ");
+
+				for (auto& i : gameData.inventory.items)
+				{
+					printf("%d\n", i.itemType);
+				}
+
+				DroppedItem* d = reinterpret_cast<DroppedItem*>(it->second.get());
+				shouldKill = !gameData.inventory.storeItem(*d);
+				printf("------------------\nintersected, after items: ");
+
+				for (auto& i : gameData.inventory.items)
+				{
+					printf("%d\n", i.itemType);
+				}
+			}
+		}
+
 		EntityUpdateData entityUpdateData
 		{
 			gameData.player.getPosition(),
 			rng,
 			gameData.entityHolder,
+			gameData.inventory,
 			it->first,
 			groundDistance,
 			shouldStepUp
 		};
 
-		bool shouldKill = false;
 
 		if (!it->second->update(deltaTime, entityUpdateData) || it->second->life <= 0)
 		{

@@ -4,6 +4,7 @@
 
 struct AssetManager;
 struct EntityHolder;
+struct Inventory;
 
 enum EntityType
 {
@@ -21,6 +22,7 @@ struct EntityUpdateData
 	Vector2 playerPosition = {};
 	std::ranlux24_base& rng;
 	EntityHolder& entityHolder;
+	Inventory& inventory;
 
 	std::uint64_t ownId = 0;
 	float groundDistance = 0;

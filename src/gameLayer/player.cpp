@@ -2,6 +2,7 @@
 #include <helper.h>
 #include <assetManager.h>
 #include <entityHolder.h>
+#include <inventory.h>
 
 void Player::render(AssetManager& assetManager)
 {
@@ -33,6 +34,5 @@ void Player::render(AssetManager& assetManager)
 
 bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
-	
 	return true;
 }
