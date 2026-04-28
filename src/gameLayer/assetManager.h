@@ -13,6 +13,7 @@ struct AssetManager
 {
 	Texture2D dirt = {};
 	Texture2D textures = {};
+	Texture2D items = {};
 	Texture2D treeTextures = {};
 	Texture2D frame = {};
 	Texture2D player = {};
@@ -25,6 +26,7 @@ struct AssetManager
 	{
 		{&dirt, "dirt.png"},
 		{&textures, "texturesWithBackgroundVersion.png"},
+		{&items, "items.png"},
 		{&treeTextures, "treetextures.png"},
 		{&frame, "frame.png"},
 		{&player, "player.png"},

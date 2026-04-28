@@ -1,9 +1,6 @@
 #pragma once
-
-#include <entity.h>
-#include <physics.h>
-
-
+#include "entity.h"
+#include "physics.h"
 
 struct DroppedItem : public Entity
 {

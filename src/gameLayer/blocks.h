@@ -130,3 +130,8 @@ struct Block
 		return false;
 	}
 };
+
+//bool isCollidable(int type)
+//{
+//	//...
+//}

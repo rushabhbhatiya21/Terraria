@@ -20,12 +20,16 @@
 #include <physics.h>
 #include <entityHolder.h>
 
+#include <items.h>
 #include <player.h>
 #include <entities/droppedItem.h>
 #include <entities/slime.h>
 #include <entities/desetSlime.h>
 #include <entities/evilEye.h>
 #include <entities/zombie.h>
+
+#include <audio.h>
+#include <settings.h>
 
 
 #pragma region global variables
@@ -119,6 +123,7 @@ bool initGame()
 	//	printf("%d\n", i);
 	//}
 
+	Audio::init();
 	assetManager.loadAll();
 	int w = 900, h = 500;
 
@@ -140,6 +145,7 @@ bool initGame()
 
 bool updateGame()
 {
+	Audio::update();
 
 #pragma region delta time
 
@@ -191,6 +197,42 @@ bool updateGame()
 
 	updateEntityPhysics(gameData.player, false);
 	gameData.camera.target = gameData.player.getPosition();
+
+	// clamp camera
+	{
+		float zoom = gameData.camera.zoom;
+
+		float screenWidth = GetScreenWidth();
+		float screenHeight = GetScreenHeight();
+
+		// half of visible area (adjusted for zoom)
+		float halfViewWidth = (screenWidth * 0.5f) / zoom;
+		float halfViewHeight = (screenHeight * 0.5f) / zoom;
+
+		float minX = halfViewWidth;
+		float maxX = gameData.gameMap.w - halfViewWidth;
+		float minY = halfViewHeight;
+		float maxY = gameData.gameMap.h - halfViewHeight;
+
+		// if map is smaller than view (zoomed out a lot), we set the camera to center of the world
+		if (maxX < minX)
+		{
+			gameData.camera.target.x = gameData.gameMap.w * 0.5f;
+		}
+		else
+		{
+			gameData.camera.target.x = Clamp(gameData.camera.target.x, minX, maxX);
+		}
+
+		if (maxY < minY)
+		{
+			gameData.camera.target.y = gameData.gameMap.h * 0.5f;
+		}
+		else
+		{
+			gameData.camera.target.y = Clamp(gameData.camera.target.y, minY, maxY);
+		}
+	}
 
 	std::ranlux24_base rng(std::random_device{}());
 	bool shouldApplyGravity = true;
@@ -323,7 +365,10 @@ bool updateGame()
 		{
 			for (auto& e : gameData.entityHolder.entities)
 			{
-				e.second->hit(gameData.player.damage);
+				if (e.second->physics.transform.intersectPoint(worldPos))
+				{
+					e.second->hit(gameData.player.damage);
+				}
 
 				//Slime* s = dynamic_cast<Slime*>(e.second.get());
 
@@ -719,6 +764,27 @@ bool updateGame()
 			);
 
 			printf("load: %d", d);
+		}
+
+		ImGui::Separator();
+
+		ImGui::SliderFloat("Master Volume", &getSettings().masterVolume, 0, 1);
+		ImGui::SliderFloat("Sound Volume", &getSettings().soundsVolume, 0, 1);
+		ImGui::SliderFloat("Music Volume", &getSettings().musicVolume, 0, 1);
+
+		if (ImGui::Button("Play Sound"))
+		{
+			Audio::playSound(Audio::placeBlock);
+		}
+
+		if (ImGui::Button("Play Forest Music"))
+		{
+			Audio::playMusic(Audio::musicForest);
+		}
+
+		if (ImGui::Button("Play Desert Music"))
+		{
+			Audio::playMusic(Audio::musicDesert);
 		}
 
 		ImGui::Separator();

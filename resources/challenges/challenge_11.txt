@@ -1,0 +1,28 @@
+I have various challenges for you with various difficulties!
+
+
+
+Starting from the easiest one, add some more sounds to the game. If you look inside the resources folder, inside the sounds, there is a bonus folder. There you have many more sounds. And you can search for some more sounds online if needed!
+
+
+
+Next, you will see that for some sounds, I have multiple variations. Maybe make a system to automatically load all the variations, and then when you play a sound, the code will automatically select a random sound from the variations. And make it easy to configure. For example, you can make it so that you search in that folder for the file name + a number, to load the variations.
+
+
+So you would say load FinalHit, and then the code will automatically try and see if there are any files called FinalHit + a number + .ogg, and then load all of them.
+
+
+
+Finally, we wouldn't really want to play 1000 sounds at the same time, so let's maybe implement a max sound playing limit. In fact, there is a limit of how many sounds/music sources you can play at once with Raylib (and any sound engine, usually). In Raylib, the default max seems to be 16 by default. So that's good, that means no need to implement the max sound playing limit ourselves, right? Not quite. It means if we play 15 sounds + one music, we won't be able to play something else. And some things might be more important than others. So maybe every time you play a sound, loop over the Sound objects loaded and use IsSoundPlaying(sound); them to count how many sounds are playing. Then, after let's say 6 or 7 sounds, only allow more sounds to play if they are extra important (like the player hurt sound). And don't play more than, let's say, 12 sounds to keep some room for music.
+
+
+
+Finally, one sound source can't overlap. This means if you play a sound, and then you play it a second time before the last one finishes, it will just restart it. Now you can instead call IfSoundPlaying and only play the sound if it returns false, so in this way, playing a sound the second time won't do anything unless the first time you played that sound finished. It's your choice. Now you can also allow for multiple instances of the same sound play if you want. Look into how LoadSoundAlias works. I recommend storing a fixed-size vector of sound aliases, and you just add and remove sound aliases from there as you play more sounds / they finish.
+
+Here is an example of LoadSoundAlias!
+
+Make sure you unload aliases once you are done with them, like:
+
+UnloadSound(alias1);
+
+Also, if you ever unload the sound itself, unload the aliases first than the sound.

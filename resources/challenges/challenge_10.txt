@@ -1,0 +1,16 @@
+I have some simple challenges for you. First of all, there is a little problem with the current system that we have. Did you figure it out? 
+I'll give you a hint, we will see this problem if we add more blocks in the future. Basically, 
+we start the first item from the last block: woodPickaxe = Block::BLOCKS_COUNT . 
+But this last block will change in the future. And so, as we add more blocks,
+old save files won't load correctly because we change the ids that each item has. 
+To fix this, just set the first item to start from a big number, like maybe 6000. 
+(Make sure you do something smaller than 65535, which is the unsigned short max).
+
+
+
+Next, if a dropped item is an item not a block, render it a little smaller (tune to your liking).
+
+
+
+Finally, add some more helper functions, like checking if an item is a tool, a weapon, 
+or if it is a pickaxe (so it breaks blocks once you add the survival mode).

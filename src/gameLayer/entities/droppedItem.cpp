@@ -1,17 +1,20 @@
 #include "droppedItem.h"
-#include <asserts.h>
-#include <helper.h>
-#include <assetManager.h>
-#include <entityHolder.h>
-#include <blocks.h>
+#include "asserts.h"
+#include "helper.h"
+#include "assetManager.h"
+#include "entityHolder.h"
+#include "items.h"
 
 void DroppedItem::render(AssetManager& assetManager)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
 
+	Texture2D texture = getTextureForItemType(itemType, assetManager);
+	Rectangle rectangle = getTextureCoordinatesForItemType(itemType);
+
 	DrawTexturePro(
-		assetManager.textures,
-		getTextureAtlas(itemType, 4, 32, 32),
+		texture,
+		rectangle,
 		aabb,
 		{ 0,0 },
 		0.f,
@@ -33,26 +36,29 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData entityUpdateData)
 				{
 					if (Vector2Distance(getPosition(), other->getPosition()) < 0.7f)
 					{
-						int otherMaxStackSize = getMaxStackSize(other->itemType);
+						other->itemCounter += itemCounter;
+						return false;
 
-						if (other->itemCounter >= itemCounter)
-						{
-							if (other->itemCounter + itemCounter <= otherMaxStackSize)
-							{
-								other->itemCounter += itemCounter;
-								return false;
-							}
-							else if (otherMaxStackSize - other->itemCounter == 0)
-							{
-								return true;
-							}
-							else
-							{
-								int partialAdd = otherMaxStackSize - other->itemCounter;
-								other->itemCounter += partialAdd;
-								itemCounter -= partialAdd;
-							}
-						}
+						//int otherMaxStackSize = getMaxStackSize(other->itemType);
+
+						//if (other->itemCounter >= itemCounter)
+						//{
+						//	if (other->itemCounter + itemCounter <= otherMaxStackSize)
+						//	{
+						//		other->itemCounter += itemCounter;
+						//		return false;
+						//	}
+						//	else if (otherMaxStackSize - other->itemCounter == 0)
+						//	{
+						//		return true;
+						//	}
+						//	else
+						//	{
+						//		int partialAdd = otherMaxStackSize - other->itemCounter;
+						//		other->itemCounter += partialAdd;
+						//		itemCounter -= partialAdd;
+						//	}
+						//}
 					}
 
 				}
