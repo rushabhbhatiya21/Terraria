@@ -11,8 +11,9 @@
 #include <assetManager.h>
 #include <editorState.h>
 #include <gameMap.h>
-#include <worldGenerator.h>
 #include <helper.h>
+#include <drawBackground.h>
+#include <worldGenerator.h>
 #include <randomStuff.h>
 
 #include <structure.h>
@@ -40,6 +41,7 @@ struct GameData
 	GameMap backgroundMap = {}; 
 	GameMap gameMap = {};
 	Camera2D camera = {};
+	DrawBackground background;
 
 	int creativeSelectedBlock = Block::air;
 
@@ -137,6 +139,8 @@ bool initGame()
 
 	Audio::init();
 	assetManager.loadAll();
+	loadSettings();
+
 	int w = 900, h = 500;
 
 	gameData.backgroundMap.create(w, h);
@@ -158,6 +162,7 @@ bool initGame()
 bool updateGame()
 {
 	Audio::update();
+	updateSettings();
 
 #pragma region delta time
 
@@ -469,6 +474,31 @@ bool updateGame()
 
 
 #pragma region draw world
+
+	// background
+	{
+		int backgroundType = DrawBackground::forest;
+
+		if (gameData.player.getPosition().x > gameData.gameMap.desertStart &&
+			gameData.player.getPosition().x < gameData.gameMap.desertEnd)
+		{
+			backgroundType = DrawBackground::desert;
+		}
+
+		if (gameData.player.getPosition().y > 130)
+		{
+			backgroundType = DrawBackground::cave;
+		}
+
+		gameData.background.setBackground(backgroundType);
+
+		gameData.background.draw(
+			deltaTime,
+			assetManager,
+			gameData.camera,
+			{ (float)gameData.gameMap.w, (float)gameData.gameMap.h }
+		);
+	}
 
 	BeginMode2D(gameData.camera);
 
@@ -833,6 +863,15 @@ bool updateGame()
 		ImGui::SliderFloat("Master Volume", &getSettings().masterVolume, 0, 1);
 		ImGui::SliderFloat("Sound Volume", &getSettings().soundsVolume, 0, 1);
 		ImGui::SliderFloat("Music Volume", &getSettings().musicVolume, 0, 1);
+
+		if (ImGui::Button("Save Settings"))
+		{
+			saveSettings();
+		}
+		if (ImGui::Button("Load Settings"))
+		{
+			loadSettings();
+		}
 
 		if (ImGui::Button("Play Sound"))
 		{

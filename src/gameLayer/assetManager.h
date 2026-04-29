@@ -22,6 +22,11 @@ struct AssetManager
 	Texture2D evilEye = {};
 	Texture2D zombie = {};
 
+	Texture2D forestBG = {};
+	Texture2D desertBG = {};
+	Texture2D snowBG = {};
+	Texture2D caveBG = {};
+
 	std::vector<TexEntry> texList =
 	{
 		{&dirt, "dirt.png"},
@@ -33,7 +38,11 @@ struct AssetManager
 		{&slime, "slime.png"},
 		{&desertSlime, "desertSlime.png"},
 		{&evilEye, "evilEye.png"},
-		{&zombie, "zombie.png"}
+		{&zombie, "zombie.png"},
+		{&forestBG, "forestBG.png"},
+		{&desertBG, "desertBG.png"},
+		{&snowBG, "snowBG.png"},
+		{&caveBG, "caveBG.png"}
 	};
 
 	void loadAll();

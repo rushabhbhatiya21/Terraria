@@ -1,0 +1,36 @@
+This challenge is optional. There is nothing wrong with using the Json library that we linked in the project, but learning to implement something like that on your own is a very good way to practice! So if you want to do this harder challenge, let's look at some implementation details. As explained in the video, the task is to implement a key-value-based saving system, so you can write data into it, and save it into a file / read it back.
+
+I already explained in the last video how the basic structure of how the code should look, and you can use this library of mine to look at how I did it. I have a KeyValueData struct there:
+
+https://github.com/meemknight/safeSave
+
+
+
+Now make it simple and fastto use. For example, this code:
+
+if (data2.entryExists("intTest"))
+{
+   char type = 0;
+   data2.getEntryType("intTest", type);
+   if (type == Entry::int_type)
+   {
+        data2.getInt("intTest", i);
+   }
+}
+
+
+Is quite a lot of typing, so make it so that you can just do:
+
+data2.getInt("intTest", i);
+And so if intTest doesn't exist or isn't an int, you won't do anything to i. Also, add a getGeneric method to read any type of int/float/double key into a double, whatever type it is. It makes it very convenient, especially if you modify the data manually in the save file, so if you change a float into an int, it should still work with this.
+
+
+
+Now, to implement the reading data back, check this tutorial:
+
+https://craftinginterpreters.com/
+
+You should read it up to lesson 6. The tutorial does use Java and various patterns, but it just keeps the code simple without anything fancy. All you need is a function or 2 and some helper lambdas.
+
+Here is an example from my code.
+
