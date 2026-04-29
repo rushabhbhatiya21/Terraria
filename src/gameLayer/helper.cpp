@@ -23,6 +23,15 @@ Rectangle getRectangleForEntity(Transform2D transform, float textureW, float tex
 	return result.getAABB();
 }
 
+Rectangle getUVForTexture(Texture2D tex, Rectangle atlas)
+{
+	atlas.x /= tex.width;
+	atlas.width /= tex.width;
+	atlas.y /= tex.height;
+	atlas.height /= tex.height;
+	return atlas;
+}
+
 std::unordered_set<int> generateRandomItemArray(int max)
 {
 	std::unordered_set<int> s = {};

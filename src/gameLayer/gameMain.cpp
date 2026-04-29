@@ -43,6 +43,7 @@ struct GameData
 	Camera2D camera = {};
 	DrawBackground background;
 
+	int previousSelectedBlock = Block::air;
 	int creativeSelectedBlock = Block::air;
 
 	Vector2 selectionStart = {};
@@ -58,6 +59,10 @@ struct GameData
 	Vector2 cameraTarget = { 0, 0 };
 	float shakeDuration = 0.f;
 	float shakeIntesity = .1f;
+
+	// crafitng
+	int maxCraftSlots = 2;
+	std::vector<int> craftSlots;
 	
 	//std::unordered_set<int> randomisedItems = {};
 	char texturePackName[128] = "default";
@@ -69,6 +74,7 @@ struct GameData
 AssetManager assetManager;
 
 bool showImgui = false;
+bool showCraftUI = false;
 
 #pragma endregion
 
@@ -141,6 +147,8 @@ bool initGame()
 	assetManager.loadAll();
 	loadSettings();
 
+	gameData.craftSlots.resize(gameData.maxCraftSlots);
+
 	int w = 900, h = 500;
 
 	gameData.backgroundMap.create(w, h);
@@ -179,9 +187,11 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region f10
+#pragma region key bindings
 
 	if (IsKeyPressed(KEY_F10)) { showImgui = !showImgui; }
+
+	if (IsKeyPressed(KEY_C)) { showCraftUI = !showCraftUI; }
 
 #pragma endregion
 
@@ -402,7 +412,7 @@ bool updateGame()
 
 	}
 
-	if (!showImgui)
+	if (!showImgui && !showCraftUI)
 	{
 		if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_MIDDLE))
 		{
@@ -414,7 +424,7 @@ bool updateGame()
 			}
 		}
 
-		if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 		{
 			// hit entities (enemies)
 			for (auto& e : gameData.entityHolder.entities)
@@ -445,7 +455,7 @@ bool updateGame()
 			}
 		}
 
-		if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 		{
 			float magnitude = Vector2Distance(gameData.player.getPosition(), worldPos);
 			if (magnitude <= 5)
@@ -468,6 +478,105 @@ bool updateGame()
 				}
 			}
 		}
+	}
+
+	// craft ui
+
+	if (showCraftUI)
+	{
+		ImGui::Begin("Craft");
+
+		// input slots
+		for (int i = 0; i < gameData.maxCraftSlots; i++)
+		{
+			ImGui::PushID(i);
+
+			int item = gameData.craftSlots[i];
+
+			auto atlas = getTextureAtlas(item, 0, 32, 32);
+			ImTextureID tex;
+
+			if (item < Block::BLOCKS_COUNT)
+			{
+				atlas = getUVForTexture(assetManager.textures, atlas);
+				tex = (ImTextureID)(intptr_t)assetManager.textures.id;
+			}
+			else
+			{
+				atlas = getUVForTexture(assetManager.items, atlas);
+				tex = (ImTextureID)(intptr_t)assetManager.items.id;
+			}
+
+			// draw image button
+			if (ImGui::ImageButton(
+				tex,
+				{ 40,40 },
+				{ atlas.x,atlas.y },
+				{ atlas.x + atlas.width,atlas.y + atlas.height }
+			))
+			{
+				// assign block back to inventory
+				ItemStack item{ gameData.craftSlots[i], 1 };
+				gameData.inventory.storeItem(item);
+
+				// clear craft slot
+				gameData.craftSlots[i] = 0;
+			}
+
+			ImGui::PopID();
+			ImGui::SameLine();
+
+			ImGui::Text(i != gameData.maxCraftSlots - 1 ? "+" : "=");
+
+			ImGui::SameLine();
+		}
+
+		int result = 0;
+
+		// preview in output slot
+		if (gameData.inventory.canCraft(gameData.craftSlots))
+		{
+			result = gameData.inventory.craft(gameData.craftSlots);
+		}
+
+		// spawn item if click on output slot
+		auto atlas = getTextureAtlas(result, 0, 32, 32);
+		ImTextureID tex;
+
+		if (result < Block::BLOCKS_COUNT)
+		{
+			atlas = getUVForTexture(assetManager.textures, atlas);
+			tex = (ImTextureID)(intptr_t)assetManager.textures.id;
+		}
+		else
+		{
+			atlas = getUVForTexture(assetManager.items, atlas);
+			tex = (ImTextureID)(intptr_t)assetManager.items.id;
+		}
+
+		if (ImGui::ImageButton(
+			tex,
+			{ 40, 40 },
+			{ atlas.x, atlas.y },
+			{ atlas.x + atlas.width, atlas.y + atlas.height }
+		))
+		{
+			if (gameData.inventory.canCraft(gameData.craftSlots))
+			{
+				int item = gameData.inventory.craft(gameData.craftSlots);
+
+				spawnDroppedItem(
+					{ gameData.player.getPosition().x + 2.5f, gameData.player.getPosition().y + 2.5f },
+					item
+				);
+
+				// clear slots after crafting
+				gameData.craftSlots[0] = 0;
+				gameData.craftSlots[1] = 0;
+			}
+		}
+
+		ImGui::End();
 	}
 
 #pragma endregion
@@ -674,15 +783,22 @@ bool updateGame()
 		for (int i = 0; i < gameData.inventory.slots; i++)
 		{
 			auto atlas = getTextureAtlas(gameData.inventory.items[i].itemType, 0, 32, 32);
-			atlas.x /= assetManager.textures.width;
-			atlas.width /= assetManager.textures.width;
-			atlas.y /= assetManager.textures.height;
-			atlas.height /= assetManager.textures.height;
+			ImTextureID tex;
+
+			if (gameData.inventory.items[i].itemType < Block::BLOCKS_COUNT)
+			{
+				atlas = getUVForTexture(assetManager.textures, atlas);
+				tex = (ImTextureID)(intptr_t)assetManager.textures.id;
+			}
+			else
+			{
+				atlas = getUVForTexture(assetManager.items, atlas);
+				tex = (ImTextureID)(intptr_t)assetManager.items.id;
+			}
 
 			ImGui::PushID(i);
 
 			// draw image button
-			ImTextureID tex = (ImTextureID)(intptr_t)assetManager.textures.id;
 			if (ImGui::ImageButton(
 				tex,
 				{ 35,35 },
@@ -691,6 +807,19 @@ bool updateGame()
 			))
 			{
 				gameData.creativeSelectedBlock = gameData.inventory.items[i].itemType;
+
+				if (showCraftUI)
+				{
+					for (int j = 0; j < gameData.maxCraftSlots; j++)
+					{
+						if (gameData.craftSlots[j] == 0)
+						{
+							gameData.craftSlots[j] = gameData.creativeSelectedBlock;
+							gameData.inventory.items[i].itemCounter -= 1;
+							break;
+						}
+					}
+				}
 			}
 
 			// get button position
@@ -710,7 +839,7 @@ bool updateGame()
 					max.y - textSize.y - 2
 				);
 
-				drawList->AddText(textPos, IM_COL32(255, 255, 255, 255), count.c_str());
+				drawList->AddText(textPos, IM_COL32(255, 255, 255, 127), count.c_str());
 			}
 
 			ImGui::PopID();

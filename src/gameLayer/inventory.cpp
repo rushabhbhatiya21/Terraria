@@ -1,5 +1,6 @@
 #include "inventory.h"
 #include <asserts.h>
+#include <blocks.h>
 
 int Inventory::getEmptySlot()
 {
@@ -84,4 +85,23 @@ void Inventory::removeItem(int index)
 	//d.itemCounter = 0;
 	items[index].itemType = 0;
 	items[index].itemCounter = 0;
+}
+
+bool Inventory::canCraft(std::vector<int> itemsTotCraft)
+{
+	for (auto& i : itemsTotCraft)
+	{
+		if (!isCraftable(i)) { return false; }
+	}
+}
+
+int Inventory::craft(std::vector<int> itemsTotCraft)
+{
+	for (auto& r : receipes)
+	{
+		if (itemsTotCraft == r.second)
+		{
+			return r.first;
+		}
+	}
 }
