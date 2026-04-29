@@ -38,22 +38,18 @@
 
 struct GameData
 {
-	GameMap backgroundMap = {}; 
+	// core
 	GameMap gameMap = {};
+	GameMap backgroundMap = {}; 
 	Camera2D camera = {};
 	DrawBackground background;
+	Inventory inventory;
 
-	int previousSelectedBlock = Block::air;
 	int creativeSelectedBlock = Block::air;
 
-	Vector2 selectionStart = {};
-	Vector2 selectionEnd = {};
-
-	Structure copyStructure;
-
+	// entities
 	Player player;
 	EntityHolder entityHolder;
-	Inventory inventory;
 
 	// camera shake
 	Vector2 cameraTarget = { 0, 0 };
@@ -63,10 +59,14 @@ struct GameData
 	// crafitng
 	int maxCraftSlots = 2;
 	std::vector<int> craftSlots;
-	
-	//std::unordered_set<int> randomisedItems = {};
+
+	// texture pack
 	char texturePackName[128] = "default";
 
+	// structure save
+	Structure copyStructure;
+	Vector2 selectionStart = {};
+	Vector2 selectionEnd = {};
 	char saveName[100] = {};
 
 } gameData;
@@ -137,12 +137,6 @@ void shakeCamera(float offsetX, float offsetY)
 
 bool initGame()
 {
-	//gameData.randomisedItems = generateRandomItemArray(100);
-	//for (auto& i : gameData.randomisedItems)
-	//{
-	//	printf("%d\n", i);
-	//}
-
 	Audio::init();
 	assetManager.loadAll();
 	loadSettings();
@@ -565,6 +559,8 @@ bool updateGame()
 			{
 				int item = gameData.inventory.craft(gameData.craftSlots);
 
+				// spawn item close to player (with offset)
+				// if too close, player will immediately pick up
 				spawnDroppedItem(
 					{ gameData.player.getPosition().x + 2.5f, gameData.player.getPosition().y + 2.5f },
 					item

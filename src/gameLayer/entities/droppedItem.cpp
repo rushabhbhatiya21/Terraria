@@ -12,7 +12,7 @@ void DroppedItem::render(AssetManager& assetManager)
 	if (isItem(itemType))
 	{
 		// item rendered smaller
-		size = .8f;
+		size = .6f;
 	}
 	else
 	{

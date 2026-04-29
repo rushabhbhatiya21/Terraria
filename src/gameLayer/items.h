@@ -5,8 +5,11 @@
 struct AssetManager;
 
 bool isItem(int type);
-
 bool isBlock(int type);
+
+bool isTool(int type);
+bool isWeapon(int type);
+bool isPickaxe(int type);
 
 struct Item
 {
@@ -53,6 +56,7 @@ struct Item
 		copperDagger,
 		ironDagger,
 		iceDagger,
+
 		copperChestPlate,
 		copperHelmet,
 		copperBoots,
@@ -79,15 +83,15 @@ struct Item
 	int type = 0;
 	int count = 1;
 
-	bool isItem()
-	{
-		return ::isItem(type);
-	}
+	bool isItem() { return ::isItem(type); }
 
-	bool isBlock()
-	{
-		return ::isBlock(type);
-	}
+	bool isBlock() { return ::isBlock(type); }
+
+	bool isTool() { return ::isTool(type); }
+
+	bool isWeapon() { return ::isWeapon(type); }
+
+	bool isPickaxe() { return ::isPickaxe(type); }
 };
 
 Texture2D getTextureForItemType(int itemType, AssetManager& assetManager);

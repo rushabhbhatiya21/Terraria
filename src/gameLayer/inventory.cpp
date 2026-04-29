@@ -75,14 +75,10 @@ bool Inventory::storeItem(ItemStack& droppedItem)
 
 void Inventory::removeItem(int index)
 {
-	printf("removing index: %d\n", index);
 	permaAssertComment(index >= 0 || index < slots, "can not remove item, out of bound index.");
 
 	if (index < 0 || index >= slots) { return; }
 
-	//DroppedItem d;
-	//d.itemType = 0;
-	//d.itemCounter = 0;
 	items[index].itemType = 0;
 	items[index].itemCounter = 0;
 }
