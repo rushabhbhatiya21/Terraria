@@ -2,6 +2,7 @@
 #include <raylib.h>
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 struct TexEntry
 {
@@ -27,6 +28,16 @@ struct AssetManager
 	Texture2D snowBG = {};
 	Texture2D caveBG = {};
 
+	//Texture2D playerBack = {};
+	//Texture2D playerFeet = {};
+	//Texture2D playerHead = {};
+	//Texture2D playerFront = {};
+
+	std::unordered_map<int, Texture2D> frontArmour;
+	std::unordered_map<int, Texture2D> backArmour;
+	std::unordered_map<int, Texture2D> feetArmour;
+	std::unordered_map<int, Texture2D> headArmour;
+
 	std::vector<TexEntry> texList =
 	{
 		{&dirt, "dirt.png"},
@@ -43,9 +54,18 @@ struct AssetManager
 		{&desertBG, "desertBG.png"},
 		{&snowBG, "snowBG.png"},
 		{&caveBG, "caveBG.png"}
+		//{&playerBack, "body/player_back.png"},
+		//{&playerFeet, "body/player_feet.png"},
+		//{&playerHead, "body/player_head.png"},
+		//{&playerFront, "body/player_front.png"}
 	};
 
 	void loadAll();
+
+	Texture2D getHeadTexture(int item);
+	Texture2D getBackTexture(int item);
+	Texture2D getFeetTexture(int item);
+	Texture2D getFrontTexture(int item);
 
 	void loadTexturePack(const std::string& pack);
 	void unloadTexturePack();

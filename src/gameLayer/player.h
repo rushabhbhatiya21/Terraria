@@ -1,5 +1,7 @@
 #pragma once
 #include <entity.h>
+#include <items.h>
+#include <entityAnimation.h>
 
 struct Player : public Entity
 {
@@ -10,6 +12,8 @@ struct Player : public Entity
 
 		life = getMaxLife();
 	}
+
+	EntityAnimation animations;
 
 	float damage = 3.f;
 
@@ -25,4 +29,9 @@ struct Player : public Entity
 	int getEntityType() { return EntityType_Player; }
 
 	float getMaxLife() { return 10; }
+
+	int armourHead = Item::partyHat;
+	int armourChest = Item::iceChestPlate;
+	int armoutLegs = Item::goldBoots;
+	int heldItem = Item::goldSword;
 };

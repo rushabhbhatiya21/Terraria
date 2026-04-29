@@ -195,13 +195,63 @@ bool updateGame()
 	gameData.camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
 
 	static float CAMERA_SPEED = 20.f;
-	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) gameData.player.physics.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) gameData.player.physics.transform.pos.x += CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) gameData.player.physics.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
-	if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) gameData.player.physics.transform.pos.y += CAMERA_SPEED * GetFrameTime();
+	static bool creative = false;
 
-	if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
-	if (IsKeyPressed(KEY_SPACE)) gameData.player.physics.jump(10);
+	{
+		bool moving = 0;
+		bool falling = 0;
+
+		if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
+		{
+			gameData.player.physics.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
+			moving = true;
+			gameData.player.animations.movingLeft = true;
+		}
+
+		if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
+		{
+			gameData.player.physics.transform.pos.x += CAMERA_SPEED * GetFrameTime();
+			moving = true;
+			gameData.player.animations.movingLeft = false;
+		}
+
+		if (creative)
+		{
+			if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) gameData.player.physics.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
+			if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) gameData.player.physics.transform.pos.y += CAMERA_SPEED * GetFrameTime();
+			if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
+		}
+
+		if (IsKeyPressed(KEY_SPACE))
+		{
+			gameData.player.physics.jump(12);
+		}
+
+		if (gameData.player.physics.downTouch)
+		{
+			falling = 0;
+		}
+		else
+		{
+			falling = 1;
+		}
+
+		if (falling)
+		{
+			gameData.player.animations.setAnimation(2);
+		}
+		else if (moving)
+		{
+			gameData.player.animations.setAnimation(1);
+		}
+		else
+		{
+			gameData.player.animations.setAnimation(0);
+		}
+
+		gameData.player.animations.update(deltaTime, 0.08, 7);
+	}
+
 
 	std::ranlux24_base rng(std::random_device{}());
 
@@ -230,7 +280,7 @@ bool updateGame()
 			entity.physics.updateFinal();
 		};
 
-	updateEntityPhysics(gameData.player, false);
+	updateEntityPhysics(gameData.player, !creative);
 	gameData.cameraTarget = gameData.player.getPosition();
 
 	// clamp camera
@@ -920,6 +970,8 @@ bool updateGame()
 
 		ImGui::SliderFloat("Camera Zoom: ", &gameData.camera.zoom, 10, 150);
 		ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 100);
+
+		ImGui::Checkbox("Creative", &creative);
 
 		if (ImGui::Button("Spawn slime"))
 		{

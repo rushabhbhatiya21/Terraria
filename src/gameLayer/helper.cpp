@@ -2,14 +2,20 @@
 #include <unordered_set>
 #include "helper.h"
 
-Rectangle getTextureAtlas(int x, int y, int cellSizePixelX, int cellSizePixelY)
+Rectangle getTextureAtlas(int x, int y, int cellSizePixelX, int cellSizePixelY, bool flipX)
 {
-	return Rectangle{
-		(float)x * cellSizePixelX,
-		(float)y * cellSizePixelY,
-		(float)cellSizePixelX,
-		(float)cellSizePixelY
-	};
+	float sizeX = cellSizePixelX;
+
+	if (flipX) { sizeX *= -1; }
+
+	return shrinkUV(
+		Rectangle{
+			(float)x * cellSizePixelX,
+			(float)y * cellSizePixelY,
+			(float)sizeX,
+			(float)cellSizePixelY
+		}
+	);
 }
 
 Rectangle getRectangleForEntity(Transform2D transform, float textureW, float textureH)
@@ -30,6 +36,24 @@ Rectangle getUVForTexture(Texture2D tex, Rectangle atlas)
 	atlas.y /= tex.height;
 	atlas.height /= tex.height;
 	return atlas;
+}
+
+Rectangle flipTextureAtlasX(Rectangle r)
+{
+	r.width = -r.width;
+	return r;
+}
+
+Rectangle shrinkUV(Rectangle in)
+{
+	float shrink = 0.1;
+
+	in.width -= shrink;
+	in.height -= shrink;
+	in.x += shrink / 2.f;
+	in.y += shrink / 2.f;
+	
+	return in;
 }
 
 std::unordered_set<int> generateRandomItemArray(int max)

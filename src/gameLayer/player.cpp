@@ -14,11 +14,94 @@ void Player::render(AssetManager& assetManager)
 
 	auto aabb = playerSprite.getAABB();
 
-	float facingDirValue = (float)assetManager.player.width * (isFacingRight ? 1 : -1);
+	auto textureUV = getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft);
+
+	if (heldItem)
+	{
+		textureUV = getTextureAtlas(animations.positionX, animations.positionY + 3, 32, 64, animations.movingLeft);
+	}
 
 	DrawTexturePro(
-		assetManager.player,
-		{ 0,0,facingDirValue,(float)assetManager.player.height },
+		assetManager.getBackTexture(armourChest),
+		textureUV,
+		aabb,
+		{ 0,0 },
+		0.f,
+		WHITE
+	);
+
+	DrawTexturePro(
+		assetManager.getFeetTexture(armoutLegs),
+		textureUV,
+		aabb,
+		{ 0,0 },
+		0.f,
+		WHITE
+	);
+
+	DrawTexturePro(
+		assetManager.getHeadTexture(armourHead),
+		textureUV,
+		aabb,
+		{ 0,0 },
+		0.f,
+		WHITE
+	);
+
+	if (heldItem)
+	{
+		Texture2D texture = getTextureForItemType(heldItem, assetManager);
+		Rectangle textureUVItem = getTextureCoordinatesForItemType(heldItem);
+
+		auto pos = aabb;
+
+		if (heldItem < Block::BLOCKS_COUNT)
+		{
+			pos.width = 0.4;
+			pos.height = 0.4;
+
+			if (animations.movingLeft)
+			{
+				pos.y += 0.5;
+				pos.x -= 0.2;
+			}
+			else
+			{
+				pos.y += 0.5;
+				pos.x += 0.6;
+			}
+		}
+		else
+		{
+			pos.width = 1;
+			pos.height = 1;
+
+			if (animations.movingLeft)
+			{
+				pos.y += 0.1;
+				pos.x -= 0.7;
+				textureUVItem = flipTextureAtlasX(textureUVItem);
+			}
+			else
+			{
+				pos.y += 0.1;
+				pos.x += 0.5;
+			}
+		}
+
+		DrawTexturePro(
+			texture,
+			textureUVItem,
+			pos,
+			{ 0,0 },
+			0.f,
+			WHITE
+		);
+	}
+
+	DrawTexturePro(
+		assetManager.getFrontTexture(armourChest),
+		textureUV,
 		aabb,
 		{ 0,0 },
 		0.f,
