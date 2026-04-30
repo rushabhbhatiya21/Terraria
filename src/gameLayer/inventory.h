@@ -18,7 +18,8 @@ struct Inventory
 	std::unordered_map<int, std::vector<int>> receipes =
 	{
 		{Item::woodPickaxe, {Block::woodLog, Block::woodLog}},
-		{Item::woodAxe, {Block::woodLog, Block::stone}}
+		{Item::woodAxe, {Block::woodLog, Block::stone}},
+		{Item::woodenSword, {Block::dirt, Block::dirt}}
 	};
 
 	Inventory()

@@ -20,6 +20,7 @@
 #include <saveMap.h>
 #include <physics.h>
 #include <entityHolder.h>
+#include <shake.h>
 
 #include <items.h>
 #include <player.h>
@@ -57,6 +58,8 @@ struct GameData
 	Vector2 cameraTarget = { 0, 0 };
 	float shakeDuration = 0.f;
 	float shakeIntesity = .1f;
+
+	float blockShakeTimer = 0.0f;
 
 	// crafitng
 	int maxCraftSlots = 2;
@@ -178,6 +181,45 @@ bool updateGame()
 #pragma endregion
 
 
+#pragma region reset times and updates
+
+	if (gameData.player.timeAfterMine > 0)
+		gameData.player.timeAfterMine -= deltaTime;
+
+	if (gameData.player.timeAfterAttack > 0)
+		gameData.player.timeAfterAttack -= deltaTime;
+
+	updateShake(deltaTime);
+	updateCameraShake(deltaTime);
+
+#pragma endregion
+
+
+#pragma region set camera offset for shake
+
+	gameData.camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
+
+	Vector2 camOffset = { 0, 0 };
+
+	if (camShake.time > 0.0f)
+	{
+		float t = camShake.time / camShake.duration;
+		float strength = camShake.strength * t;
+
+		float time = (float)GetTime();
+
+		camOffset.x = sinf(time * 30.0f + camShake.phase) * strength;
+		camOffset.y = cosf(time * 30.0f + camShake.phase) * strength;
+	}
+
+	Vector2 baseTarget = gameData.player.physics.transform.pos;
+
+	gameData.camera.target.x = baseTarget.x + camOffset.x;
+	gameData.camera.target.y = baseTarget.y + camOffset.y;
+
+#pragma endregion
+
+
 #pragma region clear background
 
 	ClearBackground({ 75,75,150,255 });
@@ -194,82 +236,151 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region player movement
+#pragma region new player movement
 
-	gameData.camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
-
-	static float CAMERA_SPEED = 10.f;
 	static bool creative = false;
 
+	// ── Movement block — replace your existing input section with this ────────────
+	// Requires the updated physics.h (updateJump, applyGravity, applyHorizontalMovement).
+	// deltaTime should already be defined as GetFrameTime() above this block.
+
 	{
-		bool moving = 0;
-		bool falling = 0;
+		// ── Horizontal input ─────────────────────────────────────────────────────
+		float inputX = 0.f;
+		bool  moving = false;
 
 		if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
 		{
-			gameData.player.physics.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
+			inputX = -1.f;
 			moving = true;
 			gameData.player.animations.movingLeft = true;
 		}
-
 		if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
 		{
-			gameData.player.physics.transform.pos.x += CAMERA_SPEED * GetFrameTime();
+			inputX = 1.f;
 			moving = true;
 			gameData.player.animations.movingLeft = false;
 		}
 
+		// ── Creative mode fly ────────────────────────────────────────────────────
 		if (creative)
 		{
-			if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) gameData.player.physics.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
-			if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) gameData.player.physics.transform.pos.y += CAMERA_SPEED * GetFrameTime();
-			if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
+			if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
+				gameData.player.physics.transform.pos.y -= PhysicalEntity::MOVE_SPEED * deltaTime;
+			if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
+				gameData.player.physics.transform.pos.y += PhysicalEntity::MOVE_SPEED * deltaTime;
+			if (GetMouseWheelMove() != 0.f)
+				gameData.camera.zoom += GetMouseWheelMove();
 		}
 
-		if (IsKeyPressed(KEY_SPACE))
-		{
-			gameData.player.physics.jump(12);
-		}
+		// ── Physics updates (order matters) ──────────────────────────────────────
+		// 1. Variable jump + coyote time + jump buffer
+		gameData.player.physics.updateJump(
+			deltaTime,
+			IsKeyDown(KEY_SPACE),    // hold = extend jump
+			IsKeyPressed(KEY_SPACE)  // press = queue jump
+		);
 
-		if (gameData.player.physics.downTouch)
-		{
-			falling = 0;
-		}
-		else
-		{
-			falling = 1;
-		}
+		// 2. Gravity (with hold/fall multipliers applied inside)
+		if (!creative)
+			gameData.player.physics.applyGravity();
 
-		if (falling)
-		{
-			gameData.player.animations.setAnimation(2);
-		}
+		// 3. Horizontal movement (ground vs air friction handled inside)
+		if (!creative)
+			gameData.player.physics.applyHorizontalMovement(deltaTime, inputX);
+
+		// ── Animation ────────────────────────────────────────────────────────────
+		bool falling = !gameData.player.physics.downTouch;
+
+		if (falling && gameData.player.physics.velocity.y < 0.f)
+			gameData.player.animations.setAnimation(2); // jumping (rising)
+		else if (falling)
+			gameData.player.animations.setAnimation(3); // falling (descending)
 		else if (moving)
-		{
-			gameData.player.animations.setAnimation(1);
-		}
+			gameData.player.animations.setAnimation(1); // walking
 		else
-		{
-			gameData.player.animations.setAnimation(0);
-		}
+			gameData.player.animations.setAnimation(0); // idle
 
 		gameData.player.animations.update(deltaTime, 0.08, 7);
 	}
 
+#pragma endregion
+
+
+#pragma region old player movement
+
+	//static float CAMERA_SPEED = 10.f;
+	//static bool creative = false;
+
+	//{
+	//	bool moving = 0;
+	//	bool falling = 0;
+
+	//	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
+	//	{
+	//		gameData.player.physics.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
+	//		moving = true;
+	//		gameData.player.animations.movingLeft = true;
+	//	}
+
+	//	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
+	//	{
+	//		gameData.player.physics.transform.pos.x += CAMERA_SPEED * GetFrameTime();
+	//		moving = true;
+	//		gameData.player.animations.movingLeft = false;
+	//	}
+
+	//	if (creative)
+	//	{
+	//		if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) gameData.player.physics.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
+	//		if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) gameData.player.physics.transform.pos.y += CAMERA_SPEED * GetFrameTime();
+	//		if (GetMouseWheelMove() != 0.f) gameData.camera.zoom += GetMouseWheelMove();
+	//	}
+
+	//	if (IsKeyPressed(KEY_SPACE))
+	//	{
+	//		gameData.player.physics.jump(12);
+	//	}
+
+	//	if (gameData.player.physics.downTouch)
+	//	{
+	//		falling = 0;
+	//	}
+	//	else
+	//	{
+	//		falling = 1;
+	//	}
+
+	//	if (falling)
+	//	{
+	//		gameData.player.animations.setAnimation(2);
+	//	}
+	//	else if (moving)
+	//	{
+	//		gameData.player.animations.setAnimation(1);
+	//	}
+	//	else
+	//	{
+	//		gameData.player.animations.setAnimation(0);
+	//	}
+
+	//	gameData.player.animations.update(deltaTime, 0.08, 7);
+	//}
+
 
 	std::ranlux24_base rng(std::random_device{}());
 
-	if (gameData.shakeDuration > 0)
-	{
-		gameData.shakeDuration -= deltaTime;
-		float offsetX = getRandomFloat(rng, -1, 1) * gameData.shakeIntesity;
-		float offsetY = getRandomFloat(rng, -1, 1) * gameData.shakeIntesity;
-		shakeCamera(offsetX, offsetY);
-	}
-	else
-	{
-		gameData.camera.target = gameData.cameraTarget;
-	}
+	//if (gameData.shakeDuration > 0)
+	//{
+	//	gameData.shakeDuration -= deltaTime;
+	//	float offsetX = getRandomFloat(rng, -1, 1) * gameData.shakeIntesity;
+	//	float offsetY = getRandomFloat(rng, -1, 1) * gameData.shakeIntesity;
+	//	shakeCamera(offsetX, offsetY);
+	//}
+	//else
+	//{
+	//	gameData.camera.target = gameData.cameraTarget;
+	//}
 
 #pragma endregion
 
@@ -479,34 +590,56 @@ bool updateGame()
 			{
 				DroppedItem* droppedItem = dynamic_cast<DroppedItem*>(e.second.get());
 
-				if (droppedItem == nullptr && e.second->physics.transform.intersectPoint(worldPos) && isWeapon(gameData.player.heldItem))
+				if (
+					droppedItem == nullptr && 
+					e.second->physics.transform.intersectPoint(worldPos) && 
+					gameData.player.timeAfterAttack <= 0
+				)
 				{
 					// Hitting an enemy
 					int dmg = calcMeleeDamage(gameData.player.heldItem);
 
+					// get reset time
+					float attackResetTime = getResetTime(gameData.player.heldItem);
+
+					// reset attack time
+					if (attackResetTime != 0)
+						gameData.player.timeAfterAttack = attackResetTime;
+
+					// reduce health from enemy
 					e.second->hit(dmg);
 
 					// camera shake
-					gameData.shakeDuration = .1f;
-					gameData.shakeIntesity = .1f;
+					triggerCameraShake(0.2f, 0.08f);
 				}
 			}
 
 			// spawn block
-			std::ranlux24_base rng;
-
 			float magnitude = Vector2Distance(gameData.player.getPosition(), worldPos);
 			if (magnitude <= 5 || creative)
 			{
 				auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 				if (b)
 				{
-					if (b->type)
+					if (b->type && gameData.player.timeAfterMine <= 0)
 					{
+						// calculate damage done to block
 						int dmg = calcBlockDamage(*b, gameData.player.heldItem);
 						b->hp -= dmg;
 
-						printf("hitting a block, life: %d\n", b->hp);
+						if (dmg > 0)
+						{
+							// add block shake here
+							triggerShake(blockX, blockY);
+						}
+
+						// get reset time, 0.7 default for bare hands, 0 for non-tool items
+						float toolResetTime = getResetTime(gameData.player.heldItem);
+
+						if (toolResetTime != 0)
+						{
+							gameData.player.timeAfterMine = toolResetTime;
+						}
 
 						if (b->hp <= 0)
 						{
@@ -542,6 +675,11 @@ bool updateGame()
 			}
 		}
 	}
+
+#pragma endregion
+
+
+#pragma region craft ui
 
 	// craft ui
 
@@ -726,56 +864,6 @@ bool updateGame()
 
 			if (b.type != Block::air)
 			{
-
-#pragma region draw tree
-
-				//Block* upperBlock = gameData.gameMap.getBlockSafe(x, y - 1);
-				//Block* belowBlock = gameData.gameMap.getBlockSafe(x, y + 1);
-
-				//if (!upperBlock || !belowBlock) continue;
-
-				//if (b.type == Block::woodLog)
-				//{
-				//	if (belowBlock->type == Block::grassBlock)
-				//	{
-				//		DrawTexturePro(
-				//			assetManager.treeTextures,
-				//			getTextureAtlas(7, 3, 32, 32), //source (in sprite)
-				//			{ posX,posY,size,size }, //dest
-				//			{ 0,0 }, //origin (top-left)
-				//			0.f,     //rotation
-				//			WHITE    //tint
-				//		);
-				//	}
-
-				//	if (upperBlock->type == Block::leaves && b.type == Block::woodLog)
-				//	{
-				//		DrawTexturePro(
-				//			assetManager.treeTextures,
-				//			getTextureAtlas(5, 3, 32, 32), //source (in sprite)
-				//			{ posX,posY,size,size }, //dest
-				//			{ 0,0 }, //origin (top-left)
-				//			0.f,     //rotation
-				//			WHITE    //tint
-				//		);
-				//		continue;
-				//	}
-				//}
-
-				//Color color = WHITE;
-
-				//if (b.type == Block::leaves)
-				//{
-				//	if (x % 2 == 0)
-				//		color = DARKBLUE;
-				//	else
-				//		color = GREEN;
-
-				//	if (y % 2 == 0)
-				//		color.a = 127;
-				//}
-#pragma endregion
-
 				atlasX = b.type;
 
 				if (b.variation == -1)
@@ -783,10 +871,15 @@ bool updateGame()
 					b.variation = rand() % 4;
 				}
 
+				Vector2 shake = getShakeOffset(x, y);
+
+				float drawX = posX + shake.x;
+				float drawY = posY + shake.y;
+
 				DrawTexturePro(
 					assetManager.textures,
 					getTextureAtlas(atlasX, b.variation, 32, 32), //source (in sprite)
-					{ posX,posY,size,size }, //dest
+					{ drawX,drawY,size,size }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
 					WHITE    //tint
@@ -989,7 +1082,7 @@ bool updateGame()
 		ImGui::Begin("Game Control");
 
 		ImGui::SliderFloat("Camera Zoom: ", &gameData.camera.zoom, 10, 150);
-		ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 100);
+		//ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 100);
 
 		ImGui::Checkbox("Creative", &creative);
 

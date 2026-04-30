@@ -19,7 +19,7 @@ struct ToolStats
 {
     int toolType;    // TOOL_PICKAXE / TOOL_AXE / TOOL_HAMMER
     int toolDamage;  // block HP removed per swing with the correct tool type
-    float toolTimeBetweenMine;
+    float timeBetweenMine;
 };
 
 struct WeaponStats
@@ -27,6 +27,7 @@ struct WeaponStats
     int   meleeDamage;   // HP removed per hit on an enemy
     float attackSpeed;   // swings per second
     float knockback;     // 0 = none, 1 = light, 2 = heavy
+    float timeBetweenAttacks;
 };
 
 struct ConsumableStats
@@ -57,18 +58,18 @@ struct ItemData
 };
 
 // ─── Constexpr factory functions (replace macros, no designated inits) ────────
-constexpr ItemData makeTool(int toolType, int toolDamage, float toolTimeBetweenMine)
+constexpr ItemData makeTool(int toolType, int toolDamage, float timeBetweenMine)
 {
     ItemData d{};
     d.category = ItemCategory::tool;
     d.maxStack = 1;
     d.tool.toolType = toolType;
     d.tool.toolDamage = toolDamage;
-    d.tool.toolTimeBetweenMine = toolTimeBetweenMine;
+    d.tool.timeBetweenMine = timeBetweenMine;
     return d;
 }
 
-constexpr ItemData makeWeapon(int meleeDamage, float attackSpeed, float knockback)
+constexpr ItemData makeWeapon(int meleeDamage, float attackSpeed, float knockback, float timeBetweenAttacks)
 {
     ItemData d{};
     d.category = ItemCategory::weapon;
@@ -76,6 +77,7 @@ constexpr ItemData makeWeapon(int meleeDamage, float attackSpeed, float knockbac
     d.weapon.meleeDamage = meleeDamage;
     d.weapon.attackSpeed = attackSpeed;
     d.weapon.knockback = knockback;
+    d.weapon.timeBetweenAttacks = timeBetweenAttacks;
     return d;
 }
 
@@ -155,25 +157,25 @@ static const ItemData ITEM_DATA[] =
     /* goldIngot        */  makeMaterial(99),
 
     // ── Weapons — swords (medium speed, good knockback) ──────────────────────
-    /* woodenSword      */  makeWeapon(8, 1.8f, 1.5f),
-    /* stoneSword       */  makeWeapon(12, 1.8f, 1.5f),
-    /* copperSword      */  makeWeapon(16, 1.8f, 1.5f),
-    /* ironSword        */  makeWeapon(22, 1.8f, 1.5f),
-    /* goldSword        */  makeWeapon(30, 1.8f, 1.5f),
+    /* woodenSword      */  makeWeapon(8, 1.8f, 1.5f, 1.f),
+    /* stoneSword       */  makeWeapon(12, 1.8f, 1.5f, 1.f),
+    /* copperSword      */  makeWeapon(16, 1.8f, 1.5f, 1.f),
+    /* ironSword        */  makeWeapon(22, 1.8f, 1.5f, 1.f),
+    /* goldSword        */  makeWeapon(30, 1.8f, 1.5f, 1.f),
 
     // ── Materials (cont.) ────────────────────────────────────────────────────
     /* ruby             */  makeMaterial(99),
 
     // ── Weapons — spears (slower, medium knockback) ───────────────────────────
-    /* copperSpear      */  makeWeapon(18, 1.4f, 1.0f),
-    /* ironSpear        */  makeWeapon(25, 1.4f, 1.0f),
-    /* goldSpear        */  makeWeapon(34, 1.4f, 1.0f),
+    /* copperSpear      */  makeWeapon(18, 1.4f, 1.0f, 1.2f),
+    /* ironSpear        */  makeWeapon(25, 1.4f, 1.0f, 1.2f),
+    /* goldSpear        */  makeWeapon(34, 1.4f, 1.0f, 1.2f),
 
     // ── Materials (cont.) ────────────────────────────────────────────────────
     /* blueRuby         */  makeMaterial(99),
 
     // ── Weapons — ice spear ───────────────────────────────────────────────────
-    /* iceSpear         */  makeWeapon(28, 1.4f, 1.0f),
+    /* iceSpear         */  makeWeapon(28, 1.4f, 1.0f, 1.2f),
 
     // ── Consumables ──────────────────────────────────────────────────────────
     /* healthPotion     */  makeConsumable(50, 0, 20),
@@ -185,12 +187,12 @@ static const ItemData ITEM_DATA[] =
     /* bone             */  makeMaterial(99),
 
     // ── Weapons — thrown ─────────────────────────────────────────────────────
-    /* shuriken         */  makeWeapon(10, 2.5f, 0.3f),
+    /* shuriken         */  makeWeapon(10, 2.5f, 0.3f, 0.4f),
 
     // ── Weapons — daggers (fast, low knockback) ───────────────────────────────
-    /* copperDagger     */  makeWeapon(14, 2.2f, 0.5f),
-    /* ironDagger       */  makeWeapon(20, 2.2f, 0.5f),
-    /* iceDagger        */  makeWeapon(22, 2.2f, 0.5f),
+    /* copperDagger     */  makeWeapon(14, 2.2f, 0.5f, 0.8f),
+    /* ironDagger       */  makeWeapon(20, 2.2f, 0.5f, 0.8f),
+    /* iceDagger        */  makeWeapon(22, 2.2f, 0.5f, 0.8f),
 
     // ── Armor — copper (defense 2/piece) ─────────────────────────────────────
     /* copperChestPlate */  makeArmor(2, 1),
@@ -247,11 +249,27 @@ inline int calcBlockDamage(const Block& block, int itemType)
     return data.tool.toolDamage / 2;        // wrong tool — half damage
 }
 
+inline const float getResetTime(int itemType)
+{
+    if (itemType < Item::firstItem || itemType >= Item::LAST_ITEM)
+        return 0.7f; // bare hand
+
+    const auto& data = getItemData(itemType);
+
+    if (data.category == ItemCategory::tool)
+        return data.tool.timeBetweenMine;
+
+    if (data.category == ItemCategory::weapon)
+        return data.weapon.timeBetweenAttacks;
+
+    return 0.0f; // fallback
+}
+
 // Enemy damage per swing. Returns 0 for non-weapons.
 inline int calcMeleeDamage(int itemType)
 {
     if (itemType < Item::firstItem || itemType >= Item::LAST_ITEM)
-        return 0;
+        return 2; // bare hand
 
     const auto& data = getItemData(itemType);
     if (data.category != ItemCategory::weapon)

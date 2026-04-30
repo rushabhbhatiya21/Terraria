@@ -30,6 +30,9 @@ struct Player : public Entity
 
 	float getMaxLife() { return 10; }
 
+	float timeAfterMine = 0.f;
+	float timeAfterAttack = 0.f;
+
 	int armourHead = Item::partyHat;
 	int armourChest = Item::iceChestPlate;
 	int armoutLegs = Item::goldBoots;
