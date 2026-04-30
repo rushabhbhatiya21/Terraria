@@ -20,6 +20,7 @@ struct ToolStats
     int toolType;    // TOOL_PICKAXE / TOOL_AXE / TOOL_HAMMER
     int toolDamage;  // block HP removed per swing with the correct tool type
     float timeBetweenMine;
+    float range;
 };
 
 struct WeaponStats
@@ -28,6 +29,7 @@ struct WeaponStats
     float attackSpeed;   // swings per second
     float knockback;     // 0 = none, 1 = light, 2 = heavy
     float timeBetweenAttacks;
+    float range;
 };
 
 struct ConsumableStats
@@ -58,7 +60,7 @@ struct ItemData
 };
 
 // ─── Constexpr factory functions (replace macros, no designated inits) ────────
-constexpr ItemData makeTool(int toolType, int toolDamage, float timeBetweenMine)
+constexpr ItemData makeTool(int toolType, int toolDamage, float timeBetweenMine, float range)
 {
     ItemData d{};
     d.category = ItemCategory::tool;
@@ -66,10 +68,11 @@ constexpr ItemData makeTool(int toolType, int toolDamage, float timeBetweenMine)
     d.tool.toolType = toolType;
     d.tool.toolDamage = toolDamage;
     d.tool.timeBetweenMine = timeBetweenMine;
+    d.tool.range = range;
     return d;
 }
 
-constexpr ItemData makeWeapon(int meleeDamage, float attackSpeed, float knockback, float timeBetweenAttacks)
+constexpr ItemData makeWeapon(int meleeDamage, float attackSpeed, float knockback, float timeBetweenAttacks, float range)
 {
     ItemData d{};
     d.category = ItemCategory::weapon;
@@ -78,6 +81,7 @@ constexpr ItemData makeWeapon(int meleeDamage, float attackSpeed, float knockbac
     d.weapon.attackSpeed = attackSpeed;
     d.weapon.knockback = knockback;
     d.weapon.timeBetweenAttacks = timeBetweenAttacks;
+    d.weapon.range = range;
     return d;
 }
 
@@ -130,25 +134,25 @@ constexpr ItemData makeAccessory()
 static const ItemData ITEM_DATA[] =
 {
     // ── Tools ────────────────────────────────────────────────────────────────
-    /* woodPickaxe      */  makeTool(TOOL_PICKAXE,  10, 0.7f),
-    /* woodAxe          */  makeTool(TOOL_AXE,      10, 0.7f),
-    /* woodHammer       */  makeTool(TOOL_HAMMER,   10, 0.7f),
+    /* woodPickaxe      */  makeTool(TOOL_PICKAXE,  10, 0.7f, 1.5f),
+    /* woodAxe          */  makeTool(TOOL_AXE,      10, 0.7f, 1.5f),
+    /* woodHammer       */  makeTool(TOOL_HAMMER,   10, 0.7f, 1.5f),
 
-    /* stonePickaxe     */  makeTool(TOOL_PICKAXE,  14, 0.7f),
-    /* stoneAxe         */  makeTool(TOOL_AXE,      14, 0.7f),
-    /* stoneHammer      */  makeTool(TOOL_HAMMER,   14, 0.7f),
+    /* stonePickaxe     */  makeTool(TOOL_PICKAXE,  14, 0.7f, 1.5f),
+    /* stoneAxe         */  makeTool(TOOL_AXE,      14, 0.7f, 1.5f),
+    /* stoneHammer      */  makeTool(TOOL_HAMMER,   14, 0.7f, 1.5f),
 
-    /* copperPickaxe    */  makeTool(TOOL_PICKAXE,  20, 0.7f),
-    /* copperAxe        */  makeTool(TOOL_AXE,      20, 0.7f),
-    /* copperHammer     */  makeTool(TOOL_HAMMER,   20, 0.7f),
+    /* copperPickaxe    */  makeTool(TOOL_PICKAXE,  20, 0.7f, 1.5f),
+    /* copperAxe        */  makeTool(TOOL_AXE,      20, 0.7f, 1.5f),
+    /* copperHammer     */  makeTool(TOOL_HAMMER,   20, 0.7f, 1.5f),
 
-    /* ironPickaxe      */  makeTool(TOOL_PICKAXE,  28, 0.7f),
-    /* ironAxe          */  makeTool(TOOL_AXE,      28, 0.7f),
-    /* ironHammer       */  makeTool(TOOL_HAMMER,   28, 0.7f),
+    /* ironPickaxe      */  makeTool(TOOL_PICKAXE,  28, 0.7f, 1.5f),
+    /* ironAxe          */  makeTool(TOOL_AXE,      28, 0.7f, 1.5f),
+    /* ironHammer       */  makeTool(TOOL_HAMMER,   28, 0.7f, 1.5f),
 
-    /* goldPickaxe      */  makeTool(TOOL_PICKAXE,  40, 0.7f),
-    /* goldAxe          */  makeTool(TOOL_AXE,      40, 0.7f),
-    /* goldHammer       */  makeTool(TOOL_HAMMER,   40, 0.7f),
+    /* goldPickaxe      */  makeTool(TOOL_PICKAXE,  40, 0.7f, 1.5f),
+    /* goldAxe          */  makeTool(TOOL_AXE,      40, 0.7f, 1.5f),
+    /* goldHammer       */  makeTool(TOOL_HAMMER,   40, 0.7f, 1.5f),
 
     // ── Materials ────────────────────────────────────────────────────────────
     /* slime            */  makeMaterial(99),
@@ -157,25 +161,25 @@ static const ItemData ITEM_DATA[] =
     /* goldIngot        */  makeMaterial(99),
 
     // ── Weapons — swords (medium speed, good knockback) ──────────────────────
-    /* woodenSword      */  makeWeapon(8, 1.8f, 1.5f, 1.f),
-    /* stoneSword       */  makeWeapon(12, 1.8f, 1.5f, 1.f),
-    /* copperSword      */  makeWeapon(16, 1.8f, 1.5f, 1.f),
-    /* ironSword        */  makeWeapon(22, 1.8f, 1.5f, 1.f),
-    /* goldSword        */  makeWeapon(30, 1.8f, 1.5f, 1.f),
+    /* woodenSword      */  makeWeapon(8, 1.8f, 1.5f, 1.f, 2.f),
+    /* stoneSword       */  makeWeapon(12, 1.8f, 1.5f, 1.f, 2.f),
+    /* copperSword      */  makeWeapon(16, 1.8f, 1.5f, 1.f, 2.f),
+    /* ironSword        */  makeWeapon(22, 1.8f, 1.5f, 1.f, 2.f),
+    /* goldSword        */  makeWeapon(30, 1.8f, 1.5f, 1.f, 2.f),
 
     // ── Materials (cont.) ────────────────────────────────────────────────────
     /* ruby             */  makeMaterial(99),
 
     // ── Weapons — spears (slower, medium knockback) ───────────────────────────
-    /* copperSpear      */  makeWeapon(18, 1.4f, 1.0f, 1.2f),
-    /* ironSpear        */  makeWeapon(25, 1.4f, 1.0f, 1.2f),
-    /* goldSpear        */  makeWeapon(34, 1.4f, 1.0f, 1.2f),
+    /* copperSpear      */  makeWeapon(18, 1.4f, 1.0f, 1.2f, 3.f),
+    /* ironSpear        */  makeWeapon(25, 1.4f, 1.0f, 1.2f, 3.f),
+    /* goldSpear        */  makeWeapon(34, 1.4f, 1.0f, 1.2f, 3.f),
 
     // ── Materials (cont.) ────────────────────────────────────────────────────
     /* blueRuby         */  makeMaterial(99),
 
     // ── Weapons — ice spear ───────────────────────────────────────────────────
-    /* iceSpear         */  makeWeapon(28, 1.4f, 1.0f, 1.2f),
+    /* iceSpear         */  makeWeapon(28, 1.4f, 1.0f, 1.2f, 3.f),
 
     // ── Consumables ──────────────────────────────────────────────────────────
     /* healthPotion     */  makeConsumable(50, 0, 20),
@@ -187,12 +191,12 @@ static const ItemData ITEM_DATA[] =
     /* bone             */  makeMaterial(99),
 
     // ── Weapons — thrown ─────────────────────────────────────────────────────
-    /* shuriken         */  makeWeapon(10, 2.5f, 0.3f, 0.4f),
+    /* shuriken         */  makeWeapon(10, 2.5f, 0.3f, 0.4f, 1.f),
 
     // ── Weapons — daggers (fast, low knockback) ───────────────────────────────
-    /* copperDagger     */  makeWeapon(14, 2.2f, 0.5f, 0.8f),
-    /* ironDagger       */  makeWeapon(20, 2.2f, 0.5f, 0.8f),
-    /* iceDagger        */  makeWeapon(22, 2.2f, 0.5f, 0.8f),
+    /* copperDagger     */  makeWeapon(14, 2.2f, 0.5f, 0.8f, 1.2f),
+    /* ironDagger       */  makeWeapon(20, 2.2f, 0.5f, 0.8f, 1.2f),
+    /* iceDagger        */  makeWeapon(22, 2.2f, 0.5f, 0.8f, 1.2f),
 
     // ── Armor — copper (defense 2/piece) ─────────────────────────────────────
     /* copperChestPlate */  makeArmor(2, 1),
@@ -276,6 +280,22 @@ inline int calcMeleeDamage(int itemType)
         return 0;
 
     return data.weapon.meleeDamage;
+}
+
+inline bool isInRange(int itemType, float dist)
+{
+    if (itemType < Item::firstItem || itemType >= Item::LAST_ITEM)
+        return 1.f; // bare hand
+
+    const auto& data = getItemData(itemType);
+
+    if (data.category == ItemCategory::tool)
+        return data.tool.range >= dist;
+
+    if (data.category == ItemCategory::weapon)
+        return data.weapon.range >= dist;
+
+    return false;
 }
 
 // HP/mana restored on use. Returns {0,0} for non-consumables.

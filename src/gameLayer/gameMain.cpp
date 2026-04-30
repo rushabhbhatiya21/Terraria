@@ -575,11 +575,13 @@ bool updateGame()
 			for (auto& e : gameData.entityHolder.entities)
 			{
 				DroppedItem* droppedItem = dynamic_cast<DroppedItem*>(e.second.get());
+				float magnitude = Vector2Distance(gameData.player.physics.transform.getCenter(), worldPos);
 
 				if (
 					droppedItem == nullptr && 
 					e.second->physics.transform.intersectPoint(worldPos) && 
-					gameData.player.timeAfterAttack <= 0
+					gameData.player.timeAfterAttack <= 0 &&
+					(isInRange(gameData.player.heldItem, magnitude) || creative)
 				)
 				{
 					// play attack animation
@@ -604,41 +606,39 @@ bool updateGame()
 			}
 
 			// spawn block
-			float magnitude = Vector2Distance(gameData.player.getPosition(), worldPos);
-			if (magnitude <= 5 || creative)
+			float magnitude = Vector2Distance(gameData.player.physics.transform.getCenter(), worldPos);
+			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
+			if (
+				b &&
+				b->type && gameData.player.timeAfterMine <= 0 &&
+				(isInRange(gameData.player.heldItem, magnitude) || creative)
+			)
 			{
-				auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
-				if (b)
+				// play attack animation
+				gameData.player.timeAfterAttackAnimation = gameData.player.maxAttackTimeAnimation;
+
+				// calculate damage done to block
+				int dmg = calcBlockDamage(*b, gameData.player.heldItem);
+				b->hp -= dmg;
+
+				if (dmg > 0)
 				{
-					if (b->type && gameData.player.timeAfterMine <= 0)
-					{
-						// play attack animation
-						gameData.player.timeAfterAttackAnimation = gameData.player.maxAttackTimeAnimation;
+					// add block shake here
+					triggerShake(blockX, blockY);
+				}
 
-						// calculate damage done to block
-						int dmg = calcBlockDamage(*b, gameData.player.heldItem);
-						b->hp -= dmg;
+				// get reset time, 0.7 default for bare hands, 0 for non-tool items
+				float toolResetTime = getResetTime(gameData.player.heldItem);
 
-						if (dmg > 0)
-						{
-							// add block shake here
-							triggerShake(blockX, blockY);
-						}
+				if (toolResetTime != 0)
+				{
+					gameData.player.timeAfterMine = toolResetTime;
+				}
 
-						// get reset time, 0.7 default for bare hands, 0 for non-tool items
-						float toolResetTime = getResetTime(gameData.player.heldItem);
-
-						if (toolResetTime != 0)
-						{
-							gameData.player.timeAfterMine = toolResetTime;
-						}
-
-						if (b->hp <= 0)
-						{
-							spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
-							*b = {};
-						}
-					}
+				if (b->hp <= 0)
+				{
+					spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
+					*b = {};
 				}
 			}
 		}
