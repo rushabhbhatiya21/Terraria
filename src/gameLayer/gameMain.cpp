@@ -54,13 +54,6 @@ struct GameData
 	Player player;
 	EntityHolder entityHolder;
 
-	// camera shake
-	Vector2 cameraTarget = { 0, 0 };
-	float shakeDuration = 0.f;
-	float shakeIntesity = .1f;
-
-	float blockShakeTimer = 0.0f;
-
 	// crafitng
 	int maxCraftSlots = 2;
 	std::vector<int> craftSlots;
@@ -130,11 +123,6 @@ void spawnDroppedItem(Vector2 positon, int type)
 
 	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
 	gameData.entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
-}
-
-void shakeCamera(float offsetX, float offsetY)
-{
-	gameData.camera.target = { gameData.cameraTarget.x + offsetX, gameData.cameraTarget.y + offsetY };
 }
 
 #pragma endregion
@@ -237,6 +225,8 @@ bool updateGame()
 
 
 #pragma region new player movement
+
+	std::ranlux24_base rng(std::random_device{}());
 
 	static bool creative = false;
 
@@ -367,21 +357,6 @@ bool updateGame()
 	//	gameData.player.animations.update(deltaTime, 0.08, 7);
 	//}
 
-
-	std::ranlux24_base rng(std::random_device{}());
-
-	//if (gameData.shakeDuration > 0)
-	//{
-	//	gameData.shakeDuration -= deltaTime;
-	//	float offsetX = getRandomFloat(rng, -1, 1) * gameData.shakeIntesity;
-	//	float offsetY = getRandomFloat(rng, -1, 1) * gameData.shakeIntesity;
-	//	shakeCamera(offsetX, offsetY);
-	//}
-	//else
-	//{
-	//	gameData.camera.target = gameData.cameraTarget;
-	//}
-
 #pragma endregion
 
 
@@ -396,7 +371,6 @@ bool updateGame()
 		};
 
 	updateEntityPhysics(gameData.player, !creative);
-	gameData.cameraTarget = gameData.player.getPosition();
 
 	// clamp camera
 	{
