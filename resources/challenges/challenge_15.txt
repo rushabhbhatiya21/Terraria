@@ -1,5 +1,15 @@
-So I showed you how to implement the transition for the backgrounds. Implement something similar for the music. So each biome should have its own music, and as you change the biome, the music should slowly transition into the new one. For this, you will need 2 Music objects, and call the updateMusicStream for each. So you will basically have int currentMusicPlaying = 0; an int currentMusicFadingOut = 0; and a timer. Af you change the music, the currentMusicFading out becomes the old music, the new music is set to currentMusicPlaying, and using the timer, you slowly fade the volume of the fading music to 0, and fade up the currentMusicPlaying volume.
+So I showed you how to implement the transition for the backgrounds. Implement something similar for the music. So each biome should have its own music, 
+and as you change the biome, the music should slowly transition into the new one. For this, you will need 2 Music objects, and call the updateMusicStream for each. 
+So you will basically have int currentMusicPlaying = 0; an int currentMusicFadingOut = 0; and a timer. Af you change the music, the currentMusicFading out becomes the old music,
+the new music is set to currentMusicPlaying, and using the timer, you slowly fade the volume of the fading music to 0, and fade up the currentMusicPlaying volume.
 
 
 
-Also, I mentioned that in terraria the biome is based on the blocks, not on what the biome was there initially when the world was generated. Implement that if you want. So every frame, you just look at the close blocks to the player, and if enough blocks of a certain biome type are there, set the correct biome. For example, enough sand blocks would result in a desert biome. But if there are more snow blocks, that will result into a ice biome. Also, what happens if you are up in the sky in a biome? Like, maybe you can't see desert blocks, but a few blocks under you, there is a desert. Maybe if there are no blocks, maybe you should go down a little until you find a block or several blocks. I don't think this will get expensive, but if you want, you can time the process to see how expensive it is. And if it takes too much time (too much time means let's say more than 1 milisecond, then you can optimize it by splitting the checks across multiple frames. Like in the first frame, you check the left blocks from the player, and than the second frame you check the right blocks from the player, and then repeat.
+Also, I mentioned that in terraria the biome is based on the blocks, not on what the biome was there initially when the world was generated. Implement that if you want. 
+So every frame, you just look at the close blocks to the player, and if enough blocks of a certain biome type are there, set the correct biome. 
+For example, enough sand blocks would result in a desert biome. But if there are more snow blocks, that will result into a ice biome.
+Also, what happens if you are up in the sky in a biome? Like, maybe you can't see desert blocks, but a few blocks under you, there is a desert. 
+Maybe if there are no blocks, maybe you should go down a little until you find a block or several blocks. I don't think this will get expensive, but if you want, 
+you can time the process to see how expensive it is. And if it takes too much time (too much time means let's say more than 1 milisecond,
+then you can optimize it by splitting the checks across multiple frames. Like in the first frame, you check the left blocks from the player, 
+and than the second frame you check the right blocks from the player, and then repeat.

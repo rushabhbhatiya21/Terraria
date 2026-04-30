@@ -1,5 +1,6 @@
 #pragma once
 #include "blocks.h"
+#include "items.h"
 
 bool isCraftable(int type)
 {

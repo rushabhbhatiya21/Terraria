@@ -88,6 +88,9 @@ struct Block
 	std::uint16_t type = 0;
 	int variation = -1;
 
+	int hp = 0;
+	int bestTool = 0;
+
 	void sanitize()
 	{
 		if (type >= BLOCKS_COUNT)

@@ -30,6 +30,8 @@
 #include <entities/evilEye.h>
 #include <entities/zombie.h>
 
+#include <itemData.h>
+
 #include <audio.h>
 #include <settings.h>
 
@@ -156,7 +158,9 @@ bool initGame()
 	gameData.player.physics.transform.w = 0.9f;
 	gameData.player.physics.transform.h = 1.8f;
 
-	spawnZombie({ 18,60 });
+	//spawnZombie({ 18,60 });
+
+	//spawnDroppedItem({ 25,60 }, 6001);
 
 	return true;
 }
@@ -190,11 +194,11 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region camera movement
+#pragma region player movement
 
 	gameData.camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
 
-	static float CAMERA_SPEED = 20.f;
+	static float CAMERA_SPEED = 10.f;
 	static bool creative = false;
 
 	{
@@ -475,9 +479,12 @@ bool updateGame()
 			{
 				DroppedItem* droppedItem = dynamic_cast<DroppedItem*>(e.second.get());
 
-				if (droppedItem == nullptr && e.second->physics.transform.intersectPoint(worldPos))
+				if (droppedItem == nullptr && e.second->physics.transform.intersectPoint(worldPos) && isWeapon(gameData.player.heldItem))
 				{
-					e.second->hit(gameData.player.damage);
+					// Hitting an enemy
+					int dmg = calcMeleeDamage(gameData.player.heldItem);
+
+					e.second->hit(dmg);
 
 					// camera shake
 					gameData.shakeDuration = .1f;
@@ -488,21 +495,33 @@ bool updateGame()
 			// spawn block
 			std::ranlux24_base rng;
 
-			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
-			if (b)
+			float magnitude = Vector2Distance(gameData.player.getPosition(), worldPos);
+			if (magnitude <= 5 || creative)
 			{
-				if (b->type)
+				auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
+				if (b)
 				{
-					spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
+					if (b->type)
+					{
+						int dmg = calcBlockDamage(*b, gameData.player.heldItem);
+						b->hp -= dmg;
+
+						printf("hitting a block, life: %d\n", b->hp);
+
+						if (b->hp <= 0)
+						{
+							spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
+							*b = {};
+						}
+					}
 				}
-				*b = {};
 			}
 		}
 
 		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 		{
 			float magnitude = Vector2Distance(gameData.player.getPosition(), worldPos);
-			if (magnitude <= 5)
+			if (magnitude <= 5 || creative)
 			{
 				// place block only if its withing reach, 
 				// no existing blocks and 
@@ -853,6 +872,7 @@ bool updateGame()
 			))
 			{
 				gameData.creativeSelectedBlock = gameData.inventory.items[i].itemType;
+				gameData.player.heldItem = gameData.creativeSelectedBlock;
 
 				if (showCraftUI)
 				{

@@ -1,7 +1,11 @@
-So you implemented paralax but what's even cooler is splitting the background into multiple layers, each with a different strength of parallax. So the things that are further away should move more slowly than the closer things. You can download the backgrounds split into layers in the resources of this challenge!
+So you implemented paralax but what's even cooler is splitting the background into multiple layers, each with a different strength of parallax. 
+So the things that are further away should move more slowly than the closer things. You can download the backgrounds split into layers in the resources of this challenge!
 
 
 
-And after that, you can also implement a day/night cycle. You can take the standalone sun and moon texture and animate them. You can draw the sky separately and slowly transition it to the night sky, or use the same night sky but with a super dark blue tint. And for the rest of the layers, slowly add a dark blue tint to them. You can also animate the stars moving or the clouds moving. Maybe you can have cloudy days, so clouds appear or disappear.
+And after that, you can also implement a day/night cycle. You can take the standalone sun and moon texture and animate them.
+You can draw the sky separately and slowly transition it to the night sky, or use the same night sky but with a super dark blue tint. 
+And for the rest of the layers, slowly add a dark blue tint to them. You can also animate the stars moving or the clouds moving. 
+Maybe you can have cloudy days, so clouds appear or disappear.
 
 Good luck!

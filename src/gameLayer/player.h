@@ -15,7 +15,7 @@ struct Player : public Entity
 
 	EntityAnimation animations;
 
-	float damage = 3.f;
+	float damage = 5.f;
 
 	Vector2& getPosition()
 	{
@@ -33,5 +33,5 @@ struct Player : public Entity
 	int armourHead = Item::partyHat;
 	int armourChest = Item::iceChestPlate;
 	int armoutLegs = Item::goldBoots;
-	int heldItem = Item::goldSword;
+	int heldItem = 0;
 };

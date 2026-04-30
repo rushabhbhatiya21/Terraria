@@ -7,9 +7,9 @@ struct AssetManager;
 bool isItem(int type);
 bool isBlock(int type);
 
-bool isTool(int type);
+bool isAccessory(int type);
 bool isWeapon(int type);
-bool isPickaxe(int type);
+bool isTool(int type);
 
 struct Item
 {
@@ -87,11 +87,11 @@ struct Item
 
 	bool isBlock() { return ::isBlock(type); }
 
-	bool isTool() { return ::isTool(type); }
+	bool isAccessory() { return ::isAccessory(type); }
 
 	bool isWeapon() { return ::isWeapon(type); }
 
-	bool isPickaxe() { return ::isPickaxe(type); }
+	bool isTool() { return ::isTool(type); }
 };
 
 Texture2D getTextureForItemType(int itemType, AssetManager& assetManager);

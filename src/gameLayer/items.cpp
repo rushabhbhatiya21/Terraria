@@ -40,7 +40,7 @@ bool isBlock(int type)
 	return !isItem(type);
 }
 
-bool isTool(int type)
+bool isAccessory(int type)
 {
 	switch (type)
 	{
@@ -93,7 +93,7 @@ bool isWeapon(int type)
 	return false;
 }
 
-bool isPickaxe(int type)
+bool isTool(int type)
 {
 	switch (type)
 	{
