@@ -89,6 +89,16 @@ bool Inventory::canCraft(std::vector<int> itemsTotCraft)
 	{
 		if (!isCraftable(i)) { return false; }
 	}
+
+	for (auto& r : receipes)
+	{
+		if (itemsTotCraft == r.second)
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 int Inventory::craft(std::vector<int> itemsTotCraft)

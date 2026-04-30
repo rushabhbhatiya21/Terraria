@@ -18,7 +18,7 @@ Texture2D getTextureForItemType(int itemType, AssetManager& assetManager)
 
 Rectangle getTextureCoordinatesForItemType(int itemType)
 {
-	if (itemType < Item::firstItem)
+	if (!isItem(itemType))
 	{
 		// is a block
 		return getTextureAtlas(itemType, 4, 32, 32);

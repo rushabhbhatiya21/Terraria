@@ -84,6 +84,6 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData entityUpdateData)
 int DroppedItem::getMaxStackSize(int type)
 {
 	if (type <= 0) { permaAssertDevelopement("item type should not be less or equal to 0 to get max stack size!"); return -1; }
-	if (type < Item::firstItem) { return 64; }
+	if (type < Item::firstItem) { return 999; }
 	return 1;
 }

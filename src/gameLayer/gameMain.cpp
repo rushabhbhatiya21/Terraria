@@ -151,7 +151,7 @@ bool initGame()
 
 	//spawnZombie({ 18,60 });
 
-	//spawnDroppedItem({ 25,60 }, 6001);
+	spawnDroppedItem({ 25,60 }, 6001);
 
 	return true;
 }
@@ -176,6 +176,14 @@ bool updateGame()
 
 	if (gameData.player.timeAfterAttack > 0)
 		gameData.player.timeAfterAttack -= deltaTime;
+
+	if (gameData.player.timeAfterAttackAnimation > 0.0f)
+	{
+		gameData.player.timeAfterAttackAnimation -= deltaTime;
+
+		if (gameData.player.timeAfterAttackAnimation < 0.0f)
+			gameData.player.timeAfterAttackAnimation = 0.0f;
+	}
 
 	updateShake(deltaTime);
 	updateCameraShake(deltaTime);
@@ -503,6 +511,10 @@ bool updateGame()
 		if (gameData.inventory.items[i].itemType != 0 && gameData.inventory.items[i].itemCounter <= 0)
 		{
 			gameData.inventory.removeItem(i);
+
+			// clear selection
+			gameData.creativeSelectedBlock = 0;
+			gameData.player.heldItem = 0;
 		}
 	}
 
@@ -570,6 +582,9 @@ bool updateGame()
 					gameData.player.timeAfterAttack <= 0
 				)
 				{
+					// play attack animation
+					gameData.player.timeAfterAttackAnimation = gameData.player.maxAttackTimeAnimation;
+
 					// Hitting an enemy
 					int dmg = calcMeleeDamage(gameData.player.heldItem);
 
@@ -597,6 +612,9 @@ bool updateGame()
 				{
 					if (b->type && gameData.player.timeAfterMine <= 0)
 					{
+						// play attack animation
+						gameData.player.timeAfterAttackAnimation = gameData.player.maxAttackTimeAnimation;
+
 						// calculate damage done to block
 						int dmg = calcBlockDamage(*b, gameData.player.heldItem);
 						b->hp -= dmg;
@@ -668,7 +686,7 @@ bool updateGame()
 
 			int item = gameData.craftSlots[i];
 
-			auto atlas = getTextureAtlas(item, 0, 32, 32);
+			auto atlas = getTextureCoordinatesForItemType(item);
 			ImTextureID tex;
 
 			if (item < Block::BLOCKS_COUNT)
@@ -715,7 +733,7 @@ bool updateGame()
 		}
 
 		// spawn item if click on output slot
-		auto atlas = getTextureAtlas(result, 0, 32, 32);
+		auto atlas = getTextureCoordinatesForItemType(result);
 		ImTextureID tex;
 
 		if (result < Block::BLOCKS_COUNT)
@@ -740,10 +758,9 @@ bool updateGame()
 			{
 				int item = gameData.inventory.craft(gameData.craftSlots);
 
-				// spawn item close to player (with offset)
-				// if too close, player will immediately pick up
+				// spawn item close to player, so its immediately picked up and added to inventory
 				spawnDroppedItem(
-					{ gameData.player.getPosition().x + 2.5f, gameData.player.getPosition().y + 2.5f },
+					{ gameData.player.getPosition().x, gameData.player.getPosition().y },
 					item
 				);
 
@@ -914,7 +931,7 @@ bool updateGame()
 
 		for (int i = 0; i < gameData.inventory.slots; i++)
 		{
-			auto atlas = getTextureAtlas(gameData.inventory.items[i].itemType, 0, 32, 32);
+			auto atlas = getTextureCoordinatesForItemType(gameData.inventory.items[i].itemType);
 			ImTextureID tex;
 
 			if (gameData.inventory.items[i].itemType < Block::BLOCKS_COUNT)

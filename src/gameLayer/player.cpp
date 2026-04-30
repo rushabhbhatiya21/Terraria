@@ -89,12 +89,26 @@ void Player::render(AssetManager& assetManager)
 			}
 		}
 
+		float angle = 0.f;
+
+		if (timeAfterAttackAnimation > 0)
+		{
+			float attackProgress = 1.0f - (timeAfterAttackAnimation / maxAttackTimeAnimation);
+
+			float t = attackProgress;
+			t = t * t * (3 - 2 * t); // smoothstep
+
+			angle = -120.0f + t * 180.0f;
+		}
+
+		Vector2 origin = { 0,0 };
+
 		DrawTexturePro(
 			texture,
 			textureUVItem,
 			pos,
-			{ 0,0 },
-			0.f,
+			origin,
+			angle,
 			WHITE
 		);
 	}
