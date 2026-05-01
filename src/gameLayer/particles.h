@@ -101,7 +101,7 @@ Color getBlockColor(int type)
     return blockColors[type];
 }
 
-std::vector<Particle> spawnParticles(Vector2 pos, std::ranlux24_base& rng, int blockType, int numberOfParticles, float maxOffset = 1)
+std::vector<Particle> spawnParticles(Vector2 pos, std::ranlux24_base& rng, int blockType, int numberOfParticles, float maxOffset = 1, int angleOffset = 0)
 {
 	std::vector<Particle> particles;
 	for (int i = 0; i < numberOfParticles; i++)
@@ -111,7 +111,7 @@ std::vector<Particle> spawnParticles(Vector2 pos, std::ranlux24_base& rng, int b
 		p.positon.x = pos.x + offset;
         p.positon.y = pos.y;
 
-		float angle = getRandomFloat(rng, 220, 320) * DEG2RAD;
+		float angle = getRandomFloat(rng, 220 + angleOffset, 320 + angleOffset) * DEG2RAD;
 		float speed = getRandomFloat(rng, 50, 150) / 30.f;
 
 		p.velocity = { cosf(angle) * speed, sinf(angle) * speed };

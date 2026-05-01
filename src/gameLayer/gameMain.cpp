@@ -392,6 +392,7 @@ bool updateGame()
 
 	bool justLanded = !wasTouchingGround && gameData.player.physics.downTouch;
 
+	// spawn particles on player land
 	if (justLanded)
 	{
 		int blockType = 1;
@@ -400,6 +401,7 @@ bool updateGame()
 		Vector2 playerPosLeft = gameData.player.physics.transform.getBottomLeft();
 
 		// get block below feet
+		// check collider left
 		auto b = gameData.gameMap.getBlockSafe(playerPosLeft.x, playerPosLeft.y);
 		if (b && b->type != Block::air)
 		{
@@ -407,17 +409,32 @@ bool updateGame()
 		}
 		else
 		{
+			// check collider right
 			Vector2 playerPosRight = gameData.player.physics.transform.getBottomRight();
 			auto b = gameData.gameMap.getBlockSafe(playerPosRight.x, playerPosRight.y);
 			if (b && b->type != Block::air) blockType = b->type;
 		}
 
-		printf("landing velocity: %f\n", landingVelocity);
-		printf("particles: %d\n", gameData.player.numberOfParticlesOnLand * int(landingVelocity));
-
 		// spawn your particles here
-		auto newParticles = spawnParticles(playerPos, rng, blockType, gameData.player.numberOfParticlesOnLand * int(landingVelocity), gameData.player.physics.transform.w);
-		gameData.particles.insert(gameData.particles.end(), newParticles.begin(), newParticles.end());
+		auto rightParticles = spawnParticles(
+			playerPos,
+			rng,
+			blockType,
+			(gameData.player.numberOfParticlesOnLand * int(landingVelocity)) / 2, 
+			gameData.player.physics.transform.w,
+			45
+		);
+
+		auto leftParticles = spawnParticles(
+			playerPos,
+			rng,
+			blockType,
+			(gameData.player.numberOfParticlesOnLand * int(landingVelocity)) / 2,
+			gameData.player.physics.transform.w,
+			-45
+		);
+		gameData.particles.insert(gameData.particles.end(), leftParticles.begin(), leftParticles.end());
+		gameData.particles.insert(gameData.particles.end(), rightParticles.begin(), rightParticles.end());
 	}
 
 	// clamp camera
