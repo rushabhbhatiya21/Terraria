@@ -3,6 +3,7 @@
 #include <assetManager.h>
 #include <helper.h>
 #include <randomStuff.h>
+#include <entityHolder.h>
 
 void DesertSlime::render(AssetManager& assetManager)
 {
@@ -100,6 +101,12 @@ bool DesertSlime::update(float deltaTime, EntityUpdateData entityUpdateData)
 
 	return true;
 }
+
+void DesertSlime::dropLoot(EntityHolder& entityHolder, int type)
+{
+	
+}
+
 
 Json DesertSlime::formatToJson()
 {

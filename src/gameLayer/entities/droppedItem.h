@@ -16,6 +16,8 @@ struct DroppedItem : public Entity
 
 	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
 
+	void dropLoot(EntityHolder& entityHolder, int type) override;
+
 	Json formatToJson() override;
 
 	bool loadFromJson(Json& j) override;

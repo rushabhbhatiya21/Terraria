@@ -26,10 +26,11 @@ struct EntityUpdateData
 	std::ranlux24_base& rng;
 	EntityHolder& entityHolder;
 	Inventory& inventory;
+	GameMap& gameMap;
 
 	std::uint64_t ownId = 0;
-	float groundDistance = 0;
-	bool shouldStepUp = false; // add this
+	//float groundDistance = 0;
+	//bool shouldStepUp = false; // add this
 
 };
 
@@ -59,6 +60,8 @@ struct Entity
 	virtual void setColliderSize() = 0;
 
 	virtual float getMaxLife() = 0;
+
+	virtual void dropLoot(EntityHolder& entityHolder, int type) = 0;
 
 	void hit(float damage)
 	{

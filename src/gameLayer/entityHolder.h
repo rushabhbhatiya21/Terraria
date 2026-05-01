@@ -2,7 +2,7 @@
 #include <memory>
 #include <cstdint>
 #include <unordered_map>
-#include <entities/slime.h>
+#include <entity.h>
 
 constexpr static std::uint64_t PLAYER_ID = 1;
 

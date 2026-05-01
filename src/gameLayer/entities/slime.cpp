@@ -1,7 +1,9 @@
 #pragma once
 #include "slime.h"
-#include <assetManager.h>
 #include <helper.h>
+#include <assetManager.h>
+#include <blocks.h>
+#include <entityHolder.h>
 
 void Slime::render(AssetManager& assetManager)
 {
@@ -30,6 +32,11 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 	}
 
 	changeStateTimer -= deltaTime;
+
+	if (life <= 0)
+	{
+		currentState = STATE_DEAD;
+	}
 
 	if (changeStateTimer < 0)
 	{
@@ -81,7 +88,7 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 			if (jumpTimer < 0)
 			{
 				jumpTimer = getRandomFloat(entityUpdateData.rng, 2, 7);
-				physics.jump(10);
+				physics.jump(7);
 
 				if (entityUpdateData.playerPosition.x > getPosition().x)
 				{
@@ -93,6 +100,13 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 				}
 			}
 			break;
+
+		case STATE_DEAD:
+		{
+			// drop loop
+			dropLoot(entityUpdateData.entityHolder, Block::woodenChest);
+			return false;
+		}
 
 		default:
 			break;
@@ -107,6 +121,19 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 
 	return true;
 
+}
+
+void Slime::dropLoot(EntityHolder& entityHolder, int type)
+{
+	DroppedItem droppedItem;
+	droppedItem.teleport(getPosition());
+
+	// make it drop rarer chests with low chance
+	droppedItem.itemType = type;
+	droppedItem.physics.velocity.y = -3.f;
+
+	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
+	entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
 }
 
 Json Slime::formatToJson()

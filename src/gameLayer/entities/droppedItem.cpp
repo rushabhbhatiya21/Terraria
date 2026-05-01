@@ -2,8 +2,8 @@
 #include "asserts.h"
 #include "helper.h"
 #include "assetManager.h"
-#include "entityHolder.h"
 #include "items.h"
+#include "entityHolder.h"
 
 void DroppedItem::render(AssetManager& assetManager)
 {
@@ -86,6 +86,11 @@ int DroppedItem::getMaxStackSize(int type)
 	if (type <= 0) { permaAssertDevelopement("item type should not be less or equal to 0 to get max stack size!"); return -1; }
 	if (type < Item::firstItem) { return 999; }
 	return 1;
+}
+
+void DroppedItem::dropLoot(EntityHolder& entityHolder, int type)
+{
+	// no implementation
 }
 
 Json DroppedItem::formatToJson()

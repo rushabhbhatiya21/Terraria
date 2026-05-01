@@ -14,7 +14,7 @@ struct Zombie : public Entity
 		life = getMaxLife();
 	}
 
-	EntityAnimation animation;
+	EntityAnimation animations;
 
 	Vector2& getPosition()
 	{
@@ -25,6 +25,8 @@ struct Zombie : public Entity
 
 	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
 
+	void dropLoot(EntityHolder& entityHolder, int type) override;
+	
 	Json formatToJson() override;
 
 	bool loadFromJson(Json& j) override;
@@ -41,12 +43,23 @@ struct Zombie : public Entity
 
 	enum
 	{
-		STATE_WONDERING = 0,
-		STATE_CHASING
+		STATE_IDLE = 0,
+		STATE_WONDERING,
+		STATE_CHASING,
+		STATE_ATTACK,
+		STATE_HURT,
+		STATE_DEAD
 	};
 
-	int currentState = STATE_WONDERING;
+	bool shouldStepUp(Vector2 playerPos, GameMap& gameMap);
+	bool isDying();
+	bool isPlayerInRange();
+	bool isPlayerInAttackRange();
+
+	int currentState = STATE_IDLE;
+	float changeDirTimer = 3.f;
 	float changeStateTimer = 1.f;
 	float jumpTimer = 5.f;
-	float moveSpeed = 0.f; // also represents direction
+	float defaultSpeed = 2.f;
+	float moveSpeed = 2.f; // also represents direction
 };

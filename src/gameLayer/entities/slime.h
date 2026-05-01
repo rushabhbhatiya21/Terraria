@@ -1,8 +1,9 @@
 #pragma once
+#include "droppedItem.h"
 #include <physics.h>
 #include <randomStuff.h>
-#include <entityAnimation.h>
 #include <entity.h>
+#include <entityAnimation.h>
 
 
 struct Slime : public Entity
@@ -25,6 +26,8 @@ struct Slime : public Entity
 
 	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
 
+	void dropLoot(EntityHolder& entityHolder, int type) override;
+
 	Json formatToJson() override;
 
 	bool loadFromJson(Json& j) override;
@@ -42,7 +45,8 @@ struct Slime : public Entity
 	enum
 	{
 		STATE_WONDERING = 0,
-		STATE_CHASING
+		STATE_CHASING,
+		STATE_DEAD
 	};
 
 	int currentState = STATE_WONDERING;

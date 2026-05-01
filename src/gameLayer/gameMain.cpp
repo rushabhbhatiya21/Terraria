@@ -154,9 +154,9 @@ bool initGame()
 	gameData.player.physics.transform.w = 0.9f;
 	gameData.player.physics.transform.h = 1.8f;
 
-	//spawnZombie({ 18,60 });
+	spawnZombie({ 25,60 });
 
-	spawnDroppedItem({ 25,60 }, 6001);
+	//spawnDroppedItem({ 25,60 }, 6001);
 
 	return true;
 }
@@ -294,7 +294,7 @@ bool updateGame()
 			gameData.player.physics.applyGravity();
 
 		// 3. Horizontal movement (ground vs air friction handled inside)
-		if (!creative)
+		//if (!creative)
 			gameData.player.physics.applyHorizontalMovement(deltaTime, inputX);
 
 		// ── Animation ────────────────────────────────────────────────────────────
@@ -482,28 +482,6 @@ bool updateGame()
 	{
 		bool shouldKill = false;
 
-		// zombie specific logic
-		if (it->second->getEntityType() == EntityType::EntityType_Zombie)
-		{
-			Vector2 zTotPlayerDirection = gameData.player.getPosition() - it->second->getPosition();
-
-			int nextX = int(it->second->getPosition().x) + 1;
-			int prevX = int(it->second->getPosition().x) - 1;
-
-			auto bNext = gameData.gameMap.getBlockSafe(nextX, it->second->getPosition().y);
-			auto bPrev = gameData.gameMap.getBlockSafe(prevX, it->second->getPosition().y);
-
-			if (bNext && zTotPlayerDirection.x >= 0 && bNext->type != Block::air && bNext->type != Block::leaves && bNext->type != Block::woodLog)
-			{
-				shouldStepUp = true;
-			}
-
-			if (bPrev && zTotPlayerDirection.x < 0 && bPrev->type != Block::air && bPrev->type != Block::leaves && bPrev->type != Block::woodLog)
-			{
-				shouldStepUp = true;
-			}
-		}
-
 		// dropped item specific logic
 		if (it->second->getEntityType() == EntityType::EntityType_DroppedItem)
 		{
@@ -525,28 +503,18 @@ bool updateGame()
 			rng,
 			gameData.entityHolder,
 			gameData.inventory,
+			gameData.gameMap,
 			it->first,
-			groundDistance,
-			shouldStepUp
 		};
 
 
-		if (!it->second->update(deltaTime, entityUpdateData) || it->second->life <= 0)
+		if (!it->second->update(deltaTime, entityUpdateData))
 		{
 			shouldKill = true;
 		}
 
 		if (shouldKill)
 		{
-			Slime* s = dynamic_cast<Slime*>(it->second.get());
-
-			// check if entity is slime
-			if (s != nullptr)
-			{
-				auto b = gameData.gameMap.getBlockSafe(s->getPosition().x - 0.5f, s->getPosition().y - 0.5f);
-				b->type = Block::woodenChest;
-			}
-
 			// erase returns next valid iterator
 			it = gameData.entityHolder.entities.erase(it);
 		}

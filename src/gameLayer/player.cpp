@@ -134,6 +134,12 @@ bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)
 	return true;
 }
 
+void Player::dropLoot(EntityHolder& entityHolder, int type)
+{
+
+}
+
+
 Json Player::formatToJson()
 {
 	Json j;
