@@ -2,6 +2,15 @@
 #include <saveMap.h>
 #include <asserts.h>
 
+#include <nlohmann/json.hpp>
+#include <gameMap.h>
+#include <entityHolder.h>
+#include <player.h>
+#include <entities/slime.h>
+#include <entities/desetSlime.h>
+#include <entities/droppedItem.h>
+#include <entities/zombie.h>
+
 struct BlockRepresentation1
 {
 	std::uint16_t type = 0;
@@ -194,4 +203,159 @@ bool readEntireFile(const char* fileName, void* buffer, size_t bufferSize, size_
 	bytesRead = size;
 	f.close();
 	return true;
+}
+
+using Json = nlohmann::json;
+
+void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
+{
+	std::error_code errorCode;
+	std::filesystem::create_directory(RESOURCES_PATH "../saves/", errorCode);
+
+	saveBlockDataToFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin");
+
+	// id holder
+	{
+		std::ofstream f(RESOURCES_PATH "../saves/idHolder.txt");
+		f << entities.idHolder.idCounter;
+		f.close();
+	}
+
+	// player
+	{
+		Json j = player.formatToJson();
+		std::ofstream f(RESOURCES_PATH "../saves/player.txt");
+		f << j.dump(2);
+	}
+
+	// entities
+	{
+		Json j;
+
+		for (auto& e : entities.entities)
+		{
+			j[std::to_string(e.first)] = e.second->formatToJson();
+		}
+
+		std::ofstream f(RESOURCES_PATH "../saves/entities.txt");
+		f << j.dump(2);
+		f.close();
+	}
+}
+
+bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
+{
+	gameMap = {};
+	entities.entities.clear();
+	player = {};
+	entities.idHolder = {};
+
+	if (!loadBlockDataFromFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin"))
+	{
+		return false;
+	}
+
+	// id holder
+	{
+		std::ifstream f(RESOURCES_PATH "../saves/idHolder.txt");
+
+		if (!f.is_open()) { return false; }
+		f >> entities.idHolder.idCounter;
+		if (!f) { return false; }
+		f.close();
+	}
+
+	// player
+	{
+		std::ifstream f(RESOURCES_PATH "../saves/player.txt");
+
+		if (!f.is_open()) { return false; }
+		Json j;
+		j = Json::parse(f, nullptr, false);
+
+		if (!player.loadFromJson(j)) { return false; }
+	}
+
+	// entites
+	{
+		std::ifstream f(RESOURCES_PATH "../saves/entites.txt");
+
+		if (!f.is_open()) { return false; }
+		Json j;
+		j = Json::parse(f, nullptr, false);
+
+		for (auto it = j.begin(); it != j.end(); ++it)
+		{
+			const std::string& keyStr = it.key();
+			bool isNumeric = !keyStr.empty() && std::all_of(keyStr.begin(), keyStr.end(), ::isdigit);
+
+			if (!isNumeric) { continue; }
+
+			std::uint64_t id = 0;
+
+			for (auto c : keyStr)
+			{
+				id *= 10;
+				id += c - '0';
+			}
+
+			Json& entityJson = it.value();
+			
+			int entityType = 0;
+
+			if (!entityJson["entityType"].is_number()) continue;
+
+			entityType = entityJson["entityType"];
+
+			switch (entityType)
+			{
+				case EntityType::EntityType_Slime:
+				{
+					Zombie zombie;
+					if (zombie.loadFromJson(entityJson))
+					{
+						entities.entities[id] = std::make_unique<Zombie>(zombie);
+					}
+
+					break;
+				}
+
+				case EntityType::EntityType_DesertSlime:
+				{
+					DesertSlime desertSlime;
+					if (desertSlime.loadFromJson(entityJson))
+					{
+						entities.entities[id] = std::make_unique<DesertSlime>(desertSlime);
+					}
+
+					break;
+				}
+
+				case EntityType::EntityType_Zombie:
+				{
+					Zombie zombie;
+					if (zombie.loadFromJson(entityJson))
+					{
+						entities.entities[id] = std::make_unique<Zombie>(zombie);
+					}
+
+					break;
+				}
+
+				case EntityType::EntityType_DroppedItem:
+				{
+					DroppedItem item;
+					if (item.loadFromJson(entityJson))
+					{
+						entities.entities[id] = std::make_unique<DroppedItem>(item);
+					}
+
+					break;
+				}
+
+				default:
+					break;
+			}
+		}
+	}
 }

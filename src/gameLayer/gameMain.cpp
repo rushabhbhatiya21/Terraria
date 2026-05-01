@@ -28,7 +28,7 @@
 #include <entities/droppedItem.h>
 #include <entities/slime.h>
 #include <entities/desetSlime.h>
-#include <entities/evilEye.h>
+//#include <entities/evilEye.h>
 #include <entities/zombie.h>
 
 #include <itemData.h>
@@ -97,14 +97,14 @@ void spawnDesertSlime(Vector2 position)
 	gameData.entityHolder.entities[id] = std::make_unique<DesertSlime>(desertSlime);
 }
 
-void spawnEvilEye(Vector2 position)
-{
-	EvilEye evilEye;
-	evilEye.teleport(position);
-
-	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
-	gameData.entityHolder.entities[id] = std::make_unique<EvilEye>(evilEye);
-}
+//void spawnEvilEye(Vector2 position)
+//{
+//	EvilEye evilEye;
+//	evilEye.teleport(position);
+//
+//	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
+//	gameData.entityHolder.entities[id] = std::make_unique<EvilEye>(evilEye);
+//}
 
 void spawnZombie(Vector2 position)
 {

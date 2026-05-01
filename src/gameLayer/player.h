@@ -7,8 +7,7 @@ struct Player : public Entity
 {
 	Player()
 	{
-		physics.transform.w = 0.9f;
-		physics.transform.h = 1.8f;
+		setColliderSize();
 
 		life = getMaxLife();
 	}
@@ -25,6 +24,16 @@ struct Player : public Entity
 	void render(AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
+
+	Json formatToJson() override;
+
+	bool loadFromJson(Json& j) override;
+
+	void setColliderSize()
+	{
+		physics.transform.w = 0.9f;
+		physics.transform.h = 1.8f;
+	}
 
 	int getEntityType() { return EntityType_Player; }
 

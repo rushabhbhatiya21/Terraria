@@ -6,8 +6,7 @@ struct DroppedItem : public Entity
 {
 	DroppedItem()
 	{
-		physics.transform.w = 0.8f;
-		physics.transform.h = 0.8f;
+		setColliderSize();
 	}
 
 	int itemType = 0;
@@ -16,6 +15,16 @@ struct DroppedItem : public Entity
 	void render(AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
+
+	Json formatToJson() override;
+
+	bool loadFromJson(Json& j) override;
+
+	void setColliderSize()
+	{
+		physics.transform.w = 0.8f;
+		physics.transform.h = 0.8f;
+	}
 
 	int getEntityType() { return EntityType_DroppedItem; }
 

@@ -87,3 +87,39 @@ int DroppedItem::getMaxStackSize(int type)
 	if (type < Item::firstItem) { return 999; }
 	return 1;
 }
+
+Json DroppedItem::formatToJson()
+{
+	Json j;
+	addCommonEntityStuffToJson(j);
+
+	j["itemType"] = itemType;
+	j["itemCounter"] = itemCounter;
+
+	return j;
+}
+
+bool DroppedItem::loadFromJson(Json& j)
+{
+	if (!loadCommonEntityStuffFromJson(j)) { return false; }
+
+	if (!j.contains("itemType")) { return false; }
+
+	if (j["itemType"].is_number()) { return false; }
+
+	itemType = j["itemType"];
+
+	if (itemType < 0 || itemType >= Item::LAST_ITEM) { return false; }
+
+	if (!j.contains("itemCounter")) { return false; }
+
+	if (j["itemCounter"].is_number()) { return false; }
+
+	itemCounter = j["itemCounter"];
+
+	if (itemCounter < 0) { return false; }
+
+	setColliderSize();
+
+	return true;
+}

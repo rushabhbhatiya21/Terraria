@@ -100,3 +100,24 @@ bool DesertSlime::update(float deltaTime, EntityUpdateData entityUpdateData)
 
 	return true;
 }
+
+Json DesertSlime::formatToJson()
+{
+	Json j;
+	addCommonEntityStuffToJson(j);
+
+	// todo slime state
+
+	return j;
+}
+
+bool DesertSlime::loadFromJson(Json& j)
+{
+	*this = {};
+
+	bool rez = loadCommonEntityStuffFromJson(j);
+
+	setColliderSize();
+
+	return rez;
+}

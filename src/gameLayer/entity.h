@@ -1,10 +1,13 @@
 #pragma once
 #include <physics.h>
 #include <random>
+#include <nlohmann/json.hpp>
 
 struct AssetManager;
 struct EntityHolder;
 struct Inventory;
+
+using Json = nlohmann::json;
 
 enum EntityType
 {
@@ -53,11 +56,41 @@ struct Entity
 
 	virtual int getEntityType() = 0;
 
+	virtual void setColliderSize() = 0;
+
 	virtual float getMaxLife() = 0;
 
 	void hit(float damage)
 	{
 		isRedTimer = 0.5f;
 		life -= damage;
+	}
+
+	virtual Json formatToJson() = 0;
+	virtual bool loadFromJson(Json& j) = 0;
+
+	void addCommonEntityStuffToJson(Json& json)
+	{
+		json["physics"] = physics.formatToJson();
+		json["life"] = life;
+		json["entityType"] = getEntityType();
+	}
+
+	bool loadCommonEntityStuffFromJson(Json& json)
+	{
+		if (!json.contains("physics")) { return false; }
+		
+		auto j = json["physics"];
+
+		if (!j.is_object()) { return false; }
+
+		if (!physics.loadFromJson(j)) { return false; }
+
+		if (json["life"].is_number())
+		{
+			life = json["life"];
+		}
+
+		return true;
 	}
 };

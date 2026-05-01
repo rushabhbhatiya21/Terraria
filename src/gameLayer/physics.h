@@ -2,6 +2,9 @@
 #include "raylib.h"
 #include <raymath.h>
 #include <cmath>
+#include <nlohmann/json.hpp>
+
+using Json = nlohmann::json;
 
 // ── Vector2 operator overloads ───────────────────────────────────────────────
 
@@ -344,6 +347,45 @@ struct PhysicalEntity
 	Vector2& getPosition()
 	{
 		return transform.pos;
+	}
+
+	Json formatToJson()
+	{
+		Json j;
+		j["posX"] = transform.pos.x;
+		j["posY"] = transform.pos.y;
+		j["velX"] = velocity.x;
+		j["velY"] = velocity.y;
+
+		return j;
+	}
+
+	bool loadFromJson(Json& j)
+	{
+		*this = {};
+
+		if (!j.contains("posX") || !j["posX"].is_number())
+			return false;
+		transform.pos.x = j["posX"];
+
+		if (!j.contains("posY") || !j["posY"].is_number())
+			return false;
+		transform.pos.y = j["posY"];
+
+		if (j.contains("velX"))
+		{
+			if (j["velX"].is_number())
+				velocity.x = j["velX"];
+		}
+
+		if (j.contains("velY"))
+		{
+			if (j["velY"].is_number())
+				velocity.y = j["velY"];
+		}
+
+		lastPosition = transform.pos;
+		return true;
 	}
 
 	// functions to resolve collisions

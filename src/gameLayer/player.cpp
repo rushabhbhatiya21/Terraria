@@ -133,3 +133,24 @@ bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
 	return true;
 }
+
+Json Player::formatToJson()
+{
+	Json j;
+	addCommonEntityStuffToJson(j);
+
+	// add more data to save here
+
+	return j;
+}
+
+bool Player::loadFromJson(Json& j)
+{
+	*this = {};
+
+	bool rez = loadCommonEntityStuffFromJson(j);
+
+	setColliderSize();
+
+	return rez;
+}

@@ -82,5 +82,25 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 	animation.update(deltaTime, 0.08f, 7);
 
 	return true;
+}
 
+Json Zombie::formatToJson()
+{
+	Json j;
+	addCommonEntityStuffToJson(j);
+
+	// todo zombie state
+
+	return j;
+}
+
+bool Zombie::loadFromJson(Json& j)
+{
+	*this = {};
+
+	bool rez = loadCommonEntityStuffFromJson(j);
+
+	setColliderSize();
+
+	return rez;
 }

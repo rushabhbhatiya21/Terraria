@@ -6,8 +6,7 @@ struct DesertSlime: public Entity
 {
 	DesertSlime()
 	{
-		physics.transform.w = 1.6f;
-		physics.transform.h = 1.6f;
+		setColliderSize();
 
 		life = getMaxLife();
 	}
@@ -22,6 +21,16 @@ struct DesertSlime: public Entity
 	void render(AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
+
+	Json formatToJson() override;
+
+	bool loadFromJson(Json& j) override;
+
+	void setColliderSize()
+	{
+		physics.transform.w = 1.f;
+		physics.transform.h = 1.f;
+	}
 
 	int getEntityType() { return EntityType_DesertSlime; }
 
