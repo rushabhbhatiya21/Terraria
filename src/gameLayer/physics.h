@@ -171,9 +171,9 @@ struct PhysicalEntity
 	// All tunable constants are here at the top — tweak to taste.
 
 	// Variable-height jump
-	static constexpr float JUMP_FORCE = 14.f;  // initial velocity on jump
-	static constexpr float JUMP_HOLD_MAX = 0.08f; // max seconds key can extend jump
-	static constexpr float JUMP_HOLD_ACCEL = 28.f;  // extra upward accel while holding
+	static constexpr float JUMP_FORCE = 12.f;  // initial velocity on jump
+	static constexpr float JUMP_HOLD_MAX = 0.04f; // max seconds key can extend jump
+	static constexpr float JUMP_HOLD_ACCEL = 14.f;  // extra upward accel while holding
 	static constexpr float JUMP_CUT_FACTOR = 0.45f; // velocity multiplier on early release
 
 	// Gravity multipliers

@@ -7,7 +7,7 @@
 
 std::unordered_map<int, Color> blockColors = {
     { Block::air,              {   0,   0,   0,   0 } }, // transparent
-    { Block::dirt,             { 155, 118,  83, 255 } },
+    { Block::dirt,             { 200, 118,  83, 255 } },
     { Block::grassBlock,       {  86, 152,  23, 255 } },
     { Block::stone,            { 136, 136, 136, 255 } },
     { Block::grass,            { 100, 180,  40, 255 } }, // flat grass / foliage
@@ -91,7 +91,8 @@ struct Particle
 
 	inline void render()
 	{
-		DrawRectangleV(positon, { .1f,.1f }, Fade(color, life));
+        // fade slowly at start
+		DrawRectangleV(positon, { .1f,.1f }, Fade(color, 1.f - (1.f - life) * (1.f - life))); // ease-out
 	}
 };
 
@@ -100,19 +101,21 @@ Color getBlockColor(int type)
     return blockColors[type];
 }
 
-std::vector<Particle> spawnParticles(Vector2 pos, std::ranlux24_base& rng, int blockType)
+std::vector<Particle> spawnParticles(Vector2 pos, std::ranlux24_base& rng, int blockType, int numberOfParticles, float maxOffset = 1)
 {
 	std::vector<Particle> particles;
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < numberOfParticles; i++)
 	{
 		Particle p;
-		p.positon = pos;
+        float offset = getRandomFloat(rng, 0, maxOffset);
+		p.positon.x = pos.x + offset;
+        p.positon.y = pos.y;
 
 		float angle = getRandomFloat(rng, 220, 320) * DEG2RAD;
 		float speed = getRandomFloat(rng, 50, 150) / 30.f;
 
 		p.velocity = { cosf(angle) * speed, sinf(angle) * speed };
-		p.life = .5f;
+		p.life = getRandomFloat(rng, .3f, .7f);
 		p.color = getBlockColor(blockType);
 		particles.push_back(p);
 	}

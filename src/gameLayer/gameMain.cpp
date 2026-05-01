@@ -124,6 +124,7 @@ void spawnDroppedItem(Vector2 positon, int type)
 	DroppedItem droppedItem;
 	droppedItem.teleport(positon);
 	droppedItem.itemType = type;
+	droppedItem.physics.velocity.y = -3.f;
 
 	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
 	gameData.entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
@@ -242,6 +243,10 @@ bool updateGame()
 	std::ranlux24_base rng(std::random_device{}());
 
 	static bool creative = false;
+
+	// ← snapshot HERE, before any physics or input runs
+	bool wasTouchingGround = gameData.player.physics.downTouch;
+	float landingVelocity = gameData.player.physics.velocity.y;
 
 	// ── Movement block — replace your existing input section with this ────────────
 	// Requires the updated physics.h (updateJump, applyGravity, applyHorizontalMovement).
@@ -383,7 +388,37 @@ bool updateGame()
 			entity.physics.updateFinal();
 		};
 
-	updateEntityPhysics(gameData.player, !creative);
+	updateEntityPhysics(gameData.player, false);
+
+	bool justLanded = !wasTouchingGround && gameData.player.physics.downTouch;
+
+	if (justLanded)
+	{
+		int blockType = 1;
+		// spawn particles at feet
+		Vector2 playerPos = gameData.player.physics.transform.getBottom();
+		Vector2 playerPosLeft = gameData.player.physics.transform.getBottomLeft();
+
+		// get block below feet
+		auto b = gameData.gameMap.getBlockSafe(playerPosLeft.x, playerPosLeft.y);
+		if (b && b->type != Block::air)
+		{
+			blockType = b->type;
+		}
+		else
+		{
+			Vector2 playerPosRight = gameData.player.physics.transform.getBottomRight();
+			auto b = gameData.gameMap.getBlockSafe(playerPosRight.x, playerPosRight.y);
+			if (b && b->type != Block::air) blockType = b->type;
+		}
+
+		printf("landing velocity: %f\n", landingVelocity);
+		printf("particles: %d\n", gameData.player.numberOfParticlesOnLand * int(landingVelocity));
+
+		// spawn your particles here
+		auto newParticles = spawnParticles(playerPos, rng, blockType, gameData.player.numberOfParticlesOnLand * int(landingVelocity), gameData.player.physics.transform.w);
+		gameData.particles.insert(gameData.particles.end(), newParticles.begin(), newParticles.end());
+	}
 
 	// clamp camera
 	{
@@ -623,7 +658,7 @@ bool updateGame()
 				gameData.player.timeAfterAttackAnimation = gameData.player.maxAttackTimeAnimation;
 
 				// particle effect
-				auto newParticles = spawnParticles({ (float)blockX + .5f, (float)blockY }, rng, b->type);
+				auto newParticles = spawnParticles({ (float)blockX, (float)blockY }, rng, b->type, 10);
 				gameData.particles.insert(gameData.particles.end(), newParticles.begin(), newParticles.end());
 
 				// calculate damage done to block

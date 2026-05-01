@@ -49,4 +49,6 @@ struct Player : public Entity
 	int armourChest = Item::iceChestPlate;
 	int armoutLegs = Item::goldBoots;
 	int heldItem = 0;
+
+	int numberOfParticlesOnLand = 1;
 };
