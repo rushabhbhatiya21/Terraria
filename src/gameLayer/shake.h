@@ -38,7 +38,7 @@ inline void triggerShake(int x, int y)
     shakeMap[key] = {
         0.15f,   // time
         0.15f,   // duration
-        0.05f,   // strength (IMPORTANT: small because your tile size = 1)
+        0.1f,   // strength (IMPORTANT: small because your tile size = 1)
         GetRandomValue(0, 1000) / 100.0f // phase
     };
 }

@@ -21,6 +21,7 @@
 #include <physics.h>
 #include <entityHolder.h>
 #include <shake.h>
+#include <particles.h>
 
 #include <items.h>
 #include <player.h>
@@ -66,6 +67,9 @@ struct GameData
 	Vector2 selectionStart = {};
 	Vector2 selectionEnd = {};
 	char saveName[100] = {};
+
+	// particles
+	std::vector<Particle> particles;
 
 } gameData;
 
@@ -187,6 +191,7 @@ bool updateGame()
 
 	updateShake(deltaTime);
 	updateCameraShake(deltaTime);
+	updateParticles(gameData.particles, deltaTime);
 
 #pragma endregion
 
@@ -617,6 +622,10 @@ bool updateGame()
 				// play attack animation
 				gameData.player.timeAfterAttackAnimation = gameData.player.maxAttackTimeAnimation;
 
+				// particle effect
+				auto newParticles = spawnParticles({ (float)blockX + .5f, (float)blockY }, rng, b->type);
+				gameData.particles.insert(gameData.particles.end(), newParticles.begin(), newParticles.end());
+
 				// calculate damage done to block
 				int dmg = calcBlockDamage(*b, gameData.player.heldItem);
 				b->hp -= dmg;
@@ -906,7 +915,7 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region draw entities
+#pragma region render entities
 
 	for (auto& e : gameData.entityHolder.entities)
 	{
@@ -916,14 +925,14 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region draw player
+#pragma region render player
 
 	gameData.player.render(assetManager);
 
 #pragma endregion
 
 
-#pragma region draw inventory
+#pragma region render inventory
 
 	if (!showImgui)
 	{
@@ -1002,7 +1011,14 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region show structure selection
+#pragma region render particles
+
+	renderParticles(gameData.particles);
+
+#pragma endregion
+
+
+#pragma region render structure selection
 
 	// show structure selection
 	if (showImgui)
@@ -1061,7 +1077,7 @@ bool updateGame()
 	//}
 
 #pragma endregion
-	
+
 
 	EndMode2D();
 
