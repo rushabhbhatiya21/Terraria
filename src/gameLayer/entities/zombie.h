@@ -26,7 +26,13 @@ struct Zombie : public Entity
 	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
 
 	void dropLoot(EntityHolder& entityHolder, int type) override;
+
+	void enterState(int newState, EntityUpdateData& entityUpdateData);
 	
+	bool shouldStepUp(Vector2 playerPos, GameMap& gameMap);
+
+	void doAttack(EntityUpdateData& entityUpdateData);
+
 	Json formatToJson() override;
 
 	bool loadFromJson(Json& j) override;
@@ -51,15 +57,22 @@ struct Zombie : public Entity
 		STATE_DEAD
 	};
 
-	bool shouldStepUp(Vector2 playerPos, GameMap& gameMap);
-	bool isDying();
-	bool isPlayerInRange();
-	bool isPlayerInAttackRange();
+	// Zombie.h — tweak these freely
+	static constexpr float SIGHT_RANGE = 15.f;
+	static constexpr float ATTACK_RANGE = 1.5f;
+	static constexpr float WANDER_SPEED = 1.5f;   // px/s
+	static constexpr float CHASE_SPEED = 3.f;
+	static constexpr float IDLE_INTERVAL = 2.f;    // seconds
+	static constexpr float WANDER_INTERVAL = 3.f;
+	static constexpr float ATTACK_COOLDOWN = 1.f;
+	static constexpr float HURT_DURATION = 0.3f;
+
+	static constexpr int ANIM_JUMP = 0;
+	static constexpr int ANIM_IDLE = 0;
+	static constexpr int ANIM_WALK = 1;
+	static constexpr int ANIM_DEAD = 4;
 
 	int currentState = STATE_IDLE;
-	float changeDirTimer = 3.f;
-	float changeStateTimer = 1.f;
-	float jumpTimer = 5.f;
-	float defaultSpeed = 2.f;
-	float moveSpeed = 2.f; // also represents direction
+	float changeStateTimer = 3.f;
+	float moveSpeed = 0.f; // also represents direction
 };

@@ -40,68 +40,36 @@ void Zombie::render(AssetManager& assetManager)
 
 bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
-	changeDirTimer -= deltaTime;
+	// --- TIMERS ---
+	if (isRedTimer > 0) isRedTimer -= deltaTime;
+	changeStateTimer -= deltaTime;
 
-	if (changeDirTimer <= 0)
+	// --- DEATH CHECK (highest priority, overrides everything) ---
+	if (life <= 0 && currentState != STATE_DEAD)
 	{
-		currentState = STATE_WONDERING;
-		changeDirTimer = 3.f;
-	}
-	else
-	{
-		currentState = STATE_IDLE;
-	}
-
-	if (life <= 0)
-	{
-		currentState = STATE_DEAD;
+		enterState(STATE_DEAD, entityUpdateData);
+		return true;
 	}
 
-	if (isRedTimer > 0)
-	{
-		isRedTimer -= deltaTime;
-	}
+	if (currentState == STATE_DEAD) return false;
 
-	//if (abs(entityUpdateData.playerPosition.x - getPosition().x) >= 1.f)
-	//{
-	//	moveSpeed = 1.f;
-	//	animation.setAnimation(1);
-	//}
-	//else
-	//{
-	//	moveSpeed = 0;
-	//	animation.setAnimation(0);
-	//}
+	// --- PERCEPTION ---
+	Vector2 toPlayer = entityUpdateData.playerPosition - getPosition();
+	float   distToPlayer = Vector2Length(toPlayer);
+	bool    playerInSight = distToPlayer < SIGHT_RANGE;
+	bool    playerInAttackRange = distToPlayer < ATTACK_RANGE;
 
-	//Vector2 dir = entityUpdateData.playerPosition - getPosition();
-	//dir = Vector2Normalize(dir);
+	// At the top of update(), temporarily
+	printf("state=%d dist=%.1f sight=%.1f speed=%.1f timer=%.2f\n",
+		currentState, distToPlayer, SIGHT_RANGE, moveSpeed, changeStateTimer);
 
-	////printf("dir.x: %f\n", dir.x);
-	//if (dir.x < 0)
-	//{
-	//	isFacingRight = false;
-	//}
-	//else
-	//{
-	//	isFacingRight = true;
-	//}
-
-	//getPosition().x += dir.x * moveSpeed * deltaTime;
+	// --- STATE TRANSITIONS ---
+	int previousState = currentState;
 
 	//if (moveSpeed && shouldStepUp(entityUpdateData.playerPosition, entityUpdateData.gameMap))
 	//{
 	//	physics.jump(10);
 	//}
-
-	// set animation
-	if (!physics.downTouch)
-	{
-		animations.setAnimation(0);
-	}
-	else
-	{
-		animations.setAnimation(1);
-	}
 
 	// set variable for flipping sprite
 	if (moveSpeed >= 0)
@@ -117,47 +85,151 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 	{
 	case STATE_IDLE:
 	{
-		printf("state changed to idle\n");
-		//if (getRandomChance(entityUpdateData.rng, 0.3))
-		//{
-		//	changeDirTimer = 1.f;
-		//	moveSpeed = 0.f;
-		//}
-		//else
-		//{
-		//	moveSpeed = defaultSpeed;
-		//}
+		if (playerInSight)
+			currentState = STATE_CHASING;
+		else if (changeStateTimer <= 0)
+		{
+			changeStateTimer = WANDER_INTERVAL;
+			currentState = STATE_WONDERING;
+		}
 		break;
 	}
 
 
 	case STATE_WONDERING:
 	{
-		printf("state changed to wondering\n");
-		moveSpeed *= -1;
-		printf("movesped: %f\n", moveSpeed);
+		if (playerInSight)
+			currentState = STATE_CHASING;
+		else if (changeStateTimer <= 0)
+		{
+			changeStateTimer = IDLE_INTERVAL;
+			currentState = STATE_IDLE;
+		}
 		break;
 	}
 
 	case STATE_CHASING:
-	case STATE_ATTACK:
-	case STATE_HURT:
-	case STATE_DEAD:
-		dropLoot(entityUpdateData.entityHolder, Block::boneChest);
+		if (!playerInSight)
+			currentState = STATE_IDLE;         // lost the player
+		else if (playerInAttackRange)
+			currentState = STATE_ATTACK;
 		break;
+
+	case STATE_ATTACK:
+		if (!playerInAttackRange)
+			currentState = STATE_CHASING;
+		else if (changeStateTimer <= 0)          // reuse timer as attack cooldown
+		{
+			changeStateTimer = ATTACK_COOLDOWN;
+			doAttack(entityUpdateData);        // deal damage, play anim, etc.
+		}
+		break;
+
+	case STATE_HURT:
+		if (changeStateTimer <= 0)               // hurt stun duration expired
+			currentState = (playerInSight) ? STATE_CHASING : STATE_IDLE;
+		break;
+
+	case STATE_DEAD:
+		break;
+
 	default:
 		break;
 	}
 
-	if (moveSpeed)
+	bool justEnteredState = (previousState != currentState);
+	if (justEnteredState)
+		enterState(currentState, entityUpdateData);
+
+	// --- MOVEMENT ---
+	switch (currentState)
 	{
-		getPosition().x += deltaTime * moveSpeed;
+	case STATE_IDLE:
+	case STATE_ATTACK:
+		moveSpeed = 0.f;
+		break;
+
+	case STATE_WONDERING:
+		// direction already chosen in enterState
+		break;
+
+	case STATE_CHASING:
+	{
+		// walk toward player
+		float dir = (toPlayer.x >= 0.f) ? 1.f : -1.f;
+		moveSpeed = dir * CHASE_SPEED;
+		break;
 	}
 
+	case STATE_HURT:
+		moveSpeed = 0.f;
+		break;
+
+	default: break;
+	}
+
+	if (moveSpeed != 0.f)
+	{
+		getPosition().x += moveSpeed * deltaTime;
+
+		if (shouldStepUp(entityUpdateData.playerPosition, entityUpdateData.gameMap))
+			physics.jump(10.f);
+	}
+
+	// --- ANIMATION ---
+	if (!physics.downTouch)
+		animations.setAnimation(ANIM_JUMP);
+	else if (moveSpeed == 0.f)
+		animations.setAnimation(ANIM_IDLE);
+	else
+		animations.setAnimation(ANIM_WALK);
+
+	animations.movingLeft = (moveSpeed < 0.f);
 	animations.update(deltaTime, 0.08f, 7);
 
 	return true;
 }
+
+// Called exactly once when transitioning INTO a new state
+void Zombie::enterState(int newState, EntityUpdateData& entityUpdateData)
+{
+	switch (newState)
+	{
+	case STATE_IDLE:
+		changeStateTimer = IDLE_INTERVAL;
+		break;
+
+	case STATE_WONDERING:
+		moveSpeed = getRandomChance(entityUpdateData.rng, 0.5f) ? WANDER_SPEED : -WANDER_SPEED;
+		changeStateTimer = WANDER_INTERVAL;
+		break;
+
+	case STATE_CHASING:
+		break;
+
+	case STATE_ATTACK:
+		changeStateTimer = ATTACK_COOLDOWN;
+		break;
+
+	case STATE_HURT:
+		changeStateTimer = HURT_DURATION;
+		break;
+
+	case STATE_DEAD:
+		moveSpeed = 0.f;
+		dropLoot(entityUpdateData.entityHolder, Block::boneChest);
+		animations.setAnimation(ANIM_DEAD);
+		break;
+
+	default: break;
+	}
+}
+
+void Zombie::doAttack(EntityUpdateData& entityUpdateData)
+{
+	entityUpdateData.playerPosition.x -= 1;
+}
+
 
 void Zombie::dropLoot(EntityHolder& entityHolder, int type)
 {
