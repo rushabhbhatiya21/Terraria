@@ -128,13 +128,11 @@ void Player::render(AssetManager& assetManager)
 		WHITE
 	);
 
-	DrawRectangleLinesEx(
-		aabb,
-		0.1f,
-		{ 20,101,250,120 }
-	);
-
-	DrawCircleLinesV(physics.transform.getCenter(), 8, RED);
+	//DrawRectangleLinesEx(
+	//	aabb,
+	//	0.1f,
+	//	{ 20,101,250,120 }
+	//);
 }
 
 bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)

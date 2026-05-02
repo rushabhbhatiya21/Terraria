@@ -177,8 +177,14 @@ bool initGame()
 
 bool updateGame()
 {
+
+#pragma region fixed updates
+
 	Audio::update();
 	updateSettings();
+
+#pragma endregion
+
 
 #pragma region delta time
 
@@ -188,7 +194,7 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region reset times and updates
+#pragma region reset attck & animation times
 
 	if (gameData.player.timeAfterMine > 0)
 		gameData.player.timeAfterMine -= deltaTime;
@@ -204,6 +210,11 @@ bool updateGame()
 			gameData.player.timeAfterAttackAnimation = 0.0f;
 	}
 
+#pragma endregion
+
+
+#pragma region updates (deltatime dependent)
+
 	updateShake(deltaTime);
 	updateCameraShake(deltaTime);
 	updateParticles(gameData.particles, deltaTime);
@@ -211,7 +222,7 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region set camera offset for shake
+#pragma region camera offset and smoothing
 
 	gameData.camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
 
@@ -248,6 +259,10 @@ bool updateGame()
 	if (IsKeyPressed(KEY_F10)) { showImgui = !showImgui; }
 
 	if (IsKeyPressed(KEY_C)) { showCraftUI = !showCraftUI; }
+
+	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) { saveWorld(gameData.gameMap, gameData.entityHolder, gameData.player); }
+
+	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_L)) { loadWorld(gameData.gameMap, gameData.entityHolder, gameData.player); }
 
 #pragma endregion
 
@@ -822,7 +837,7 @@ bool updateGame()
 #pragma endregion
 
 
-#pragma region draw world
+#pragma region draw background
 
 	// background
 	{
@@ -849,7 +864,11 @@ bool updateGame()
 		);
 	}
 
+#pragma endregion
+
 	BeginMode2D(gameData.camera);
+
+#pragma region draw world
 
 	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, gameData.camera);
 	Vector2 bottomRightView = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, gameData.camera);
@@ -1119,9 +1138,14 @@ bool updateGame()
 
 	EndMode2D();
 
+#pragma region lighting
+
 	// Apply cave lighting ONLY when underground
 	if (gameData.player.getPosition().y > 130)
 	{
+		// Light mask render texture
+		lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+
 		// Convert player world pos -> screen pos
 		Vector2 playerScreen = GetWorldToScreen2D(
 			gameData.player.physics.transform.getCenter(),
@@ -1131,7 +1155,7 @@ bool updateGame()
 		// Update light mask in screen space
 		BeginTextureMode(lightMask);
 		ClearBackground(BLACK);
-		DrawCircleGradient(playerScreen.x, playerScreen.y, 400, WHITE, BLACK);
+		DrawCircleGradient(playerScreen.x, playerScreen.y, 600, WHITE, BLACK);
 		EndTextureMode();
 
 		// Overlay mask on screen
@@ -1144,6 +1168,8 @@ bool updateGame()
 		);
 		EndBlendMode();
 	}
+
+#pragma endregion
 
 
 #pragma region ImGui Madness
@@ -1289,6 +1315,13 @@ bool updateGame()
 #pragma region display fps
 
 	DrawFPS(10, 10);
+
+#pragma endregion
+
+
+#pragma region cleanup
+
+	UnloadRenderTexture(lightMask);
 
 #pragma endregion
 
