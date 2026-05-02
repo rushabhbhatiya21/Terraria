@@ -22,6 +22,7 @@
 #include <entityHolder.h>
 #include <shake.h>
 #include <particles.h>
+#include <secondOrderDynamics.h>
 
 #include <items.h>
 #include <player.h>
@@ -70,11 +71,12 @@ struct GameData
 	Vector2 selectionEnd = {};
 	char saveName[100] = {};
 
-	// night time
-	float nightTime = 0;
+	SecondOrderDynamics camFollow;
 
 	// particles
 	std::vector<Particle> particles;
+
+	
 
 } gameData;
 
@@ -164,7 +166,9 @@ bool initGame()
 	// Light mask render texture
 	lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
 
-	//spawnZombie({ 25,60 });
+	gameData.camFollow.init(1.5f, .74f, 1.f, gameData.player.getPosition());
+
+	spawnZombie({ 25,60 });
 
 	//spawnDroppedItem({ 25,60 }, 6001);
 
@@ -224,10 +228,10 @@ bool updateGame()
 		camOffset.y = cosf(time * 30.0f + camShake.phase) * strength;
 	}
 
-	Vector2 baseTarget = gameData.player.physics.transform.pos;
+	Vector2 smoothTarget = gameData.camFollow.Update(deltaTime, gameData.player.getPosition());
 
-	gameData.camera.target.x = baseTarget.x + camOffset.x;
-	gameData.camera.target.y = baseTarget.y + camOffset.y;
+	gameData.camera.target.x = smoothTarget.x + camOffset.x;
+	gameData.camera.target.y = smoothTarget.y + camOffset.y;
 
 #pragma endregion
 
@@ -614,6 +618,7 @@ bool updateGame()
 
 				if (
 					droppedItem == nullptr && 
+					gameData.player.physics.downTouch &&
 					e.second->physics.transform.intersectPoint(worldPos) && 
 					gameData.player.timeAfterAttack <= 0 &&
 					(isInRange(gameData.player.heldItem, magnitude) || creative)
@@ -645,7 +650,9 @@ bool updateGame()
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
 			if (
 				b &&
-				b->type && gameData.player.timeAfterMine <= 0 &&
+				b->type && 
+				gameData.player.physics.downTouch &&
+				gameData.player.timeAfterMine <= 0 &&
 				(isInRange(gameData.player.heldItem, magnitude) || creative)
 			)
 			{
@@ -1113,30 +1120,30 @@ bool updateGame()
 	EndMode2D();
 
 	// Apply cave lighting ONLY when underground
-	//if (gameData.player.getPosition().y > 130)
-	//{
-	// Convert player world pos -> screen pos
-	Vector2 playerScreen = GetWorldToScreen2D(
-		gameData.player.physics.transform.getCenter(),
-		gameData.camera
-	);
+	if (gameData.player.getPosition().y > 130)
+	{
+		// Convert player world pos -> screen pos
+		Vector2 playerScreen = GetWorldToScreen2D(
+			gameData.player.physics.transform.getCenter(),
+			gameData.camera
+		);
 
-	// Update light mask in screen space
-	BeginTextureMode(lightMask);
-	ClearBackground(BLACK);
-	DrawCircleGradient(playerScreen.x, playerScreen.y, 400, WHITE, BLACK);
-	EndTextureMode();
+		// Update light mask in screen space
+		BeginTextureMode(lightMask);
+		ClearBackground(BLACK);
+		DrawCircleGradient(playerScreen.x, playerScreen.y, 400, WHITE, BLACK);
+		EndTextureMode();
 
-	// Overlay mask on screen
-	BeginBlendMode(BLEND_MULTIPLIED);
-	DrawTextureRec(
-		lightMask.texture,
-		{ 0, 0, (float)GetScreenWidth(), (float)-GetScreenHeight() }, // negative H = flip Y
-		{ 0, 0 },
-		WHITE
-	);
-	EndBlendMode();
-	//}
+		// Overlay mask on screen
+		BeginBlendMode(BLEND_MULTIPLIED);
+		DrawTextureRec(
+			lightMask.texture,
+			{ 0, 0, (float)GetScreenWidth(), (float)-GetScreenHeight() }, // negative H = flip Y
+			{ 0, 0 },
+			WHITE
+		);
+		EndBlendMode();
+	}
 
 
 #pragma region ImGui Madness
