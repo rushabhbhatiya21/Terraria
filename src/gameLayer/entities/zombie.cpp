@@ -59,10 +59,6 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 	bool    playerInSight = distToPlayer < SIGHT_RANGE;
 	bool    playerInAttackRange = distToPlayer < ATTACK_RANGE;
 
-	// At the top of update(), temporarily
-	printf("state=%d dist=%.1f sight=%.1f speed=%.1f timer=%.2f\n",
-		currentState, distToPlayer, SIGHT_RANGE, moveSpeed, changeStateTimer);
-
 	// --- STATE TRANSITIONS ---
 	int previousState = currentState;
 

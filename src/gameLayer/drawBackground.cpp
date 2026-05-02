@@ -69,7 +69,14 @@ void DrawBackground::draw(float deltaTime, AssetManager& assetManager, Camera2D 
 			Rectangle src = { 0,0,(float)bg.width,(float)bg.height };
 			Rectangle dest = { offX, offY, bgW, bhH };
 
-			DrawTexturePro(bg, src, dest, { 0,0 }, 0.f, { 255,255,255,(unsigned char)(255 * opacity) });
+			DrawTexturePro(
+				bg, 
+				src, 
+				dest, 
+				{ 0,0 }, 
+				0.f, 
+				{ 255 ,255 ,255 ,(unsigned char)(255 * opacity) }
+			);
 		};
 
 	drawBackground(currentBackgroundType, 0.3f, 1.f);

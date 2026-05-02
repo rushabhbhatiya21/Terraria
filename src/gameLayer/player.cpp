@@ -54,6 +54,9 @@ void Player::render(AssetManager& assetManager)
 		Rectangle textureUVItem = getTextureCoordinatesForItemType(heldItem);
 
 		auto pos = aabb;
+		float rotation = 0;
+		float angle = 0;
+		Vector2 origin = { 0,1 };
 
 		if (heldItem < Block::BLOCKS_COUNT)
 		{
@@ -78,39 +81,42 @@ void Player::render(AssetManager& assetManager)
 
 			if (animations.movingLeft)
 			{
-				pos.y += 0.1;
-				pos.x -= 0.7;
+				pos.y += 1.2;
+				pos.x += 0.2;
+				angle = 120;
+				origin = { 1,1 };
 				textureUVItem = flipTextureAtlasX(textureUVItem);
 			}
 			else
 			{
-				pos.y += 0.1;
-				pos.x += 0.5;
+				pos.y += 1.2;
+				pos.x += 0.8;
+				angle = -120;
 			}
 		}
 
-		float angle = 0.f;
-
 		if (timeAfterAttackAnimation > 0)
 		{
+			isPlayingAttackAnimation = true;
 			float attackProgress = 1.0f - (timeAfterAttackAnimation / maxAttackTimeAnimation);
 
 			float t = attackProgress;
 			t = t * t * (3 - 2 * t); // smoothstep
 
-			angle = -120.0f + t * 180.0f;
-		}
+			if (animations.movingLeft ? t *= -1 : t *= 1);
 
-		Vector2 origin = { 0,0 };
+			rotation = angle + t * 180.0f;
+		}
 
 		DrawTexturePro(
 			texture,
 			textureUVItem,
 			pos,
 			origin,
-			angle,
+			rotation,
 			WHITE
 		);
+
 	}
 
 	DrawTexturePro(
@@ -127,6 +133,8 @@ void Player::render(AssetManager& assetManager)
 		0.1f,
 		{ 20,101,250,120 }
 	);
+
+	DrawCircleLinesV(physics.transform.getCenter(), 8, RED);
 }
 
 bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)
@@ -136,7 +144,7 @@ bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)
 
 void Player::dropLoot(EntityHolder& entityHolder, int type)
 {
-
+	// no need to implement
 }
 
 

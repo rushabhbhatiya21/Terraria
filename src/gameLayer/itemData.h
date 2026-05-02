@@ -134,25 +134,25 @@ constexpr ItemData makeAccessory()
 static const ItemData ITEM_DATA[] =
 {
     // ── Tools ────────────────────────────────────────────────────────────────
-    /* woodPickaxe      */  makeTool(TOOL_PICKAXE,  10, 0.7f, 1.5f),
-    /* woodAxe          */  makeTool(TOOL_AXE,      10, 0.7f, 1.5f),
-    /* woodHammer       */  makeTool(TOOL_HAMMER,   10, 0.7f, 1.5f),
+    /* woodPickaxe      */  makeTool(TOOL_PICKAXE,  10, 0.7f, 3.2f),
+    /* woodAxe          */  makeTool(TOOL_AXE,      10, 0.7f, 3.2f),
+    /* woodHammer       */  makeTool(TOOL_HAMMER,   10, 0.7f, 3.2f),
 
-    /* stonePickaxe     */  makeTool(TOOL_PICKAXE,  14, 0.7f, 1.5f),
-    /* stoneAxe         */  makeTool(TOOL_AXE,      14, 0.7f, 1.5f),
-    /* stoneHammer      */  makeTool(TOOL_HAMMER,   14, 0.7f, 1.5f),
+    /* stonePickaxe     */  makeTool(TOOL_PICKAXE,  14, 0.7f, 3.2f),
+    /* stoneAxe         */  makeTool(TOOL_AXE,      14, 0.7f, 3.2f),
+    /* stoneHammer      */  makeTool(TOOL_HAMMER,   14, 0.7f, 3.2f),
 
-    /* copperPickaxe    */  makeTool(TOOL_PICKAXE,  20, 0.7f, 1.5f),
-    /* copperAxe        */  makeTool(TOOL_AXE,      20, 0.7f, 1.5f),
-    /* copperHammer     */  makeTool(TOOL_HAMMER,   20, 0.7f, 1.5f),
+    /* copperPickaxe    */  makeTool(TOOL_PICKAXE,  20, 0.7f, 3.2f),
+    /* copperAxe        */  makeTool(TOOL_AXE,      20, 0.7f, 3.2f),
+    /* copperHammer     */  makeTool(TOOL_HAMMER,   20, 0.7f, 3.2f),
 
-    /* ironPickaxe      */  makeTool(TOOL_PICKAXE,  28, 0.7f, 1.5f),
-    /* ironAxe          */  makeTool(TOOL_AXE,      28, 0.7f, 1.5f),
-    /* ironHammer       */  makeTool(TOOL_HAMMER,   28, 0.7f, 1.5f),
+    /* ironPickaxe      */  makeTool(TOOL_PICKAXE,  28, 0.7f, 3.2f),
+    /* ironAxe          */  makeTool(TOOL_AXE,      28, 0.7f, 3.2f),
+    /* ironHammer       */  makeTool(TOOL_HAMMER,   28, 0.7f, 3.2f),
 
-    /* goldPickaxe      */  makeTool(TOOL_PICKAXE,  40, 0.7f, 1.5f),
-    /* goldAxe          */  makeTool(TOOL_AXE,      40, 0.7f, 1.5f),
-    /* goldHammer       */  makeTool(TOOL_HAMMER,   40, 0.7f, 1.5f),
+    /* goldPickaxe      */  makeTool(TOOL_PICKAXE,  40, 0.7f, 3.2f),
+    /* goldAxe          */  makeTool(TOOL_AXE,      40, 0.7f, 3.2f),
+    /* goldHammer       */  makeTool(TOOL_HAMMER,   40, 0.7f, 3.2f),
 
     // ── Materials ────────────────────────────────────────────────────────────
     /* slime            */  makeMaterial(99),

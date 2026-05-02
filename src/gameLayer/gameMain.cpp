@@ -37,6 +37,8 @@
 #include <audio.h>
 #include <settings.h>
 
+#define CAMERA_ZOOM 50.0f
+
 
 #pragma region global variables
 
@@ -68,6 +70,9 @@ struct GameData
 	Vector2 selectionEnd = {};
 	char saveName[100] = {};
 
+	// night time
+	float nightTime = 0;
+
 	// particles
 	std::vector<Particle> particles;
 
@@ -77,6 +82,8 @@ AssetManager assetManager;
 
 bool showImgui = false;
 bool showCraftUI = false;
+
+RenderTexture2D lightMask;
 
 #pragma endregion
 
@@ -148,13 +155,16 @@ bool initGame()
 
 	gameData.camera.target = { 20, 120 };
 	gameData.camera.rotation = 0.f;
-	gameData.camera.zoom = 50.f;
+	gameData.camera.zoom = CAMERA_ZOOM;
 
 	gameData.player.teleport({ 20, 60 });
 	gameData.player.physics.transform.w = 0.9f;
 	gameData.player.physics.transform.h = 1.8f;
 
-	spawnZombie({ 25,60 });
+	// Light mask render texture
+	lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+
+	//spawnZombie({ 25,60 });
 
 	//spawnDroppedItem({ 25,60 }, 6001);
 
@@ -902,7 +912,8 @@ bool updateGame()
 					{ drawX,drawY,size,size }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
-					WHITE    //tint
+					{ WHITE }
+
 				);
 			}
 		}
@@ -1100,6 +1111,32 @@ bool updateGame()
 
 
 	EndMode2D();
+
+	// Apply cave lighting ONLY when underground
+	//if (gameData.player.getPosition().y > 130)
+	//{
+	// Convert player world pos -> screen pos
+	Vector2 playerScreen = GetWorldToScreen2D(
+		gameData.player.physics.transform.getCenter(),
+		gameData.camera
+	);
+
+	// Update light mask in screen space
+	BeginTextureMode(lightMask);
+	ClearBackground(BLACK);
+	DrawCircleGradient(playerScreen.x, playerScreen.y, 400, WHITE, BLACK);
+	EndTextureMode();
+
+	// Overlay mask on screen
+	BeginBlendMode(BLEND_MULTIPLIED);
+	DrawTextureRec(
+		lightMask.texture,
+		{ 0, 0, (float)GetScreenWidth(), (float)-GetScreenHeight() }, // negative H = flip Y
+		{ 0, 0 },
+		WHITE
+	);
+	EndBlendMode();
+	//}
 
 
 #pragma region ImGui Madness

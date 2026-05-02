@@ -45,12 +45,13 @@ struct Player : public Entity
 	float timeAfterAttack = 0.f;
 
 	float timeAfterAttackAnimation = 0.f;
-	float maxAttackTimeAnimation = 0.7f;
+	float maxAttackTimeAnimation = 0.5f;
+	bool isPlayingAttackAnimation = false;
 
 	int armourHead = Item::partyHat;
 	int armourChest = Item::iceChestPlate;
 	int armoutLegs = Item::goldBoots;
-	int heldItem = 0;
+	int heldItem = Item::goldAxe;
 
 	int numberOfParticlesOnLand = 1;
 };
