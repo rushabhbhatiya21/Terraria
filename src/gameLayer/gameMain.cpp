@@ -1318,13 +1318,6 @@ bool updateGame()
 
 #pragma endregion
 
-
-#pragma region cleanup
-
-	UnloadRenderTexture(lightMask);
-
-#pragma endregion
-
 	return true;
 }
 
@@ -1332,6 +1325,7 @@ bool updateGame()
 
 void closeGame()
 {
+	UnloadRenderTexture(lightMask);
 	std::cout << "\n\nCLOSED!!!!!!!!!\n\n";
 }
 

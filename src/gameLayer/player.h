@@ -51,7 +51,7 @@ struct Player : public Entity
 	int armourHead = Item::partyHat;
 	int armourChest = Item::iceChestPlate;
 	int armoutLegs = Item::goldBoots;
-	int heldItem = Item::goldAxe;
+	int heldItem = Item::ironSword;
 
 	int numberOfParticlesOnLand = 1;
 };

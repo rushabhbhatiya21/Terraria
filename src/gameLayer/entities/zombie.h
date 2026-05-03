@@ -31,6 +31,8 @@ struct Zombie : public Entity
 	
 	bool shouldStepUp(Vector2 playerPos, GameMap& gameMap);
 
+	bool isOnLedge(GameMap& gameMap);
+
 	void doAttack(EntityUpdateData& entityUpdateData);
 
 	Json formatToJson() override;

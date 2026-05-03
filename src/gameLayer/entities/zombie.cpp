@@ -28,14 +28,6 @@ void Zombie::render(AssetManager& assetManager)
 		0.f, // rotation
 		color // tint
 	);
-
-	//DrawTextureRec(
-	//	assetManager.zombie, 
-	//	(Rectangle) { 0, 0, facing, frameHeight }, 
-	//	getPosition(), 
-	//	WHITE
-	//);
-
 }
 
 bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
@@ -48,7 +40,7 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 	if (life <= 0 && currentState != STATE_DEAD)
 	{
 		enterState(STATE_DEAD, entityUpdateData);
-		return true;
+		return false;
 	}
 
 	if (currentState == STATE_DEAD) return false;
@@ -58,32 +50,24 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 	float   distToPlayer = Vector2Length(toPlayer);
 	bool    playerInSight = distToPlayer < SIGHT_RANGE;
 	bool    playerInAttackRange = distToPlayer < ATTACK_RANGE;
+	bool    isOnEdge = isOnLedge(entityUpdateData.gameMap);
 
 	// --- STATE TRANSITIONS ---
 	int previousState = currentState;
 
-	//if (moveSpeed && shouldStepUp(entityUpdateData.playerPosition, entityUpdateData.gameMap))
-	//{
-	//	physics.jump(10);
-	//}
-
 	// set variable for flipping sprite
 	if (moveSpeed >= 0)
-	{
 		animations.movingLeft = false;
-	}
 	else
-	{
 		animations.movingLeft = true;
-	}
 
 	switch (currentState)
 	{
 	case STATE_IDLE:
 	{
-		if (playerInSight)
+		if (playerInSight && !isOnEdge)
 			currentState = STATE_CHASING;
-		else if (changeStateTimer <= 0)
+		else if (isOnEdge || changeStateTimer <= 0) // force wander immediately if on edge
 		{
 			changeStateTimer = WANDER_INTERVAL;
 			currentState = STATE_WONDERING;
@@ -91,11 +75,10 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 		break;
 	}
 
-
 	case STATE_WONDERING:
 	{
-		if (playerInSight)
-			currentState = STATE_CHASING;
+		if (isOnEdge) // hit a ledge while wandering, reverse direction
+			moveSpeed = -moveSpeed;
 		else if (changeStateTimer <= 0)
 		{
 			changeStateTimer = IDLE_INTERVAL;
@@ -106,23 +89,27 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 
 	case STATE_CHASING:
 		if (!playerInSight)
-			currentState = STATE_IDLE;         // lost the player
+			currentState = STATE_IDLE;
+		else if (isOnEdge)
+			currentState = STATE_WONDERING;
 		else if (playerInAttackRange)
 			currentState = STATE_ATTACK;
 		break;
 
 	case STATE_ATTACK:
-		if (!playerInAttackRange)
+		if (isOnEdge)
+			currentState = STATE_IDLE;
+		else if (!playerInAttackRange)
 			currentState = STATE_CHASING;
-		else if (changeStateTimer <= 0)          // reuse timer as attack cooldown
+		else if (changeStateTimer <= 0) // reuse timer as attack cooldown
 		{
 			changeStateTimer = ATTACK_COOLDOWN;
-			doAttack(entityUpdateData);        // deal damage, play anim, etc.
+			doAttack(entityUpdateData);
 		}
 		break;
 
 	case STATE_HURT:
-		if (changeStateTimer <= 0)               // hurt stun duration expired
+		if (changeStateTimer <= 0) // hurt stun duration expired
 			currentState = (playerInSight) ? STATE_CHASING : STATE_IDLE;
 		break;
 
@@ -151,7 +138,6 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 
 	case STATE_CHASING:
 	{
-		// walk toward player
 		float dir = (toPlayer.x >= 0.f) ? 1.f : -1.f;
 		moveSpeed = dir * CHASE_SPEED;
 		break;
@@ -196,9 +182,23 @@ void Zombie::enterState(int newState, EntityUpdateData& entityUpdateData)
 		break;
 
 	case STATE_WONDERING:
-		moveSpeed = getRandomChance(entityUpdateData.rng, 0.5f) ? WANDER_SPEED : -WANDER_SPEED;
-		changeStateTimer = WANDER_INTERVAL;
+	{
+		Vector2 toPlayer = entityUpdateData.playerPosition - getPosition();
+		bool onEdge = isOnLedge(entityUpdateData.gameMap);
+
+		if (onEdge)
+		{
+			// walk away from player and give enough time to clear the ledge
+			moveSpeed = (toPlayer.x >= 0.f) ? -WANDER_SPEED : WANDER_SPEED;
+			changeStateTimer = WANDER_INTERVAL * 3.f;
+		}
+		else
+		{
+			moveSpeed = getRandomChance(entityUpdateData.rng, 0.5f) ? WANDER_SPEED : -WANDER_SPEED;
+			changeStateTimer = WANDER_INTERVAL;
+		}
 		break;
+	}
 
 	case STATE_CHASING:
 		break;
@@ -223,23 +223,20 @@ void Zombie::enterState(int newState, EntityUpdateData& entityUpdateData)
 
 void Zombie::doAttack(EntityUpdateData& entityUpdateData)
 {
-	entityUpdateData.playerPosition.x -= 1;
+	// implement attack here
 }
-
 
 void Zombie::dropLoot(EntityHolder& entityHolder, int type)
 {
 	DroppedItem droppedItem;
 	droppedItem.teleport(getPosition());
 
-	// make it drop rarer chests with low chance
 	droppedItem.itemType = type;
 	droppedItem.physics.velocity.y = -3.f;
 
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
 	entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
 }
-
 
 bool Zombie::shouldStepUp(Vector2 playerPos, GameMap& gameMap)
 {
@@ -252,15 +249,35 @@ bool Zombie::shouldStepUp(Vector2 playerPos, GameMap& gameMap)
 	auto bPrev = gameMap.getBlockSafe(prevX, getPosition().y);
 
 	if (bNext && zTotPlayerDirection.x >= 0 && isCollidable(bNext->type))
-	{
 		return true;
-	}
 
 	if (bPrev && zTotPlayerDirection.x < 0 && isCollidable(bPrev->type))
-	{
 		return true;
-	}
+
 	return false;
+}
+
+bool Zombie::isOnLedge(GameMap& gameMap)
+{
+	if (!physics.downTouch)
+		return false;
+
+	int belowY = int(getPosition().y) + 1;
+
+	if (moveSpeed > 0.f) // moving right, check right side
+	{
+		int nextX = int(getPosition().x) + 1;
+		auto bNext = gameMap.getBlockSafe(nextX, belowY);
+		return !bNext || !isCollidable(bNext->type);
+	}
+	else if (moveSpeed < 0.f) // moving left, check left side
+	{
+		int prevX = int(getPosition().x) - 1;
+		auto bPrev = gameMap.getBlockSafe(prevX, belowY);
+		return !bPrev || !isCollidable(bPrev->type);
+	}
+
+	return false; // not moving, not on edge
 }
 
 Json Zombie::formatToJson()
