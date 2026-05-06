@@ -212,11 +212,11 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 	std::error_code errorCode;
 	std::filesystem::create_directory(RESOURCES_PATH "../saves/", errorCode);
 
-	saveBlockDataToFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin");
+	saveBlockDataToFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin.tmp");
 
 	// id holder
 	{
-		std::ofstream f(RESOURCES_PATH "../saves/idHolder.txt");
+		std::ofstream f(RESOURCES_PATH "../saves/idHolder.txt.tmp");
 		f << entities.idHolder.idCounter;
 		f.close();
 	}
@@ -224,7 +224,7 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 	// player
 	{
 		Json j = player.formatToJson();
-		std::ofstream f(RESOURCES_PATH "../saves/player.txt");
+		std::ofstream f(RESOURCES_PATH "../saves/player.txt.tmp");
 		f << j.dump(2);
 	}
 
@@ -237,9 +237,14 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 			j[std::to_string(e.first)] = e.second->formatToJson();
 		}
 
-		std::ofstream f(RESOURCES_PATH "../saves/entities.txt");
+		std::ofstream f(RESOURCES_PATH "../saves/entities.txt.tmp");
 		f << j.dump(2);
 		f.close();
+
+		std::filesystem::rename(RESOURCES_PATH "../saves/map.bin.tmp", RESOURCES_PATH "../saves/map.bin", errorCode);
+		std::filesystem::rename(RESOURCES_PATH "../saves/idHolder.txt.tmp", RESOURCES_PATH "../saves/idHolder.txt", errorCode);
+		std::filesystem::rename(RESOURCES_PATH "../saves/player.txt.tmp", RESOURCES_PATH "../saves/player.txt", errorCode);
+		std::filesystem::rename(RESOURCES_PATH "../saves/entities.txt.tmp", RESOURCES_PATH "../saves/entities.txt", errorCode);
 	}
 }
 
