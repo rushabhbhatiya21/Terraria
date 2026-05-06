@@ -1,0 +1,17 @@
+Challenge: Inventory
+Your challenge is to finish implementing the inventory system. 
+You should be able to display items there and also pick and drop them with the cursor.
+
+
+
+Here are some tips to implement this system. In the future, you may add some more inventory slots, like armour and accessories.
+You will need to make a function that places an item from one slot to another, so it can use 2 references. T
+he idea is that this function will have all the logic for placing an item from one slot to another. 
+Instead of using references, you can also hold all the items in a single array, so you just need an index
+to refer to an item slot. Or, you can have a different array for the items, armour, and accessories, 
+but then have a function that gives an index, returns you the correct reference in the correct slot, 
+so you assign a different index to each slot in the inventory. 
+And you also need a way to know which index you are currently hovering over.
+
+Try to implement all the useful stuff ,like if you click an occupied slot it will spawn the items,
+and if you click a slot that has the same items, it will try to place it there.

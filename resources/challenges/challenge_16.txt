@@ -1,0 +1,12 @@
+Challenge Animated Hearts
+As shown in the last video, your challenge is to sync the player's life with the hearts display.
+And as an extra challenge, you can implement animated hearts! You can download an extra hearts texture 
+in the resources of this lesson to help you with thatHere are some tips:
+
+First of all, add some ImGui buttons to heal/damage the player so you can test this.
+
+Now, for the hurt/heal animations, the best way to do this is to separate this animation system from the game.
+So you should just have a setLife method, and then, this method will internally do all the logic for the animation.
+For example, if the current life is 5 and you call set life to 4 on the animation system,
+it will know using the previous life value that it should display a hurt animation. 
+And you can also make a method that sets the life without any animation in case you need that.

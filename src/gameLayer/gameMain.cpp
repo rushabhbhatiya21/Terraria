@@ -12,6 +12,7 @@
 #include <editorState.h>
 #include <gameMap.h>
 #include <helper.h>
+#include <ui.h>
 #include <drawBackground.h>
 #include <worldGenerator.h>
 #include <randomStuff.h>
@@ -76,7 +77,7 @@ struct GameData
 	// particles
 	std::vector<Particle> particles;
 
-	
+	bool insideInventory = false;
 
 } gameData;
 
@@ -137,6 +138,29 @@ void spawnDroppedItem(Vector2 positon, int type)
 
 	auto id = gameData.entityHolder.idHolder.getEntityIdAndIncreament();
 	gameData.entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+}
+
+Rectangle getInventoryRectangle(float w, float h)
+{
+	Rectangle inventoryRectangle;
+
+	inventoryRectangle.height = h * .3f;
+	inventoryRectangle.width = inventoryRectangle.height * 3;
+
+	float maxWidth = w * .9f;
+	if (inventoryRectangle.width > maxWidth)
+	{
+		float scaleFactor = maxWidth / inventoryRectangle.width;
+		inventoryRectangle.height *= scaleFactor;
+		inventoryRectangle.width *= scaleFactor;
+	}
+
+	inventoryRectangle = placeRectangleTopLeft(inventoryRectangle);
+
+	inventoryRectangle.x += w * .01f;
+	inventoryRectangle.y += h * .01f;
+
+	return inventoryRectangle;
 }
 
 #pragma endregion
@@ -577,6 +601,14 @@ bool updateGame()
 
 #pragma region handle input
 
+	bool insideInventoryMenu = false;
+	Rectangle inventoryRectangle = getInventoryRectangle(GetScreenWidth(), GetScreenHeight());
+
+	if (gameData.insideInventory && CheckCollisionPointRec(GetMousePosition(), inventoryRectangle))
+	{
+		insideInventoryMenu = true;
+	}
+
 	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), gameData.camera);
 	int blockX = (int)floor(worldPos.x);
 	int blockY = (int)floor(worldPos.y);
@@ -611,8 +643,9 @@ bool updateGame()
 
 	}
 
-	if (!showImgui && !showCraftUI)
+	if (!showImgui)
 	{
+		if (!insideInventoryMenu)
 		if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_MIDDLE))
 		{
 			auto b = gameData.gameMap.getBlockSafe(blockX, blockY);
@@ -623,6 +656,7 @@ bool updateGame()
 			}
 		}
 
+		if (!insideInventoryMenu)
 		if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 		{
 			// hit entities (enemies)
@@ -704,6 +738,7 @@ bool updateGame()
 			}
 		}
 
+		if (!insideInventoryMenu)
 		if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 		{
 			float magnitude = Vector2Distance(gameData.player.getPosition(), worldPos);
@@ -726,6 +761,11 @@ bool updateGame()
 					}
 				}
 			}
+		}
+
+		if (IsKeyPressed(KEY_TAB))
+		{
+			gameData.insideInventory = !gameData.insideInventory;
 		}
 	}
 
@@ -951,15 +991,19 @@ bool updateGame()
 #pragma region draw frame and selected block
 
 	//draw selected block
-	DrawTexturePro(
-		assetManager.frame,
-		{ 0,0,(float)assetManager.frame.width,(float)assetManager.frame.height },
-		{ (float)blockX, (float)blockY, 1, 1 },
-		{},
-		0.f,
-		WHITE
-	);
+	if (!insideInventoryMenu)
+	{
+		DrawTexturePro(
+			assetManager.frame,
+			{ 0,0,(float)assetManager.frame.width,(float)assetManager.frame.height },
+			{ (float)blockX, (float)blockY, 1, 1 },
+			{},
+			0.f,
+			WHITE
+		);
+	}
 
+	// todo: show this inside inventury menu or not
 	DrawTexturePro(
 		assetManager.textures,
 		getTextureAtlas(gameData.creativeSelectedBlock, 0, 32, 32),
@@ -991,79 +1035,79 @@ bool updateGame()
 
 #pragma region render inventory
 
-	if (!showImgui)
-	{
-		ImGui::Begin("Inventory");
+	//if (!showImgui)
+	//{
+	//	ImGui::Begin("Inventory");
 
-		for (int i = 0; i < gameData.inventory.slots; i++)
-		{
-			auto atlas = getTextureCoordinatesForItemType(gameData.inventory.items[i].itemType);
-			ImTextureID tex;
+	//	for (int i = 0; i < gameData.inventory.slots; i++)
+	//	{
+	//		auto atlas = getTextureCoordinatesForItemType(gameData.inventory.items[i].itemType);
+	//		ImTextureID tex;
 
-			if (gameData.inventory.items[i].itemType < Block::BLOCKS_COUNT)
-			{
-				atlas = getUVForTexture(assetManager.textures, atlas);
-				tex = (ImTextureID)(intptr_t)assetManager.textures.id;
-			}
-			else
-			{
-				atlas = getUVForTexture(assetManager.items, atlas);
-				tex = (ImTextureID)(intptr_t)assetManager.items.id;
-			}
+	//		if (gameData.inventory.items[i].itemType < Block::BLOCKS_COUNT)
+	//		{
+	//			atlas = getUVForTexture(assetManager.textures, atlas);
+	//			tex = (ImTextureID)(intptr_t)assetManager.textures.id;
+	//		}
+	//		else
+	//		{
+	//			atlas = getUVForTexture(assetManager.items, atlas);
+	//			tex = (ImTextureID)(intptr_t)assetManager.items.id;
+	//		}
 
-			ImGui::PushID(i);
+	//		ImGui::PushID(i);
 
-			// draw image button
-			if (ImGui::ImageButton(
-				tex,
-				{ 35,35 },
-				{ atlas.x,atlas.y },
-				{ atlas.x + atlas.width,atlas.y + atlas.height }
-			))
-			{
-				gameData.creativeSelectedBlock = gameData.inventory.items[i].itemType;
-				gameData.player.heldItem = gameData.creativeSelectedBlock;
+	//		// draw image button
+	//		if (ImGui::ImageButton(
+	//			tex,
+	//			{ 35,35 },
+	//			{ atlas.x,atlas.y },
+	//			{ atlas.x + atlas.width,atlas.y + atlas.height }
+	//		))
+	//		{
+	//			gameData.creativeSelectedBlock = gameData.inventory.items[i].itemType;
+	//			gameData.player.heldItem = gameData.creativeSelectedBlock;
 
-				if (showCraftUI)
-				{
-					for (int j = 0; j < gameData.maxCraftSlots; j++)
-					{
-						if (gameData.craftSlots[j] == 0)
-						{
-							gameData.craftSlots[j] = gameData.creativeSelectedBlock;
-							gameData.inventory.items[i].itemCounter -= 1;
-							break;
-						}
-					}
-				}
-			}
+	//			if (showCraftUI)
+	//			{
+	//				for (int j = 0; j < gameData.maxCraftSlots; j++)
+	//				{
+	//					if (gameData.craftSlots[j] == 0)
+	//					{
+	//						gameData.craftSlots[j] = gameData.creativeSelectedBlock;
+	//						gameData.inventory.items[i].itemCounter -= 1;
+	//						break;
+	//					}
+	//				}
+	//			}
+	//		}
 
-			// get button position
-			ImVec2 min = ImGui::GetItemRectMin();
-			ImVec2 max = ImGui::GetItemRectMax();
+	//		// get button position
+	//		ImVec2 min = ImGui::GetItemRectMin();
+	//		ImVec2 max = ImGui::GetItemRectMax();
 
-			// draw text on top (bottom-right corner)
-			if (gameData.inventory.items[i].itemType != 0)
-			{
-				std::string count = std::to_string(gameData.inventory.items[i].itemCounter);
+	//		// draw text on top (bottom-right corner)
+	//		if (gameData.inventory.items[i].itemType != 0)
+	//		{
+	//			std::string count = std::to_string(gameData.inventory.items[i].itemCounter);
 
-				ImDrawList* drawList = ImGui::GetWindowDrawList();
+	//			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-				ImVec2 textSize = ImGui::CalcTextSize(count.c_str());
-				ImVec2 textPos = ImVec2(
-					max.x - textSize.x - 2,
-					max.y - textSize.y - 2
-				);
+	//			ImVec2 textSize = ImGui::CalcTextSize(count.c_str());
+	//			ImVec2 textPos = ImVec2(
+	//				max.x - textSize.x - 2,
+	//				max.y - textSize.y - 2
+	//			);
 
-				drawList->AddText(textPos, IM_COL32(255, 255, 255, 127), count.c_str());
-			}
+	//			drawList->AddText(textPos, IM_COL32(255, 255, 255, 127), count.c_str());
+	//		}
 
-			ImGui::PopID();
-			ImGui::SameLine();
-		}
+	//		ImGui::PopID();
+	//		ImGui::SameLine();
+	//	}
 
-		ImGui::End();
-	}
+	//	ImGui::End();
+	//}
 
 #pragma endregion
 
@@ -1137,6 +1181,94 @@ bool updateGame()
 
 
 	EndMode2D();
+
+#pragma	region ui
+
+	float w = GetScreenWidth();
+	float h = GetScreenHeight();
+
+	Rectangle heartRectangle;
+	heartRectangle.height = h * .05f;
+	heartRectangle.width = heartRectangle.height * 5;
+
+	heartRectangle = placeReactangleTopRightCorner(heartRectangle, w);
+
+	//DrawRectangle(heartRectangle.x, heartRectangle.y, heartRectangle.width, heartRectangle.height, RED);
+
+	for (int i = 0; i < 5; i++)
+	{
+		Rectangle oneHeartRectangle = heartRectangle;
+		oneHeartRectangle.width = oneHeartRectangle.height;
+		oneHeartRectangle.x += oneHeartRectangle.width * i;
+
+		DrawTexturePro(
+			assetManager.hearts,
+			getTextureAtlas(0, 0, assetManager.hearts.width / 3, assetManager.hearts.height),
+			oneHeartRectangle,
+			{ 0,0 },
+			0.f,
+			WHITE
+		);
+	}
+
+	if (gameData.insideInventory)
+	{
+		Rectangle inventoryRectangle = getInventoryRectangle(w, h);
+
+		DrawRectangle(
+			inventoryRectangle.x,
+			inventoryRectangle.y,
+			inventoryRectangle.width, 
+			inventoryRectangle.height,
+			{ 100,100,100,100 }
+		);
+
+		inventoryRectangle = shrinkRectanglePercentage(inventoryRectangle, .01f, .01f);
+
+		Rectangle oneCellRectangle;
+		oneCellRectangle.height = inventoryRectangle.height / 3;
+		oneCellRectangle.width = oneCellRectangle.height;
+		oneCellRectangle.x = inventoryRectangle.x;
+		oneCellRectangle.y = inventoryRectangle.y;
+
+		for (int i = 0; i < 9; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				Rectangle r = oneCellRectangle;
+				r.x += i * oneCellRectangle.width;
+				r.y += j * oneCellRectangle.height;
+
+				r = shrinkRectanglePercentage(r, .1f, .1f);
+
+				if (CheckCollisionPointRec(GetMousePosition(), r))
+				{
+					DrawTexturePro(
+						assetManager.frame,
+						getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
+						r,
+						{ 0,0 },
+						0.f,
+						{ 220,250,220,250 }
+					);
+				}
+				else
+				{
+					DrawTexturePro(
+						assetManager.frame,
+						getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
+						r,
+						{ 0,0 },
+						0.f,
+						{ 180,180,200,240 }
+					);
+				}
+			}
+		}
+	}
+
+#pragma endregion
+
 
 #pragma region lighting
 

@@ -18,6 +18,7 @@ struct AssetManager
 	Texture2D treeTextures = {};
 	Texture2D frame = {};
 	Texture2D player = {};
+	Texture2D hearts = {};
 	Texture2D slime = {};
 	Texture2D desertSlime = {};
 	Texture2D evilEye = {};
@@ -46,6 +47,7 @@ struct AssetManager
 		{&treeTextures, "treetextures.png"},
 		{&frame, "frame.png"},
 		{&player, "player.png"},
+		{&hearts, "hearts.png"},
 		{&slime, "slime.png"},
 		{&desertSlime, "desertSlime.png"},
 		{&evilEye, "evilEye.png"},

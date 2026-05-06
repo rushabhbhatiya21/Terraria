@@ -92,6 +92,12 @@ struct Item
 	bool isWeapon() { return ::isWeapon(type); }
 
 	bool isTool() { return ::isTool(type); }
+
+	int getMaxStackSize()
+	{
+		if (isTool() || isWeapon()) return 1;
+		return 99;
+	}
 };
 
 Texture2D getTextureForItemType(int itemType, AssetManager& assetManager);

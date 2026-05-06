@@ -1,0 +1,60 @@
+Challenge: more expressive UI
+So I showed you a nice way to specify the UI using some functions that return a rectangle. And we can use those functions to place the rectangle wherever we want. But what if we had more flexibility? Like, what if we could say that we want a rectangle with this size on X, this size on Y, and then place it there. And then inside that rectangle, we want 2 rectangles, one to the left and one to the right. Let me show you how I did it.
+
+I used a builder pattern and a global variable that represents the current "frame". So whenever we make a new UI element, we make it in respect to the current frame. This helps us make UI elements inside other UI elements. And you don't have to necessarily use this builder pattern or the fancy things that I did here if you don't know how to implement them; they are more advanced indeed. You can accomplish the same thing with just some functions that also take in as a parameter a parent rectangle. And then you can have a function to set the rect a certain size on X, a certain size on Y, using percentages of the parent rectangle.
+
+Now let's see how my library does these things:
+
+
+
+the CPP file 
+https://github.com/meemknight/glui/blob/f6481c320addcadcffdcb0ed529d3e78476f15c2/glui/src/glui.cpp#L2413
+
+the H file
+https://github.com/meemknight/glui/blob/f6481c320addcadcffdcb0ed529d3e78476f15c2/glui/include/glui/glui.h#L210
+
+
+I can basically do this:
+
+
+
+{
+	//the main frame, the entire screen.
+	glui::Frame f({0, 0, w, h});
+ 
+	//a box that fills the entire left part of the screen, shrinked a little.
+	auto leftBox = glui::Box().xLeft().yTop().xDimensionPercentage(0.5).
+		yDimensionPercentage(1.f).shrinkPercentage({0.1,0.1});
+ 
+	renderer.renderRectangle(leftBox, Colors_Red);
+ 
+	{
+		//a secondary frame, the left part of the screen
+		glui::Frame f2(leftBox);
+ 
+		//this box will use the current frame f2 as a refference
+		auto centerBox = glui::Box().xDimensionPercentage(0.5).yAspectRatio(1.f).
+			xCenter().yCenter()();
+ 
+		renderer.renderRectangle(centerBox, Colors_Blue);
+ 
+	}
+ 
+	//from here on we use again the frame f as a refference
+ 
+	auto rightBox = glui::Box().xRight().yTop().xDimensionPercentage(0.5).
+		yDimensionPercentage(1.f).shrinkPercentage({0.1,0.1});
+ 
+	renderer.renderRectangle(rightBox, Colors_Yellow);
+}
+
+With this result:
+
+
+
+
+So again, I used some C++ tricks to make that syntax possible, and you can look into my code to see how I did it, but if that seems too hard for you. Again, you can accomplish the same thing with just some functions that also take in as a parameter a parent rectangle. And then you can have a function to set the rect a certain size on X, a certain size on Y, using percentages of the parent rectangle.
+
+
+
+The important thing is that you have easy-to-specify UI layouts, as I showed there!
