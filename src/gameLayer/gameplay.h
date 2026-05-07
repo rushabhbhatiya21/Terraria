@@ -71,4 +71,6 @@ struct Gameplay
 	bool init();
 
 	bool update(AssetManager& assetManager);
+
+	void closeGame() const;
 };

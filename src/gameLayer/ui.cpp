@@ -1,5 +1,19 @@
 #include "ui.h"
 
+Rectangle placeRectangleTopLeft(Rectangle r)
+{
+	r.x = 0;
+	r.y = 0;
+	return r;
+}
+
+Rectangle placeRectangleCenterTop(Rectangle r, float w)
+{
+	r.x = (w - r.width) / 2.0f;
+	r.y = 0;
+	return r;
+}
+
 Rectangle placeReactangleTopRightCorner(Rectangle r, float w)
 {
 	r.x = w - r.width;
@@ -14,12 +28,6 @@ Rectangle placeRectangleCenter(Rectangle r, float w, float h)
 	return r;
 }
 
-Rectangle placeRectangleTopLeft(Rectangle r)
-{
-	r.x = 0;
-	r.y = 0;
-	return r;
-}
 
 Rectangle enlargeRectanglePixels(Rectangle r, float pixelsX, float pixelsY)
 {
@@ -42,4 +50,130 @@ Rectangle shrinkRectanglePercentage(Rectangle r, float percentageX, float percen
 	r.x += shrinkX / 2.f;
 	r.y += shrinkY / 2.f;
 	return r;
+}
+
+void UIEngine::updateAndRender()
+{
+	float w = GetScreenWidth();
+	float h = GetScreenHeight();
+
+	Rectangle oneButtonRectangle = {};
+	oneButtonRectangle.width = w * .8f;
+	oneButtonRectangle.height = h / (widgets.size() + 1);
+
+	oneButtonRectangle.height = std::min(oneButtonRectangle.height, oneButtonRectangle.width / 8.f);
+
+	oneButtonRectangle = placeRectangleCenterTop(oneButtonRectangle, w);
+	oneButtonRectangle.y += oneButtonRectangle.height / 2.f;
+
+	int fontSize = (int)(oneButtonRectangle.height * .5f);
+
+	for (auto& w : widgets)
+	{
+		Rectangle smallerRect = shrinkRectanglePercentage(oneButtonRectangle, .01f, .1f);
+
+		//DrawRectangle(smallerRect.x, smallerRect.y, smallerRect.width, smallerRect.height, { 90,90,110,205 });
+
+		auto drawText = [&](Rectangle smallerRect, float yOffset = 0)
+			{
+				int textWidth = MeasureText(w.text.c_str(), fontSize);
+				int textHeight = fontSize; // in raylib font height = font size default
+
+				float textX = smallerRect.x + (smallerRect.width - textWidth) / 2.f;
+				float textY = smallerRect.y + (smallerRect.height - textHeight) / 2.f;
+
+				Color shadowColor = { 0,0,0,255 };
+				DrawText(w.text.c_str(), textX - fontSize * .08f, textY + fontSize * .08f + yOffset, fontSize, shadowColor);
+
+				DrawText(w.text.c_str(), textX, textY + yOffset, fontSize, WHITE);
+			};
+
+		w.isHovered = false;
+		w.isBeingClicked = false;
+		w.isReleased = false;
+
+		if (CheckCollisionPointRec(GetMousePosition(), smallerRect))
+		{
+			w.isHovered = true;
+
+			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+			{
+				w.isBeingClicked = true;
+			}
+
+			if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+			{
+				w.isReleased = true;
+			}
+		}
+
+		switch (w.type)
+		{
+			case button:
+			{
+				const float clickOffset = .05f;
+				Color clickColor = { 120,120,135,205 };
+				Color defaultColor = { 90,90,110,205 };
+
+				if (w.isBeingClicked)
+				{
+					DrawRectangle(
+						smallerRect.x, 
+						smallerRect.y + smallerRect.height * clickOffset,
+						smallerRect.width,
+						smallerRect.height, 
+						clickColor
+					);
+				}
+				else
+				{
+					if (w.isHovered)
+					{
+						DrawRectangle(
+							smallerRect.x,
+							smallerRect.y,
+							smallerRect.width,
+							smallerRect.height,
+							clickColor
+						);
+					}
+
+					if (w.isReleased)
+					{
+						DrawRectangle(
+							smallerRect.x,
+							smallerRect.y,
+							smallerRect.width,
+							smallerRect.height,
+							defaultColor
+						);
+					}
+				}
+
+				if (w.isBeingClicked)
+				{
+					drawText(smallerRect, smallerRect.height * clickOffset);
+				}
+				else
+				{
+					drawText(smallerRect);
+				}
+
+				break;
+			}
+
+			case title:
+			{
+				drawText(smallerRect);
+				break;
+			}
+
+			default:
+				break;
+		}
+
+		oneButtonRectangle.y += oneButtonRectangle.height;
+	}
+
+	widgets.clear();
 }

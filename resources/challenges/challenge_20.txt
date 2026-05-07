@@ -1,0 +1,6 @@
+I have a simple challenge for you: abstract the button function (and maybe the title as well) 
+out of this UI system so that you can also call it as a standalone function. 
+The idea is that you would reuse it in the implementation of the UI system. Now, to get the button information,
+like if it is pressed, released, or hovered over with the cursor, you can just add that as a return of the function 
+(into a struct with that data) or take that info as a reference. for each of the individual things.
+Or as an optional pointer, so if you pass 0, you don't write that information.

@@ -1,0 +1,3 @@
+As explained in the lesson, your challenge is to animate the background for the main Menu! Think of cool stuff you can add, 
+like sometimes randomly changing the background, or even animating the sun and adding a day/night cycle.
+Did you know that you can move the sun in the main menu of Terraria using the mouse? Maybe implement that as a fun Easter egg!

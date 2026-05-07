@@ -13,7 +13,6 @@
 #include <entities/droppedItem.h>
 #include <entities/slime.h>
 #include <entities/desetSlime.h>
-//#include <entities/evilEye.h>
 #include <entities/zombie.h>
 
 #include <itemData.h>
@@ -1360,4 +1359,9 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 	return true;
+}
+
+void Gameplay::closeGame() const
+{
+	UnloadRenderTexture(lightMask);
 }
