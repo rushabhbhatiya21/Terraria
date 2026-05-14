@@ -2,6 +2,7 @@
 #include <helper.h>
 #include <assetManager.h>
 #include <entityHolder.h>
+#include <items/blocks.h>
 #include <inventory.h>
 
 void Player::render(AssetManager& assetManager)
@@ -60,38 +61,38 @@ void Player::render(AssetManager& assetManager)
 
 		if (heldItem < Block::BLOCKS_COUNT)
 		{
-			pos.width = 0.4;
-			pos.height = 0.4;
+			pos.width = 0.4f;
+			pos.height = 0.4f;
 
 			if (animations.movingLeft)
 			{
-				pos.y += 0.5;
-				pos.x -= 0.2;
+				pos.y += 0.5f;
+				pos.x -= 0.2f;
 			}
 			else
 			{
-				pos.y += 0.5;
-				pos.x += 0.6;
+				pos.y += 0.5f;
+				pos.x += 0.6f;
 			}
 		}
 		else
 		{
-			pos.width = 1;
-			pos.height = 1;
+			pos.width = 1.f;
+			pos.height = 1.f;
 
 			if (animations.movingLeft)
 			{
-				pos.y += 1.2;
-				pos.x += 0.2;
-				angle = 120;
-				origin = { 1,1 };
+				pos.y += 1.2f;
+				pos.x += 0.2f;
+				angle = 120.f;
+				origin = { 1.f,1.f };
 				textureUVItem = flipTextureAtlasX(textureUVItem);
 			}
 			else
 			{
-				pos.y += 1.2;
-				pos.x += 0.8;
-				angle = -120;
+				pos.y += 1.2f;
+				pos.x += 0.8f;
+				angle = -120.f;
 			}
 		}
 
@@ -101,9 +102,9 @@ void Player::render(AssetManager& assetManager)
 			float attackProgress = 1.0f - (timeAfterAttackAnimation / maxAttackTimeAnimation);
 
 			float t = attackProgress;
-			t = t * t * (3 - 2 * t); // smoothstep
+			t = t * t * (3.f - 2.f * t); // smoothstep
 
-			if (animations.movingLeft ? t *= -1 : t *= 1);
+			if (animations.movingLeft ? t *= -1.f : t *= 1.f);
 
 			rotation = angle + t * 180.0f;
 		}
@@ -137,6 +138,15 @@ void Player::render(AssetManager& assetManager)
 
 bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
+	useTimer -= deltaTime;
+
+	useTimer -= deltaTime;
+
+	if (useTimer < 0.f)
+	{
+		useTimer = 0.f;
+	}
+
 	return true;
 }
 

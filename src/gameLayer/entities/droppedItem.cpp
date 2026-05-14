@@ -2,8 +2,8 @@
 #include "asserts.h"
 #include "helper.h"
 #include "assetManager.h"
-#include "items.h"
 #include "entityHolder.h"
+#include <items/item.h>
 
 void DroppedItem::render(AssetManager& assetManager)
 {
@@ -84,7 +84,7 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData entityUpdateData)
 int DroppedItem::getMaxStackSize(int type)
 {
 	if (type <= 0) { permaAssertDevelopement("item type should not be less or equal to 0 to get max stack size!"); return -1; }
-	if (type < Item::firstItem) { return 999; }
+	if (type < Items::firstItem) { return 999; }
 	return 1;
 }
 
@@ -114,7 +114,7 @@ bool DroppedItem::loadFromJson(Json& j)
 
 	itemType = j["itemType"];
 
-	if (itemType < 0 || itemType >= Item::LAST_ITEM) { return false; }
+	if (itemType < 0 || itemType >= Items::LAST_ITEM) { return false; }
 
 	if (!j.contains("itemCounter")) { return false; }
 

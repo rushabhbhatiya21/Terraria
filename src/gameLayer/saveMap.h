@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <fstream>
-#include <blocks.h>
+#include <items/blocks.h>
 
 size_t getFileSize(const char* fileName);
 

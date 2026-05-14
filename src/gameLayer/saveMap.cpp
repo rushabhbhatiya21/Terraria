@@ -363,4 +363,6 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 			}
 		}
 	}
+
+	return true;
 }

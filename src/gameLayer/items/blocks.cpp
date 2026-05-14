@@ -1,5 +1,5 @@
 #include "blocks.h"
-#include "items.h"
+#include "items/item.h"
 
 bool isCraftable(int type)
 {

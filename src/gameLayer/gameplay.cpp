@@ -15,7 +15,8 @@
 #include <entities/desetSlime.h>
 #include <entities/zombie.h>
 
-#include <itemData.h>
+#include <items/item.h>
+#include <items/itemUse.h>
 
 void Gameplay::spawnSlime(Vector2 position)
 {
@@ -157,6 +158,7 @@ bool Gameplay::init()
 
 	backgroundMap.create(w, h);
 	generateWorld(gameMap);
+	registerItems();
 
 	camera.target = { 20, 120 };
 	camera.rotation = 0.f;
@@ -554,12 +556,21 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma endregion
 
+	player.update(deltaTime, EntityUpdateData
+		{
+			player.getPosition(),
+			rng,
+			entityHolder,
+			inventory,
+			gameMap
+		}
+	);
 
 #pragma region inventory
 
-	for (int i = 0; i < inventory.items.size(); i++)
+	for (int i = 0; i < inventory.slots.size(); i++)
 	{
-		if (inventory.items[i].itemType != 0 && inventory.items[i].itemCounter <= 0)
+		if (inventory.slots[i].itemId != 0 && inventory.slots[i].count <= 0)
 		{
 			inventory.removeItem(i);
 
@@ -647,28 +658,31 @@ bool Gameplay::update(AssetManager& assetManager)
 					float magnitude = Vector2Distance(player.physics.transform.getCenter(), worldPos);
 
 					if (
-						droppedItem == nullptr &&
+						droppedItem == nullptr && // is not dropped item
 						player.physics.downTouch &&
-						e.second->physics.transform.intersectPoint(worldPos) &&
-						player.timeAfterAttack <= 0 &&
-						(isInRange(player.heldItem, magnitude) || creative)
+						player.timeAfterAttack <= 0
+						//(isInRange(player.heldItem, magnitude) || creative)
 						)
 					{
-						// play attack animation
-						player.timeAfterAttackAnimation = player.maxAttackTimeAnimation;
+						useItem(player, ItemStack{ player.heldItem, 1 });
 
-						// Hitting an enemy
-						int dmg = calcMeleeDamage(player.heldItem);
+						printf("life: %f\n", e.second->life);
 
-						// get reset time
-						float attackResetTime = getResetTime(player.heldItem);
+						//// play attack animation
+						//player.timeAfterAttackAnimation = player.maxAttackTimeAnimation;
 
-						// reset attack time
-						if (attackResetTime != 0)
-							player.timeAfterAttack = attackResetTime;
+						//// Hitting an enemy
+						//int dmg = calcMeleeDamage(player.heldItem);
 
-						// reduce health from enemy
-						e.second->hit(dmg);
+						//// get reset time
+						//float attackResetTime = getResetTime(player.heldItem);
+
+						//// reset attack time
+						//if (attackResetTime != 0)
+						//	player.timeAfterAttack = attackResetTime;
+
+						//// reduce health from enemy
+						//e.second->hit(dmg);
 
 						// camera shake
 						triggerCameraShake(0.2f, 0.08f);
@@ -682,40 +696,40 @@ bool Gameplay::update(AssetManager& assetManager)
 					b &&
 					b->type &&
 					player.physics.downTouch &&
-					player.timeAfterMine <= 0 &&
-					(isInRange(player.heldItem, magnitude) || creative)
+					player.timeAfterMine <= 0 
+					//(isInRange(player.heldItem, magnitude) || creative)
 					)
 				{
-					// play attack animation
-					player.timeAfterAttackAnimation = player.maxAttackTimeAnimation;
+					//// play attack animation
+					//player.timeAfterAttackAnimation = player.maxAttackTimeAnimation;
 
-					// particle effect
-					auto newParticles = spawnParticles({ (float)blockX, (float)blockY }, rng, b->type, 10);
-					particles.insert(particles.end(), newParticles.begin(), newParticles.end());
+					//// particle effect
+					//auto newParticles = spawnParticles({ (float)blockX, (float)blockY }, rng, b->type, 10);
+					//particles.insert(particles.end(), newParticles.begin(), newParticles.end());
 
-					// calculate damage done to block
-					int dmg = calcBlockDamage(*b, player.heldItem);
-					b->hp -= dmg;
+					//// calculate damage done to block
+					//int dmg = calcBlockDamage(*b, player.heldItem);
+					//b->hp -= dmg;
 
-					if (dmg > 0)
-					{
-						// add block shake here
-						triggerShake(blockX, blockY);
-					}
+					//if (dmg > 0)
+					//{
+					//	// add block shake here
+					//	triggerShake(blockX, blockY);
+					//}
 
-					// get reset time, 0.7 default for bare hands, 0 for non-tool items
-					float toolResetTime = getResetTime(player.heldItem);
+					//// get reset time, 0.7 default for bare hands, 0 for non-tool items
+					//float toolResetTime = getResetTime(player.heldItem);
 
-					if (toolResetTime != 0)
-					{
-						player.timeAfterMine = toolResetTime;
-					}
+					//if (toolResetTime != 0)
+					//{
+					//	player.timeAfterMine = toolResetTime;
+					//}
 
-					if (b->hp <= 0)
-					{
-						spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
-						*b = {};
-					}
+					//if (b->hp <= 0)
+					//{
+					//	spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
+					//	*b = {};
+					//}
 				}
 			}
 
@@ -732,13 +746,13 @@ bool Gameplay::update(AssetManager& assetManager)
 					auto b = gameMap.getBlockSafe(blockX, blockY);
 					if (b && b->type == Block::air && gameMap.isAdjacentBlock(blockX, blockY))
 					{
-						for (auto& i : inventory.items)
+						for (auto& i : inventory.slots)
 						{
 							// check inventory to see if we have same type of item and have more than 0
-							if (creativeSelectedBlock == i.itemType && i.itemCounter > 0)
+							if (creativeSelectedBlock == i.itemId && i.count > 0)
 							{
-								b->type = i.itemType;
-								i.itemCounter -= 1;
+								b->type = i.itemId;
+								i.count -= 1;
 							}
 						}
 					}
@@ -746,111 +760,6 @@ bool Gameplay::update(AssetManager& assetManager)
 			}
 		}
 	}
-
-#pragma endregion
-
-
-#pragma region craft ui - needs refactoring
-
-	//// craft ui
-
-	//if (showCraftUI)
-	//{
-	//	ImGui::Begin("Craft");
-
-	//	// input slots
-	//	for (int i = 0; i < maxCraftSlots; i++)
-	//	{
-	//		ImGui::PushID(i);
-
-	//		int item = craftSlots[i];
-
-	//		auto atlas = getTextureCoordinatesForItemType(item);
-	//		ImTextureID tex;
-
-	//		if (item < Block::BLOCKS_COUNT)
-	//		{
-	//			atlas = getUVForTexture(assetManager.textures, atlas);
-	//			tex = (ImTextureID)(intptr_t)assetManager.textures.id;
-	//		}
-	//		else
-	//		{
-	//			atlas = getUVForTexture(assetManager.items, atlas);
-	//			tex = (ImTextureID)(intptr_t)assetManager.items.id;
-	//		}
-
-	//		// draw image button
-	//		if (ImGui::ImageButton(
-	//			tex,
-	//			{ 40,40 },
-	//			{ atlas.x,atlas.y },
-	//			{ atlas.x + atlas.width,atlas.y + atlas.height }
-	//		))
-	//		{
-	//			// assign block back to inventory
-	//			ItemStack item{ craftSlots[i], 1 };
-	//			inventory.storeItem(item);
-
-	//			// clear craft slot
-	//			craftSlots[i] = 0;
-	//		}
-
-	//		ImGui::PopID();
-	//		ImGui::SameLine();
-
-	//		ImGui::Text(i != maxCraftSlots - 1 ? "+" : "=");
-
-	//		ImGui::SameLine();
-	//	}
-
-	//	int result = 0;
-
-	//	// preview in output slot
-	//	if (inventory.canCraft(craftSlots))
-	//	{
-	//		result = inventory.craft(craftSlots);
-	//	}
-
-	//	// spawn item if click on output slot
-	//	auto atlas = getTextureCoordinatesForItemType(result);
-	//	ImTextureID tex;
-
-	//	if (result < Block::BLOCKS_COUNT)
-	//	{
-	//		atlas = getUVForTexture(assetManager.textures, atlas);
-	//		tex = (ImTextureID)(intptr_t)assetManager.textures.id;
-	//	}
-	//	else
-	//	{
-	//		atlas = getUVForTexture(assetManager.items, atlas);
-	//		tex = (ImTextureID)(intptr_t)assetManager.items.id;
-	//	}
-
-	//	if (ImGui::ImageButton(
-	//		tex,
-	//		{ 40, 40 },
-	//		{ atlas.x, atlas.y },
-	//		{ atlas.x + atlas.width, atlas.y + atlas.height }
-	//	))
-	//	{
-	//		if (inventory.canCraft(craftSlots))
-	//		{
-	//			int item = inventory.craft(craftSlots);
-
-	//			// spawn item close to player, so its immediately picked up and added to inventory
-	//			spawnDroppedItem(
-	//				{ player.getPosition().x, player.getPosition().y },
-	//				item
-	//			);
-
-	//			// clear slots after crafting
-	//			craftSlots[0] = 0;
-	//			craftSlots[1] = 0;
-	//		}
-	//	}
-
-	//	ImGui::End();
-	//}
 
 #pragma endregion
 
@@ -1007,85 +916,6 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma region render player
 
 	player.render(assetManager);
-
-#pragma endregion
-
-
-#pragma region render inventory old
-
-	//if (!showImgui)
-	//{
-	//	ImGui::Begin("Inventory");
-
-	//	for (int i = 0; i < inventory.slots; i++)
-	//	{
-	//		auto atlas = getTextureCoordinatesForItemType(inventory.items[i].itemType);
-	//		ImTextureID tex;
-
-	//		if (inventory.items[i].itemType < Block::BLOCKS_COUNT)
-	//		{
-	//			atlas = getUVForTexture(assetManager.textures, atlas);
-	//			tex = (ImTextureID)(intptr_t)assetManager.textures.id;
-	//		}
-	//		else
-	//		{
-	//			atlas = getUVForTexture(assetManager.items, atlas);
-	//			tex = (ImTextureID)(intptr_t)assetManager.items.id;
-	//		}
-
-	//		ImGui::PushID(i);
-
-	//		// draw image button
-	//		if (ImGui::ImageButton(
-	//			tex,
-	//			{ 35,35 },
-	//			{ atlas.x,atlas.y },
-	//			{ atlas.x + atlas.width,atlas.y + atlas.height }
-	//		))
-	//		{
-	//			creativeSelectedBlock = inventory.items[i].itemType;
-	//			player.heldItem = creativeSelectedBlock;
-
-	//			if (showCraftUI)
-	//			{
-	//				for (int j = 0; j < maxCraftSlots; j++)
-	//				{
-	//					if (craftSlots[j] == 0)
-	//					{
-	//						craftSlots[j] = creativeSelectedBlock;
-	//						inventory.items[i].itemCounter -= 1;
-	//						break;
-	//					}
-	//				}
-	//			}
-	//		}
-
-	//		// get button position
-	//		ImVec2 min = ImGui::GetItemRectMin();
-	//		ImVec2 max = ImGui::GetItemRectMax();
-
-	//		// draw text on top (bottom-right corner)
-	//		if (inventory.items[i].itemType != 0)
-	//		{
-	//			std::string count = std::to_string(inventory.items[i].itemCounter);
-
-	//			ImDrawList* drawList = ImGui::GetWindowDrawList();
-
-				//ImVec2 textSize = ImGui::CalcTextSize(count.c_str());
-	//			ImVec2 textPos = ImVec2(
-	//				max.x - textSize.x - 2,
-	//				max.y - textSize.y - 2
-	//			);
-
-				//drawList->AddText(textPos, IM_COL32(255, 255, 255, 127), count.c_str());
-	//		}
-
-	//		ImGui::PopID();
-	//		ImGui::SameLine();
-	//	}
-
-	//	ImGui::End();
-	//}
 
 #pragma endregion
 
@@ -1297,8 +1127,8 @@ bool Gameplay::update(AssetManager& assetManager)
 
 				// display item from inventory
 				int index = j * inventory.rows + i;
-				auto atlas = getTextureCoordinatesForItemType(inventory.items[index].itemType);
-				Texture2D tex = getTextureForItemType(inventory.items[index].itemType, assetManager);
+				auto atlas = getTextureCoordinatesForItemType(inventory.slots[index].itemId);
+				Texture2D tex = getTextureForItemType(inventory.slots[index].itemId, assetManager);
 
 				DrawTexturePro(
 					tex,
@@ -1309,15 +1139,17 @@ bool Gameplay::update(AssetManager& assetManager)
 					c
 				);
 
-				if (inventory.items[index].itemCounter != 0 && !isItem(inventory.items[index].itemType))
+				if (inventory.slots[index].count != 0 && !isItem(inventory.slots[index].itemId))
 				{
 					Vector2 textPos =
 					{
 						r.x + r.width * 0.5f,
 						r.y + r.height * 0.75f
 					};
-					std::string str = std::to_string(inventory.items[index].itemCounter);
+					std::string str = std::to_string(inventory.slots[index].count);
 					Vector2 textSize = MeasureTextEx(GetFontDefault(), str.c_str(), 25.f, 2.f);
+
+					// write item count as text
 					DrawTextPro(
 						GetFontDefault(),
 						str.c_str(),
@@ -1399,8 +1231,12 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			int selectedItemType = inventory.visibleRecipes[selectedRecipeIndex];
 			bool canCraft = inventory.canCraft(selectedItemType);
-			int item = inventory.craft(selectedItemType);
-			spawnDroppedItem(player.getPosition(), item);
+
+			if (canCraft)
+			{
+				int item = inventory.craft(selectedItemType);
+				spawnDroppedItem(player.getPosition(), item);
+			}
 		}
 
 		int padding = 10;
@@ -1425,9 +1261,8 @@ bool Gameplay::update(AssetManager& assetManager)
 				selectedRecipeIndex = i;
 
 				// craft item if clicked
-				if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+				if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT) && canCraft)
 				{
-					bool canCraft = inventory.canCraft(selectedItemType);
 					int item = inventory.craft(selectedItemType);
 					spawnDroppedItem(player.getPosition(), item);
 				}
@@ -1447,12 +1282,7 @@ bool Gameplay::update(AssetManager& assetManager)
 				itemColor = canCraft ? WHITE : ColorAlpha(WHITE, 0.4f);
 			}
 
-			DrawRectangleRounded(
-				rr,
-				.3f,
-				6,
-				bg
-			);
+			DrawRectangleRounded(rr, .3f, 6, bg);
 
 			rr = shrinkRectanglePercentage(rr, .4f, .4f);
 
@@ -1476,15 +1306,10 @@ bool Gameplay::update(AssetManager& assetManager)
 				ri.y += i * oneCellRectangleIngredient.height + padding;
 				ri = shrinkRectanglePercentage(ri, .3f, .3f);
 				std::vector<ItemStack> selectedItemIngredients = inventory.receipes[itemType].ingredients;
-				int ingredient = selectedItemIngredients[j].itemType;
+				int ingredient = selectedItemIngredients[j].itemId;
 				bool hasEnoughIngredients = inventory.hasEnoughIngredients(selectedItemIngredients[j]);
 
-				DrawRectangleRounded(
-					ri,
-					.3f,
-					1.f,
-					{ 48, 125, 255, 255 } // blue
-				);
+				DrawRectangleRounded(ri, .3f, 1.f, { 48, 125, 255, 255 }); // blue color
 
 				ri = shrinkRectanglePercentage(ri, .25f, .25f);
 
@@ -1499,7 +1324,7 @@ bool Gameplay::update(AssetManager& assetManager)
 					itemColor
 				);
 
-				std::string str = std::to_string(selectedItemIngredients[j].itemCounter);
+				std::string str = std::to_string(selectedItemIngredients[j].count);
 				Vector2 textPos =
 				{
 					ri.x + ri.width * 0.5f,

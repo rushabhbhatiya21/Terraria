@@ -1,12 +1,12 @@
 #include "inventory.h"
 #include <asserts.h>
-#include <blocks.h>
+#include <items/blocks.h>
 
 int Inventory::getEmptySlot()
 {
-	for (int i = 0; i < slots; i++)
+	for (int i = 0; i < slotCount; i++)
 	{
-		if (items[i].itemType == 0) { return i; };
+		if (slots[i].itemId == 0) { return i; };
 	}
 	return -1;
 
@@ -14,38 +14,38 @@ int Inventory::getEmptySlot()
 
 bool Inventory::storeItem(ItemStack& droppedItem)
 {
-	bool isTypeItem = isItem(droppedItem.itemType);
+	bool isTypeItem = isItem(droppedItem.itemId);
 	if (!isTypeItem)
 	{
-		for (auto& i : items)
+		for (auto& i : slots)
 		{
 			// same item type exist in inventory then stack
-			if (i.itemType == droppedItem.itemType)
+			if (i.itemId == droppedItem.itemId)
 			{
 				// make sure stack does not exceed max
-				if (i.itemCounter <= 999)
+				if (i.count <= 999)
 				{
 					// if dropped item has more than max stack
-					if (droppedItem.itemCounter > 999)
+					if (droppedItem.count > 999)
 					{
-						int remaining = droppedItem.itemCounter - i.itemCounter;
-						i.itemCounter = 999;
-						droppedItem.itemCounter -= remaining;
+						int remaining = droppedItem.count - i.count;
+						i.count = 999;
+						droppedItem.count -= remaining;
 						return true;
 					}
 
 					// stack does not exceed max after putting item in inventory
-					else if (i.itemCounter + droppedItem.itemCounter <= 999)
+					else if (i.count + droppedItem.count <= 999)
 					{
-						i.itemCounter += droppedItem.itemCounter;
+						i.count += droppedItem.count;
 						// kill droppedItem
 						return false;
 					}
 					else
 					{
-						int partialAdd = 999 - i.itemCounter;
-						i.itemCounter += partialAdd;
-						droppedItem.itemCounter -= partialAdd;
+						int partialAdd = 999 - i.count;
+						i.count += partialAdd;
+						droppedItem.count -= partialAdd;
 					}
 				}
 			}
@@ -63,15 +63,15 @@ bool Inventory::storeItem(ItemStack& droppedItem)
 	}
 	else
 	{
-		if (!isTypeItem && droppedItem.itemCounter > 999)
+		if (!isTypeItem && droppedItem.count > 999)
 		{
-			droppedItem.itemCounter -= 999;
-			items[emptySlot] = { droppedItem.itemType, 999 };
+			droppedItem.count -= 999;
+			slots[emptySlot] = { droppedItem.itemId, 999 };
 			return true;
 		}
 		else
 		{
-			items[emptySlot] = { droppedItem.itemType, droppedItem.itemCounter };
+			slots[emptySlot] = { droppedItem.itemId, droppedItem.count };
 			return false;
 		}
 	}
@@ -79,21 +79,21 @@ bool Inventory::storeItem(ItemStack& droppedItem)
 
 void Inventory::removeItem(int index)
 {
-	permaAssertComment(index >= 0 || index < slots, "can not remove item, out of bound index.");
+	permaAssertComment(index >= 0 || index < slotCount, "can not remove item, out of bound index.");
 
-	if (index < 0 || index >= slots) { return; }
+	if (index < 0 || index >= slotCount) { return; }
 
-	items[index].itemType = 0;
-	items[index].itemCounter = 0;
+	slots[index].itemId = 0;
+	slots[index].count = 0;
 }
 
 bool Inventory::hasEnoughIngredients(ItemStack& itemStack)
 {
-	for (auto& item : items)
+	for (auto& item : slots)
 	{
-		if (item.itemType == itemStack.itemType)
+		if (item.itemId == itemStack.itemId)
 		{
-			if (item.itemCounter >= itemStack.itemCounter)
+			if (item.count >= itemStack.count)
 			{
 				return true;
 			}
@@ -107,11 +107,11 @@ bool Inventory::hasEnoughIngredients(ItemStack& itemStack)
 	return false; // item not found in inventory
 }
 
-int Inventory::getItemIndexFromInventory(int itemType)
+int Inventory::getItemIndexFromInventory(int itemId)
 {
-	for (int i = 0; i < items.size(); i++)
+	for (int i = 0; i < slots.size(); i++)
 	{
-		if (items[i].itemType == itemType)
+		if (slots[i].itemId == itemId)
 		{
 			return i;
 		}
@@ -140,11 +140,11 @@ int Inventory::craft(int item)
 
 	for (auto& ingredient : recipe.ingredients)
 	{
-		int index = getItemIndexFromInventory(ingredient.itemType);
+		int index = getItemIndexFromInventory(ingredient.itemId);
 		permaAssertComment(index >= 0, "Item not found in inventory, must not be able to craft item.");
-		permaAssertComment(items[index].itemCounter >= ingredient.itemCounter, "ingredients mismatch, must not be able to craft item.");
+		permaAssertComment(slots[index].count >= ingredient.count, "ingredients mismatch, must not be able to craft item.");
 
-		items[index].itemCounter -= ingredient.itemCounter;
+		slots[index].count -= ingredient.count;
 		return item;
 	}
 

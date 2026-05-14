@@ -4,7 +4,7 @@
 #include "randomStuff.h"
 #include <structure.h>
 #include <saveMap.h>
-#include "BlockData.h" // initBlock, TOOL_* constants
+#include "items/blockData.h" // initBlock, TOOL_* constants
 
 void generateWorld(GameMap& gameMap, int seed)
 {

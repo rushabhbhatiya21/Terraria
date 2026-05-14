@@ -1,6 +1,6 @@
 #pragma once
 #include <vector>
-#include <blocks.h>
+#include <items/blocks.h>
 
 struct GameMap
 {

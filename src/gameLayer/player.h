@@ -1,7 +1,7 @@
 #pragma once
 #include <entity.h>
-#include <items.h>
 #include <entityAnimation.h>
+#include <items/item.h>
 
 struct Player : public Entity
 {
@@ -48,10 +48,13 @@ struct Player : public Entity
 	float maxAttackTimeAnimation = 0.5f;
 	bool isPlayingAttackAnimation = false;
 
+	float useTimer = 0.3f;
+
 	int armourHead = 0;
 	int armourChest = 0;
 	int armoutLegs = 0;
-	int heldItem = 0;
+
+	int heldItem = Items::woodenSword;
 
 	int numberOfParticlesOnLand = 1;
 };

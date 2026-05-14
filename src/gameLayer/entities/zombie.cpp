@@ -1,7 +1,7 @@
 #pragma once
 #include "zombie.h"
 #include "droppedItem.h"
-#include <blocks.h>
+#include <items/blocks.h>
 #include <gameMap.h>
 #include <assetManager.h>
 #include <helper.h>

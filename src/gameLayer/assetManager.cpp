@@ -2,7 +2,7 @@
 #include <assetManager.h>
 #include <filesystem>
 #include <unordered_map>
-#include <items.h>
+#include <items/item.h>
 
 
 void AssetManager::loadAll()
@@ -22,28 +22,28 @@ void AssetManager::loadAll()
 	frontArmour[0] = LoadTexture(RESOURCES_PATH "body/player_front.png");
 	backArmour[0] = LoadTexture(RESOURCES_PATH "body/player_back.png");
 
-	headArmour[Item::partyHat] = LoadTexture(RESOURCES_PATH "body/party_hat.png");
-	headArmour[Item::sunGlasses] = LoadTexture(RESOURCES_PATH "body/sunglasses.png");
+	headArmour[Items::partyHat] = LoadTexture(RESOURCES_PATH "body/party_hat.png");
+	headArmour[Items::sunGlasses] = LoadTexture(RESOURCES_PATH "body/sunglasses.png");
 
-	feetArmour[Item::copperBoots] = LoadTexture(RESOURCES_PATH "body/copper_armour_feet.png");
-	headArmour[Item::copperHelmet] = LoadTexture(RESOURCES_PATH "body/copper_armour_head.png");
-	frontArmour[Item::copperChestPlate] = LoadTexture(RESOURCES_PATH "body/copper_armour_front.png");
-	backArmour[Item::copperChestPlate] = LoadTexture(RESOURCES_PATH "body/copper_armour_back.png");
+	feetArmour[Items::copperBoots] = LoadTexture(RESOURCES_PATH "body/copper_armour_feet.png");
+	headArmour[Items::copperHelmet] = LoadTexture(RESOURCES_PATH "body/copper_armour_head.png");
+	frontArmour[Items::copperChestPlate] = LoadTexture(RESOURCES_PATH "body/copper_armour_front.png");
+	backArmour[Items::copperChestPlate] = LoadTexture(RESOURCES_PATH "body/copper_armour_back.png");
 
-	feetArmour[Item::ironBoots] = LoadTexture(RESOURCES_PATH "body/iron_armour_feet.png");
-	headArmour[Item::ironHelmet] = LoadTexture(RESOURCES_PATH "body/iron_armour_head.png");
-	frontArmour[Item::ironChestPlate] = LoadTexture(RESOURCES_PATH "body/iron_armour_front.png");
-	backArmour[Item::ironChestPlate] = LoadTexture(RESOURCES_PATH "body/iron_armour_back.png");
+	feetArmour[Items::ironBoots] = LoadTexture(RESOURCES_PATH "body/iron_armour_feet.png");
+	headArmour[Items::ironHelmet] = LoadTexture(RESOURCES_PATH "body/iron_armour_head.png");
+	frontArmour[Items::ironChestPlate] = LoadTexture(RESOURCES_PATH "body/iron_armour_front.png");
+	backArmour[Items::ironChestPlate] = LoadTexture(RESOURCES_PATH "body/iron_armour_back.png");
 
-	feetArmour[Item::goldBoots] = LoadTexture(RESOURCES_PATH "body/gold_armour_feet.png");
-	headArmour[Item::goldHelmet] = LoadTexture(RESOURCES_PATH "body/gold_armour_head.png");
-	frontArmour[Item::goldChestPlate] = LoadTexture(RESOURCES_PATH "body/gold_armour_front.png");
-	backArmour[Item::goldChestPlate] = LoadTexture(RESOURCES_PATH "body/gold_armour_back.png");
+	feetArmour[Items::goldBoots] = LoadTexture(RESOURCES_PATH "body/gold_armour_feet.png");
+	headArmour[Items::goldHelmet] = LoadTexture(RESOURCES_PATH "body/gold_armour_head.png");
+	frontArmour[Items::goldChestPlate] = LoadTexture(RESOURCES_PATH "body/gold_armour_front.png");
+	backArmour[Items::goldChestPlate] = LoadTexture(RESOURCES_PATH "body/gold_armour_back.png");
 
-	feetArmour[Item::iceBoots] = LoadTexture(RESOURCES_PATH "body/ice_armour_feet.png");
-	headArmour[Item::iceHelmet] = LoadTexture(RESOURCES_PATH "body/ice_armour_head.png");
-	frontArmour[Item::iceChestPlate] = LoadTexture(RESOURCES_PATH "body/ice_armour_front.png");
-	backArmour[Item::iceChestPlate] = LoadTexture(RESOURCES_PATH "body/ice_armour_back.png");
+	feetArmour[Items::iceBoots] = LoadTexture(RESOURCES_PATH "body/ice_armour_feet.png");
+	headArmour[Items::iceHelmet] = LoadTexture(RESOURCES_PATH "body/ice_armour_head.png");
+	frontArmour[Items::iceChestPlate] = LoadTexture(RESOURCES_PATH "body/ice_armour_front.png");
+	backArmour[Items::iceChestPlate] = LoadTexture(RESOURCES_PATH "body/ice_armour_back.png");
 }
 
 Texture2D AssetManager::getHeadTexture(int item)

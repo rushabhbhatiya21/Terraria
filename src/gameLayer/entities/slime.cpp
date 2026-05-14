@@ -2,8 +2,8 @@
 #include "slime.h"
 #include <helper.h>
 #include <assetManager.h>
-#include <blocks.h>
 #include <entityHolder.h>
+#include <items/blocks.h>
 
 void Slime::render(AssetManager& assetManager)
 {

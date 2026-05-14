@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <raylib.h>
 #include <randomStuff.h>
-#include <blocks.h>
+#include <items/blocks.h>
 
 extern std::unordered_map<int, Color> blockColors;
 

@@ -2,13 +2,8 @@
 #include <vector>
 #include <unordered_map>
 #include <entities/droppedItem.h>
-#include <items.h>
-
-struct ItemStack
-{
-	int itemType = 0;
-	int itemCounter = 0;
-};
+#include <items/item.h>
+#include <items/blocks.h>
 
 struct Recipe
 {
@@ -21,21 +16,21 @@ struct Inventory
 {
 	int rows = 9;
 	int cols = 3;
-	int slots = rows * cols;
-	std::vector<ItemStack> items;
+	int slotCount = rows * cols;
+	std::vector<ItemStack> slots;
 
-	std::unordered_map<int, Recipe> receipes =
+	std::unordered_map<ItemId, Recipe> receipes =
 	{
-		{Item::woodPickaxe, {false, 1, {{Block::woodLog, 3}}}},
-		{Item::woodAxe, {false, 1, {{Block::woodLog, 1}, {Block::stone, 1}}}},
-		{Item::woodenSword, {false, 1, {{Block::dirt, 2}}}}
+		{Items::woodPickaxe, {false, 1, {{Block::woodLog, 3}}}},
+		{Items::woodAxe, {false, 1, {{Block::woodLog, 1}, {Block::stone, 1}}}},
+		{Items::woodenSword, {false, 1, {{Block::dirt, 2}}}}
 	};
 
-	std::vector<int> visibleRecipes;
+	std::vector<ItemId> visibleRecipes;
 
 	Inventory()
 	{
-		items.resize(slots, { 0,0 });
+		slots.resize(slotCount, { 0,0 });
 		visibleRecipes.reserve(receipes.size());
 
 		for (auto& r : receipes)
