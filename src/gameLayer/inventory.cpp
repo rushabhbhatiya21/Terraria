@@ -85,29 +85,30 @@ void Inventory::removeItem(int index)
 
 bool Inventory::canCraft(std::vector<int> itemsTotCraft)
 {
-	for (auto& i : itemsTotCraft)
-	{
-		if (!isCraftable(i)) { return false; }
-	}
+	//for (auto& i : itemsTotCraft)
+	//{
+	//	if (!isCraftable(i)) { return false; }
+	//}
 
-	for (auto& r : receipes)
-	{
-		if (itemsTotCraft == r.second)
-		{
-			return true;
-		}
-	}
+	//for (auto& r : receipes)
+	//{
+	//	if (itemsTotCraft == r.second)
+	//	{
+	//		return true;
+	//	}
+	//}
 
 	return false;
 }
 
 int Inventory::craft(std::vector<int> itemsTotCraft)
 {
-	for (auto& r : receipes)
-	{
-		if (itemsTotCraft == r.second)
-		{
-			return r.first;
-		}
-	}
+	//for (auto& r : receipes)
+	//{
+	//	if (itemsTotCraft == r.second)
+	//	{
+	//		return r.first;
+	//	}
+	//}
+	return 0;
 }

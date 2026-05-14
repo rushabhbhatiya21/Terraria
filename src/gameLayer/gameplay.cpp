@@ -78,6 +78,29 @@ Rectangle Gameplay::getInventoryRectangle(float w, float h)
 	return inventoryRectangle;
 }
 
+Rectangle Gameplay::getCraftRectangle(float w, float h)
+{
+	Rectangle craftRectangle = {};
+
+	craftRectangle.height = h * .5f;
+	craftRectangle.width = w * .1f;
+
+	float maxWidth = w * .9f;
+	if (craftRectangle.width > maxWidth)
+	{
+		float scaleFactor = maxWidth / craftRectangle.width;
+		craftRectangle.height *= scaleFactor;
+		craftRectangle.width *= scaleFactor;
+	}
+
+	craftRectangle = placeRectangleBottomLeftCorner(craftRectangle, h);
+
+	craftRectangle.x += w * .01f;
+	craftRectangle.y += h * .01f;
+
+	return craftRectangle;
+}
+
 bool Gameplay::init()
 {
 	craftSlots.resize(maxCraftSlots);
@@ -109,14 +132,6 @@ bool Gameplay::init()
 
 bool Gameplay::update(AssetManager& assetManager)
 {
-
-#pragma region fixed updates
-
-	Audio::update();
-	updateSettings();
-
-#pragma endregion
-
 
 #pragma region delta time
 
@@ -190,7 +205,9 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	if (IsKeyPressed(KEY_F10)) { showImgui = !showImgui; }
 
-	if (IsKeyPressed(KEY_C)) { showCraftUI = !showCraftUI; }
+	if (IsKeyPressed(KEY_TAB)) { insideInventory = !insideInventory; }
+
+	if (IsKeyPressed(KEY_C)) { insideCraft = !insideCraft; }
 
 	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) { saveWorld(gameMap, entityHolder, player); }
 
@@ -517,6 +534,14 @@ bool Gameplay::update(AssetManager& assetManager)
 		insideInventoryMenu = true;
 	}
 
+	bool insideCraftingMenu = false;
+	Rectangle craftRectangle = getCraftRectangle(GetScreenWidth(), GetScreenHeight());
+
+	if (insideCraft && CheckCollisionPointRec(GetMousePosition(), craftRectangle))
+	{
+		insideCraftingMenu = true;
+	}
+
 	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), camera);
 	int blockX = (int)floor(worldPos.x);
 	int blockY = (int)floor(worldPos.y);
@@ -553,7 +578,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	if (!showImgui)
 	{
-		if (!insideInventoryMenu)
+		if (!insideInventoryMenu && !insideCraftingMenu)
 			if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_MIDDLE))
 			{
 				auto b = gameMap.getBlockSafe(blockX, blockY);
@@ -564,7 +589,7 @@ bool Gameplay::update(AssetManager& assetManager)
 				}
 			}
 
-		if (!insideInventoryMenu)
+		if (!insideInventoryMenu && !insideCraftingMenu)
 			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 			{
 				// hit entities (enemies)
@@ -646,7 +671,8 @@ bool Gameplay::update(AssetManager& assetManager)
 				}
 			}
 
-		if (!insideInventoryMenu)
+		if (!insideInventoryMenu && !insideCraftingMenu)
+		{
 			if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
 			{
 				float magnitude = Vector2Distance(player.getPosition(), worldPos);
@@ -670,10 +696,6 @@ bool Gameplay::update(AssetManager& assetManager)
 					}
 				}
 			}
-
-		if (IsKeyPressed(KEY_TAB))
-		{
-			insideInventory = !insideInventory;
 		}
 	}
 
@@ -682,105 +704,105 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region craft ui - needs refactoring
 
-	// craft ui
+	//// craft ui
 
-	if (showCraftUI)
-	{
-		ImGui::Begin("Craft");
+	//if (showCraftUI)
+	//{
+	//	ImGui::Begin("Craft");
 
-		// input slots
-		for (int i = 0; i < maxCraftSlots; i++)
-		{
-			ImGui::PushID(i);
+	//	// input slots
+	//	for (int i = 0; i < maxCraftSlots; i++)
+	//	{
+	//		ImGui::PushID(i);
 
-			int item = craftSlots[i];
+	//		int item = craftSlots[i];
 
-			auto atlas = getTextureCoordinatesForItemType(item);
-			ImTextureID tex;
+	//		auto atlas = getTextureCoordinatesForItemType(item);
+	//		ImTextureID tex;
 
-			if (item < Block::BLOCKS_COUNT)
-			{
-				atlas = getUVForTexture(assetManager.textures, atlas);
-				tex = (ImTextureID)(intptr_t)assetManager.textures.id;
-			}
-			else
-			{
-				atlas = getUVForTexture(assetManager.items, atlas);
-				tex = (ImTextureID)(intptr_t)assetManager.items.id;
-			}
+	//		if (item < Block::BLOCKS_COUNT)
+	//		{
+	//			atlas = getUVForTexture(assetManager.textures, atlas);
+	//			tex = (ImTextureID)(intptr_t)assetManager.textures.id;
+	//		}
+	//		else
+	//		{
+	//			atlas = getUVForTexture(assetManager.items, atlas);
+	//			tex = (ImTextureID)(intptr_t)assetManager.items.id;
+	//		}
 
-			// draw image button
-			if (ImGui::ImageButton(
-				tex,
-				{ 40,40 },
-				{ atlas.x,atlas.y },
-				{ atlas.x + atlas.width,atlas.y + atlas.height }
-			))
-			{
-				// assign block back to inventory
-				ItemStack item{ craftSlots[i], 1 };
-				inventory.storeItem(item);
+	//		// draw image button
+	//		if (ImGui::ImageButton(
+	//			tex,
+	//			{ 40,40 },
+	//			{ atlas.x,atlas.y },
+	//			{ atlas.x + atlas.width,atlas.y + atlas.height }
+	//		))
+	//		{
+	//			// assign block back to inventory
+	//			ItemStack item{ craftSlots[i], 1 };
+	//			inventory.storeItem(item);
 
-				// clear craft slot
-				craftSlots[i] = 0;
-			}
+	//			// clear craft slot
+	//			craftSlots[i] = 0;
+	//		}
 
-			ImGui::PopID();
-			ImGui::SameLine();
+	//		ImGui::PopID();
+	//		ImGui::SameLine();
 
-			ImGui::Text(i != maxCraftSlots - 1 ? "+" : "=");
+	//		ImGui::Text(i != maxCraftSlots - 1 ? "+" : "=");
 
-			ImGui::SameLine();
-		}
+	//		ImGui::SameLine();
+	//	}
 
-		int result = 0;
+	//	int result = 0;
 
-		// preview in output slot
-		if (inventory.canCraft(craftSlots))
-		{
-			result = inventory.craft(craftSlots);
-		}
+	//	// preview in output slot
+	//	if (inventory.canCraft(craftSlots))
+	//	{
+	//		result = inventory.craft(craftSlots);
+	//	}
 
-		// spawn item if click on output slot
-		auto atlas = getTextureCoordinatesForItemType(result);
-		ImTextureID tex;
+	//	// spawn item if click on output slot
+	//	auto atlas = getTextureCoordinatesForItemType(result);
+	//	ImTextureID tex;
 
-		if (result < Block::BLOCKS_COUNT)
-		{
-			atlas = getUVForTexture(assetManager.textures, atlas);
-			tex = (ImTextureID)(intptr_t)assetManager.textures.id;
-		}
-		else
-		{
-			atlas = getUVForTexture(assetManager.items, atlas);
-			tex = (ImTextureID)(intptr_t)assetManager.items.id;
-		}
+	//	if (result < Block::BLOCKS_COUNT)
+	//	{
+	//		atlas = getUVForTexture(assetManager.textures, atlas);
+	//		tex = (ImTextureID)(intptr_t)assetManager.textures.id;
+	//	}
+	//	else
+	//	{
+	//		atlas = getUVForTexture(assetManager.items, atlas);
+	//		tex = (ImTextureID)(intptr_t)assetManager.items.id;
+	//	}
 
-		if (ImGui::ImageButton(
-			tex,
-			{ 40, 40 },
-			{ atlas.x, atlas.y },
-			{ atlas.x + atlas.width, atlas.y + atlas.height }
-		))
-		{
-			if (inventory.canCraft(craftSlots))
-			{
-				int item = inventory.craft(craftSlots);
+	//	if (ImGui::ImageButton(
+	//		tex,
+	//		{ 40, 40 },
+	//		{ atlas.x, atlas.y },
+	//		{ atlas.x + atlas.width, atlas.y + atlas.height }
+	//	))
+	//	{
+	//		if (inventory.canCraft(craftSlots))
+	//		{
+	//			int item = inventory.craft(craftSlots);
 
-				// spawn item close to player, so its immediately picked up and added to inventory
-				spawnDroppedItem(
-					{ player.getPosition().x, player.getPosition().y },
-					item
-				);
+	//			// spawn item close to player, so its immediately picked up and added to inventory
+	//			spawnDroppedItem(
+	//				{ player.getPosition().x, player.getPosition().y },
+	//				item
+	//			);
 
-				// clear slots after crafting
-				craftSlots[0] = 0;
-				craftSlots[1] = 0;
-			}
-		}
+	//			// clear slots after crafting
+	//			craftSlots[0] = 0;
+	//			craftSlots[1] = 0;
+	//		}
+	//	}
 
-		ImGui::End();
-	}
+	//	ImGui::End();
+	//}
 
 #pragma endregion
 
@@ -899,7 +921,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma region draw frame and selected block
 
 	//draw selected block
-	if (!insideInventoryMenu)
+	if (!insideInventoryMenu && !insideCraftingMenu)
 	{
 		DrawTexturePro(
 			assetManager.frame,
@@ -1001,13 +1023,13 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	//			ImDrawList* drawList = ImGui::GetWindowDrawList();
 
-	//			ImVec2 textSize = ImGui::CalcTextSize(count.c_str());
+				//ImVec2 textSize = ImGui::CalcTextSize(count.c_str());
 	//			ImVec2 textPos = ImVec2(
 	//				max.x - textSize.x - 2,
 	//				max.y - textSize.y - 2
 	//			);
 
-	//			drawList->AddText(textPos, IM_COL32(255, 255, 255, 127), count.c_str());
+				//drawList->AddText(textPos, IM_COL32(255, 255, 255, 127), count.c_str());
 	//		}
 
 	//		ImGui::PopID();
@@ -1095,6 +1117,8 @@ bool Gameplay::update(AssetManager& assetManager)
 	float w = GetScreenWidth();
 	float h = GetScreenHeight();
 
+#pragma region life ui
+
 	Rectangle heartRectangle;
 	heartRectangle.height = h * .05f;
 	heartRectangle.width = heartRectangle.height * 5;
@@ -1119,6 +1143,10 @@ bool Gameplay::update(AssetManager& assetManager)
 		);
 	}
 
+#pragma endregion
+
+#pragma region inventory ui
+
 	if (insideInventory)
 	{
 		Rectangle inventoryRectangle = getInventoryRectangle(w, h);
@@ -1139,9 +1167,9 @@ bool Gameplay::update(AssetManager& assetManager)
 		oneCellRectangle.x = inventoryRectangle.x;
 		oneCellRectangle.y = inventoryRectangle.y;
 
-		for (int i = 0; i < 9; i++)
+		for (int i = 0; i < inventory.rows; i++)
 		{
-			for (int j = 0; j < 3; j++)
+			for (int j = 0; j < inventory.cols; j++)
 			{
 				Rectangle r = oneCellRectangle;
 				r.x += i * oneCellRectangle.width;
@@ -1149,31 +1177,196 @@ bool Gameplay::update(AssetManager& assetManager)
 
 				r = shrinkRectanglePercentage(r, .1f, .1f);
 
+				Color c = { 180,180,200,240 };
+
 				if (CheckCollisionPointRec(GetMousePosition(), r))
 				{
-					DrawTexturePro(
-						assetManager.frame,
-						getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
-						r,
-						{ 0,0 },
-						0.f,
-						{ 220,250,220,250 }
-					);
+					c = { 220,250,220,250 };
 				}
 				else
 				{
-					DrawTexturePro(
-						assetManager.frame,
-						getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
-						r,
-						{ 0,0 },
+					c = { 180,180,200,240 };
+				}
+
+				DrawTexturePro(
+					assetManager.frame,
+					getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
+					r,
+					{ 0,0 },
+					0.f,
+					c
+				);
+
+				// display item from inventory
+				int index = j * inventory.rows + i;
+				auto atlas = getTextureCoordinatesForItemType(inventory.items[index].itemType);
+				Texture2D tex = getTextureForItemType(inventory.items[index].itemType, assetManager);
+
+				DrawTexturePro(
+					tex,
+					atlas,
+					shrinkRectanglePercentage(r, .3f, .3f),
+					{ 0,0 },
+					0.f,
+					c
+				);
+
+				if (inventory.items[index].itemCounter != 0 && !isItem(inventory.items[index].itemType))
+				{
+					Vector2 textPos =
+					{
+						r.x + r.width * 0.5f,
+						r.y + r.height * 0.75f
+					};
+					std::string str = std::to_string(inventory.items[index].itemCounter);
+					Vector2 textSize = MeasureTextEx(GetFontDefault(), str.c_str(), 25.f, 2.f);
+					DrawTextPro(
+						GetFontDefault(),
+						str.c_str(),
+						textPos,
+						{ textSize.x / 2.f, textSize.y / 2.f },
 						0.f,
-						{ 180,180,200,240 }
+						25.f,
+						1.f,
+						{ 255, 255, 255, 200 }
 					);
 				}
 			}
 		}
 	}
+
+#pragma endregion
+
+#pragma region craft ui
+
+
+	if (insideCraft)
+	{
+		Rectangle craftRectangle = getCraftRectangle(GetScreenWidth(), GetScreenHeight());
+
+		craftRectangle = shrinkRectanglePercentage(craftRectangle, .01f, .01f);
+
+		DrawRectangleLinesEx(craftRectangle, 1, RED);
+
+		Rectangle oneCellRectangle;
+		oneCellRectangle.height = craftRectangle.height / 5;
+		oneCellRectangle.width = oneCellRectangle.height;
+		oneCellRectangle.x = craftRectangle.x;
+		oneCellRectangle.y = craftRectangle.y;
+
+		float scroll = GetMouseWheelMove();
+		printf("scroll: %f\n", scroll);
+
+		//DrawRectanglePro(craftRectangle, { 0,0 }, .0f, RED);
+		int selectedItemIndex = 0;
+		int maxRecipeSize = inventory.visibleRecipes.size();
+		if (scroll > 0)
+		{
+			if (selectedItemIndex < maxRecipeSize) selectedItemIndex += 1;
+		}
+		else
+		{
+			if (selectedItemIndex > 0) selectedItemIndex -= 1;
+		}
+
+		// put int selectedRecipeIndex = 0; in gamedata
+		// int selectedItemType = visibleRecipes[selectedRecipeIndex];
+		// Recipe& recipe = recipes[selectedItemType];
+		// then draw ui
+
+		for (int i = 0; i < maxRecipeSize; i++)
+		{
+			int selectedItem = inventory.visibleRecipes[selectedItemIndex];
+			int totalIngredients = 0;
+
+			for (auto& stack : inventory.receipes[selectedItem].ingredients)
+			{
+				totalIngredients += stack.itemCounter;
+			}
+
+			for (int j = 0; j < totalIngredients; j++)
+			{
+				Rectangle r = oneCellRectangle;
+				r.x += i * oneCellRectangle.width;
+				r.y += j * oneCellRectangle.height;
+
+				r = shrinkRectanglePercentage(r, .1f, .1f);
+
+				Color c = { 180,180,200,240 };
+
+				if (CheckCollisionPointRec(GetMousePosition(), r))
+				{
+					c = { 220,250,220,250 };
+				}
+				else
+				{
+					c = { 180,180,200,240 };
+				}
+
+				DrawTexturePro(
+					assetManager.frame,
+					getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
+					r,
+					{ 0,0 },
+					0.f,
+					c
+				);
+
+				if (j == 0)
+				{
+					auto atlas = getTextureCoordinatesForItemType(selectedItem);
+					Texture2D tex = getTextureForItemType(selectedItem, assetManager);
+					DrawTexturePro(
+						tex,
+						atlas,
+						r,
+						{ 0,0 },
+						0.f,
+						c
+					);
+				}
+				else if (j == 1)
+				{
+					r = shrinkRectanglePercentage(r, .3f, .3f);
+					std::vector<ItemStack> ingredients = inventory.receipes[selectedItem].ingredients;
+					if (ingredients.size() >= 1)
+					{
+						auto atlas = getTextureCoordinatesForItemType(ingredients[0].itemType);
+						Texture2D tex = getTextureForItemType(ingredients[0].itemType, assetManager);
+						DrawTexturePro(
+							tex,
+							atlas,
+							r,
+							{ 0,0 },
+							0.f,
+							c
+						);
+					}
+				}
+
+				else
+				{
+					r = shrinkRectanglePercentage(r, .3f, .3f);
+					std::vector<ItemStack> ingredients = inventory.receipes[selectedItem].ingredients;
+					if (ingredients.size() >= 2)
+					{
+						auto atlas = getTextureCoordinatesForItemType(ingredients[1].itemType);
+						Texture2D tex = getTextureForItemType(ingredients[1].itemType, assetManager);
+						DrawTexturePro(
+							tex,
+							atlas,
+							r,
+							{ 0,0 },
+							0.f,
+							c
+						);
+					}
+				}
+			}
+		}
+	}
+
+#pragma endregion
 
 #pragma endregion
 

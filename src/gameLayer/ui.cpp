@@ -1,5 +1,6 @@
 #include "ui.h"
 
+// top
 Rectangle placeRectangleTopLeft(Rectangle r)
 {
 	r.x = 0;
@@ -21,6 +22,7 @@ Rectangle placeReactangleTopRightCorner(Rectangle r, float w)
 	return r;
 }
 
+// center
 Rectangle placeRectangleCenter(Rectangle r, float w, float h)
 {
 	r.x = (w - r.width) * 0.5f;
@@ -28,7 +30,43 @@ Rectangle placeRectangleCenter(Rectangle r, float w, float h)
 	return r;
 }
 
+Rectangle placeRectangleCenterLeft(Rectangle r, float h)
+{
+	r.x = 0;
+	r.y = (h - r.height) * 0.5f;
+	return r;
+}
 
+Rectangle placeRectangleCenterRight(Rectangle r, float w, float h)
+{
+	r.x = (w - r.width) / 2.0f;
+	r.y = (h - r.height) * 0.5f;
+	return r;
+}
+
+// bottom
+Rectangle placeRectangleBottomLeftCorner(Rectangle r, float h)
+{
+	r.x = 0;
+	r.y = h - r.height;
+	return r;
+}
+
+Rectangle placeRectangleBottom(Rectangle r, float w, float h)
+{
+	r.x = (w - r.width) * 0.5f;
+	r.y = h - r.height;
+	return r;
+}
+
+Rectangle placeRectangleBottomRightCorner(Rectangle r, float w, float h)
+{
+	r.x = w - r.width;
+	r.y = h - r.height;
+	return r;
+}
+
+// enlarge and shrink
 Rectangle enlargeRectanglePixels(Rectangle r, float pixelsX, float pixelsY)
 {
 	r.width += pixelsX;
@@ -173,6 +211,36 @@ void UIEngine::updateAndRender()
 		}
 
 		oneButtonRectangle.y += oneButtonRectangle.height;
+	}
+
+	bool disableInputThisFrame = false;
+
+	if (widgets.size() != lastFrameWidgets.size())
+	{
+		disableInputThisFrame = true;
+	}
+	else
+	{
+		for (int i = 0; i < widgets.size(); i++)
+		{
+			if (widgets[i].type != lastFrameWidgets[i].type)
+			{
+				disableInputThisFrame = true;
+				break;
+			}
+		}
+	}
+
+	lastFrameWidgets = widgets;
+
+	if (disableInputThisFrame)
+	{
+		for (auto& w : widgets)
+		{
+			w.isHovered = false;
+			w.isReleased = false;
+			w.isBeingClicked = false;
+		}
 	}
 
 	widgets.clear();

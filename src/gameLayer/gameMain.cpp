@@ -12,6 +12,7 @@ AssetManager assetManager;
 Gameplay gameplay;
 UIEngine mainMenuButtons;
 DrawBackground backgroundForMenu;
+bool gameplayRunning = false;
 
 #pragma endregion
 
@@ -29,19 +30,43 @@ bool initGame()
 
 bool updateGame()
 {
+	Audio::update();
+	updateSettings();
+
 	ClearBackground({ 0,0,0,255 });
 
-	Camera2D c = {};
-	c.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
-	c.target = Vector2{ 500,500 };
-	c.zoom = 20;
-	backgroundForMenu.draw(GetFrameTime(), assetManager, c, { 1000,1000 });
+	if (!gameplayRunning)
+	{
+		Camera2D c = {};
+		c.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
+		c.target = Vector2{ 500,500 };
+		c.zoom = 20;
+		backgroundForMenu.draw(GetFrameTime(), assetManager, c, { 1000,1000 });
 
-	mainMenuButtons.addTitle("hello");
-	mainMenuButtons.addButton("Button");
-	mainMenuButtons.addButton("Button");
+		mainMenuButtons.addTitle("Canvas Adventures");
 
-	mainMenuButtons.updateAndRender();
+		if (mainMenuButtons.addButton("Start Game"))
+		{
+			gameplayRunning = true;
+			gameplay = {};
+			gameplay.init();
+		}
+
+		mainMenuButtons.addButton("Settings");
+
+		if (mainMenuButtons.addButton("Exit"))
+		{
+			return false;
+		}
+
+		mainMenuButtons.updateAndRender();
+		return true;
+	}
+	else
+	{
+		return gameplay.update(assetManager);
+	}
+
 	//return gameplay.update(assetManager);
 	return true;
 }

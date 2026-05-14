@@ -54,7 +54,7 @@ struct Gameplay
 
 	bool showImgui = false;
 	bool insideInventory = false;
-	bool showCraftUI = false;
+	bool insideCraft = false;
 
 	void spawnSlime(Vector2 position);
 
@@ -67,6 +67,8 @@ struct Gameplay
 	void spawnDroppedItem(Vector2 positon, int type);
 
 	Rectangle getInventoryRectangle(float w, float h);
+
+	Rectangle getCraftRectangle(float w, float h);
 
 	bool init();
 

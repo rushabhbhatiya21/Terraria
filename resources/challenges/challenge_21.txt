@@ -1,0 +1,26 @@
+Challenge: Expand the Menu UI system
+As explained in this lesson, your challenge is to expand on this menu UI system with new widgets and features! The next simplest widget to add would be a slider. 
+
+Textures are a little harder because you need to keep the aspect ratio. And that's not always possible, so you may need to look into the DrawTextureNPatch function from raylib.
+
+
+And check out my library for more ideas of widgets and features:
+
+https://github.com/meemknight/glui
+
+Here are some: check boxes, multi sliders, the ability to have more widgets on one row, a color picker, and a drop-down selector. Some are harder to implement for sure than others, so do what you can.
+
+
+
+By far tho, the coolest thing you can do is allow the library to create menu navigation for you! So you can, for example, write something like
+
+ui.StartMenu("Settings");
+    ui.Slider(/*...*/);
+ui.EndMenu();
+This will make a button for you with the text "settings", which, if you click, will get you into this secondary menu, which only has a slider inside. And you can have multiple sub-menus. You will need to implement some sort of "stack" that keeps track of what the current menu is that you are inside, and only render the widgets that are in that menu.
+
+You may want to add ids for this as well, because if we have multiple menus with the same name, the code may not work correctly anymore.
+
+
+
+Finally, you may also want to implement the in-game menu, so you can exit the game and return to the main menu!
