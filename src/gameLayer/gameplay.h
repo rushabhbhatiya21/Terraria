@@ -53,7 +53,10 @@ struct Gameplay
 	// recipe
 	int selectedRecipeIndex = 0;
 
-	RenderTexture2D lightMask;
+	// lighting
+	int lastScreenWidth = 0;
+	int lastScreenHeight = 0;
+	RenderTexture2D lightMask = { 0 };
 
 	bool showImgui = false;
 	bool insideInventory = false;

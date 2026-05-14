@@ -83,12 +83,12 @@ Rectangle Gameplay::getCraftRectangle(float w, float h)
 	Rectangle craftRectangle = {};
 
 	// Base size
-	craftRectangle.width = w * 0.22f;
-	craftRectangle.height = craftRectangle.width * 1.2f;
+	craftRectangle.width = w * 0.15f;
+	craftRectangle.height = h * 0.35f;
 
-	// Clamp
-	craftRectangle.width = Clamp(craftRectangle.width, 180.f, 320.f);
-	craftRectangle.height = Clamp(craftRectangle.height, 260.f, 420.f);
+	//// Clamp
+	//craftRectangle.width = Clamp(craftRectangle.width, 180.f, 420.f);
+	//craftRectangle.height = Clamp(craftRectangle.height, 260.f, 420.f);
 
 	// Bottom left
 	craftRectangle = placeRectangleBottomLeftCorner(craftRectangle, h);
@@ -112,7 +112,7 @@ Rectangle Gameplay::getRecipeRectangle(
 	float padding = 10.f;
 
 	// 1/3 width
-	recipeRectangle.width =	craftRectangle.width * 0.33f;
+	recipeRectangle.width =	craftRectangle.width * 0.2f;
 
 	// Fixed internal padding
 	recipeRectangle.height = craftRectangle.height - padding * 2.f;
@@ -136,25 +136,15 @@ Rectangle Gameplay::getIngredientsRectangle(
 	float padding = 10.f;
 
 	// Remaining width
-	ingredientRectangle.width =
-		craftRectangle.width -
-		recipeRectangle.width -
-		padding * 3.f;
+	ingredientRectangle.width = craftRectangle.width - recipeRectangle.width - padding * 3.f;
 
 	// Almost full height
-	ingredientRectangle.height =
-		craftRectangle.height -
-		padding * 2.f;
+	ingredientRectangle.height = craftRectangle.height - padding * 2.f;
 
 	// Position to the RIGHT of recipe panel
-	ingredientRectangle.x =
-		recipeRectangle.x +
-		recipeRectangle.width +
-		padding;
+	ingredientRectangle.x =	recipeRectangle.x +	recipeRectangle.width +	padding;
 
-	ingredientRectangle.y =
-		craftRectangle.y +
-		padding;
+	ingredientRectangle.y =	craftRectangle.y + padding;
 
 	return ingredientRectangle;
 }
@@ -565,7 +555,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region inventory - needs refactoring
+#pragma region inventory
 
 	for (int i = 0; i < inventory.items.size(); i++)
 	{
@@ -1021,7 +1011,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region render inventory
+#pragma region render inventory old
 
 	//if (!showImgui)
 	//{
@@ -1170,6 +1160,56 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	EndMode2D();
 
+#pragma region lighting
+
+	int screenW = GetScreenWidth();
+	int screenH = GetScreenHeight();
+
+	if (lightMask.id == 0 || screenW != lastScreenWidth || screenH != lastScreenHeight)
+	{
+		// Free old one if exists
+		if (lightMask.id != 0)
+		{
+			UnloadRenderTexture(lightMask);
+		}
+
+		// Create new render texture
+		lightMask = LoadRenderTexture(screenW, screenH);
+
+		lastScreenWidth = screenW;
+		lastScreenHeight = screenH;
+	}
+
+	// Apply cave lighting ONLY when underground
+	if (player.getPosition().y > 130)
+	{
+
+		// Convert player world pos -> screen pos
+		Vector2 playerScreen = GetWorldToScreen2D(
+			player.physics.transform.getCenter(),
+			camera
+		);
+
+		// Update light mask in screen space
+		BeginTextureMode(lightMask);
+		ClearBackground(BLACK);
+		DrawCircleGradient(playerScreen.x, playerScreen.y, 600, WHITE, BLACK);
+		EndTextureMode();
+
+		// Overlay mask on screen
+		BeginBlendMode(BLEND_MULTIPLIED);
+		DrawTextureRec(
+			lightMask.texture,
+			{ 0, 0, (float)screenW, (float)-screenH }, // negative H = flip Y
+			{ 0, 0 },
+			WHITE
+		);
+		EndBlendMode();
+	}
+
+#pragma endregion
+
+
 #pragma	region ui
 
 	float w = GetScreenWidth();
@@ -1315,7 +1355,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		ingredientRect = shrinkRectanglePercentage(ingredientRect, .01f, .01f);
 		DrawRectangleLinesEx(ingredientRect, 1, GREEN);
 
-		float baseCellSize = recipeRect.width;
+		float baseCellSize = recipeRect.width * .7f;
 
 		// RECIPE
 		Rectangle oneCellRectangleRecipe = {};
@@ -1324,7 +1364,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		oneCellRectangleRecipe.x = recipeRect.x + (recipeRect.width - oneCellRectangleRecipe.width) * 0.5f;
 		oneCellRectangleRecipe.y = recipeRect.y;
 		oneCellRectangleRecipe = shrinkRectanglePercentage(oneCellRectangleRecipe, 0.1f, 0.1f);
-		DrawRectangleLinesEx(oneCellRectangleRecipe, 1, BLUE);
+		//DrawRectangleLinesEx(oneCellRectangleRecipe, 1, BLUE);
 
 		// INGREDIENT
 		Rectangle oneCellRectangleIngredient = {};
@@ -1333,141 +1373,155 @@ bool Gameplay::update(AssetManager& assetManager)
 		oneCellRectangleIngredient.x = ingredientRect.x;
 		oneCellRectangleIngredient.y = ingredientRect.y;
 		oneCellRectangleIngredient = shrinkRectanglePercentage(oneCellRectangleIngredient, 0.1f, 0.1f);
-		DrawRectangleLinesEx(oneCellRectangleIngredient, 1, DARKPURPLE);
+		//DrawRectangleLinesEx(oneCellRectangleIngredient, 1, DARKPURPLE);
 
-	//	float scroll = GetMouseWheelMove();
-
-	//	//DrawRectanglePro(craftRectangle, { 0,0 }, .0f, RED);
 		int maxRecipeSize = inventory.visibleRecipes.size();
+		float scroll = GetMouseWheelMove();
 
-	//	if (scroll > 0)
-	//	{
-	//		if (selectedRecipeIndex < maxRecipeSize - 1)
-	//		{
-	//			selectedRecipeIndex += 1;
-	//			selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize);
-	//		}
-	//	}
-	//	else if (scroll < 0)
-	//	{
-	//		if (selectedRecipeIndex > 0)
-	//		{
-	//			selectedRecipeIndex -= 1;
-	//			selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize);
-	//		}
-	//	}
+		if (scroll < 0)
+		{
+			if (selectedRecipeIndex < maxRecipeSize - 1)
+			{
+				selectedRecipeIndex += 1;
+				selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize);
+			}
+		}
+		else if (scroll > 0)
+		{
+			if (selectedRecipeIndex > 0)
+			{
+				selectedRecipeIndex -= 1;
+				selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize);
+			}
+		}
 
-	//	int selectedItemType = inventory.visibleRecipes[selectedRecipeIndex];
+		if (IsKeyPressed(KEY_ENTER))
+		{
+			int selectedItemType = inventory.visibleRecipes[selectedRecipeIndex];
+			bool canCraft = inventory.canCraft(selectedItemType);
+			int item = inventory.craft(selectedItemType);
+			spawnDroppedItem(player.getPosition(), item);
+		}
 
-	// put int selectedRecipeIndex = 0; in gamedata
-	// int selectedItemType = visibleRecipes[selectedRecipeIndex];
-	// Recipe& recipe = recipes[selectedItemType];
-	// then draw ui
+		int padding = 10;
 
-		//for (int i = 0; i < maxRecipeSize; i++)
-		//{
-		//	int itemType = inventory.visibleRecipes[i];
+		for (int i = 0; i < maxRecipeSize; i++)
+		{
+			int itemType = inventory.visibleRecipes[i];
+			bool canCraft = inventory.canCraft(itemType);
+			int selectedItemType = inventory.visibleRecipes[selectedRecipeIndex];
 
-		//	Rectangle r = oneCellRectangleRecipe;
-		//	r.y += i * oneCellRectangleRecipe.height;
+			// item rectangle
+			Rectangle rr = oneCellRectangleRecipe;
+			rr.y += i * (oneCellRectangleRecipe.height + padding);
+			rr = shrinkRectanglePercentage(rr, .1f, .1f);
 
-		//	r = shrinkRectanglePercentage(r, .1f, .1f);
+			// item and bg colors
+			Color bg;
+			Color itemColor;
 
-		//	Color c = { 180,180,200,240 };
+			if (CheckCollisionPointRec(GetMousePosition(), rr))
+			{
+				selectedRecipeIndex = i;
 
-		//	if (CheckCollisionPointRec(GetMousePosition(), r))
-		//	{
-		//		c = { 220,250,220,250 };
-		//	}
-		//	else
-		//	{
-		//		c = { 180,180,200,240 };
-		//	}
+				// craft item if clicked
+				if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+				{
+					bool canCraft = inventory.canCraft(selectedItemType);
+					int item = inventory.craft(selectedItemType);
+					spawnDroppedItem(player.getPosition(), item);
+				}
+			}
 
-		//	DrawTexturePro(
-		//		assetManager.frame,
-		//		getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
-		//		r,
-		//		{ 0,0 },
-		//		0.f,
-		//		c
-		//	);
+			if (selectedRecipeIndex == i)
+			{
+				// Selected item
+				rr = enlargeRectanglePercentage(rr, .2f, .2f);
+				bg = { 255, 220, 20, 255 };
+				itemColor = canCraft ? WHITE : ColorAlpha(WHITE, 0.55f);
+			}
+			else
+			{
+				// Normal slot
+				bg = canCraft ? Color{ 48, 125, 255, 255 } : Color{ 28, 55, 110, 255 };
+				itemColor = canCraft ? WHITE : ColorAlpha(WHITE, 0.4f);
+			}
 
-		//	auto atlas = getTextureCoordinatesForItemType(itemType);
-		//	Texture2D tex = getTextureForItemType(itemType, assetManager);
-		//	DrawTexturePro(
-		//		tex,
-		//		atlas,
-		//		r,
-		//		{ 0,0 },
-		//		0.f,
-		//		c
-		//	);
+			DrawRectangleRounded(
+				rr,
+				.3f,
+				6,
+				bg
+			);
 
-		//	for (int j = 0; j < inventory.receipes[itemType].ingredients.size(); j++)
-		//	{
-		//		r.x += j * oneCellRectangleIngredient.width;
-		//		std::vector<ItemStack> selectedItemIngredients = inventory.receipes[itemType].ingredients;
-		//		int ingredient = selectedItemIngredients[j].itemType;
+			rr = shrinkRectanglePercentage(rr, .4f, .4f);
 
-		//		DrawTexturePro(
-		//			assetManager.frame,
-		//			getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
-		//			r,
-		//			{ 0,0 },
-		//			0.f,
-		//			c
-		//		);
+			auto atlas = getTextureCoordinatesForItemType(itemType);
+			Texture2D tex = getTextureForItemType(itemType, assetManager);
+			DrawTexturePro(
+				tex,
+				atlas,
+				rr,
+				{ 0,0 },
+				0.f,
+				itemColor
+			);
 
-		//		auto atlas = getTextureCoordinatesForItemType(ingredient);
-		//		Texture2D tex = getTextureForItemType(ingredient, assetManager);
-		//		DrawTexturePro(
-		//			tex,
-		//			atlas,
-		//			r,
-		//			{ 0,0 },
-		//			0.f,
-		//			c
-		//		);
-		//	}
-		//}
+			if (itemType != selectedItemType) continue;
+
+			for (int j = 0; j < inventory.receipes[itemType].ingredients.size(); j++)
+			{
+				Rectangle ri = oneCellRectangleIngredient;
+				ri.x += j * oneCellRectangleIngredient.width;
+				ri.y += i * oneCellRectangleIngredient.height + padding;
+				ri = shrinkRectanglePercentage(ri, .3f, .3f);
+				std::vector<ItemStack> selectedItemIngredients = inventory.receipes[itemType].ingredients;
+				int ingredient = selectedItemIngredients[j].itemType;
+				bool hasEnoughIngredients = inventory.hasEnoughIngredients(selectedItemIngredients[j]);
+
+				DrawRectangleRounded(
+					ri,
+					.3f,
+					1.f,
+					{ 48, 125, 255, 255 } // blue
+				);
+
+				ri = shrinkRectanglePercentage(ri, .25f, .25f);
+
+				auto atlas = getTextureCoordinatesForItemType(ingredient);
+				Texture2D tex = getTextureForItemType(ingredient, assetManager);
+				DrawTexturePro(
+					tex,
+					atlas,
+					ri,
+					{ 0,0 },
+					0.f,
+					itemColor
+				);
+
+				std::string str = std::to_string(selectedItemIngredients[j].itemCounter);
+				Vector2 textPos =
+				{
+					ri.x + ri.width * 0.5f,
+					ri.y + ri.height * 0.85f
+				};
+				Vector2 textSize = MeasureTextEx(GetFontDefault(), str.c_str(), 10.f, 1.f);
+
+				DrawTextPro(
+					GetFontDefault(),
+					str.c_str(),
+					textPos,
+					{ textSize.x / 2.f, textSize.y / 2.f },
+					0.f,
+					10.f,
+					1.f,
+					hasEnoughIngredients ? Color{ 255, 255, 255, 200 } : RED
+				);
+			}
+		}
 	}
 
 #pragma endregion
-
-#pragma endregion
-
-
-#pragma region lighting
-
-	// Apply cave lighting ONLY when underground
-	if (player.getPosition().y > 130)
-	{
-		// Light mask render texture
-		lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
-
-		// Convert player world pos -> screen pos
-		Vector2 playerScreen = GetWorldToScreen2D(
-			player.physics.transform.getCenter(),
-			camera
-		);
-
-		// Update light mask in screen space
-		BeginTextureMode(lightMask);
-		ClearBackground(BLACK);
-		DrawCircleGradient(playerScreen.x, playerScreen.y, 600, WHITE, BLACK);
-		EndTextureMode();
-
-		// Overlay mask on screen
-		BeginBlendMode(BLEND_MULTIPLIED);
-		DrawTextureRec(
-			lightMask.texture,
-			{ 0, 0, (float)GetScreenWidth(), (float)-GetScreenHeight() }, // negative H = flip Y
-			{ 0, 0 },
-			WHITE
-		);
-		EndBlendMode();
-	}
 
 #pragma endregion
 
@@ -1614,7 +1668,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region display fps
 
-	DrawFPS(10, 10);
+	DrawFPS(20, 20);
 
 #pragma endregion
 

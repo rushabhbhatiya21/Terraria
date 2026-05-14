@@ -23,6 +23,7 @@ Rectangle placeRectangleBottomRightCorner(Rectangle r, float w, float h);
 
 Rectangle enlargeRectanglePixels(Rectangle r, float pixelsX, float pixelsY);
 
+Rectangle enlargeRectanglePercentage(Rectangle r, float percentageX, float percentageY);
 Rectangle shrinkRectanglePercentage(Rectangle r, float percentageX, float percentageY);
 
 struct UIEngine

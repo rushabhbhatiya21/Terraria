@@ -77,6 +77,20 @@ Rectangle enlargeRectanglePixels(Rectangle r, float pixelsX, float pixelsY)
 	return r;
 }
 
+Rectangle enlargeRectanglePercentage(Rectangle r, float percentageX, float percentageY)
+{
+	float enlargeX = r.width * percentageX;
+	float enlargeY = r.height * percentageY;
+
+	r.width += enlargeX;
+	r.height += enlargeY;
+
+	r.x -= enlargeX / 2.f;
+	r.y -= enlargeY / 2.f;
+
+	return r;
+}
+
 Rectangle shrinkRectanglePercentage(Rectangle r, float percentageX, float percentageY)
 {
 	float shrinkX = r.width * percentageX;

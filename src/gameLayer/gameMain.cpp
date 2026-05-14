@@ -12,7 +12,8 @@ AssetManager assetManager;
 Gameplay gameplay;
 UIEngine mainMenuButtons;
 DrawBackground backgroundForMenu;
-bool gameplayRunning = false;
+// set false for menu
+bool gameplayRunning = true;
 
 #pragma endregion
 

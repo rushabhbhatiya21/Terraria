@@ -35,7 +35,7 @@ struct Inventory
 
 	Inventory()
 	{
-		items.reserve(slots);
+		items.resize(slots, { 0,0 });
 		visibleRecipes.reserve(receipes.size());
 
 		for (auto& r : receipes)
@@ -49,6 +49,8 @@ struct Inventory
 	bool storeItem(ItemStack& droppedItem);
 	void removeItem(int index);
 
-	bool canCraft(std::vector<int> itemsTotCraft);
-	int craft(std::vector<int> itemsTotCraft);
+	int getItemIndexFromInventory(int itemType);
+	bool hasEnoughIngredients(ItemStack& itemStack);
+	bool canCraft(int item);
+	int craft(int item);
 };

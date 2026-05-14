@@ -1,0 +1,10 @@
+-- Craft UI
+- make items scrollable
+
+-- Weapons
+- implement melee weapons
+- implement range weapons
+- weapon animation with physics
+- range projectile
+- hit pause
+- hit effect

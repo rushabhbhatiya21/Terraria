@@ -14,35 +14,39 @@ int Inventory::getEmptySlot()
 
 bool Inventory::storeItem(ItemStack& droppedItem)
 {
-	for (auto& i : items)
+	bool isTypeItem = isItem(droppedItem.itemType);
+	if (!isTypeItem)
 	{
-		// same item type exist in inventory then stack
-		if (i.itemType == droppedItem.itemType)
+		for (auto& i : items)
 		{
-			// make sure stack does not exceed max
-			if (i.itemCounter <= 999)
+			// same item type exist in inventory then stack
+			if (i.itemType == droppedItem.itemType)
 			{
-				// if dropped item has more than max stack
-				if (droppedItem.itemCounter > 999)
+				// make sure stack does not exceed max
+				if (i.itemCounter <= 999)
 				{
-					int remaining = droppedItem.itemCounter - i.itemCounter;
-					i.itemCounter = 999;
-					droppedItem.itemCounter -= remaining;
-					return true;
-				}
+					// if dropped item has more than max stack
+					if (droppedItem.itemCounter > 999)
+					{
+						int remaining = droppedItem.itemCounter - i.itemCounter;
+						i.itemCounter = 999;
+						droppedItem.itemCounter -= remaining;
+						return true;
+					}
 
-				// stack does not exceed max after putting item in inventory
-				else if (i.itemCounter + droppedItem.itemCounter <= 999)
-				{
-					i.itemCounter += droppedItem.itemCounter;
-					// kill droppedItem
-					return false;
-				}
-				else
-				{
-					int partialAdd = 999 - i.itemCounter;
-					i.itemCounter += partialAdd;
-					droppedItem.itemCounter -= partialAdd;
+					// stack does not exceed max after putting item in inventory
+					else if (i.itemCounter + droppedItem.itemCounter <= 999)
+					{
+						i.itemCounter += droppedItem.itemCounter;
+						// kill droppedItem
+						return false;
+					}
+					else
+					{
+						int partialAdd = 999 - i.itemCounter;
+						i.itemCounter += partialAdd;
+						droppedItem.itemCounter -= partialAdd;
+					}
 				}
 			}
 		}
@@ -59,7 +63,7 @@ bool Inventory::storeItem(ItemStack& droppedItem)
 	}
 	else
 	{
-		if (droppedItem.itemCounter > 999)
+		if (!isTypeItem && droppedItem.itemCounter > 999)
 		{
 			droppedItem.itemCounter -= 999;
 			items[emptySlot] = { droppedItem.itemType, 999 };
@@ -83,32 +87,66 @@ void Inventory::removeItem(int index)
 	items[index].itemCounter = 0;
 }
 
-bool Inventory::canCraft(std::vector<int> itemsTotCraft)
+bool Inventory::hasEnoughIngredients(ItemStack& itemStack)
 {
-	//for (auto& i : itemsTotCraft)
-	//{
-	//	if (!isCraftable(i)) { return false; }
-	//}
+	for (auto& item : items)
+	{
+		if (item.itemType == itemStack.itemType)
+		{
+			if (item.itemCounter >= itemStack.itemCounter)
+			{
+				return true;
+			}
+			else
+			{
+				return false; // not enough ingredients count
+			}
+		}
+	}
 
-	//for (auto& r : receipes)
-	//{
-	//	if (itemsTotCraft == r.second)
-	//	{
-	//		return true;
-	//	}
-	//}
-
-	return false;
+	return false; // item not found in inventory
 }
 
-int Inventory::craft(std::vector<int> itemsTotCraft)
+int Inventory::getItemIndexFromInventory(int itemType)
 {
-	//for (auto& r : receipes)
-	//{
-	//	if (itemsTotCraft == r.second)
-	//	{
-	//		return r.first;
-	//	}
-	//}
-	return 0;
+	for (int i = 0; i < items.size(); i++)
+	{
+		if (items[i].itemType == itemType)
+		{
+			return i;
+		}
+	}
+	return -1; // item not found, not gonna happen but still
+}
+
+bool Inventory::canCraft(int item)
+{
+	Recipe& itemToCraft = receipes[item];
+
+	for (auto& ingredient : itemToCraft.ingredients)
+	{
+		if (!hasEnoughIngredients(ingredient))
+		{
+			return false;
+		}
+	}
+
+	return true;
+}
+
+int Inventory::craft(int item)
+{
+	Recipe& recipe = receipes[item];
+
+	for (auto& ingredient : recipe.ingredients)
+	{
+		int index = getItemIndexFromInventory(ingredient.itemType);
+		permaAssertComment(index >= 0, "Item not found in inventory, must not be able to craft item.");
+		permaAssertComment(items[index].itemCounter >= ingredient.itemCounter, "ingredients mismatch, must not be able to craft item.");
+
+		items[index].itemCounter -= ingredient.itemCounter;
+		return item;
+	}
+
+	return -1;
 }
