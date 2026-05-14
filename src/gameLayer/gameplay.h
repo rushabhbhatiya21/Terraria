@@ -50,6 +50,9 @@ struct Gameplay
 	// particles
 	std::vector<Particle> particles;
 
+	// recipe
+	int selectedRecipeIndex = 0;
+
 	RenderTexture2D lightMask;
 
 	bool showImgui = false;
@@ -69,6 +72,9 @@ struct Gameplay
 	Rectangle getInventoryRectangle(float w, float h);
 
 	Rectangle getCraftRectangle(float w, float h);
+
+	Rectangle getRecipeRectangle(float w, float h, Rectangle craftRectangle);
+	Rectangle getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle);
 
 	bool init();
 

@@ -82,23 +82,81 @@ Rectangle Gameplay::getCraftRectangle(float w, float h)
 {
 	Rectangle craftRectangle = {};
 
-	craftRectangle.height = h * .5f;
-	craftRectangle.width = w * .1f;
+	// Base size
+	craftRectangle.width = w * 0.22f;
+	craftRectangle.height = craftRectangle.width * 1.2f;
 
-	float maxWidth = w * .9f;
-	if (craftRectangle.width > maxWidth)
-	{
-		float scaleFactor = maxWidth / craftRectangle.width;
-		craftRectangle.height *= scaleFactor;
-		craftRectangle.width *= scaleFactor;
-	}
+	// Clamp
+	craftRectangle.width = Clamp(craftRectangle.width, 180.f, 320.f);
+	craftRectangle.height = Clamp(craftRectangle.height, 260.f, 420.f);
 
+	// Bottom left
 	craftRectangle = placeRectangleBottomLeftCorner(craftRectangle, h);
 
-	craftRectangle.x += w * .01f;
-	craftRectangle.y += h * .01f;
+	// Fixed padding
+	float padding = 12.f;
+
+	craftRectangle.x += padding;
+	craftRectangle.y -= padding;
 
 	return craftRectangle;
+}
+
+Rectangle Gameplay::getRecipeRectangle(
+	float w,
+	float h,
+	Rectangle craftRectangle)
+{
+	Rectangle recipeRectangle = {};
+
+	float padding = 10.f;
+
+	// 1/3 width
+	recipeRectangle.width =	craftRectangle.width * 0.33f;
+
+	// Fixed internal padding
+	recipeRectangle.height = craftRectangle.height - padding * 2.f;
+
+	// Inside parent
+	recipeRectangle.x =	craftRectangle.x + padding;
+
+	recipeRectangle.y =	craftRectangle.y + padding;
+
+	return recipeRectangle;
+}
+
+Rectangle Gameplay::getIngredientsRectangle(
+	float w,
+	float h,
+	Rectangle craftRectangle,
+	Rectangle recipeRectangle)
+{
+	Rectangle ingredientRectangle = {};
+
+	float padding = 10.f;
+
+	// Remaining width
+	ingredientRectangle.width =
+		craftRectangle.width -
+		recipeRectangle.width -
+		padding * 3.f;
+
+	// Almost full height
+	ingredientRectangle.height =
+		craftRectangle.height -
+		padding * 2.f;
+
+	// Position to the RIGHT of recipe panel
+	ingredientRectangle.x =
+		recipeRectangle.x +
+		recipeRectangle.width +
+		padding;
+
+	ingredientRectangle.y =
+		craftRectangle.y +
+		padding;
+
+	return ingredientRectangle;
 }
 
 bool Gameplay::init()
@@ -1242,128 +1300,137 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	if (insideCraft)
 	{
-		Rectangle craftRectangle = getCraftRectangle(GetScreenWidth(), GetScreenHeight());
+		float w = GetScreenWidth();
+		float h = GetScreenHeight();
 
+		Rectangle craftRectangle = getCraftRectangle(w, h);
 		craftRectangle = shrinkRectanglePercentage(craftRectangle, .01f, .01f);
+		DrawRectangleLinesEx(craftRectangle, 2, RED);
 
-		DrawRectangleLinesEx(craftRectangle, 1, RED);
+		Rectangle recipeRect = getRecipeRectangle(w, h, craftRectangle);
+		recipeRect = shrinkRectanglePercentage(recipeRect, .01f, .01f);
+		DrawRectangleLinesEx(recipeRect, 1, YELLOW);
 
-		Rectangle oneCellRectangle;
-		oneCellRectangle.height = craftRectangle.height / 5;
-		oneCellRectangle.width = oneCellRectangle.height;
-		oneCellRectangle.x = craftRectangle.x;
-		oneCellRectangle.y = craftRectangle.y;
+		Rectangle ingredientRect = getIngredientsRectangle(w, h, craftRectangle, recipeRect);
+		ingredientRect = shrinkRectanglePercentage(ingredientRect, .01f, .01f);
+		DrawRectangleLinesEx(ingredientRect, 1, GREEN);
 
-		float scroll = GetMouseWheelMove();
-		printf("scroll: %f\n", scroll);
+		float baseCellSize = recipeRect.width;
 
-		//DrawRectanglePro(craftRectangle, { 0,0 }, .0f, RED);
-		int selectedItemIndex = 0;
+		// RECIPE
+		Rectangle oneCellRectangleRecipe = {};
+		oneCellRectangleRecipe.width = baseCellSize;
+		oneCellRectangleRecipe.height = baseCellSize;
+		oneCellRectangleRecipe.x = recipeRect.x + (recipeRect.width - oneCellRectangleRecipe.width) * 0.5f;
+		oneCellRectangleRecipe.y = recipeRect.y;
+		oneCellRectangleRecipe = shrinkRectanglePercentage(oneCellRectangleRecipe, 0.1f, 0.1f);
+		DrawRectangleLinesEx(oneCellRectangleRecipe, 1, BLUE);
+
+		// INGREDIENT
+		Rectangle oneCellRectangleIngredient = {};
+		oneCellRectangleIngredient.width = baseCellSize;
+		oneCellRectangleIngredient.height = baseCellSize;
+		oneCellRectangleIngredient.x = ingredientRect.x;
+		oneCellRectangleIngredient.y = ingredientRect.y;
+		oneCellRectangleIngredient = shrinkRectanglePercentage(oneCellRectangleIngredient, 0.1f, 0.1f);
+		DrawRectangleLinesEx(oneCellRectangleIngredient, 1, DARKPURPLE);
+
+	//	float scroll = GetMouseWheelMove();
+
+	//	//DrawRectanglePro(craftRectangle, { 0,0 }, .0f, RED);
 		int maxRecipeSize = inventory.visibleRecipes.size();
-		if (scroll > 0)
-		{
-			if (selectedItemIndex < maxRecipeSize) selectedItemIndex += 1;
-		}
-		else
-		{
-			if (selectedItemIndex > 0) selectedItemIndex -= 1;
-		}
 
-		// put int selectedRecipeIndex = 0; in gamedata
-		// int selectedItemType = visibleRecipes[selectedRecipeIndex];
-		// Recipe& recipe = recipes[selectedItemType];
-		// then draw ui
+	//	if (scroll > 0)
+	//	{
+	//		if (selectedRecipeIndex < maxRecipeSize - 1)
+	//		{
+	//			selectedRecipeIndex += 1;
+	//			selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize);
+	//		}
+	//	}
+	//	else if (scroll < 0)
+	//	{
+	//		if (selectedRecipeIndex > 0)
+	//		{
+	//			selectedRecipeIndex -= 1;
+	//			selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize);
+	//		}
+	//	}
 
-		for (int i = 0; i < maxRecipeSize; i++)
-		{
-			int selectedItem = inventory.visibleRecipes[selectedItemIndex];
-			int totalIngredients = 0;
+	//	int selectedItemType = inventory.visibleRecipes[selectedRecipeIndex];
 
-			for (auto& stack : inventory.receipes[selectedItem].ingredients)
-			{
-				totalIngredients += stack.itemCounter;
-			}
+	// put int selectedRecipeIndex = 0; in gamedata
+	// int selectedItemType = visibleRecipes[selectedRecipeIndex];
+	// Recipe& recipe = recipes[selectedItemType];
+	// then draw ui
 
-			for (int j = 0; j < totalIngredients; j++)
-			{
-				Rectangle r = oneCellRectangle;
-				r.x += i * oneCellRectangle.width;
-				r.y += j * oneCellRectangle.height;
+		//for (int i = 0; i < maxRecipeSize; i++)
+		//{
+		//	int itemType = inventory.visibleRecipes[i];
 
-				r = shrinkRectanglePercentage(r, .1f, .1f);
+		//	Rectangle r = oneCellRectangleRecipe;
+		//	r.y += i * oneCellRectangleRecipe.height;
 
-				Color c = { 180,180,200,240 };
+		//	r = shrinkRectanglePercentage(r, .1f, .1f);
 
-				if (CheckCollisionPointRec(GetMousePosition(), r))
-				{
-					c = { 220,250,220,250 };
-				}
-				else
-				{
-					c = { 180,180,200,240 };
-				}
+		//	Color c = { 180,180,200,240 };
 
-				DrawTexturePro(
-					assetManager.frame,
-					getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
-					r,
-					{ 0,0 },
-					0.f,
-					c
-				);
+		//	if (CheckCollisionPointRec(GetMousePosition(), r))
+		//	{
+		//		c = { 220,250,220,250 };
+		//	}
+		//	else
+		//	{
+		//		c = { 180,180,200,240 };
+		//	}
 
-				if (j == 0)
-				{
-					auto atlas = getTextureCoordinatesForItemType(selectedItem);
-					Texture2D tex = getTextureForItemType(selectedItem, assetManager);
-					DrawTexturePro(
-						tex,
-						atlas,
-						r,
-						{ 0,0 },
-						0.f,
-						c
-					);
-				}
-				else if (j == 1)
-				{
-					r = shrinkRectanglePercentage(r, .3f, .3f);
-					std::vector<ItemStack> ingredients = inventory.receipes[selectedItem].ingredients;
-					if (ingredients.size() >= 1)
-					{
-						auto atlas = getTextureCoordinatesForItemType(ingredients[0].itemType);
-						Texture2D tex = getTextureForItemType(ingredients[0].itemType, assetManager);
-						DrawTexturePro(
-							tex,
-							atlas,
-							r,
-							{ 0,0 },
-							0.f,
-							c
-						);
-					}
-				}
+		//	DrawTexturePro(
+		//		assetManager.frame,
+		//		getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
+		//		r,
+		//		{ 0,0 },
+		//		0.f,
+		//		c
+		//	);
 
-				else
-				{
-					r = shrinkRectanglePercentage(r, .3f, .3f);
-					std::vector<ItemStack> ingredients = inventory.receipes[selectedItem].ingredients;
-					if (ingredients.size() >= 2)
-					{
-						auto atlas = getTextureCoordinatesForItemType(ingredients[1].itemType);
-						Texture2D tex = getTextureForItemType(ingredients[1].itemType, assetManager);
-						DrawTexturePro(
-							tex,
-							atlas,
-							r,
-							{ 0,0 },
-							0.f,
-							c
-						);
-					}
-				}
-			}
-		}
+		//	auto atlas = getTextureCoordinatesForItemType(itemType);
+		//	Texture2D tex = getTextureForItemType(itemType, assetManager);
+		//	DrawTexturePro(
+		//		tex,
+		//		atlas,
+		//		r,
+		//		{ 0,0 },
+		//		0.f,
+		//		c
+		//	);
+
+		//	for (int j = 0; j < inventory.receipes[itemType].ingredients.size(); j++)
+		//	{
+		//		r.x += j * oneCellRectangleIngredient.width;
+		//		std::vector<ItemStack> selectedItemIngredients = inventory.receipes[itemType].ingredients;
+		//		int ingredient = selectedItemIngredients[j].itemType;
+
+		//		DrawTexturePro(
+		//			assetManager.frame,
+		//			getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
+		//			r,
+		//			{ 0,0 },
+		//			0.f,
+		//			c
+		//		);
+
+		//		auto atlas = getTextureCoordinatesForItemType(ingredient);
+		//		Texture2D tex = getTextureForItemType(ingredient, assetManager);
+		//		DrawTexturePro(
+		//			tex,
+		//			atlas,
+		//			r,
+		//			{ 0,0 },
+		//			0.f,
+		//			c
+		//		);
+		//	}
+		//}
 	}
 
 #pragma endregion

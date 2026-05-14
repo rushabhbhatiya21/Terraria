@@ -35,8 +35,8 @@ struct Inventory
 
 	Inventory()
 	{
-		items.resize(slots, { 0,0 });
-		visibleRecipes.resize(receipes.size());
+		items.reserve(slots);
+		visibleRecipes.reserve(receipes.size());
 
 		for (auto& r : receipes)
 		{
