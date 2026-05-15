@@ -1,4 +1,4 @@
-#include "player.h"
+﻿#include "player.h"
 #include <helper.h>
 #include <assetManager.h>
 #include <entityHolder.h>
@@ -56,7 +56,6 @@ void Player::render(AssetManager& assetManager)
 
 		auto pos = aabb;
 		float rotation = 0;
-		float angle = 0;
 		Vector2 origin = { 0,1 };
 
 		if (heldItem < Block::BLOCKS_COUNT)
@@ -82,37 +81,40 @@ void Player::render(AssetManager& assetManager)
 
 			if (animations.movingLeft)
 			{
-				pos.y += 1.2f;
+				pos.y += 1.f;
 				pos.x += 0.2f;
-				angle = 120.f;
-				origin = { 1.f,1.f };
 				textureUVItem = flipTextureAtlasX(textureUVItem);
+				origin = { 1.f, 1.f };
 			}
 			else
 			{
-				pos.y += 1.2f;
-				pos.x += 0.8f;
-				angle = -120.f;
+				pos.y += 1.f;
+				pos.x += .8f;
+				origin = { 0.f, 1.f };
 			}
 		}
 
 		if (isPlayingAttackAnimation)
 		{
-			float attackProgress = 1.f - (useTimer / attackDuration);
+			float t = 1.f - (swingTimer / attackDuration);
+			t = Clamp(t, 0.f, 1.f);
+			t = t * t * (3.f - 2.f * t); // smooth step
 
-			attackProgress = Clamp(attackProgress, 0.f, 1.f);
-
-			float t = attackProgress;
-
-			// smoothstep
-			t = t * t * (3.f - 2.f * t);
-
-			if (animations.movingLeft)
+			float startAngle, endAngle;
+			// right - 0
+			if (!animations.movingLeft)
 			{
-				t *= -1.f;
+				startAngle = -90.f;
+				endAngle = 90.f;
+			}
+			// left - 0
+			else
+			{
+				startAngle = 90;
+				endAngle = -90;
 			}
 
-			rotation = angle + t * 180.f;
+			rotation = Lerp(startAngle, endAngle, t);
 		}
 
 		DrawTexturePro(
@@ -123,6 +125,9 @@ void Player::render(AssetManager& assetManager)
 			rotation,
 			WHITE
 		);
+
+		// debug heldItem box
+		//DrawRectangleLinesEx(pos, .1f, RED);
 
 	}
 
@@ -135,6 +140,7 @@ void Player::render(AssetManager& assetManager)
 		WHITE
 	);
 
+	// debug player box
 	//DrawRectangleLinesEx(
 	//	aabb,
 	//	0.1f,
@@ -144,43 +150,45 @@ void Player::render(AssetManager& assetManager)
 
 bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
+	// cooldown timer
 	useTimer -= deltaTime;
-
-	if (useTimer < 0.f)
+	if (useTimer <= 0.f)
 	{
 		useTimer = 0.f;
+	}
+
+	// swing timer
+	swingTimer -= deltaTime;
+	if (swingTimer <= 0.f)
+	{
+		swingTimer = 0.f;
 		isPlayingAttackAnimation = false;
 	}
 
-	if (useTimer > 0)
+	if (swingTimer > 0.f)
 	{
 		weaponBase = getPosition();
-
-		float t = 1.f - (useTimer / attackDuration);
-		//float t = 0;
+		float t = 1.f - (swingTimer / attackDuration);
+		t = Clamp(t, 0.f, 1.f);
 
 		float startAngle = 0, endAngle = 0;
-
+		// right - 0
 		if (!animations.movingLeft)
 		{
-			startAngle = -135.f;   // 10 o'clock (after negation in radians)
-			endAngle = 135.f;    // 4 o'clock
+			startAngle = -90.f;
+			endAngle = 90.f;
 		}
+		// left - 180
 		else
 		{
-			startAngle = -45.f;    // mirrored
-			endAngle = 45.f;
+			startAngle = 270.f;
+			endAngle = 90.f;
 		}
 
-		//float radians = DEG2RAD * (-currentAngle); // keep negation
-
 		float currentAngle = Lerp(startAngle, endAngle, t);
-		//float currentAngle = -45.f;
-		float radians = DEG2RAD * (-currentAngle);
-
+		float radians = DEG2RAD * currentAngle;
 		weaponTip.x = weaponBase.x + cosf(radians) * weaponLength;
 		weaponTip.y = weaponBase.y + sinf(radians) * weaponLength;
-
 		isPlayingAttackAnimation = true;
 	}
 

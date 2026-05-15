@@ -37,7 +37,7 @@ void spawnMeleeAttack(
     float knockback
 );
 
-void updateMeleeAttacks(
+bool updateMeleeAttacks(
     float deltaTime,
     std::unordered_map<std::uint64_t, std::unique_ptr<Entity>>& enemies
 );

@@ -73,14 +73,15 @@ struct Player : public Entity
 	Vector2 weaponBase = {};
 	Vector2 weaponTip = {};
 
-	float timeAfterMine = 0.f;
-	float timeAfterAttack = 0.f;
+	//float timeAfterMine = 0.f;
+	//float timeAfterAttack = 0.f;
 
-	float timeAfterAttackAnimation = 0.f;
-	float maxAttackTimeAnimation = 0.5f;
+	//float timeAfterAttackAnimation = 0.f;
+	//float maxAttackTimeAnimation = 0.5f;
+
 	bool isPlayingAttackAnimation = false;
 	float attackDuration = 0.f;
-
+	float swingTimer = 0.f;
 	float useTimer = 0.f;
 
 	int armourHead = 0;

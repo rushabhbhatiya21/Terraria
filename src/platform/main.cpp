@@ -18,7 +18,7 @@ int main()
 	bool isProdTest = false;
 
 	int flagScreenMode = FLAG_WINDOW_RESIZABLE;
-	int w = 1920, h = 1020;
+	int w = 1080, h = 720;
 
 	if (isProdTest) 
 	{

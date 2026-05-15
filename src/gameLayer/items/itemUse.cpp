@@ -12,7 +12,8 @@ void useItem(Player& player, ItemStack& stack)
 	if (player.useTimer > 0.f) return;
 
 	player.useTimer = item.useTime;
-	player.attackDuration = item.useTime * 0.35f;
+	player.attackDuration = item.useTime * .35f;
+	player.swingTimer = player.attackDuration;
 
 	switch (item.category)
 	{

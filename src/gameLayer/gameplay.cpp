@@ -939,7 +939,12 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle melee attacks
 
-	updateMeleeAttacks(deltaTime, entityHolder.entities);
+	bool hit = updateMeleeAttacks(deltaTime, entityHolder.entities);
+
+	if (hit)
+	{
+		triggerCameraShake(.1f, .15f);
+	}
 
 #pragma endregion
 

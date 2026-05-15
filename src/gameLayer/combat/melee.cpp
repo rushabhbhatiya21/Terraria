@@ -3,6 +3,7 @@
 #include <entity.h>
 #include <raylib.h>
 #include <player.h>
+#include <shake.h>
 
 std::vector<MeleeAttack> meleeAttacks;
 
@@ -34,7 +35,7 @@ void spawnMeleeAttack(
     meleeAttacks.push_back(attack);
 }
 
-void updateMeleeAttacks(
+bool updateMeleeAttacks(
     float deltaTime,
     std::unordered_map<std::uint64_t, std::unique_ptr<Entity>>& enemies
 )
@@ -48,7 +49,6 @@ void updateMeleeAttacks(
         // remove expired attacks
         if (attack.lifetime <= 0.f)
         {
-            printf("attack expired.\n");
             meleeAttacks.erase(meleeAttacks.begin() + i);
             continue;
         }
@@ -63,38 +63,35 @@ void updateMeleeAttacks(
             if (enemy.second->life <= 0)
                 continue;
 
-            printf("attack initiated...\n");
             Player* player = dynamic_cast<Player*>(attack.owner);
 
             if (player == nullptr) continue;
 
             if (checkForHits(player->weaponBase, player->weaponTip, *enemy.second.get()))
             {
-                printf("enemy hp: %f, attack in radius, hitting enemy...\n", enemy.second->life);
                 enemy.second->life -= attack.damage;
-                printf("enemy hp after attack: %f\n\n", enemy.second->life);
 
-                // simple knockback
-                enemy.second->physics.velocity.x += attack.direction * attack.knockback * 50.f;
+                // implement knockback later
 
                 // prevent multi-hit from same swing
                 attack.lifetime = 0.f;
 
-                break;
+                return true;
             }
         }
     }
+    return false;
 }
 
 bool checkForHits(Vector2 base, Vector2 tip, Entity& enemy)
 {
-    DrawLineEx(base, tip, .1f, GREEN);
+    //DrawLineEx(base, tip, .05f, GREEN);
 
     for (float t = 0; t <= 1; t += 0.2f)
     {
         Vector2 p = Vector2Lerp(base, tip, t);
 
-        DrawCircleV(p, .1f, YELLOW);
+        //DrawCircleV(p, .1f, YELLOW);
 
         if (CheckCollisionPointRec(p, enemy.physics.transform.getAABB()))
         {
