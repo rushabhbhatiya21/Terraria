@@ -16,6 +16,9 @@ struct Inventory
 {
 	int rows = 9;
 	int cols = 3;
+
+	int HOTBAR_SIZE = rows;
+
 	int slotCount = rows * cols;
 	std::vector<ItemStack> slots;
 
@@ -38,6 +41,11 @@ struct Inventory
 			if (r.second.isBenchRequired) continue;
 			visibleRecipes.push_back(r.first);
 		}
+	}
+
+	bool isHotbarSlot(int slot)
+	{
+		return slot < HOTBAR_SIZE;
 	}
 
 	int getEmptySlot();

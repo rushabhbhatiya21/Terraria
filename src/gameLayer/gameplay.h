@@ -26,15 +26,14 @@ struct Gameplay
 	DrawBackground background;
 	Inventory inventory;
 
+	// inventory
+	int selectedHotbarSlot = 0;
+
 	int creativeSelectedBlock = Block::air;
 
 	// entities
 	Player player;
 	EntityHolder entityHolder;
-
-	// crafitng
-	int maxCraftSlots = 2;
-	std::vector<int> craftSlots;
 
 	// texture pack
 	char texturePackName[128] = "default";

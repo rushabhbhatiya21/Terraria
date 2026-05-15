@@ -55,7 +55,8 @@ struct Player : public Entity
 	int armourChest = 0;
 	int armoutLegs = 0;
 
-	int heldItem = Items::stonePickaxe;
+	ItemId heldItem = 0;
+	int selectedHotbarSlot = -1;
 
 	int numberOfParticlesOnLand = 1;
 };

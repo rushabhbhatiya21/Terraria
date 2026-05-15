@@ -155,8 +155,6 @@ Rectangle Gameplay::getIngredientsRectangle(
 
 bool Gameplay::init()
 {
-	craftSlots.resize(maxCraftSlots);
-
 	int w = 900, h = 500;
 
 	backgroundMap.create(w, h);
@@ -179,6 +177,8 @@ bool Gameplay::init()
 	spawnZombie({ 25,60 });
 
 	//spawnDroppedItem({ 25,60 }, 6001);
+
+	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 
 	return true;
 }
@@ -250,7 +250,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region new player movement
+#pragma region player movement
 
 	std::ranlux24_base rng(std::random_device{}());
 
@@ -323,69 +323,6 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		player.animations.update(deltaTime, 0.08, 7);
 	}
-
-#pragma endregion
-
-
-#pragma region old player movement
-
-	//static float CAMERA_SPEED = 10.f;
-	//static bool creative = false;
-
-	//{
-	//	bool moving = 0;
-	//	bool falling = 0;
-
-	//	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
-	//	{
-	//		player.physics.transform.pos.x -= CAMERA_SPEED * GetFrameTime();
-	//		moving = true;
-	//		player.animations.movingLeft = true;
-	//	}
-
-	//	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
-	//	{
-	//		player.physics.transform.pos.x += CAMERA_SPEED * GetFrameTime();
-	//		moving = true;
-	//		player.animations.movingLeft = false;
-	//	}
-
-	//	if (creative)
-	//	{
-	//		if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) player.physics.transform.pos.y -= CAMERA_SPEED * GetFrameTime();
-	//		if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) player.physics.transform.pos.y += CAMERA_SPEED * GetFrameTime();
-	//		if (GetMouseWheelMove() != 0.f) camera.zoom += GetMouseWheelMove();
-	//	}
-
-	//	if (IsKeyPressed(KEY_SPACE))
-	//	{
-	//		player.physics.jump(12);
-	//	}
-
-	//	if (player.physics.downTouch)
-	//	{
-	//		falling = 0;
-	//	}
-	//	else
-	//	{
-	//		falling = 1;
-	//	}
-
-	//	if (falling)
-	//	{
-	//		player.animations.setAnimation(2);
-	//	}
-	//	else if (moving)
-	//	{
-	//		player.animations.setAnimation(1);
-	//	}
-	//	else
-	//	{
-	//		player.animations.setAnimation(0);
-	//	}
-
-	//	player.animations.update(deltaTime, 0.08, 7);
-	//}
 
 #pragma endregion
 
@@ -879,6 +816,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma endregion
 
+
 #pragma region render structure selection
 
 	// show structure selection
@@ -939,7 +877,6 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma endregion
 
-
 	EndMode2D();
 
 #pragma region lighting
@@ -999,7 +936,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region life ui
 
-	Rectangle heartRectangle;
+	Rectangle heartRectangle{};
 	heartRectangle.height = h * .05f;
 	heartRectangle.width = heartRectangle.height * 5;
 
@@ -1041,7 +978,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		inventoryRectangle = shrinkRectanglePercentage(inventoryRectangle, .01f, .01f);
 
-		Rectangle oneCellRectangle;
+		Rectangle oneCellRectangle{};
 		oneCellRectangle.height = inventoryRectangle.height / 3;
 		oneCellRectangle.width = oneCellRectangle.height;
 		oneCellRectangle.x = inventoryRectangle.x;
@@ -1051,6 +988,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			for (int j = 0; j < inventory.cols; j++)
 			{
+				int index = j * inventory.rows + i;
 				Rectangle r = oneCellRectangle;
 				r.x += i * oneCellRectangle.width;
 				r.y += j * oneCellRectangle.height;
@@ -1062,10 +1000,33 @@ bool Gameplay::update(AssetManager& assetManager)
 				if (CheckCollisionPointRec(GetMousePosition(), r))
 				{
 					c = { 220,250,220,250 };
+
+					// equip item on left click
+					if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+					{
+						if (player.selectedHotbarSlot == index)
+						{
+							player.heldItem = 0;
+							player.selectedHotbarSlot = -1;
+						}
+						else
+						{
+							if (!inventory.isHotbarSlot(index)) continue;
+
+							player.selectedHotbarSlot = index;
+							player.heldItem = inventory.slots[index].itemId;
+						}
+					}
 				}
 				else
 				{
 					c = { 180,180,200,240 };
+				}
+
+				// selected override
+				if (player.selectedHotbarSlot == index)
+				{
+					c = { 255,230,80,255 };
 				}
 
 				DrawTexturePro(
@@ -1078,7 +1039,6 @@ bool Gameplay::update(AssetManager& assetManager)
 				);
 
 				// display item from inventory
-				int index = j * inventory.rows + i;
 				auto atlas = getTextureCoordinatesForItemType(inventory.slots[index].itemId);
 				Texture2D tex = getTextureForItemType(inventory.slots[index].itemId, assetManager);
 
