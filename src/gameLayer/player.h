@@ -25,34 +25,6 @@ struct Player : public Entity
 
 	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
 
-	//inline Rectangle getWeaponHitBox()
-	//{
-	//	auto pos = physics.transform.getAABB();
-	//	float rotation = 0;
-	//	float angle = 0;
-	//	Vector2 origin = { 0,1 };
-
-	//	pos.width = 0.5f;
-	//	pos.height = 1.5f;
-
-	//	if (animations.movingLeft)
-	//	{
-	//		pos.y -= 0.2f;
-	//		rotation = -45.f;
-	//		angle = 120.f;
-	//		origin = { 1.f,1.f };
-	//	}
-	//	else
-	//	{
-	//		pos.y += 0.2f;
-	//		pos.x += 1.2f;
-	//		rotation = 45.f;
-	//		angle = -120.f;
-	//	}
-
-	//	return pos;
-	//}
-
 	void dropLoot(EntityHolder& entityHolder, int type) override;
 	
 	Json formatToJson() override;
@@ -69,15 +41,10 @@ struct Player : public Entity
 
 	float getMaxLife() { return 50; }
 
+	// for weapon swing animation
 	float weaponLength = 1.5f;
 	Vector2 weaponBase = {};
 	Vector2 weaponTip = {};
-
-	//float timeAfterMine = 0.f;
-	//float timeAfterAttack = 0.f;
-
-	//float timeAfterAttackAnimation = 0.f;
-	//float maxAttackTimeAnimation = 0.5f;
 
 	bool isPlayingAttackAnimation = false;
 	float attackDuration = 0.f;
@@ -88,7 +55,7 @@ struct Player : public Entity
 	int armourChest = 0;
 	int armoutLegs = 0;
 
-	int heldItem = Items::woodenSword;
+	int heldItem = Items::stonePickaxe;
 
 	int numberOfParticlesOnLand = 1;
 };

@@ -9,7 +9,6 @@ std::vector<MeleeAttack> meleeAttacks;
 
 void spawnMeleeAttack(
     Entity* owner,
-    Vector2 position,
     int direction,
     int damage,
     float radius,
@@ -20,14 +19,14 @@ void spawnMeleeAttack(
 
     attack.owner = owner;
 
-    attack.position = position;
+    attack.position = owner->getPosition();
     attack.direction = direction;
     attack.damage = damage;
     attack.radius = radius;
     attack.knockback = knockback;
 
     // attack exists briefly
-    attack.lifetime = 0.5f;
+    attack.lifetime = 0.4f;
 
     // offset attack in facing direction
     attack.position.x += direction * radius;
@@ -69,9 +68,10 @@ bool updateMeleeAttacks(
 
             if (checkForHits(player->weaponBase, player->weaponTip, *enemy.second.get()))
             {
-                enemy.second->life -= attack.damage;
+                enemy.second->hit(attack.damage);
 
                 // implement knockback later
+                // maybe implement knockback at enemy side and call it in hit to keep it clean
 
                 // prevent multi-hit from same swing
                 attack.lifetime = 0.f;

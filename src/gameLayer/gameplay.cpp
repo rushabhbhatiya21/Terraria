@@ -19,6 +19,7 @@
 #include <items/itemUse.h>
 
 #include <combat/melee.h>
+#include "combat/tool.h"
 
 void Gameplay::spawnSlime(Vector2 position)
 {
@@ -643,96 +644,9 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 			{
-				// old hit and spawn
-				{
-					//// hit entities (enemies)
-					//for (auto& e : entityHolder.entities)
-					//{
-					//	DroppedItem* droppedItem = dynamic_cast<DroppedItem*>(e.second.get());
-					//	float magnitude = Vector2Distance(player.physics.transform.getCenter(), worldPos);
-
-						//if (
-						//	droppedItem == nullptr && // is not dropped item
-						//	player.physics.downTouch &&
-						//	player.timeAfterAttack <= 0
-						//	//(isInRange(player.heldItem, magnitude) || creative)
-						//	)
-						//{
-							//useItem(player, ItemStack{ player.heldItem, 1 });
-
-							//printf("life: %f\n", e.second->life);
-
-							//// play attack animation
-							//player.timeAfterAttackAnimation = player.maxAttackTimeAnimation;
-
-							//// Hitting an enemy
-							//int dmg = calcMeleeDamage(player.heldItem);
-
-							//// get reset time
-							//float attackResetTime = getResetTime(player.heldItem);
-
-							//// reset attack time
-							//if (attackResetTime != 0)
-							//	player.timeAfterAttack = attackResetTime;
-
-							//// reduce health from enemy
-							//e.second->hit(dmg);
-
-							//// camera shake
-							//triggerCameraShake(0.2f, 0.08f);
-					//	}
-					//}
-
-					//// spawn block
-					//float magnitude = Vector2Distance(player.physics.transform.getCenter(), worldPos);
-					//auto b = gameMap.getBlockSafe(blockX, blockY);
-					//if (
-					//	b &&
-					//	b->type &&
-					//	player.physics.downTouch &&
-					//	player.timeAfterMine <= 0 
-					//	//(isInRange(player.heldItem, magnitude) || creative)
-					//	)
-					//{
-						//// play attack animation
-						//player.timeAfterAttackAnimation = player.maxAttackTimeAnimation;
-
-						//// particle effect
-						//auto newParticles = spawnParticles({ (float)blockX, (float)blockY }, rng, b->type, 10);
-						//particles.insert(particles.end(), newParticles.begin(), newParticles.end());
-
-						//// calculate damage done to block
-						//int dmg = calcBlockDamage(*b, player.heldItem);
-						//b->hp -= dmg;
-
-						//if (dmg > 0)
-						//{
-						//	// add block shake here
-						//	triggerShake(blockX, blockY);
-						//}
-
-						//// get reset time, 0.7 default for bare hands, 0 for non-tool items
-						//float toolResetTime = getResetTime(player.heldItem);
-
-						//if (toolResetTime != 0)
-						//{
-						//	player.timeAfterMine = toolResetTime;
-						//}
-
-						//if (b->hp <= 0)
-						//{
-						//	spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
-						//	*b = {};
-						//}
-					//	}
-				}
-
-				// attacks added
-				useItem(player, ItemStack{ player.heldItem, 1 });
-
-				// need to update attack in update loop
-				// same way implement all other use methods - tools, consumable and call its update in update loop
-
+				// attack and tool done
+				// todo consumable and place block
+				useItem(player, ItemStack{ player.heldItem, 1 }, worldPos);
 			}
 		}
 
@@ -948,6 +862,22 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma endregion
 
+
+#pragma region handle tool swing
+
+	ToolHitResult result = updateToolSwing(deltaTime, gameMap);
+
+	if (result.hit)
+	{
+		triggerShake((int)result.pos.x, (int)result.pos.y);
+		auto newParticles = spawnParticles({ result.pos.x, result.pos.y }, rng, result.type, 10);
+		particles.insert(particles.end(), newParticles.begin(), newParticles.end());
+
+		if (result.broke)
+			spawnDroppedItem({ std::floor(result.pos.x) + 0.5f, result.pos.y + 0.5f }, result.type);
+	}
+
+#pragma endregion
 
 #pragma region render structure selection
 

@@ -30,7 +30,6 @@ extern std::vector<MeleeAttack> meleeAttacks;
 
 void spawnMeleeAttack(
     Entity* owner,
-    Vector2 position,
     int direction,
     int damage,
     float radius,

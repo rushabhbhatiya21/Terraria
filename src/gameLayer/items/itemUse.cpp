@@ -1,9 +1,10 @@
 #include "items/item.h"
 #include "items/itemUse.h"
-#include "combat/melee.h"
+#include <combat/melee.h>
+#include <combat/tool.h>
 #include <player.h>
 
-void useItem(Player& player, ItemStack& stack)
+void useItem(Player& player, ItemStack& stack, Vector2 mouseWorldPos)
 {
 	if (stack.count <= 0) return;
 
@@ -12,17 +13,23 @@ void useItem(Player& player, ItemStack& stack)
 	if (player.useTimer > 0.f) return;
 
 	player.useTimer = item.useTime;
-	player.attackDuration = item.useTime * .35f;
-	player.swingTimer = player.attackDuration;
 
 	switch (item.category)
 	{
 	case ItemCategory::WEAPON:
+		player.attackDuration = item.useTime * .35f;
+		player.swingTimer = player.attackDuration;
 		useWeapon(player, item);
 		break;
 
 	case ItemCategory::TOOL:
-		useTool(player, item);
+		player.attackDuration = item.useTime * .35f;
+		player.swingTimer = player.attackDuration;
+		useTool(player, item, mouseWorldPos);
+		break;
+
+	case ItemCategory::BLOCK:
+		useBlock(player, item, mouseWorldPos);
 		break;
 
 	case ItemCategory::CONSUMABLE:
@@ -40,7 +47,6 @@ void useWeapon(Player& player, const ItemDefinition& item)
 
 	spawnMeleeAttack(
 		&player,
-		player.getPosition(),
 		player.isFacingRight,
 		weapon.damage,
 		weapon.range,
@@ -48,12 +54,26 @@ void useWeapon(Player& player, const ItemDefinition& item)
 	);
 }
 
-void useTool(Player& player, const ItemDefinition& item)
+void useTool(Player& player, const ItemDefinition& item, Vector2 mouseWorldPos)
 {
+	const ToolData& tool = item.tool;
 
+	spawnToolSwing(
+		&player,
+		mouseWorldPos,
+		tool.range,
+		tool.power
+	);
+}
+
+void useBlock(Player& player, const ItemDefinition& item, Vector2 mouseWorldPos)
+{
+	// todo implement
+	printf("todo - implement useBlock\n");
 }
 
 void useConsumable(Player& player, ItemStack& stack, const ItemDefinition& item)
 {
-
+	// todo implement
+	printf("todo - implement useConsumable\n");
 }
