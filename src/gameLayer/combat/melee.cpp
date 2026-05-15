@@ -1,10 +1,13 @@
 // melee.cpp
 #include "melee.h"
 #include <entity.h>
+#include <raylib.h>
+#include <player.h>
 
 std::vector<MeleeAttack> meleeAttacks;
 
 void spawnMeleeAttack(
+    Entity* owner,
     Vector2 position,
     int direction,
     int damage,
@@ -14,6 +17,8 @@ void spawnMeleeAttack(
 {
     MeleeAttack attack{};
 
+    attack.owner = owner;
+
     attack.position = position;
     attack.direction = direction;
     attack.damage = damage;
@@ -21,7 +26,7 @@ void spawnMeleeAttack(
     attack.knockback = knockback;
 
     // attack exists briefly
-    attack.lifetime = 0.12f;
+    attack.lifetime = 0.5f;
 
     // offset attack in facing direction
     attack.position.x += direction * radius;
@@ -31,7 +36,7 @@ void spawnMeleeAttack(
 
 void updateMeleeAttacks(
     float deltaTime,
-    std::vector<Entity>& enemies
+    std::unordered_map<std::uint64_t, std::unique_ptr<Entity>>& enemies
 )
 {
     for (int i = (int)meleeAttacks.size() - 1; i >= 0; --i)
@@ -43,30 +48,34 @@ void updateMeleeAttacks(
         // remove expired attacks
         if (attack.lifetime <= 0.f)
         {
+            printf("attack expired.\n");
             meleeAttacks.erase(meleeAttacks.begin() + i);
             continue;
         }
 
         // collision against enemies
-        for (Entity& enemy : enemies)
+        for (auto& enemy : enemies)
         {
-            if (enemy.life <= 0)
+            if (enemy.second->getEntityType() == EntityType::EntityType_Player
+                || enemy.second->getEntityType() == EntityType::EntityType_DroppedItem)
                 continue;
 
-            float dist =
-                Vector2Distance(
-                    attack.position,
-                    enemy.getPosition()
-                );
+            if (enemy.second->life <= 0)
+                continue;
 
-            if (dist <= attack.radius)
+            printf("attack initiated...\n");
+            Player* player = dynamic_cast<Player*>(attack.owner);
+
+            if (player == nullptr) continue;
+
+            if (checkForHits(player->weaponBase, player->weaponTip, *enemy.second.get()))
             {
-                enemy.life -= attack.damage;
+                printf("enemy hp: %f, attack in radius, hitting enemy...\n", enemy.second->life);
+                enemy.second->life -= attack.damage;
+                printf("enemy hp after attack: %f\n\n", enemy.second->life);
 
                 // simple knockback
-                enemy.physics.velocity.x +=
-                    attack.direction *
-                    attack.knockback * 250.f;
+                enemy.second->physics.velocity.x += attack.direction * attack.knockback * 50.f;
 
                 // prevent multi-hit from same swing
                 attack.lifetime = 0.f;
@@ -75,6 +84,24 @@ void updateMeleeAttacks(
             }
         }
     }
+}
+
+bool checkForHits(Vector2 base, Vector2 tip, Entity& enemy)
+{
+    DrawLineEx(base, tip, .1f, GREEN);
+
+    for (float t = 0; t <= 1; t += 0.2f)
+    {
+        Vector2 p = Vector2Lerp(base, tip, t);
+
+        DrawCircleV(p, .1f, YELLOW);
+
+        if (CheckCollisionPointRec(p, enemy.physics.transform.getAABB()))
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 void drawMeleeAttacks()

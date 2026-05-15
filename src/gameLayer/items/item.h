@@ -71,6 +71,10 @@ struct ItemDefinition
     ItemCategory category = ItemCategory::NONE;
     int          maxStack = 1;
     float        useTime = 0.f;
+    bool         isTool = false;
+    bool         isWeapon = false;
+    bool         isConsumable = false;
+    bool         isArmor = false;
 
     union
     {
@@ -113,6 +117,7 @@ struct ItemDefinition
         d.tool.type = type;
         d.tool.power = power;
         d.tool.range = range;
+        d.isTool = true;
         return d;
     }
 
@@ -125,6 +130,7 @@ struct ItemDefinition
         d.weapon.damage = damage;
         d.weapon.knockback = knockback;
         d.weapon.range = range;
+        d.isWeapon = true;
         return d;
     }
 
@@ -135,6 +141,7 @@ struct ItemDefinition
         d.maxStack = 1;
         d.armor.slot = slot;
         d.armor.defense = defense;
+        d.isArmor = true;
         return d;
     }
 
@@ -146,6 +153,7 @@ struct ItemDefinition
         d.useTime = useTime;
         d.consumable.healAmount = healAmount;
         d.consumable.manaAmount = manaAmount;
+        d.isConsumable = true;
         return d;
     }
 };

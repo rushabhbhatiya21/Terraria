@@ -83,7 +83,7 @@ void registerItems()
     reg(Items::bone, D::makeMaterial(.2f));
 
     // ── Weapons — swords (damage, useTime, knockback, range) ─────────────────
-    reg(Items::woodenSword, D::makeWeapon(8, 1.0f, 1.5f, 2.0f));
+    reg(Items::woodenSword, D::makeWeapon(8, 1.f, 1.5f, 2.0f));
     reg(Items::stoneSword, D::makeWeapon(12, 1.0f, 1.5f, 2.0f));
     reg(Items::copperSword, D::makeWeapon(16, 1.0f, 1.5f, 2.0f));
     reg(Items::ironSword, D::makeWeapon(22, 1.0f, 1.5f, 2.0f));

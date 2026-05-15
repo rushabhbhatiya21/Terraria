@@ -63,9 +63,9 @@ struct Entity
 
 	virtual void dropLoot(EntityHolder& entityHolder, int type) = 0;
 
-	void hit(float damage)
+	void hit(float damage, float redTimer = .5f)
 	{
-		isRedTimer = 0.5f;
+		isRedTimer = redTimer;
 		life -= damage;
 	}
 

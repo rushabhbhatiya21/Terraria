@@ -1,14 +1,19 @@
 // melee.h
 #pragma once
 
+#include <memory>
+#include <cstdint>
 #include <vector>
+#include <unordered_map>
 #include <raylib.h>
 
 struct Entity;
 
 struct MeleeAttack
 {
-    Vector2 position{};
+    Entity* owner = nullptr;
+
+    Vector2 position = {};
 
     float radius = 0.f;
 
@@ -24,6 +29,7 @@ struct MeleeAttack
 extern std::vector<MeleeAttack> meleeAttacks;
 
 void spawnMeleeAttack(
+    Entity* owner,
     Vector2 position,
     int direction,
     int damage,
@@ -33,7 +39,9 @@ void spawnMeleeAttack(
 
 void updateMeleeAttacks(
     float deltaTime,
-    std::vector<Entity>& enemies
+    std::unordered_map<std::uint64_t, std::unique_ptr<Entity>>& enemies
 );
+
+bool checkForHits(Vector2 base, Vector2 tip, Entity& enemy);
 
 void drawMeleeAttacks();

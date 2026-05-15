@@ -12,6 +12,7 @@ void useItem(Player& player, ItemStack& stack)
 	if (player.useTimer > 0.f) return;
 
 	player.useTimer = item.useTime;
+	player.attackDuration = item.useTime * 0.35f;
 
 	switch (item.category)
 	{
@@ -37,6 +38,7 @@ void useWeapon(Player& player, const ItemDefinition& item)
 	const WeaponData& weapon = item.weapon;
 
 	spawnMeleeAttack(
+		&player,
 		player.getPosition(),
 		player.isFacingRight,
 		weapon.damage,

@@ -18,6 +18,8 @@
 #include <items/item.h>
 #include <items/itemUse.h>
 
+#include <combat/melee.h>
+
 void Gameplay::spawnSlime(Vector2 position)
 {
 	Slime slime;
@@ -187,25 +189,6 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	float deltaTime = GetFrameTime();
 	if (deltaTime > 1.f / 5.f) deltaTime = 1 / 5.f;
-
-#pragma endregion
-
-
-#pragma region reset attck & animation times
-
-	if (player.timeAfterMine > 0)
-		player.timeAfterMine -= deltaTime;
-
-	if (player.timeAfterAttack > 0)
-		player.timeAfterAttack -= deltaTime;
-
-	if (player.timeAfterAttackAnimation > 0.0f)
-	{
-		player.timeAfterAttackAnimation -= deltaTime;
-
-		if (player.timeAfterAttackAnimation < 0.0f)
-			player.timeAfterAttackAnimation = 0.0f;
-	}
 
 #pragma endregion
 
@@ -556,6 +539,9 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma endregion
 
+
+#pragma region player
+
 	player.update(deltaTime, EntityUpdateData
 		{
 			player.getPosition(),
@@ -565,6 +551,9 @@ bool Gameplay::update(AssetManager& assetManager)
 			gameMap
 		}
 	);
+
+#pragma endregion
+
 
 #pragma region inventory
 
@@ -638,6 +627,7 @@ bool Gameplay::update(AssetManager& assetManager)
 	if (!showImgui)
 	{
 		if (!insideInventoryMenu && !insideCraftingMenu)
+		{
 			if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_MIDDLE))
 			{
 				auto b = gameMap.getBlockSafe(blockX, blockY);
@@ -647,91 +637,104 @@ bool Gameplay::update(AssetManager& assetManager)
 					creativeSelectedBlock = b->type;
 				}
 			}
+		}
 
 		if (!insideInventoryMenu && !insideCraftingMenu)
+		{
 			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 			{
-				// hit entities (enemies)
-				for (auto& e : entityHolder.entities)
+				// old hit and spawn
 				{
-					DroppedItem* droppedItem = dynamic_cast<DroppedItem*>(e.second.get());
-					float magnitude = Vector2Distance(player.physics.transform.getCenter(), worldPos);
+					//// hit entities (enemies)
+					//for (auto& e : entityHolder.entities)
+					//{
+					//	DroppedItem* droppedItem = dynamic_cast<DroppedItem*>(e.second.get());
+					//	float magnitude = Vector2Distance(player.physics.transform.getCenter(), worldPos);
 
-					if (
-						droppedItem == nullptr && // is not dropped item
-						player.physics.downTouch &&
-						player.timeAfterAttack <= 0
-						//(isInRange(player.heldItem, magnitude) || creative)
-						)
-					{
-						useItem(player, ItemStack{ player.heldItem, 1 });
+						//if (
+						//	droppedItem == nullptr && // is not dropped item
+						//	player.physics.downTouch &&
+						//	player.timeAfterAttack <= 0
+						//	//(isInRange(player.heldItem, magnitude) || creative)
+						//	)
+						//{
+							//useItem(player, ItemStack{ player.heldItem, 1 });
 
-						printf("life: %f\n", e.second->life);
+							//printf("life: %f\n", e.second->life);
 
+							//// play attack animation
+							//player.timeAfterAttackAnimation = player.maxAttackTimeAnimation;
+
+							//// Hitting an enemy
+							//int dmg = calcMeleeDamage(player.heldItem);
+
+							//// get reset time
+							//float attackResetTime = getResetTime(player.heldItem);
+
+							//// reset attack time
+							//if (attackResetTime != 0)
+							//	player.timeAfterAttack = attackResetTime;
+
+							//// reduce health from enemy
+							//e.second->hit(dmg);
+
+							//// camera shake
+							//triggerCameraShake(0.2f, 0.08f);
+					//	}
+					//}
+
+					//// spawn block
+					//float magnitude = Vector2Distance(player.physics.transform.getCenter(), worldPos);
+					//auto b = gameMap.getBlockSafe(blockX, blockY);
+					//if (
+					//	b &&
+					//	b->type &&
+					//	player.physics.downTouch &&
+					//	player.timeAfterMine <= 0 
+					//	//(isInRange(player.heldItem, magnitude) || creative)
+					//	)
+					//{
 						//// play attack animation
 						//player.timeAfterAttackAnimation = player.maxAttackTimeAnimation;
 
-						//// Hitting an enemy
-						//int dmg = calcMeleeDamage(player.heldItem);
+						//// particle effect
+						//auto newParticles = spawnParticles({ (float)blockX, (float)blockY }, rng, b->type, 10);
+						//particles.insert(particles.end(), newParticles.begin(), newParticles.end());
 
-						//// get reset time
-						//float attackResetTime = getResetTime(player.heldItem);
+						//// calculate damage done to block
+						//int dmg = calcBlockDamage(*b, player.heldItem);
+						//b->hp -= dmg;
 
-						//// reset attack time
-						//if (attackResetTime != 0)
-						//	player.timeAfterAttack = attackResetTime;
+						//if (dmg > 0)
+						//{
+						//	// add block shake here
+						//	triggerShake(blockX, blockY);
+						//}
 
-						//// reduce health from enemy
-						//e.second->hit(dmg);
+						//// get reset time, 0.7 default for bare hands, 0 for non-tool items
+						//float toolResetTime = getResetTime(player.heldItem);
 
-						// camera shake
-						triggerCameraShake(0.2f, 0.08f);
-					}
+						//if (toolResetTime != 0)
+						//{
+						//	player.timeAfterMine = toolResetTime;
+						//}
+
+						//if (b->hp <= 0)
+						//{
+						//	spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
+						//	*b = {};
+						//}
+					//	}
 				}
 
-				// spawn block
-				float magnitude = Vector2Distance(player.physics.transform.getCenter(), worldPos);
-				auto b = gameMap.getBlockSafe(blockX, blockY);
-				if (
-					b &&
-					b->type &&
-					player.physics.downTouch &&
-					player.timeAfterMine <= 0 
-					//(isInRange(player.heldItem, magnitude) || creative)
-					)
-				{
-					//// play attack animation
-					//player.timeAfterAttackAnimation = player.maxAttackTimeAnimation;
+				// attacks added
+				useItem(player, ItemStack{ player.heldItem, 1 });
 
-					//// particle effect
-					//auto newParticles = spawnParticles({ (float)blockX, (float)blockY }, rng, b->type, 10);
-					//particles.insert(particles.end(), newParticles.begin(), newParticles.end());
+				// need to update attack in update loop
+				// same way implement all other use methods - tools, consumable and call its update in update loop
 
-					//// calculate damage done to block
-					//int dmg = calcBlockDamage(*b, player.heldItem);
-					//b->hp -= dmg;
-
-					//if (dmg > 0)
-					//{
-					//	// add block shake here
-					//	triggerShake(blockX, blockY);
-					//}
-
-					//// get reset time, 0.7 default for bare hands, 0 for non-tool items
-					//float toolResetTime = getResetTime(player.heldItem);
-
-					//if (toolResetTime != 0)
-					//{
-					//	player.timeAfterMine = toolResetTime;
-					//}
-
-					//if (b->hp <= 0)
-					//{
-					//	spawnDroppedItem({ (float)blockX + 0.5f, (float)blockY + 0.5f }, b->type);
-					//	*b = {};
-					//}
-				}
 			}
+		}
 
 		if (!insideInventoryMenu && !insideCraftingMenu)
 		{
@@ -908,6 +911,13 @@ bool Gameplay::update(AssetManager& assetManager)
 	for (auto& e : entityHolder.entities)
 	{
 		e.second->render(assetManager);
+		//DrawRectangleLines(
+		//	e.second->physics.transform.pos.x,
+		//	e.second->physics.transform.pos.y,
+		//	e.second->physics.transform.w,
+		//	e.second->physics.transform.h,
+		//	PURPLE
+		//);
 	}
 
 #pragma endregion
@@ -923,6 +933,13 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma region render particles
 
 	renderParticles(particles);
+
+#pragma endregion
+
+
+#pragma region handle melee attacks
+
+	updateMeleeAttacks(deltaTime, entityHolder.entities);
 
 #pragma endregion
 

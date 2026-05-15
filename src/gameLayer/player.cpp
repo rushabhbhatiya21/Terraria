@@ -96,17 +96,23 @@ void Player::render(AssetManager& assetManager)
 			}
 		}
 
-		if (timeAfterAttackAnimation > 0)
+		if (isPlayingAttackAnimation)
 		{
-			isPlayingAttackAnimation = true;
-			float attackProgress = 1.0f - (timeAfterAttackAnimation / maxAttackTimeAnimation);
+			float attackProgress = 1.f - (useTimer / attackDuration);
+
+			attackProgress = Clamp(attackProgress, 0.f, 1.f);
 
 			float t = attackProgress;
-			t = t * t * (3.f - 2.f * t); // smoothstep
 
-			if (animations.movingLeft ? t *= -1.f : t *= 1.f);
+			// smoothstep
+			t = t * t * (3.f - 2.f * t);
 
-			rotation = angle + t * 180.0f;
+			if (animations.movingLeft)
+			{
+				t *= -1.f;
+			}
+
+			rotation = angle + t * 180.f;
 		}
 
 		DrawTexturePro(
@@ -140,11 +146,42 @@ bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
 	useTimer -= deltaTime;
 
-	useTimer -= deltaTime;
-
 	if (useTimer < 0.f)
 	{
 		useTimer = 0.f;
+		isPlayingAttackAnimation = false;
+	}
+
+	if (useTimer > 0)
+	{
+		weaponBase = getPosition();
+
+		float t = 1.f - (useTimer / attackDuration);
+		//float t = 0;
+
+		float startAngle = 0, endAngle = 0;
+
+		if (!animations.movingLeft)
+		{
+			startAngle = -135.f;   // 10 o'clock (after negation in radians)
+			endAngle = 135.f;    // 4 o'clock
+		}
+		else
+		{
+			startAngle = -45.f;    // mirrored
+			endAngle = 45.f;
+		}
+
+		//float radians = DEG2RAD * (-currentAngle); // keep negation
+
+		float currentAngle = Lerp(startAngle, endAngle, t);
+		//float currentAngle = -45.f;
+		float radians = DEG2RAD * (-currentAngle);
+
+		weaponTip.x = weaponBase.x + cosf(radians) * weaponLength;
+		weaponTip.y = weaponBase.y + sinf(radians) * weaponLength;
+
+		isPlayingAttackAnimation = true;
 	}
 
 	return true;
