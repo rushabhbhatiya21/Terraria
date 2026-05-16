@@ -204,11 +204,11 @@ void Player::updateSwing(float deltaTime)
 	//	resetTrailNextFrame = false;
 	//}
 
-	//if (swingTimer <= 0.f)
-	//{
-	//	isPlayingAttackAnimation = false;
-	//	return;
-	//}
+	if (swingTimer <= 0.f)
+	{
+		isPlayingAttackAnimation = false;
+		return;
+	}
 
 	//printf("swingTimer: %.3f  trailCount: %d  weaponTip: %.2f %.2f\n",
 	//	swingTimer, trailCount, weaponTip.x, weaponTip.y);

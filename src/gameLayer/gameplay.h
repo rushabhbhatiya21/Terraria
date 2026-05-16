@@ -15,7 +15,7 @@
 #include <player.h>
 #include <inventory.h>
 
-#define CAMERA_ZOOM 50.0f
+#define CAMERA_ZOOM 30.0f
 
 struct Gameplay
 {

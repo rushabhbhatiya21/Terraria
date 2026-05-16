@@ -537,12 +537,6 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		if (!insideInventoryMenu && !insideCraftingMenu)
 		{
-			if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) // first frame only
-			{
-				player.trailCount = 0;
-				player.trailHead = 0;
-			}
-
 			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 			{
 				// attack and tool done
