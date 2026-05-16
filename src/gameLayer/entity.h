@@ -13,11 +13,7 @@ enum EntityType
 {
 	EntityType_Player = 0,
 	EntityType_DroppedItem,
-	EntityType_Slime,
-	EntityType_DesertSlime,
-	EntityType_EvilEye,
-	EntityType_Zombie,
-
+	EntityType_Enemy
 };
 
 struct EntityUpdateData
@@ -29,9 +25,6 @@ struct EntityUpdateData
 	GameMap& gameMap;
 
 	std::uint64_t ownId = 0;
-	//float groundDistance = 0;
-	//bool shouldStepUp = false; // add this
-
 };
 
 struct Entity
@@ -40,6 +33,7 @@ struct Entity
 	float life = 1;
 	bool isFacingRight = true;
 	float isRedTimer = 0.f;
+	float hitStopTimer = 0;
 
 	Vector2& getPosition()
 	{
@@ -63,11 +57,7 @@ struct Entity
 
 	virtual void dropLoot(EntityHolder& entityHolder, int type) = 0;
 
-	void hit(float damage, float redTimer = .5f)
-	{
-		isRedTimer = redTimer;
-		life -= damage;
-	}
+	virtual void hit(float damage, Vector2 hitFromPosition, float redTimer = .5f) = 0;
 
 	virtual Json formatToJson() = 0;
 	virtual bool loadFromJson(Json& j) = 0;

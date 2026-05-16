@@ -1,21 +1,12 @@
 #pragma once
-#include <entity.h>
-#include <entityAnimation.h>
+#include "enemy.h"
 
-struct DesertSlime: public Entity
+struct Slime : public Enemy
 {
-	DesertSlime()
+	Slime()
 	{
 		setColliderSize();
-
 		life = getMaxLife();
-	}
-
-	EntityAnimation animation;
-
-	Vector2& getPosition()
-	{
-		return physics.getPosition();
 	}
 
 	void render(AssetManager& assetManager) override;
@@ -30,23 +21,23 @@ struct DesertSlime: public Entity
 
 	void setColliderSize()
 	{
-		physics.transform.w = 1.f;
-		physics.transform.h = 1.f;
+		physics.transform.w = 0.8f;
+		physics.transform.h = 0.8f;
 	}
 
-	int getEntityType() { return EntityType_DesertSlime; }
+	int getEnemyType() override { return EnemyType_Slime; }
 
-	float getMaxLife() { return 15; }
+	float getMaxLife() override { return 35; }
 
-	enum
-	{
-		STATE_WONDERING = 0,
-		STATE_CHASING
-	};
+	//enum
+	//{
+	//	STATE_WONDERING = 0,
+	//	STATE_CHASING,
+	//	STATE_DEAD
+	//};
 
 	int currentState = STATE_WONDERING;
 	float changeStateTimer = 1.f;
 	float jumpTimer = 5.f;
 	float moveSpeed = 0.f; // also represents direction
-
 };

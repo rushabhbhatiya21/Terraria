@@ -23,6 +23,8 @@ struct AssetManager
 	Texture2D desertSlime = {};
 	Texture2D evilEye = {};
 	Texture2D zombie = {};
+	Texture2D health = {};
+	Texture2D healthBar = {};
 
 	Texture2D forestBG = {};
 	Texture2D desertBG = {};
@@ -52,6 +54,8 @@ struct AssetManager
 		{&desertSlime, "desertSlime.png"},
 		{&evilEye, "evilEye.png"},
 		{&zombie, "zombie.png"},
+		{&health, "health.png"},
+		{&healthBar, "healthBar.png"},
 		{&forestBG, "forestBG.png"},
 		{&desertBG, "desertBG.png"},
 		{&snowBG, "snowBG.png"},

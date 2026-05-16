@@ -1,24 +1,12 @@
 #pragma once
-#include <physics.h>
-#include <randomStuff.h>
-#include <entityAnimation.h>
-#include <entity.h>
+#include "enemy.h"
 
-
-struct Zombie : public Entity
+struct Zombie : public Enemy
 {
 	Zombie()
 	{
 		setColliderSize();
-
 		life = getMaxLife();
-	}
-
-	EntityAnimation animations;
-
-	Vector2& getPosition()
-	{
-		return physics.getPosition();
 	}
 
 	void render(AssetManager& assetManager) override;
@@ -28,12 +16,20 @@ struct Zombie : public Entity
 	void dropLoot(EntityHolder& entityHolder, int type) override;
 
 	void enterState(int newState, EntityUpdateData& entityUpdateData);
-	
+
 	bool shouldStepUp(Vector2 playerPos, GameMap& gameMap);
 
 	bool isOnLedge(GameMap& gameMap);
 
 	void doAttack(EntityUpdateData& entityUpdateData);
+
+	//void enterState(int newState, EntityUpdateData& entityUpdateData) override;
+
+	//bool shouldStepUp(Vector2 playerPos, GameMap& gameMap) override;
+
+	//bool isOnLedge(GameMap& gameMap) override;
+
+	//void doAttack(EntityUpdateData& entityUpdateData) override;
 
 	Json formatToJson() override;
 
@@ -45,19 +41,9 @@ struct Zombie : public Entity
 		physics.transform.h = 1.8f;
 	}
 
-	int getEntityType() { return EntityType_Zombie; }
+	int getEnemyType() override { return EnemyType_Zombie; }
 
-	float getMaxLife() { return 10; }
-
-	enum
-	{
-		STATE_IDLE = 0,
-		STATE_WONDERING,
-		STATE_CHASING,
-		STATE_ATTACK,
-		STATE_HURT,
-		STATE_DEAD
-	};
+	float getMaxLife() override { return 50; }
 
 	// Zombie.h — tweak these freely
 	static constexpr float SIGHT_RANGE = 15.f;
@@ -74,7 +60,6 @@ struct Zombie : public Entity
 	static constexpr int ANIM_WALK = 1;
 	static constexpr int ANIM_DEAD = 4;
 
-	int currentState = STATE_IDLE;
 	float changeStateTimer = 3.f;
 	float moveSpeed = 0.f; // also represents direction
 };

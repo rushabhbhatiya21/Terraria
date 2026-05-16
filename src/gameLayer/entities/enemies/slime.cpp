@@ -1,5 +1,6 @@
 #pragma once
 #include "slime.h"
+#include "../droppedItem.h"
 #include <helper.h>
 #include <assetManager.h>
 #include <entityHolder.h>
@@ -16,7 +17,7 @@ void Slime::render(AssetManager& assetManager)
 
 	DrawTexturePro(
 		assetManager.slime,
-		getTextureAtlas(animation.positionX, animation.positionY, facingValue, 32),
+		getTextureAtlas(animations.positionX, animations.positionY, facingValue, 32),
 		aabb, // dest
 		{ 0, 0 }, // origin top-left corner
 		0.f, // rotation
@@ -64,11 +65,11 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 	if (physics.downTouch)
 	{
 		moveSpeed = 0.f;
-		animation.setAnimation(0); // on ground
+		animations.setAnimation(0); // on ground
 	}
 	else
 	{
-		animation.setAnimation(1); // in air
+		animations.setAnimation(1); // in air
 	}
 
 	jumpTimer -= deltaTime;
@@ -117,7 +118,7 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 		getPosition().x += deltaTime * moveSpeed;
 	}
 
-	animation.update(deltaTime, 0.08f, 7);
+	animations.update(deltaTime, 0.08f, 7);
 
 	return true;
 

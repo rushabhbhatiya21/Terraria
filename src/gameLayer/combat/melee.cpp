@@ -57,8 +57,7 @@ MeleeHitResult updateMeleeAttacks(
         // collision against enemies
         for (auto& enemy : enemies)
         {
-            if (enemy.second->getEntityType() == EntityType::EntityType_Player
-                || enemy.second->getEntityType() == EntityType::EntityType_DroppedItem)
+            if (enemy.second->getEntityType() != EntityType::EntityType_Enemy)
                 continue;
 
             if (enemy.second->life <= 0)
@@ -70,7 +69,9 @@ MeleeHitResult updateMeleeAttacks(
 
             if (checkForHits(player->weaponBase, player->weaponTip, *enemy.second.get()))
             {
-                enemy.second->hit(attack.damage);
+                enemy.second->hit(attack.damage, attack.owner->getPosition());
+                enemy.second->hitStopTimer = 1.f;
+                player->hitStopTimer = .08f; // same duration, they freeze together
 
                 // implement knockback later
                 // maybe implement knockback at enemy side and call it in hit to keep it clean

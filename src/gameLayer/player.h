@@ -31,6 +31,14 @@ struct Player : public Entity
 
 	bool loadFromJson(Json& j) override;
 
+	void updateTimers(float deltaTime);
+	void updateMovement(float deltaTime);
+	void updateSwing(float deltaTime);
+	void updateAnimation(float deltaTime);
+
+	void renderTrailPass(float expand, unsigned char maxAlpha);
+	void renderTrail();
+
 	void setColliderSize()
 	{
 		physics.transform.w = 0.9f;
@@ -40,6 +48,12 @@ struct Player : public Entity
 	int getEntityType() { return EntityType_Player; }
 
 	float getMaxLife() { return 50; }
+
+	// implement later
+	void hit(float damage, Vector2 hitFromPosition, float redTimer = .5f) override
+	{
+		life -= damage;
+	}
 
 	// for weapon swing animation
 	float weaponLength = 1.5f;
@@ -59,4 +73,17 @@ struct Player : public Entity
 	int selectedHotbarSlot = -1;
 
 	int numberOfParticlesOnLand = 1;
+
+	//static constexpr int TRAIL_SIZE = 8;
+
+	//struct TrailPoint {
+	//	Vector2 tip;
+	//	Vector2 base;
+	//	float alpha; // 1.0 = fresh, 0.0 = gone
+	//};
+
+	//std::array<TrailPoint, TRAIL_SIZE> trailPoints;
+	//int trailHead = 0;        // index of newest point
+	//int trailCount = 0;       // how many are valid
+	//bool resetTrailNextFrame = false;
 };

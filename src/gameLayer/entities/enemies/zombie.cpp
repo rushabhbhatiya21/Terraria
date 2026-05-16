@@ -1,6 +1,6 @@
 #pragma once
 #include "zombie.h"
-#include "droppedItem.h"
+#include "../droppedItem.h"
 #include <items/blocks.h>
 #include <gameMap.h>
 #include <assetManager.h>
@@ -32,6 +32,14 @@ void Zombie::render(AssetManager& assetManager)
 
 bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 {
+	// --- HITSTOP ---
+	if (hitStopTimer > 0)
+	{
+		hitStopTimer -= deltaTime;
+		physics.velocity = { 0.f, 0.f };
+		return true; // skip ALL logic and physics this frame
+	}
+
 	// --- TIMERS ---
 	if (isRedTimer > 0) isRedTimer -= deltaTime;
 	changeStateTimer -= deltaTime;

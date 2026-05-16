@@ -6,10 +6,10 @@
 #include <gameMap.h>
 #include <entityHolder.h>
 #include <player.h>
-#include <entities/slime.h>
-#include <entities/desetSlime.h>
 #include <entities/droppedItem.h>
-#include <entities/zombie.h>
+#include <entities/enemies/slime.h>
+#include <entities/enemies/desetSlime.h>
+#include <entities/enemies/zombie.h>
 
 struct BlockRepresentation1
 {
@@ -314,18 +314,18 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 
 			switch (entityType)
 			{
-				case EntityType::EntityType_Slime:
+				case EnemyType_Slime:
 				{
-					Zombie zombie;
-					if (zombie.loadFromJson(entityJson))
+					Slime slime;
+					if (slime.loadFromJson(entityJson))
 					{
-						entities.entities[id] = std::make_unique<Zombie>(zombie);
+						entities.entities[id] = std::make_unique<Slime>(slime);
 					}
 
 					break;
 				}
 
-				case EntityType::EntityType_DesertSlime:
+				case EnemyType_DesertSlime:
 				{
 					DesertSlime desertSlime;
 					if (desertSlime.loadFromJson(entityJson))
@@ -336,7 +336,7 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 					break;
 				}
 
-				case EntityType::EntityType_Zombie:
+				case EnemyType_Zombie:
 				{
 					Zombie zombie;
 					if (zombie.loadFromJson(entityJson))

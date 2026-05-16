@@ -33,4 +33,6 @@ struct DroppedItem : public Entity
 	float getMaxLife() { return 1; }
 
 	int getMaxStackSize(int type);
+
+	void hit(float damage, Vector2 hitFromPosition, float redTimer = .5f) override { /* no implementation */ }
 };

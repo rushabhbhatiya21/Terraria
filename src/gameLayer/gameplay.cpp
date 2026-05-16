@@ -11,9 +11,10 @@
 
 #include <shake.h>
 #include <entities/droppedItem.h>
-#include <entities/slime.h>
-#include <entities/desetSlime.h>
-#include <entities/zombie.h>
+#include <entities/enemies/enemy.h>
+#include <entities/enemies/slime.h>
+#include <entities/enemies/desetSlime.h>
+#include <entities/enemies/zombie.h>
 
 #include <items/item.h>
 #include <items/itemUse.h>
@@ -255,7 +256,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region player movement
+#pragma region creative mode
 
 	std::ranlux24_base rng(std::random_device{}());
 
@@ -265,74 +266,22 @@ bool Gameplay::update(AssetManager& assetManager)
 	bool wasTouchingGround = player.physics.downTouch;
 	float landingVelocity = player.physics.velocity.y;
 
-	// ── Movement block — replace your existing input section with this ────────────
-	// Requires the updated physics.h (updateJump, applyGravity, applyHorizontalMovement).
-	// deltaTime should already be defined as GetFrameTime() above this block.
-
+	// ── Creative mode fly ────────────────────────────────────────────────────
+	if (creative)
 	{
-		// ── Horizontal input ─────────────────────────────────────────────────────
-		float inputX = 0.f;
-		bool  moving = false;
-
-		if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
-		{
-			inputX = -1.f;
-			moving = true;
-			player.animations.movingLeft = true;
-		}
-		if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
-		{
-			inputX = 1.f;
-			moving = true;
-			player.animations.movingLeft = false;
-		}
-
-		// ── Creative mode fly ────────────────────────────────────────────────────
-		if (creative)
-		{
-			if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
-				player.physics.transform.pos.y -= PhysicalEntity::MOVE_SPEED * deltaTime;
-			if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
-				player.physics.transform.pos.y += PhysicalEntity::MOVE_SPEED * deltaTime;
-			if (GetMouseWheelMove() != 0.f)
-				camera.zoom += GetMouseWheelMove();
-		}
-
-		// ── Physics updates (order matters) ──────────────────────────────────────
-		// 1. Variable jump + coyote time + jump buffer
-		player.physics.updateJump(
-			deltaTime,
-			IsKeyDown(KEY_SPACE),    // hold = extend jump
-			IsKeyPressed(KEY_SPACE)  // press = queue jump
-		);
-
-		// 2. Gravity (with hold/fall multipliers applied inside)
-		if (!creative)
-			player.physics.applyGravity();
-
-		// 3. Horizontal movement (ground vs air friction handled inside)
-		//if (!creative)
-		player.physics.applyHorizontalMovement(deltaTime, inputX);
-
-		// ── Animation ────────────────────────────────────────────────────────────
-		bool falling = !player.physics.downTouch;
-
-		if (falling && player.physics.velocity.y < 0.f)
-			player.animations.setAnimation(2); // jumping (rising)
-		else if (falling)
-			player.animations.setAnimation(3); // falling (descending)
-		else if (moving)
-			player.animations.setAnimation(1); // walking
-		else
-			player.animations.setAnimation(0); // idle
-
-		player.animations.update(deltaTime, 0.08, 7);
+		if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
+			player.physics.transform.pos.y -= PhysicalEntity::MOVE_SPEED * deltaTime;
+		if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
+			player.physics.transform.pos.y += PhysicalEntity::MOVE_SPEED * deltaTime;
+		if (GetMouseWheelMove() != 0.f)
+			camera.zoom += GetMouseWheelMove();
 	}
+
 
 #pragma endregion
 
 
-#pragma region handle entities
+#pragma region handle player
 
 	auto updateEntityPhysics = [&](auto& entity, bool applyGravity = true)
 		{
@@ -391,6 +340,20 @@ bool Gameplay::update(AssetManager& assetManager)
 		particles.insert(particles.end(), rightParticles.begin(), rightParticles.end());
 	}
 
+	player.update(deltaTime, EntityUpdateData
+		{
+			player.getPosition(),
+			rng,
+			entityHolder,
+			inventory,
+			gameMap
+		}
+	);
+#pragma endregion
+
+
+#pragma region clamp camera
+
 	// clamp camera
 	{
 		float zoom = camera.zoom;
@@ -427,6 +390,11 @@ bool Gameplay::update(AssetManager& assetManager)
 		}
 	}
 
+#pragma endregion
+
+
+#pragma region handle entities
+
 	bool shouldApplyGravity = true;
 	float groundDistance = 0;
 	bool shouldStepUp = false;
@@ -458,7 +426,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			entityHolder,
 			inventory,
 			gameMap,
-			it->first,
+			it->first
 		};
 
 
@@ -479,21 +447,6 @@ bool Gameplay::update(AssetManager& assetManager)
 			++it;
 		}
 	}
-
-#pragma endregion
-
-
-#pragma region player
-
-	player.update(deltaTime, EntityUpdateData
-		{
-			player.getPosition(),
-			rng,
-			entityHolder,
-			inventory,
-			gameMap
-		}
-	);
 
 #pragma endregion
 
@@ -584,6 +537,12 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		if (!insideInventoryMenu && !insideCraftingMenu)
 		{
+			if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) // first frame only
+			{
+				player.trailCount = 0;
+				player.trailHead = 0;
+			}
+
 			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 			{
 				// attack and tool done
@@ -822,6 +781,13 @@ bool Gameplay::update(AssetManager& assetManager)
 		//	e.second->physics.transform.h,
 		//	PURPLE
 		//);
+
+		if (e.second->getEntityType() == EntityType_Enemy)
+		{
+			Enemy* enemy = dynamic_cast<Enemy*>(e.second.get());
+			enemy->renderHealthBar(assetManager);
+			enemy->updateHealthBar(deltaTime);
+		}
 	}
 
 #pragma endregion
@@ -1310,18 +1276,6 @@ bool Gameplay::update(AssetManager& assetManager)
 		if (ImGui::Button("Spawn slime"))
 		{
 			spawnSlime({ 18,60 });
-		}
-
-		if (ImGui::Button("Hurt a slime"))
-		{
-			for (auto& e : entityHolder.entities)
-			{
-				if (e.second->getEntityType() == EntityType::EntityType_Slime)
-				{
-					e.second->life -= 3;
-					break;
-				}
-			}
 		}
 
 		ImGui::InputText(("Texture Pack"), texturePackName, sizeof(texturePackName));
