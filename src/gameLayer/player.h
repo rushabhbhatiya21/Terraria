@@ -55,7 +55,7 @@ struct Player : public Entity
 	int armourChest = 0;
 	int armoutLegs = 0;
 
-	ItemId heldItem = 0;
+	ItemId heldItem = Items::copperSword;
 	int selectedHotbarSlot = -1;
 
 	int numberOfParticlesOnLand = 1;

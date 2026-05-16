@@ -50,7 +50,8 @@ ToolHitResult updateToolSwing(float deltatime, GameMap& gameMap)
 
 			result.hit = true;
 			result.type = b->type;
-			result.pos = Vector2{ swing.mousePosition.x, swing.mousePosition.y };
+			result.position = Vector2{ swing.mousePosition.x, swing.mousePosition.y };
+			result.power = swing.power;
 
 			// block broken
 			if (b->hp <= 0)

@@ -9,8 +9,9 @@ struct ToolHitResult
 {
 	bool hit = false;
 	bool broke = false;
-	Vector2 pos = {};
+	Vector2 position = {};
 	int type = 0;
+	int power = 0;
 };
 
 struct ToolSwing

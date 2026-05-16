@@ -9,6 +9,13 @@
 
 struct Entity;
 
+struct MeleeHitResult
+{
+    bool hit = false;
+    Vector2 positon = {};
+    int damage = 0;
+};
+
 struct MeleeAttack
 {
     Entity* owner = nullptr;
@@ -36,7 +43,7 @@ void spawnMeleeAttack(
     float knockback
 );
 
-bool updateMeleeAttacks(
+MeleeHitResult updateMeleeAttacks(
     float deltaTime,
     std::unordered_map<std::uint64_t, std::unique_ptr<Entity>>& enemies
 );

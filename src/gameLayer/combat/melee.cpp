@@ -34,11 +34,13 @@ void spawnMeleeAttack(
     meleeAttacks.push_back(attack);
 }
 
-bool updateMeleeAttacks(
+MeleeHitResult updateMeleeAttacks(
     float deltaTime,
     std::unordered_map<std::uint64_t, std::unique_ptr<Entity>>& enemies
 )
 {
+    MeleeHitResult result{};
+
     for (int i = (int)meleeAttacks.size() - 1; i >= 0; --i)
     {
         MeleeAttack& attack = meleeAttacks[i];
@@ -76,11 +78,14 @@ bool updateMeleeAttacks(
                 // prevent multi-hit from same swing
                 attack.lifetime = 0.f;
 
-                return true;
+                result.hit = true;
+                result.positon = enemy.second->getPosition();
+                result.damage = attack.damage;
+                return result;
             }
         }
     }
-    return false;
+    return result;
 }
 
 bool checkForHits(Vector2 base, Vector2 tip, Entity& enemy)

@@ -26,6 +26,8 @@ struct Gameplay
 	DrawBackground background;
 	Inventory inventory;
 
+	float lifetime = 0;
+
 	// inventory
 	int selectedHotbarSlot = 0;
 

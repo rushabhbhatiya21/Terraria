@@ -21,6 +21,8 @@
 #include <combat/melee.h>
 #include "combat/tool.h"
 
+#include "ui/popupText.h"
+
 void Gameplay::spawnSlime(Vector2 position)
 {
 	Slime slime;
@@ -180,6 +182,8 @@ bool Gameplay::init()
 
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 
+	lifetime = 3;
+
 	return true;
 }
 
@@ -199,6 +203,7 @@ bool Gameplay::update(AssetManager& assetManager)
 	updateShake(deltaTime);
 	updateCameraShake(deltaTime);
 	updateParticles(particles, deltaTime);
+	updatePopupText(deltaTime);
 
 #pragma endregion
 
@@ -327,7 +332,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region entities
+#pragma region handle entities
 
 	auto updateEntityPhysics = [&](auto& entity, bool applyGravity = true)
 		{
@@ -493,7 +498,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region inventory
+#pragma region handle inventory
 
 	for (int i = 0; i < inventory.slots.size(); i++)
 	{
@@ -613,6 +618,54 @@ bool Gameplay::update(AssetManager& assetManager)
 				}
 			}
 		}
+	}
+
+#pragma endregion
+
+
+#pragma region handle melee attacks
+
+	MeleeHitResult meleeResult = updateMeleeAttacks(deltaTime, entityHolder.entities);
+
+	if (meleeResult.hit)
+	{
+		triggerCameraShake(.1f, .15f);
+		spawnPopupText(
+			meleeResult.positon,
+			Vector2{ .1f, .1f },
+			std::to_string(meleeResult.damage),
+			1,
+			.4f,
+			-1.f,
+			WHITE
+		);
+	}
+
+#pragma endregion
+
+
+#pragma region handle tool swing
+
+	ToolHitResult swingResult = updateToolSwing(deltaTime, gameMap);
+
+	if (swingResult.hit)
+	{
+		triggerShake((int)swingResult.position.x, (int)swingResult.position.y);
+		auto newParticles = spawnParticles({ swingResult.position.x, swingResult.position.y }, rng, swingResult.type, 10);
+		particles.insert(particles.end(), newParticles.begin(), newParticles.end());
+
+		if (swingResult.broke)
+			spawnDroppedItem({ std::floor(swingResult.position.x) + 0.5f, swingResult.position.y + 0.5f }, swingResult.type);
+
+		spawnPopupText(
+			swingResult.position,
+			Vector2{ 0, .1f },
+			std::to_string(swingResult.power),
+			1,
+			.2f,
+			-1.f,
+			WHITE
+		);
 	}
 
 #pragma endregion
@@ -788,35 +841,6 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region handle melee attacks
-
-	bool hit = updateMeleeAttacks(deltaTime, entityHolder.entities);
-
-	if (hit)
-	{
-		triggerCameraShake(.1f, .15f);
-	}
-
-#pragma endregion
-
-
-#pragma region handle tool swing
-
-	ToolHitResult result = updateToolSwing(deltaTime, gameMap);
-
-	if (result.hit)
-	{
-		triggerShake((int)result.pos.x, (int)result.pos.y);
-		auto newParticles = spawnParticles({ result.pos.x, result.pos.y }, rng, result.type, 10);
-		particles.insert(particles.end(), newParticles.begin(), newParticles.end());
-
-		if (result.broke)
-			spawnDroppedItem({ std::floor(result.pos.x) + 0.5f, result.pos.y + 0.5f }, result.type);
-	}
-
-#pragma endregion
-
-
 #pragma region render structure selection
 
 	// show structure selection
@@ -837,6 +861,13 @@ bool Gameplay::update(AssetManager& assetManager)
 			{ 20,101,250,145 }
 		);
 	}
+
+#pragma endregion
+
+
+#pragma region render popup text
+
+	drawPopuptext();
 
 #pragma endregion
 
@@ -1268,6 +1299,8 @@ bool Gameplay::update(AssetManager& assetManager)
 	if (showImgui)
 	{
 		ImGui::Begin("Game Control");
+
+		ImGui::InputFloat("lifetime", &lifetime);
 
 		ImGui::SliderFloat("Camera Zoom: ", &camera.zoom, 10, 150);
 		//ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 100);
