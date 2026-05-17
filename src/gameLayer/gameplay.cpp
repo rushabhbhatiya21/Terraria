@@ -62,7 +62,7 @@ static SkyData getSkyData(float t)
 	// Night → Night
 	if (t < 0.25f)
 	{
-		return { nightSky, nightColor, 0.65f, "Night" };
+		return { nightSky, nightColor, 0.65f, DayPhase::NIGHT };
 	}
 	// Sunrise  06:00–09:00
 	else if (t < 0.375f)
@@ -72,13 +72,13 @@ static SkyData getSkyData(float t)
 			lerpColor(nightSky,   daySky,    p),
 			lerpColor(nightColor, dayColor,   p),
 			0.65f * (1.0f - p),
-			"Sunrise"
+			DayPhase::SUNRISE
 		};
 	}
 	// Day  09:00–18:00
 	else if (t < 0.75f)
 	{
-		return { daySky, dayColor, 0.0f, "Day" };
+		return { daySky, dayColor, 0.0f, DayPhase::DAY };
 	}
 	// Sunset  18:00–21:00
 	else if (t < 0.875f)
@@ -88,11 +88,11 @@ static SkyData getSkyData(float t)
 			lerpColor(daySky,    nightSky,   p),
 			lerpColor(dayColor,  nightColor, p),
 			0.65f * p,
-			"Sunset"
+			DayPhase::SUNSET
 		};
 	}
 	// Night  21:00–24:00
-	return { nightSky, nightColor, 0.65f, "Night" };
+	return { nightSky, nightColor, 0.65f, DayPhase::NIGHT };
 }
 
 bool Gameplay::isNight(float t)
@@ -270,9 +270,8 @@ bool Gameplay::init()
 
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnZombie({ 25,60 });
-
-	//spawnDroppedItem({ 25,60 }, 6001);
+	//spawnZombie({ 25,60 });
+	maxEnemyCount = 5;
 
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 
@@ -783,6 +782,24 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	startYView = Clamp((float)startYView, 0.f, (float)gameMap.h - 1);
 	endYView = Clamp((float)endYView, 0.f, (float)gameMap.h - 1);
+
+	enemySpawner.enemySpawnTimer -= deltaTime;
+
+	int enemyCount = 0;
+
+	for (auto& [id, entity] : entityHolder.entities)
+	{
+		if (entity->getEntityType() == EntityType::EntityType_Enemy)
+		{
+			enemyCount++;
+		}
+	}
+
+	if (enemySpawner.enemySpawnTimer <= 0 && enemyCount < maxEnemyCount)
+	{
+		spawnEnemy(entityHolder, gameMap, rng, startXView, endXView, startYView, endYView);
+		enemySpawner.enemySpawnTimer = 2;
+	}
 
 	for (int y = startYView; y <= endYView; y++)
 	{
@@ -1402,7 +1419,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	DrawTextEx(
 		GetFontDefault(),
-		skyData.phase.c_str(),
+		phase_to_str(skyData.phase),
 		{ 120, 40 },
 		20,
 		5,

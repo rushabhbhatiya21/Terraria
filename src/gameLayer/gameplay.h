@@ -15,8 +15,30 @@
 
 #include <player.h>
 #include <inventory.h>
+#include <enemySpawner.h>
 
 #define CAMERA_ZOOM 30.0f
+
+enum class DayPhase
+{
+	SUNRISE = 0,
+	DAY,
+	SUNSET,
+	NIGHT
+};
+
+inline const char* phase_to_str(DayPhase phase)
+{
+	switch (phase)
+	{
+	case DayPhase::SUNRISE: return "sunrise";
+	case DayPhase::DAY:     return "day";
+	case DayPhase::SUNSET:  return "sunset";
+	case DayPhase::NIGHT:   return "night";
+	}
+
+	return "unknown";
+}
 
 struct WorldTimeClock
 {
@@ -30,7 +52,7 @@ struct SkyData
 	Color       skyColor;
 	Color       ambientColor;
 	float       darkness;
-	std::string phase;
+	DayPhase phase;
 };
 
 
@@ -79,7 +101,11 @@ struct Gameplay
 	// world time
 	float worldTime = 0;
 	WorldTimeClock clock = {};
-	float FULL_DAY_LENGTH = 20;
+	float FULL_DAY_LENGTH = 600;
+
+	// enemy spawner
+	EnemySpawner enemySpawner = {};
+	int maxEnemyCount = 0;
 
 	bool showImgui = false;
 	bool insideInventory = false;
