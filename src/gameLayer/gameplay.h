@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <string>
 #include <raylib.h>
 
 #include <gameMap.h>
@@ -16,6 +17,22 @@
 #include <inventory.h>
 
 #define CAMERA_ZOOM 30.0f
+
+struct WorldTimeClock
+{
+	int hh = 0;
+	int mm = 0;
+	int ss = 0;
+};
+
+struct SkyData
+{
+	Color       skyColor;
+	Color       ambientColor;
+	float       darkness;
+	std::string phase;
+};
+
 
 struct Gameplay
 {
@@ -59,9 +76,18 @@ struct Gameplay
 	int lastScreenHeight = 0;
 	RenderTexture2D lightMask = { 0 };
 
+	// world time
+	float worldTime = 0;
+	WorldTimeClock clock = {};
+	float FULL_DAY_LENGTH = 20;
+
 	bool showImgui = false;
 	bool insideInventory = false;
 	bool insideCraft = false;
+
+	bool isNight(float t);
+	float getDayPercent(float t);
+	WorldTimeClock getWorldTimeClock(float t);
 
 	void spawnSlime(Vector2 position);
 

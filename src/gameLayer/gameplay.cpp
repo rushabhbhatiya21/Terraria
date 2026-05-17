@@ -1,5 +1,5 @@
 #include "gameplay.h"
-
+#include <iostream>
 #include <imgui.h>
 
 #include <ui.h>
@@ -23,6 +23,98 @@
 #include "combat/tool.h"
 
 #include "ui/popupText.h"
+
+
+
+// Bright, slightly warm white — more natural than pure white
+const Color dayColor = { 255, 250, 230, 255 };
+
+// Deeper, richer sky blue — more contrast against terrain
+const Color daySky = { 85, 170, 255, 255 };
+
+// Sunrise — cool pink/gold, feels like early morning mist
+const Color sunriseA = { 255, 200, 160, 255 };  // warm gold horizon
+const Color sunriseB = { 200, 160, 220, 255 };  // soft lavender upper sky
+const Color sunriseSky = { 255, 180, 140, 255 };  // peachy horizon glow
+
+// Sunset — deeper, moodier, clearly different from sunrise
+const Color sunsetA = { 255, 100,  60, 255 };  // burnt orange-red
+const Color sunsetB = { 120,  50, 140, 255 };  // deep violet
+const Color sunsetSky = { 100,  60, 130, 255 };  // dusky purple
+
+// Night — slightly cooler/deeper, more contrast at night
+const Color nightColor = { 20,  35,  80, 255 };
+const Color nightSky = { 8,  12,  40, 255 };  // near-black deep blue
+
+static Color lerpColor(Color a, Color b, float t)
+{
+	return
+	{
+		(unsigned char)(a.r + (b.r - a.r) * t),
+		(unsigned char)(a.g + (b.g - a.g) * t),
+		(unsigned char)(a.b + (b.b - a.b) * t),
+		255
+	};
+}
+
+static SkyData getSkyData(float t)
+{
+	// Night → Night
+	if (t < 0.25f)
+	{
+		return { nightSky, nightColor, 0.65f, "Night" };
+	}
+	// Sunrise  06:00–09:00
+	else if (t < 0.375f)
+	{
+		float p = (t - 0.25f) / 0.125f;
+		return {
+			lerpColor(nightSky,   daySky,    p),
+			lerpColor(nightColor, dayColor,   p),
+			0.65f * (1.0f - p),
+			"Sunrise"
+		};
+	}
+	// Day  09:00–18:00
+	else if (t < 0.75f)
+	{
+		return { daySky, dayColor, 0.0f, "Day" };
+	}
+	// Sunset  18:00–21:00
+	else if (t < 0.875f)
+	{
+		float p = (t - 0.75f) / 0.125f;
+		return {
+			lerpColor(daySky,    nightSky,   p),
+			lerpColor(dayColor,  nightColor, p),
+			0.65f * p,
+			"Sunset"
+		};
+	}
+	// Night  21:00–24:00
+	return { nightSky, nightColor, 0.65f, "Night" };
+}
+
+bool Gameplay::isNight(float t)
+{
+	return (t >= 0.5f && t < 0.9f);
+}
+
+float Gameplay::getDayPercent(float t)
+{
+	// todo implement
+	return 0;
+}
+
+WorldTimeClock Gameplay::getWorldTimeClock(float t)
+{
+	int totalMinutes = (int)(t * 1440);
+
+	int h = totalMinutes / 60;
+	int m = totalMinutes % 60;
+
+	return WorldTimeClock{ h, m, 0 };
+}
 
 void Gameplay::spawnSlime(Vector2 position)
 {
@@ -158,6 +250,7 @@ Rectangle Gameplay::getIngredientsRectangle(
 
 bool Gameplay::init()
 {
+	double loadStart = GetTime();
 	int w = 900, h = 500;
 
 	backgroundMap.create(w, h);
@@ -173,7 +266,7 @@ bool Gameplay::init()
 	player.physics.transform.h = 1.8f;
 
 	// Light mask render texture
-	lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+	//lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
 
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
@@ -185,6 +278,11 @@ bool Gameplay::init()
 
 	lifetime = 3;
 
+	std::ranlux24_base rng(std::random_device{}());
+	float randStartTime = getRandomFloat(rng, 0.375f, 0.75f);
+	worldTime = randStartTime * FULL_DAY_LENGTH;
+	double loadEnd = GetTime();
+	TraceLog(LOG_INFO, "Load time: %.3f seconds", loadEnd - loadStart);
 	return true;
 }
 
@@ -195,6 +293,21 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	float deltaTime = GetFrameTime();
 	if (deltaTime > 1.f / 5.f) deltaTime = 1 / 5.f;
+
+#pragma endregion
+
+
+#pragma region world time
+
+	worldTime += deltaTime;
+	if (worldTime >= FULL_DAY_LENGTH)
+		worldTime -= FULL_DAY_LENGTH;
+
+	float t = worldTime / FULL_DAY_LENGTH;
+
+	SkyData skyData = getSkyData(t);
+	Color ambientColor = skyData.ambientColor;
+	float darkness = skyData.darkness;
 
 #pragma endregion
 
@@ -236,7 +349,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region clear background
 
-	ClearBackground({ 75,75,150,255 });
+	ClearBackground(skyData.skyColor);
 
 #pragma endregion
 
@@ -870,6 +983,19 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	EndMode2D();
 
+#pragma region day/night cycle render
+
+	DrawRectangle(
+		0,
+		0,
+		GetScreenWidth(),
+		GetScreenHeight(),
+		Fade(ambientColor, darkness)
+	);
+
+#pragma endregion
+
+
 #pragma region lighting
 
 	int screenW = GetScreenWidth();
@@ -1248,6 +1374,40 @@ bool Gameplay::update(AssetManager& assetManager)
 			}
 		}
 	}
+
+#pragma endregion
+
+#pragma region world clock
+
+	WorldTimeClock clock = getWorldTimeClock(t);
+
+	std::string hour = std::to_string(clock.hh);
+	if (clock.hh < 10)
+		hour = "0" + hour;
+
+	std::string minute = std::to_string(clock.mm);
+	if (clock.mm < 10)
+		minute = "0" + minute;
+
+	std::string strClock = hour + " : " + minute;
+
+	DrawTextEx(
+		GetFontDefault(),
+		strClock.c_str(),
+		{ 20,40 },
+		20,
+		5,
+		GREEN
+	);
+
+	DrawTextEx(
+		GetFontDefault(),
+		skyData.phase.c_str(),
+		{ 120, 40 },
+		20,
+		5,
+		GREEN
+	);
 
 #pragma endregion
 
