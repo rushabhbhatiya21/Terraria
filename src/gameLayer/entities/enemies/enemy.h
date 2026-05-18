@@ -80,6 +80,7 @@ struct Enemy : public Entity
 		damageTaken = damage;
 		hurtTimer = 1;
 
+		if (life <= 0) return;
 		knockback(damage, hitFromPosition);
 
 		// Force into hurt state — you'll call enterState from the subclass
