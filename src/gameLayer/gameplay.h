@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <string>
 #include <raylib.h>
@@ -16,7 +17,8 @@
 #include <player.h>
 #include <inventory.h>
 
-#define CAMERA_ZOOM 30.0f
+#define CAMERA_ZOOM 20.0f
+#define MAX_LIGHT 4
 
 struct WorldTimeClock
 {
@@ -55,7 +57,7 @@ struct Gameplay
 	EntityHolder entityHolder;
 
 	// texture pack
-	char texturePackName[128] = "default";
+	char texturePackName[128] = "hdtextures";
 
 	// structure save
 	Structure copyStructure;
@@ -79,7 +81,10 @@ struct Gameplay
 	// world time
 	float worldTime = 0;
 	WorldTimeClock clock = {};
-	float FULL_DAY_LENGTH = 20;
+	float FULL_DAY_LENGTH = 600;
+
+	// light map
+	std::vector<std::vector<int>> lightMap;
 
 	bool showImgui = false;
 	bool insideInventory = false;
@@ -105,6 +110,8 @@ struct Gameplay
 
 	Rectangle getRecipeRectangle(float w, float h, Rectangle craftRectangle);
 	Rectangle getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle);
+
+	void fillLight(int x, int y, int offsetX, int offsetY, int maxValue);
 
 	bool init();
 

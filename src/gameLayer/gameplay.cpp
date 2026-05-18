@@ -24,8 +24,6 @@
 
 #include "ui/popupText.h"
 
-
-
 // Bright, slightly warm white — more natural than pure white
 const Color dayColor = { 255, 250, 230, 255 };
 
@@ -97,7 +95,7 @@ static SkyData getSkyData(float t)
 
 bool Gameplay::isNight(float t)
 {
-	return (t >= 0.5f && t < 0.9f);
+	return (t >= 0.875f || t < 0.25f);
 }
 
 float Gameplay::getDayPercent(float t)
@@ -248,6 +246,41 @@ Rectangle Gameplay::getIngredientsRectangle(
 	return ingredientRectangle;
 }
 
+static void fill(int x, int y, int offsetX, int offsetY, int value, std::vector<std::vector<int>>& lightMap, GameMap& gameMap)
+{
+	if (x < 0 || y < 0 || x > lightMap.size() - 1 || y > lightMap[0].size() - 1) return;
+
+	auto* b = gameMap.getBlockSafe(x + offsetX, y + offsetY - 2);
+
+	if (!b) return;
+
+	if (b->isCollidable())
+		value -= 1;
+
+	if (lightMap[x][y] >= value) return;
+	
+	lightMap[x][y] = value;
+
+	fill(x - 1, y, offsetX, offsetY, value, lightMap, gameMap); // left
+	fill(x, y - 1, offsetX, offsetY, value, lightMap, gameMap); // top
+	fill(x + 1, y, offsetX, offsetY, value, lightMap, gameMap); // right
+	fill(x, y + 1, offsetX, offsetY, value, lightMap, gameMap); // bottom
+}
+
+void Gameplay::fillLight(int x, int y, int offsetX, int offsetY, int maxValue)
+{
+	fill(x, y, offsetX, offsetY, maxValue, lightMap, gameMap);
+}
+
+static float tileNoise(int x, int y)
+{
+	unsigned int n = x * 374761393u + y * 668265263u;
+	n = (n ^ (n >> 13u)) * 1274126177u;
+	n ^= (n >> 16u);
+
+	return (n & 255) / 255.f;
+}
+
 bool Gameplay::init()
 {
 	double loadStart = GetTime();
@@ -261,16 +294,39 @@ bool Gameplay::init()
 	camera.rotation = 0.f;
 	camera.zoom = CAMERA_ZOOM;
 
+	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, camera);
+	Vector2 bottomRightView = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, camera);
+
+	int startXView = (int)floorf(topLeftView.x - 1);
+	int endXView = (int)floorf(bottomRightView.x + 1);
+	int startYView = (int)floorf(topLeftView.y - 1);
+	int endYView = (int)floorf(bottomRightView.y + 1);
+
+	startXView = Clamp((float)startXView, 0.f, (float)gameMap.w - 1);
+	endXView = Clamp((float)endXView, 0.f, (float)gameMap.w - 1);
+
+	startYView = Clamp((float)startYView, 0.f, (float)gameMap.h - 1);
+	endYView = Clamp((float)endYView, 0.f, (float)gameMap.h - 1);
+
+	lightMap.assign(endXView - startXView + 1, std::vector<int>(endYView - startYView + 1, -1));
+
+	//for (auto& row : lightMap)
+	//{
+	//	printf("\n");
+	//	for (auto& col : row)
+	//		printf("%d ", col);
+	//}
+
 	player.teleport({ 20, 60 });
 	player.physics.transform.w = 0.9f;
 	player.physics.transform.h = 1.8f;
 
 	// Light mask render texture
-	//lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+	lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
 
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnZombie({ 25,60 });
+	//spawnZombie({ 25,60 });
 
 	//spawnDroppedItem({ 25,60 }, 6001);
 
@@ -710,7 +766,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region handle tool swing
+#pragma region handle tools
 
 	ToolHitResult swingResult = updateToolSwing(deltaTime, gameMap);
 
@@ -784,6 +840,13 @@ bool Gameplay::update(AssetManager& assetManager)
 	startYView = Clamp((float)startYView, 0.f, (float)gameMap.h - 1);
 	endYView = Clamp((float)endYView, 0.f, (float)gameMap.h - 1);
 
+	// create light map
+	lightMap.assign(endXView - startXView + 1, std::vector<int>(endYView - startYView + 1, -1));
+	int localX = (int)player.getPosition().x - startXView;
+	int localY = (int)player.getPosition().y - startYView;
+
+	fillLight(localX, localY, startXView, startYView, MAX_LIGHT);
+
 	for (int y = startYView; y <= endYView; y++)
 	{
 		for (int x = startXView; x <= endXView; x++)
@@ -832,14 +895,34 @@ bool Gameplay::update(AssetManager& assetManager)
 				float drawX = posX + shake.x;
 				float drawY = posY + shake.y;
 
+				int mapValue = lightMap[x - startXView][y - startYView];
+
+				float brightness = (float)mapValue / (float)(MAX_LIGHT - 1);
+
+				float ambient = 0.08f;
+				brightness = ambient + brightness * (1.f - ambient);
+
+				if (mapValue > 0)
+				{
+					float noise = tileNoise(x, y);
+					brightness *= 0.92f + noise * ambient;
+				}
+
+				brightness = Clamp(brightness, 0.f, 1.f);
+
+
+				// optional gamma-ish curve
+				brightness = brightness * brightness;
+
+				unsigned char light = (unsigned char)(brightness * 255.f);
+
 				DrawTexturePro(
 					assetManager.textures,
 					getTextureAtlas(atlasX, b.variation, 32, 32), //source (in sprite)
 					{ drawX,drawY,size,size }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
-					{ WHITE }
-
+					Color{ light,light,light,255 }
 				);
 			}
 		}

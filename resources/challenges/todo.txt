@@ -2,9 +2,9 @@
 - make items scrollable
 
 -- Weapons
-- implement melee weapons
+- implement melee weapons - done
 - implement range weapons
-- weapon animation with physics
+- weapon animation with physics - done
 - range projectile
-- hit pause
+- hit pause - done
 - hit effect
