@@ -22,6 +22,7 @@ bool initGame()
 {
 	Audio::init();
 	assetManager.loadAll();
+	assetManager.loadTexturePack("hdtextures");
 	loadSettings();
 
 	gameplay.init();

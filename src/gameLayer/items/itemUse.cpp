@@ -8,32 +8,34 @@ void useItem(Player& player, ItemStack& stack, Vector2 mouseWorldPos)
 {
 	if (stack.count <= 0) return;
 
-	ItemDefinition& item = getItem(stack.itemId);
+	ItemDefinition* item = getItem(stack.itemId);
+
+	if (!item) return;
 
 	if (player.useTimer > 0.f) return;
 
-	player.useTimer = item.useTime;
+	player.useTimer = item->useTime;
 
-	switch (item.category)
+	switch (item->category)
 	{
 	case ItemCategory::WEAPON:
-		player.attackDuration = item.useTime * .35f;
+		player.attackDuration = item->useTime * .35f;
 		player.swingTimer = player.attackDuration;
-		useWeapon(player, item);
+		useWeapon(player, *item);
 		break;
 
 	case ItemCategory::TOOL:
-		player.attackDuration = item.useTime * .35f;
+		player.attackDuration = item->useTime * .35f;
 		player.swingTimer = player.attackDuration;
-		useTool(player, item, mouseWorldPos);
+		useTool(player, *item, mouseWorldPos);
 		break;
 
 	case ItemCategory::BLOCK:
-		useBlock(player, item, mouseWorldPos);
+		useBlock(player, *item, mouseWorldPos);
 		break;
 
 	case ItemCategory::CONSUMABLE:
-		useConsumable(player, stack, item);
+		useConsumable(player, stack, *item);
 		break;
 
 	default:

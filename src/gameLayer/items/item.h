@@ -171,7 +171,7 @@ struct ItemStack
 void registerItems();
 extern std::unordered_map<ItemId, ItemDefinition> itemDatabase;
 
-ItemDefinition& getItem(int itemType);
+ItemDefinition* getItem(int itemType);
 bool            isItem(int itemType);
 
 // ─── Texture helpers ──────────────────────────────────────────────────────────

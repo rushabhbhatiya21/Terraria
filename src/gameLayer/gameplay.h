@@ -1,4 +1,5 @@
 #pragma once
+
 #include <vector>
 #include <string>
 #include <raylib.h>
@@ -17,7 +18,8 @@
 #include <inventory.h>
 #include <enemySpawner.h>
 
-#define CAMERA_ZOOM 30.0f
+#define CAMERA_ZOOM 20.0f
+#define MAX_LIGHT 4
 
 enum class DayPhase
 {
@@ -77,7 +79,7 @@ struct Gameplay
 	EntityHolder entityHolder;
 
 	// texture pack
-	char texturePackName[128] = "default";
+	char texturePackName[128] = "hdtextures";
 
 	// structure save
 	Structure copyStructure;
@@ -97,6 +99,7 @@ struct Gameplay
 	int lastScreenWidth = 0;
 	int lastScreenHeight = 0;
 	RenderTexture2D lightMask = { 0 };
+	std::vector<std::vector<int>> lightMap;
 
 	// world time
 	float worldTime = 0;
@@ -131,6 +134,8 @@ struct Gameplay
 
 	Rectangle getRecipeRectangle(float w, float h, Rectangle craftRectangle);
 	Rectangle getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle);
+
+	void floodFillLight(int x, int y, int offsetX, int offsetY, int value);
 
 	bool init();
 

@@ -7,9 +7,16 @@ std::unordered_map<ItemId, ItemDefinition> itemDatabase;
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
 
-ItemDefinition& getItem(ItemId itemId)
+ItemDefinition* getItem(ItemId itemId)
 {
-    return itemDatabase.at(itemId);
+    auto it = itemDatabase.find(itemId);
+
+    if (it != itemDatabase.end())
+    {
+        return&it->second;
+    }
+
+    return nullptr;
 }
 
 bool isItem(int itemType)

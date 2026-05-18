@@ -1,10 +1,17 @@
 -- Craft UI
+- add more items
 - make items scrollable
 
 -- Weapons
-- implement melee weapons
-- implement range weapons
-- weapon animation with physics
-- range projectile
-- hit pause
-- hit effect
+- range projectile - start working
+- implement useBlock to place block on map
+- fall damage for player and enemies both
+- update player hearts based on player health
+- enemies hurt player
+- implement melee weapons - done
+- weapon animation with physics - done
+- hit pause - done
+
+-- Effects
+- weapon hit effect
+- running trail based on block
