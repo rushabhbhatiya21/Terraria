@@ -45,7 +45,7 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 	changeStateTimer -= deltaTime;
 
 	// --- DEATH CHECK (highest priority, overrides everything) ---
-	if (life <= 0 && currentState != STATE_DEAD)
+	if (isDead() && currentState != STATE_DEAD)
 	{
 		enterState(STATE_DEAD, entityUpdateData);
 		return false;

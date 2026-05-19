@@ -4,6 +4,7 @@
 #include <raylib.h>
 #include <player.h>
 #include <shake.h>
+#include <entities/enemies/enemy.h>
 
 std::vector<MeleeAttack> meleeAttacks;
 
@@ -55,32 +56,35 @@ MeleeHitResult updateMeleeAttacks(
         }
 
         // collision against enemies
-        for (auto& enemy : enemies)
+        for (auto& e : enemies)
         {
-            if (enemy.second->getEntityType() != EntityType::EntityType_Enemy)
+            if (e.second->getEntityType() != EntityType::EntityType_Enemy)
                 continue;
 
-            if (enemy.second->life <= 0)
+            Enemy* enemy = dynamic_cast<Enemy*>(e.second.get());
+
+            if (enemy->life <= 0)
                 continue;
 
             Player* player = dynamic_cast<Player*>(attack.owner);
 
             if (player == nullptr) continue;
 
-            if (checkForHits(player->weaponBase, player->weaponTip, *enemy.second.get()))
+            if (checkForHits(player->weaponBase, player->weaponTip, *enemy))
             {
-                enemy.second->hit(attack.damage, attack.owner->getPosition());
-                enemy.second->hitStopTimer = 1.f;
-                player->hitStopTimer = .08f; // same duration, they freeze together
+                if (enemy->isAlive())
+                {
+                    enemy->hitStopTimer  = .1f;
+                    player->hitStopTimer = .1f; // same duration, they freeze together
+                }
 
-                // implement knockback later
-                // maybe implement knockback at enemy side and call it in hit to keep it clean
+                enemy->hit(attack.damage, attack.owner->getPosition());
 
                 // prevent multi-hit from same swing
                 attack.lifetime = 0.f;
 
                 result.hit = true;
-                result.positon = enemy.second->getPosition();
+                result.positon = enemy->getPosition();
                 result.damage = attack.damage;
                 return result;
             }

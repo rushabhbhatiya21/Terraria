@@ -36,8 +36,8 @@ struct Player : public Entity
 	void updateSwing(float deltaTime);
 	void updateAnimation(float deltaTime);
 
-	void renderTrailPass(float expand, unsigned char maxAlpha);
-	void renderTrail();
+	//void renderTrailPass(float expand, unsigned char maxAlpha);
+	//void renderTrail();
 
 	void setColliderSize()
 	{
@@ -50,7 +50,7 @@ struct Player : public Entity
 	float getMaxLife() { return 50; }
 
 	// implement later
-	void hit(float damage, Vector2 hitFromPosition, float redTimer = .5f) override
+	void hit(float damage, Vector2 hitFromPosition) override
 	{
 		life -= damage;
 	}

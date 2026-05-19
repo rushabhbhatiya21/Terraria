@@ -73,9 +73,19 @@ struct Enemy : public Entity
 		physics.velocity.y = -3.f; // small upward bump, feels more impactful
 	}
 
-	void hit(float damage, Vector2 hitFromPosition, float redTimer = .5f) override
+	bool isDead()
 	{
-		isRedTimer = redTimer;
+		return life <= 0;
+	}
+
+	bool isAlive()
+	{
+		return !isDead();
+	}
+
+	void hit(float damage, Vector2 hitFromPosition) override
+	{
+		isRedTimer = hitStopTimer;
 		life -= damage;
 		damageTaken = damage;
 		hurtTimer = 1;

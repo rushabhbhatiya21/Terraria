@@ -2,9 +2,9 @@
 #include <assetManager.h>
 #include <raymath.h>
 
-void DrawBackground::draw(float deltaTime, AssetManager& assetManager, Camera2D camera, Vector2 mapSize)
+void DrawBackground::draw(float deltaTime, AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor)
 {
-	auto drawBackground = [&](int type, float parallax, float opacity)
+	auto drawBackground = [&](int type, float parallax, float opacity, Color skyColor)
 		{
 			Texture bg = assetManager.forestBG;
 
@@ -69,17 +69,19 @@ void DrawBackground::draw(float deltaTime, AssetManager& assetManager, Camera2D 
 			Rectangle src = { 0,0,(float)bg.width,(float)bg.height };
 			Rectangle dest = { offX, offY, bgW, bhH };
 
+			skyColor.a = opacity * 255;
+
 			DrawTexturePro(
 				bg, 
 				src, 
 				dest, 
 				{ 0,0 }, 
 				0.f, 
-				{ 255 ,255 ,255 ,(unsigned char)(255 * opacity) }
+				skyColor
 			);
 		};
 
-	drawBackground(currentBackgroundType, 0.3f, 1.f);
+	drawBackground(currentBackgroundType, 0.3f, 1.f, skyColor);
 
 	// draw transition on top
 	transitionTime -= deltaTime;
@@ -87,7 +89,7 @@ void DrawBackground::draw(float deltaTime, AssetManager& assetManager, Camera2D 
 	{
 		float opacity = transitionTime;
 		if (opacity > 1) { opacity = 1; }
-		drawBackground(currentTransitionType, .3f, opacity);
+		drawBackground(currentTransitionType, .3f, opacity, skyColor);
 	}
 }
 

@@ -200,10 +200,7 @@ Rectangle Gameplay::getCraftRectangle(float w, float h)
 	return craftRectangle;
 }
 
-Rectangle Gameplay::getRecipeRectangle(
-	float w,
-	float h,
-	Rectangle craftRectangle)
+Rectangle Gameplay::getRecipeRectangle(float w, float h, Rectangle craftRectangle)
 {
 	Rectangle recipeRectangle = {};
 
@@ -223,11 +220,7 @@ Rectangle Gameplay::getRecipeRectangle(
 	return recipeRectangle;
 }
 
-Rectangle Gameplay::getIngredientsRectangle(
-	float w,
-	float h,
-	Rectangle craftRectangle,
-	Rectangle recipeRectangle)
+Rectangle Gameplay::getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle)
 {
 	Rectangle ingredientRectangle = {};
 
@@ -315,11 +308,12 @@ bool Gameplay::init()
 
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	//spawnZombie({ 25,60 });
+	spawnZombie({ 25,60 });
 	maxEnemyCount = 5;
 
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 
+	// for debug only
 	lifetime = 3;
 
 	std::ranlux24_base rng(std::random_device{}());
@@ -393,7 +387,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region clear background
 
-	ClearBackground(skyData.skyColor);
+	ClearBackground(BLACK);
 
 #pragma endregion
 
@@ -781,11 +775,11 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-//#pragma region handle blocks
-//
-//	updateBlock(gameMap, inventory);
-//
-//#pragma endregion
+#pragma region handle blocks
+
+	updateBlock(gameMap, inventory);
+
+#pragma endregion
 
 
 #pragma region draw background
@@ -811,19 +805,14 @@ bool Gameplay::update(AssetManager& assetManager)
 			deltaTime,
 			assetManager,
 			camera,
-			{ (float)gameMap.w, (float)gameMap.h }
+			{ (float)gameMap.w, (float)gameMap.h },
+			skyData.skyColor
 		);
 	}
 
 #pragma endregion
 
 	BeginMode2D(camera);
-
-#pragma region handle blocks
-
-	updateBlock(gameMap, inventory);
-
-#pragma endregion
 
 #pragma region draw world
 

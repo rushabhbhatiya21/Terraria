@@ -57,7 +57,7 @@ struct Entity
 
 	virtual void dropLoot(EntityHolder& entityHolder, int type) = 0;
 
-	virtual void hit(float damage, Vector2 hitFromPosition, float redTimer = .5f) = 0;
+	virtual void hit(float damage, Vector2 hitFromPosition) = 0;
 
 	virtual Json formatToJson() = 0;
 	virtual bool loadFromJson(Json& j) = 0;
