@@ -2,7 +2,7 @@
 #include <string>
 #include <unordered_map>
 #include <raylib.h>
-#include "items/itemIds.h"
+#include "itemIds.h"
 
 struct AssetManager;
 
@@ -36,6 +36,84 @@ enum class ArmorSlot
     BOOTS
 };
 
+enum class BlockType
+{
+    air = 0,
+    dirt,
+    grassBlock,
+    stone,
+    grass,
+    sand,
+    sandRuby,
+    sandStone,
+    woodPlank,
+    stoneBricks,
+    clay,
+    woodLog,
+    leaves,
+    copper,
+    iron,
+    gold,
+    copperBlock,
+    ironBlock,
+    goldBlock,
+    bricks,
+    snow,
+    ice,
+    rubyBlock,
+    platform,
+    workBench,
+    glass,
+    furnace,
+    painting,
+    sappling,
+    snowBlueRuby,
+    blueRubyBlock,
+    door,
+    jar,
+    table,
+    wordrobe,
+    bookShelf,
+    snowBricks,
+    iceTable,
+    iceWordrobe,
+    iceBookShelf,
+    icePlatform,
+    sandTable,
+    sandWordrobe,
+    sandBookShelf,
+    sandPlatform,
+    woodenChest,
+    iceChest,
+    sandChest,
+    boneChest,
+    boneBricks,
+    boneBench,
+    boneWordrobe,
+    boneBookShelf,
+    bonePlatform,
+    dirtWall,
+    stoneWall,
+    woodWall,
+    sandStoneWall,
+    brickWall,
+    glassWall,
+    copperBlockWall,
+    silverBlockWall,
+    goldBlockWall,
+    snowWall,
+    sandWall,
+    stoneBricksWall,
+    rubyBlockWall,
+    heroglyphWall,
+    blueRubyWall,
+    plankedWall,
+    snowBrickWall,
+    boneBrickWall,
+
+    BLOCKS_COUNT,
+};
+
 // ─── Stat blocks ──────────────────────────────────────────────────────────────
 
 struct WeaponData
@@ -64,6 +142,13 @@ struct ArmorData
     int       defense = 0;  // flat damage reduction
 };
 
+struct BlockData
+{
+    BlockType type = BlockType::air;
+    int       hp = 0;
+    int       bestTool = 0;
+};
+
 // ─── ItemDefinition ───────────────────────────────────────────────────────────
 
 struct ItemDefinition
@@ -82,6 +167,7 @@ struct ItemDefinition
         WeaponData     weapon;
         ConsumableData consumable;
         ArmorData      armor;
+        BlockData      block;
     };
 
     // ── Constructors ──────────────────────────────────────────────────────────
@@ -154,6 +240,18 @@ struct ItemDefinition
         d.consumable.healAmount = healAmount;
         d.consumable.manaAmount = manaAmount;
         d.isConsumable = true;
+        return d;
+    }
+
+    static ItemDefinition makeBlock(BlockType type, int hp, int bestTool, float useTime = 0.15f, int maxStack = 999)
+    {
+        ItemDefinition d;
+        d.category = ItemCategory::BLOCK;
+        d.maxStack = maxStack;
+        d.useTime = useTime;
+        d.block.type = type;
+        d.block.hp = hp;
+        d.block.bestTool = bestTool;
         return d;
     }
 };

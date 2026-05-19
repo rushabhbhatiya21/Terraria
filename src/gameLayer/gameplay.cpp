@@ -20,7 +20,8 @@
 #include <items/itemUse.h>
 
 #include <combat/melee.h>
-#include "combat/tool.h"
+#include <combat/tool.h>
+#include <combat/blockSpawn..h>
 
 #include "ui/popupText.h"
 
@@ -701,32 +702,32 @@ bool Gameplay::update(AssetManager& assetManager)
 			}
 		}
 
-		if (!insideInventoryMenu && !insideCraftingMenu)
-		{
-			if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
-			{
-				float magnitude = Vector2Distance(player.getPosition(), worldPos);
-				if (magnitude <= 5 || creative)
-				{
-					// place block only if its withing reach, 
-					// no existing blocks and 
-					// adjecent block exists
-					auto b = gameMap.getBlockSafe(blockX, blockY);
-					if (b && b->type == Block::air && gameMap.isAdjacentBlock(blockX, blockY))
-					{
-						for (auto& i : inventory.slots)
-						{
-							// check inventory to see if we have same type of item and have more than 0
-							if (creativeSelectedBlock == i.itemId && i.count > 0)
-							{
-								b->type = i.itemId;
-								i.count -= 1;
-							}
-						}
-					}
-				}
-			}
-		}
+		//if (!insideInventoryMenu && !insideCraftingMenu)
+		//{
+		//	if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
+		//	{
+		//		float magnitude = Vector2Distance(player.getPosition(), worldPos);
+		//		if (magnitude <= 5 || creative)
+		//		{
+		//			// place block only if its withing reach, 
+		//			// no existing blocks and 
+		//			// adjecent block exists
+		//			auto b = gameMap.getBlockSafe(blockX, blockY);
+		//			if (b && b->type == Block::air && gameMap.isAdjacentBlock(blockX, blockY))
+		//			{
+		//				for (auto& i : inventory.slots)
+		//				{
+		//					// check inventory to see if we have same type of item and have more than 0
+		//					if (creativeSelectedBlock == i.itemId && i.count > 0)
+		//					{
+		//						b->type = i.itemId;
+		//						i.count -= 1;
+		//					}
+		//				}
+		//			}
+		//		}
+		//	}
+		//}
 	}
 
 #pragma endregion
@@ -780,6 +781,13 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
+//#pragma region handle blocks
+//
+//	updateBlock(gameMap, inventory);
+//
+//#pragma endregion
+
+
 #pragma region draw background
 
 	// background
@@ -810,6 +818,12 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 	BeginMode2D(camera);
+
+#pragma region handle blocks
+
+	updateBlock(gameMap, inventory);
+
+#pragma endregion
 
 #pragma region draw world
 

@@ -43,6 +43,11 @@ Rectangle getTextureCoordinatesForItemType(int itemType)
     return getTextureAtlas(itemType - Items::firstItem, 0, 32, 32);
 }
 
+// Tool type IDs
+constexpr int TOOL_PICKAXE = 6001;
+constexpr int TOOL_AXE = 6002;
+constexpr int TOOL_HAMMER = 6003;
+
 // ─── Register ─────────────────────────────────────────────────────────────────
 //
 //  Tool power tiers:    wood=10  stone=14  copper=20  iron=28  gold=40
@@ -56,6 +61,117 @@ Rectangle getTextureCoordinatesForItemType(int itemType)
 void registerItems()
 {
     using D = ItemDefinition;
+
+    // ── Soil & terrain ──────────────────────────────────────────────────────
+    reg(Items::dirt, D::makeBlock(BlockType::dirt, 20, TOOL_PICKAXE));
+    reg(Items::grassBlock, D::makeBlock(BlockType::grassBlock, 20, TOOL_PICKAXE));
+    reg(Items::stone, D::makeBlock(BlockType::stone, 60, TOOL_PICKAXE));
+    reg(Items::grass, D::makeBlock(BlockType::grass, 5, TOOL_AXE));
+    reg(Items::sand, D::makeBlock(BlockType::sand, 15, TOOL_PICKAXE));
+    reg(Items::sandRuby, D::makeBlock(BlockType::sandRuby, 80, TOOL_PICKAXE));
+    reg(Items::sandStone, D::makeBlock(BlockType::sandStone, 55, TOOL_PICKAXE));
+
+    // ── Wood & planks ───────────────────────────────────────────────────────
+    reg(Items::woodPlank, D::makeBlock(BlockType::woodPlank, 35, TOOL_AXE));
+
+    // ── Stone & brick ───────────────────────────────────────────────────────
+    reg(Items::stoneBricks, D::makeBlock(BlockType::stoneBricks, 70, TOOL_HAMMER));
+
+    // ── Soil (cont.) ────────────────────────────────────────────────────────
+    reg(Items::clay, D::makeBlock(BlockType::clay, 25, TOOL_PICKAXE));
+
+    // ── Wood (cont.) ────────────────────────────────────────────────────────
+    reg(Items::woodLog, D::makeBlock(BlockType::woodLog, 40, TOOL_AXE));
+    reg(Items::leaves, D::makeBlock(BlockType::leaves, 5, TOOL_AXE));
+
+    // ── Ores ────────────────────────────────────────────────────────────────
+    reg(Items::copper, D::makeBlock(BlockType::copper, 60, TOOL_PICKAXE));
+    reg(Items::iron, D::makeBlock(BlockType::iron, 80, TOOL_PICKAXE));
+    reg(Items::gold, D::makeBlock(BlockType::gold, 100, TOOL_PICKAXE));
+
+    // ── Ore blocks ──────────────────────────────────────────────────────────
+    reg(Items::copperBlock, D::makeBlock(BlockType::copperBlock, 70, TOOL_PICKAXE));
+    reg(Items::ironBlock, D::makeBlock(BlockType::ironBlock, 90, TOOL_PICKAXE));
+    reg(Items::goldBlock, D::makeBlock(BlockType::goldBlock, 110, TOOL_PICKAXE));
+
+    // ── Brick ───────────────────────────────────────────────────────────────
+    reg(Items::bricks, D::makeBlock(BlockType::bricks, 65, TOOL_HAMMER));
+
+    // ── Snow & ice ──────────────────────────────────────────────────────────
+    reg(Items::snow, D::makeBlock(BlockType::snow, 15, TOOL_PICKAXE));
+    reg(Items::ice, D::makeBlock(BlockType::ice, 20, TOOL_PICKAXE));
+
+    // ── Ore blocks (cont.) ──────────────────────────────────────────────────
+    reg(Items::rubyBlock, D::makeBlock(BlockType::rubyBlock, 120, TOOL_PICKAXE));
+
+    // ── Furniture / platforms ───────────────────────────────────────────────
+    reg(Items::platform, D::makeBlock(BlockType::platform, 20, TOOL_AXE));
+    reg(Items::workBench, D::makeBlock(BlockType::workBench, 30, TOOL_AXE));
+
+    // ── Special ─────────────────────────────────────────────────────────────
+    reg(Items::glass, D::makeBlock(BlockType::glass, 10, TOOL_HAMMER));
+    reg(Items::furnace, D::makeBlock(BlockType::furnace, 50, TOOL_PICKAXE));
+    reg(Items::painting, D::makeBlock(BlockType::painting, 10, TOOL_HAMMER));
+
+    // ── Plants ──────────────────────────────────────────────────────────────
+    reg(Items::sappling, D::makeBlock(BlockType::sappling, 5, TOOL_AXE));
+
+    // ── Ore blocks (cont.) ──────────────────────────────────────────────────
+    reg(Items::snowBlueRuby, D::makeBlock(BlockType::snowBlueRuby, 80, TOOL_PICKAXE));
+    reg(Items::blueRubyBlock, D::makeBlock(BlockType::blueRubyBlock, 130, TOOL_PICKAXE));
+
+    // ── Furniture ───────────────────────────────────────────────────────────
+    reg(Items::door, D::makeBlock(BlockType::door, 30, TOOL_AXE, 1));
+    reg(Items::jar, D::makeBlock(BlockType::jar, 10, TOOL_HAMMER));
+    reg(Items::table, D::makeBlock(BlockType::table, 30, TOOL_AXE));
+    reg(Items::wordrobe, D::makeBlock(BlockType::wordrobe, 35, TOOL_AXE));
+    reg(Items::bookShelf, D::makeBlock(BlockType::bookShelf, 30, TOOL_AXE));
+
+    // ── Snow brick & furniture ──────────────────────────────────────────────
+    reg(Items::snowBricks, D::makeBlock(BlockType::snowBricks, 70, TOOL_HAMMER));
+    reg(Items::iceTable, D::makeBlock(BlockType::iceTable, 30, TOOL_AXE));
+    reg(Items::iceWordrobe, D::makeBlock(BlockType::iceWordrobe, 35, TOOL_AXE));
+    reg(Items::iceBookShelf, D::makeBlock(BlockType::iceBookShelf, 30, TOOL_AXE));
+    reg(Items::icePlatform, D::makeBlock(BlockType::icePlatform, 20, TOOL_AXE));
+
+    // ── Sand furniture ──────────────────────────────────────────────────────
+    reg(Items::sandTable, D::makeBlock(BlockType::sandTable, 30, TOOL_AXE));
+    reg(Items::sandWordrobe, D::makeBlock(BlockType::sandWordrobe, 35, TOOL_AXE));
+    reg(Items::sandBookShelf, D::makeBlock(BlockType::sandBookShelf, 30, TOOL_AXE));
+    reg(Items::sandPlatform, D::makeBlock(BlockType::sandPlatform, 20, TOOL_AXE));
+
+    // ── Chests ──────────────────────────────────────────────────────────────
+    reg(Items::woodenChest, D::makeBlock(BlockType::woodenChest, 40, TOOL_AXE, 1));
+    reg(Items::iceChest, D::makeBlock(BlockType::iceChest, 40, TOOL_AXE, 1));
+    reg(Items::sandChest, D::makeBlock(BlockType::sandChest, 40, TOOL_AXE, 1));
+    reg(Items::boneChest, D::makeBlock(BlockType::boneChest, 40, TOOL_AXE, 1));
+
+    // ── Bone set ────────────────────────────────────────────────────────────
+    reg(Items::boneBricks, D::makeBlock(BlockType::boneBricks, 75, TOOL_HAMMER));
+    reg(Items::boneBench, D::makeBlock(BlockType::boneBench, 30, TOOL_AXE));
+    reg(Items::boneWordrobe, D::makeBlock(BlockType::boneWordrobe, 35, TOOL_AXE));
+    reg(Items::boneBookShelf, D::makeBlock(BlockType::boneBookShelf, 30, TOOL_AXE));
+    reg(Items::bonePlatform, D::makeBlock(BlockType::bonePlatform, 20, TOOL_AXE));
+
+    // ── Walls (all broken by hammer) ────────────────────────────────────────
+    reg(Items::dirtWall, D::makeBlock(BlockType::dirtWall, 12, TOOL_HAMMER));
+    reg(Items::stoneWall, D::makeBlock(BlockType::stoneWall, 30, TOOL_HAMMER));
+    reg(Items::woodWall, D::makeBlock(BlockType::woodWall, 20, TOOL_HAMMER));
+    reg(Items::sandStoneWall, D::makeBlock(BlockType::sandStoneWall, 30, TOOL_HAMMER));
+    reg(Items::brickWall, D::makeBlock(BlockType::brickWall, 35, TOOL_HAMMER));
+    reg(Items::glassWall, D::makeBlock(BlockType::glassWall, 8, TOOL_HAMMER));
+    reg(Items::copperBlockWall, D::makeBlock(BlockType::copperBlockWall, 40, TOOL_HAMMER));
+    reg(Items::silverBlockWall, D::makeBlock(BlockType::silverBlockWall, 45, TOOL_HAMMER));
+    reg(Items::goldBlockWall, D::makeBlock(BlockType::goldBlockWall, 55, TOOL_HAMMER));
+    reg(Items::snowWall, D::makeBlock(BlockType::snowWall, 20, TOOL_HAMMER));
+    reg(Items::sandWall, D::makeBlock(BlockType::sandWall, 25, TOOL_HAMMER));
+    reg(Items::stoneBricksWall, D::makeBlock(BlockType::stoneBricksWall, 35, TOOL_HAMMER));
+    reg(Items::rubyBlockWall, D::makeBlock(BlockType::rubyBlockWall, 55, TOOL_HAMMER));
+    reg(Items::heroglyphWall, D::makeBlock(BlockType::heroglyphWall, 60, TOOL_HAMMER));
+    reg(Items::blueRubyWall, D::makeBlock(BlockType::blueRubyWall, 60, TOOL_HAMMER));
+    reg(Items::plankedWall, D::makeBlock(BlockType::plankedWall, 20, TOOL_HAMMER));
+    reg(Items::snowBrickWall, D::makeBlock(BlockType::snowBrickWall, 30, TOOL_HAMMER));
+    reg(Items::boneBrickWall, D::makeBlock(BlockType::boneBrickWall, 40, TOOL_HAMMER));
 
     // ── Tools ─────────────────────────────────────────────────────────────────
     reg(Items::woodPickaxe, D::makeTool(ToolType::PICKAXE, 10, 0.7f, 3.2f));

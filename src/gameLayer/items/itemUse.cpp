@@ -2,6 +2,7 @@
 #include "items/itemUse.h"
 #include <combat/melee.h>
 #include <combat/tool.h>
+#include <combat/blockSpawn..h>
 #include <player.h>
 
 void useItem(Player& player, ItemStack& stack, Vector2 mouseWorldPos)
@@ -70,8 +71,8 @@ void useTool(Player& player, const ItemDefinition& item, Vector2 mouseWorldPos)
 
 void useBlock(Player& player, const ItemDefinition& item, Vector2 mouseWorldPos)
 {
-	// todo implement
-	printf("todo - implement useBlock\n");
+	const BlockData& block = item.block;
+	spawnBlock(mouseWorldPos, player.getPosition(), (int)block.type);
 }
 
 void useConsumable(Player& player, ItemStack& stack, const ItemDefinition& item)

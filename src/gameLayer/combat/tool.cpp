@@ -45,6 +45,7 @@ ToolHitResult updateToolSwing(float deltatime, GameMap& gameMap)
 
 		if (dist <= swing.range)
 		{
+			// todo: if best tool, does double damage
 			// hit block
 			b->hp -= swing.power;
 
