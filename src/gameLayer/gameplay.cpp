@@ -273,16 +273,18 @@ static float tileNoise(int x, int y)
 bool Gameplay::init()
 {
 	double loadStart = GetTime();
-	int w = 900, h = 500;
 
+	int w = 900, h = 500;
 	backgroundMap.create(w, h);
 	generateWorld(gameMap);
 	registerItems();
 
+	// cam init
 	camera.target = { 20, 120 };
 	camera.rotation = 0.f;
 	camera.zoom = CAMERA_ZOOM;
 
+	// coords for light
 	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, camera);
 	Vector2 bottomRightView = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, camera);
 
@@ -297,8 +299,10 @@ bool Gameplay::init()
 	startYView = Clamp((float)startYView, 0.f, (float)gameMap.h - 1);
 	endYView = Clamp((float)endYView, 0.f, (float)gameMap.h - 1);
 
+	// light
 	lightMap.assign(endXView - startXView + 1, std::vector<int>(endYView - startYView + 1, -1));
 
+	// player spawn
 	player.teleport({ 20, 60 });
 	player.physics.transform.w = 0.9f;
 	player.physics.transform.h = 1.8f;
@@ -306,19 +310,23 @@ bool Gameplay::init()
 	// Light mask render texture
 	lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
 
+	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
 	spawnZombie({ 25,60 });
 	maxEnemyCount = 5;
 
+	// start item in inventory
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 
 	// for debug only
 	lifetime = 3;
 
+	// start day at random time
 	std::ranlux24_base rng(std::random_device{}());
 	float randStartTime = getRandomFloat(rng, 0.375f, 0.75f);
 	worldTime = randStartTime * FULL_DAY_LENGTH;
+
 	double loadEnd = GetTime();
 	TraceLog(LOG_INFO, "Load time: %.3f seconds", loadEnd - loadStart);
 	return true;

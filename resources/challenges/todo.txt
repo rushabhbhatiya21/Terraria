@@ -8,6 +8,7 @@
 - fall damage for player and enemies both
 - update player hearts based on player health
 - enemies hurt player
+- update enemy behaviour
 - add more enemies, make them throw ice balls, fire balls, lightning balls, etc. 
 - status effects implementation.
 
