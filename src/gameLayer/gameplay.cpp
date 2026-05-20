@@ -814,7 +814,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	BeginMode2D(camera);
 
-#pragma region draw world
+#pragma region calculate world coords
 
 	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, camera);
 	Vector2 bottomRightView = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, camera);
@@ -830,6 +830,11 @@ bool Gameplay::update(AssetManager& assetManager)
 	startYView = Clamp((float)startYView, 0.f, (float)gameMap.h - 1);
 	endYView = Clamp((float)endYView, 0.f, (float)gameMap.h - 1);
 
+#pragma endregion
+
+
+#pragma region enemy spawner
+
 	enemySpawner.enemySpawnTimer -= deltaTime;
 
 	int enemyCount = 0;
@@ -842,11 +847,26 @@ bool Gameplay::update(AssetManager& assetManager)
 		}
 	}
 
+	// spawn more enemies at night
+	if (isNight(t))
+	{
+		maxEnemyCount = getRandomInt(rng, 10, 15);
+	}
+	else
+	{
+		maxEnemyCount = getRandomInt(rng, 5, 8);
+	}
+
 	if (enemySpawner.enemySpawnTimer <= 0 && enemyCount < maxEnemyCount)
 	{
 		spawnEnemy(entityHolder, gameMap, rng, startXView, endXView, startYView, endYView);
 		enemySpawner.enemySpawnTimer = 2;
 	}
+
+#pragma endregion
+
+
+#pragma region light flood fill
 
 	// create light map
 	lightMap.assign(endXView - startXView + 1, std::vector<int>(endYView - startYView + 1, -1));
@@ -854,6 +874,11 @@ bool Gameplay::update(AssetManager& assetManager)
 	int localY = (int)player.getPosition().y - startYView;
 
 	floodFillLight(localX, localY, startXView, startYView, MAX_LIGHT);
+
+#pragma endregion
+
+
+#pragma region draw world
 
 	for (int y = startYView; y <= endYView; y++)
 	{
