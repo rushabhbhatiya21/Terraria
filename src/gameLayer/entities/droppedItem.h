@@ -7,6 +7,7 @@ struct DroppedItem : public Entity
 	DroppedItem()
 	{
 		setColliderSize();
+		isAlive = true;
 	}
 
 	int itemType = 0;
@@ -14,7 +15,7 @@ struct DroppedItem : public Entity
 
 	void render(AssetManager& assetManager) override;
 
-	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
+	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
 	void dropLoot(EntityHolder& entityHolder, int type) override;
 

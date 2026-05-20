@@ -115,42 +115,17 @@ WorldTimeClock Gameplay::getWorldTimeClock(float t)
 	return WorldTimeClock{ h, m, 0 };
 }
 
-void Gameplay::spawnSlime(Vector2 position)
+void Gameplay::spawnDroppedItem(Vector2 position, int type)
 {
-	Slime slime;
-	slime.teleport(position);
-
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
-	entityHolder.entities[id] = std::make_unique<Slime>(slime);
-}
+	auto item = std::make_unique<DroppedItem>();
+	item->teleport(position);
+	item->itemType = type;
+	item->physics.velocity.y = -3.f;
 
-void Gameplay::spawnDesertSlime(Vector2 position)
-{
-	DesertSlime desertSlime;
-	desertSlime.teleport(position);
-
-	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
-	entityHolder.entities[id] = std::make_unique<DesertSlime>(desertSlime);
-}
-
-void Gameplay::spawnZombie(Vector2 position)
-{
-	Zombie zombie;
-	zombie.teleport(position);
-
-	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
-	entityHolder.entities[id] = std::make_unique<Zombie>(zombie);
-}
-
-void Gameplay::spawnDroppedItem(Vector2 positon, int type)
-{
-	DroppedItem droppedItem;
-	droppedItem.teleport(positon);
-	droppedItem.itemType = type;
-	droppedItem.physics.velocity.y = -3.f;
-
-	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
-	entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+	DroppedItem* itemPtr = item.get();
+	entityHolder.entities[id] = std::move(item);
+	entityHolder.droppedItems.push_back(itemPtr);
 }
 
 Rectangle Gameplay::getInventoryRectangle(float w, float h)
@@ -313,7 +288,7 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnZombie({ 25,60 });
+	spawnEnemyHelper<Zombie>({ 25,60 });
 	maxEnemyCount = 5;
 
 	// start item in inventory
@@ -501,7 +476,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	player.update(deltaTime, EntityUpdateData
 		{
-			player.getPosition(),
+			player,
 			rng,
 			entityHolder,
 			inventory,
@@ -558,29 +533,15 @@ bool Gameplay::update(AssetManager& assetManager)
 	float groundDistance = 0;
 	bool shouldStepUp = false;
 
+	// cleanup before fresh update
+	entityHolder.cleanup();
+
 	// update all entities
 	for (auto it = entityHolder.entities.begin(); it != entityHolder.entities.end();)
 	{
-		bool shouldKill = false;
-
-		// dropped item specific logic
-		if (it->second->getEntityType() == EntityType::EntityType_DroppedItem)
-		{
-			if (it->second->physics.transform.intersectTransform(player.physics.transform))
-			{
-				DroppedItem* d = reinterpret_cast<DroppedItem*>(it->second.get());
-				ItemStack itemStack
-				{
-					d->itemType,
-					d->itemCounter
-				};
-				shouldKill = !inventory.storeItem(itemStack);
-			}
-		}
-
 		EntityUpdateData entityUpdateData
 		{
-			player.getPosition(),
+			player,
 			rng,
 			entityHolder,
 			inventory,
@@ -588,16 +549,10 @@ bool Gameplay::update(AssetManager& assetManager)
 			it->first
 		};
 
-
+		// if update false, kill entity
 		if (!it->second->update(deltaTime, entityUpdateData))
 		{
-			shouldKill = true;
-		}
-
-		if (shouldKill)
-		{
-			// erase returns next valid iterator
-			it = entityHolder.entities.erase(it);
+			it->second->isAlive = false;
 		}
 		else
 		{
@@ -737,7 +692,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle melee attacks
 
-	MeleeHitResult meleeResult = updateMeleeAttacks(deltaTime, entityHolder.entities);
+	MeleeHitResult meleeResult = updateMeleeAttacks(deltaTime, entityHolder.enemies);
 
 	if (meleeResult.hit)
 	{
@@ -845,15 +800,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	enemySpawner.enemySpawnTimer -= deltaTime;
 
-	int enemyCount = 0;
-
-	for (auto& [id, entity] : entityHolder.entities)
-	{
-		if (entity->getEntityType() == EntityType::EntityType_Enemy)
-		{
-			enemyCount++;
-		}
-	}
+	int enemyCount = entityHolder.enemies.size();
 
 	// spawn more enemies at night
 	if (isNight(t))
@@ -864,6 +811,8 @@ bool Gameplay::update(AssetManager& assetManager)
 	{
 		maxEnemyCount = getRandomInt(rng, 5, 8);
 	}
+
+	//maxEnemyCount = 5;
 
 	if (enemySpawner.enemySpawnTimer <= 0 && enemyCount < maxEnemyCount)
 	{
@@ -1012,13 +961,18 @@ bool Gameplay::update(AssetManager& assetManager)
 		//	e.second->physics.transform.h,
 		//	PURPLE
 		//);
+	}
 
-		if (e.second->getEntityType() == EntityType_Enemy)
-		{
-			Enemy* enemy = dynamic_cast<Enemy*>(e.second.get());
-			enemy->renderHealthBar(assetManager);
-			enemy->updateHealthBar(deltaTime);
-		}
+#pragma endregion
+
+
+#pragma region enemy health bars
+
+
+	for (auto& e : entityHolder.enemies)
+	{
+		e->renderHealthBar(assetManager);
+		e->updateHealthBar(deltaTime);
 	}
 
 #pragma endregion
@@ -1553,7 +1507,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		if (ImGui::Button("Spawn slime"))
 		{
-			spawnSlime({ 18,60 });
+			spawnEnemyHelper<Slime>({ 18,60 });
 		}
 
 		ImGui::InputText(("Texture Pack"), texturePackName, sizeof(texturePackName));

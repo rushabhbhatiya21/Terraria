@@ -7,6 +7,7 @@
 #include <unordered_map>
 #include <raylib.h>
 
+struct Enemy;
 struct Entity;
 
 struct MeleeHitResult
@@ -45,9 +46,9 @@ void spawnMeleeAttack(
 
 MeleeHitResult updateMeleeAttacks(
     float deltaTime,
-    std::unordered_map<std::uint64_t, std::unique_ptr<Entity>>& enemies
+    std::vector<Enemy*>& enemies
 );
 
-bool checkForHits(Vector2 base, Vector2 tip, Entity& enemy);
+bool checkForHits(Vector2 base, Vector2 tip, Enemy& enemy);
 
 void drawMeleeAttacks();

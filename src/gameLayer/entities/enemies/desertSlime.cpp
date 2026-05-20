@@ -4,6 +4,7 @@
 #include <helper.h>
 #include <randomStuff.h>
 #include <entityHolder.h>
+#include <player.h>
 
 void DesertSlime::render(AssetManager& assetManager)
 {
@@ -21,19 +22,19 @@ void DesertSlime::render(AssetManager& assetManager)
 	);
 }
 
-bool DesertSlime::update(float deltaTime, EntityUpdateData entityUpdateData)
+bool DesertSlime::update(float deltaTime, EntityUpdateData& data)
 {
 	changeStateTimer -= deltaTime;
 
 	if (changeStateTimer < 0)
 	{
-		changeStateTimer = getRandomFloat(entityUpdateData.rng, 1, 7);
+		changeStateTimer = getRandomFloat(data.rng, 1, 7);
 
-		float distance = Vector2Distance(getPosition(), entityUpdateData.playerPosition);
+		float distance = Vector2Distance(getPosition(), data.player.getPosition());
 
 		if (distance < 20.f)
 		{
-			if (getRandomChance(entityUpdateData.rng, 0.8f))
+			if (getRandomChance(data.rng, 0.8f))
 			{
 				currentState = STATE_CHASING;
 			}
@@ -65,25 +66,25 @@ bool DesertSlime::update(float deltaTime, EntityUpdateData entityUpdateData)
 	case STATE_WONDERING:
 		if (jumpTimer < 0)
 		{
-			jumpTimer = getRandomFloat(entityUpdateData.rng, 3, 12);
+			jumpTimer = getRandomFloat(data.rng, 3, 12);
 			physics.jump(10);
-			moveSpeed = getRandomFloat(entityUpdateData.rng, -7, 7);
+			moveSpeed = getRandomFloat(data.rng, -7, 7);
 		}
 		break;
 
 	case STATE_CHASING:
 		if (jumpTimer < 0)
 		{
-			jumpTimer = getRandomFloat(entityUpdateData.rng, 2, 7);
+			jumpTimer = getRandomFloat(data.rng, 2, 7);
 			physics.jump(10);
 
-			if (entityUpdateData.playerPosition.x > getPosition().x)
+			if (data.player.getPosition().x > getPosition().x)
 			{
-				moveSpeed = getRandomFloat(entityUpdateData.rng, 1, 7);
+				moveSpeed = getRandomFloat(data.rng, 1, 7);
 			}
 			else
 			{
-				moveSpeed = -getRandomFloat(entityUpdateData.rng, 1, 7);
+				moveSpeed = -getRandomFloat(data.rng, 1, 7);
 			}
 		}
 		break;

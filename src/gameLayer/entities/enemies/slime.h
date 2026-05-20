@@ -11,7 +11,7 @@ struct Slime : public Enemy
 
 	void render(AssetManager& assetManager) override;
 
-	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
+	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
 	void dropLoot(EntityHolder& entityHolder, int type) override;
 

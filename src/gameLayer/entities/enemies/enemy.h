@@ -14,10 +14,10 @@ enum EnemyType
 
 struct Enemy : public Entity
 {
-	Enemy()
-	{
-		setColliderSize();
-	}
+	//Enemy()
+	//{
+	//	isAlive = true;
+	//}
 
 	EntityAnimation animations;
 
@@ -36,7 +36,7 @@ struct Enemy : public Entity
 
 	virtual void render(AssetManager& assetManager) override = 0;
 
-	virtual bool update(float deltaTime, EntityUpdateData entityUpdateData) override = 0;
+	virtual bool update(float deltaTime, EntityUpdateData& entityUpdateData) override = 0;
 
 	virtual void dropLoot(EntityHolder& entityHolder, int type) override = 0;
 
@@ -58,12 +58,6 @@ struct Enemy : public Entity
 
 	virtual float getMaxLife() override = 0;
 
-	void setColliderSize()
-	{
-		physics.transform.w = 0.9f;
-		physics.transform.h = 1.8f;
-	}
-
 	void knockback(float damage, Vector2 hitFromPosition, float knockbackForce = 3.f)
 	{
 		// Push away from whoever hit us
@@ -71,16 +65,6 @@ struct Enemy : public Entity
 
 		physics.velocity.x = direction * knockbackForce;
 		physics.velocity.y = -3.f; // small upward bump, feels more impactful
-	}
-
-	bool isDead()
-	{
-		return life <= 0;
-	}
-
-	bool isAlive()
-	{
-		return !isDead();
 	}
 
 	void hit(float damage, Vector2 hitFromPosition) override

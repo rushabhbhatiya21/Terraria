@@ -6,6 +6,7 @@
 #include <assetManager.h>
 #include <helper.h>
 #include <entityHolder.h>
+#include <player.h>
 
 void Zombie::render(AssetManager& assetManager)
 {
@@ -30,7 +31,7 @@ void Zombie::render(AssetManager& assetManager)
 	);
 }
 
-bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
+bool Zombie::update(float deltaTime, EntityUpdateData& data)
 {
 	// --- HITSTOP ---
 	if (hitStopTimer > 0)
@@ -45,20 +46,20 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 	changeStateTimer -= deltaTime;
 
 	// --- DEATH CHECK (highest priority, overrides everything) ---
-	if (isDead() && currentState != STATE_DEAD)
+	if (!isAlive && currentState != STATE_DEAD)
 	{
-		enterState(STATE_DEAD, entityUpdateData);
+		enterState(STATE_DEAD, data);
 		return false;
 	}
 
 	if (currentState == STATE_DEAD) return false;
 
 	// --- PERCEPTION ---
-	Vector2 toPlayer = entityUpdateData.playerPosition - getPosition();
+	Vector2 toPlayer = data.player.getPosition() - getPosition();
 	float   distToPlayer = Vector2Length(toPlayer);
 	bool    playerInSight = distToPlayer < SIGHT_RANGE;
 	bool    playerInAttackRange = distToPlayer < ATTACK_RANGE;
-	bool    isOnEdge = isOnLedge(entityUpdateData.gameMap);
+	bool    isOnEdge = isOnLedge(data.gameMap);
 
 	// --- STATE TRANSITIONS ---
 	int previousState = currentState;
@@ -112,7 +113,7 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 		else if (changeStateTimer <= 0) // reuse timer as attack cooldown
 		{
 			changeStateTimer = ATTACK_COOLDOWN;
-			doAttack(entityUpdateData);
+			doAttack(data);
 		}
 		break;
 
@@ -130,7 +131,7 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 
 	bool justEnteredState = (previousState != currentState);
 	if (justEnteredState)
-		enterState(currentState, entityUpdateData);
+		enterState(currentState, data);
 
 	// --- MOVEMENT ---
 	switch (currentState)
@@ -162,7 +163,7 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 	{
 		getPosition().x += moveSpeed * deltaTime;
 
-		if (shouldStepUp(entityUpdateData.playerPosition, entityUpdateData.gameMap))
+		if (shouldStepUp(data.player.getPosition(), data.gameMap))
 			physics.jump(10.f);
 	}
 
@@ -181,7 +182,7 @@ bool Zombie::update(float deltaTime, EntityUpdateData entityUpdateData)
 }
 
 // Called exactly once when transitioning INTO a new state
-void Zombie::enterState(int newState, EntityUpdateData& entityUpdateData)
+void Zombie::enterState(int newState, EntityUpdateData& data)
 {
 	switch (newState)
 	{
@@ -191,8 +192,8 @@ void Zombie::enterState(int newState, EntityUpdateData& entityUpdateData)
 
 	case STATE_WONDERING:
 	{
-		Vector2 toPlayer = entityUpdateData.playerPosition - getPosition();
-		bool onEdge = isOnLedge(entityUpdateData.gameMap);
+		Vector2 toPlayer = data.player.getPosition() - getPosition();
+		bool onEdge = isOnLedge(data.gameMap);
 
 		if (onEdge)
 		{
@@ -202,7 +203,7 @@ void Zombie::enterState(int newState, EntityUpdateData& entityUpdateData)
 		}
 		else
 		{
-			moveSpeed = getRandomChance(entityUpdateData.rng, 0.5f) ? WANDER_SPEED : -WANDER_SPEED;
+			moveSpeed = getRandomChance(data.rng, 0.5f) ? WANDER_SPEED : -WANDER_SPEED;
 			changeStateTimer = WANDER_INTERVAL;
 		}
 		break;
@@ -221,7 +222,7 @@ void Zombie::enterState(int newState, EntityUpdateData& entityUpdateData)
 
 	case STATE_DEAD:
 		moveSpeed = 0.f;
-		dropLoot(entityUpdateData.entityHolder, Block::boneChest);
+		dropLoot(data.entityHolder, Block::boneChest);
 		animations.setAnimation(ANIM_DEAD);
 		break;
 

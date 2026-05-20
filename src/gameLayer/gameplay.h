@@ -18,8 +18,8 @@
 #include <inventory.h>
 #include <enemySpawner.h>
 
-#define CAMERA_ZOOM 20.0f
-#define MAX_LIGHT 4
+#define CAMERA_ZOOM 30.0f
+#define MAX_LIGHT 5
 
 enum class DayPhase
 {
@@ -118,13 +118,11 @@ struct Gameplay
 	float getDayPercent(float t);
 	WorldTimeClock getWorldTimeClock(float t);
 
-	void spawnSlime(Vector2 position);
-
-	void spawnDesertSlime(Vector2 position);
+	//void spawnDesertSlime(Vector2 position);
 
 	//void spawnEvilEye(Vector2 position);
 
-	void spawnZombie(Vector2 position);
+	//void spawnZombie(Vector2 position);
 
 	void spawnDroppedItem(Vector2 positon, int type);
 
@@ -136,6 +134,17 @@ struct Gameplay
 	Rectangle getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle);
 
 	void floodFillLight(int x, int y, int offsetX, int offsetY, int value);
+
+	template<typename T>
+	void spawnEnemyHelper(Vector2 position)
+	{
+		auto id = entityHolder.idHolder.getEntityIdAndIncreament();
+		auto enemy = std::make_unique<T>();
+		enemy->teleport(position);
+		Enemy* enemyPtr = enemy.get();
+		entityHolder.entities[id] = std::move(enemy);
+		entityHolder.enemies.push_back(enemyPtr);
+	}
 
 	bool init();
 

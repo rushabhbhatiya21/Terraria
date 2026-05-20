@@ -5,6 +5,7 @@
 #include <assetManager.h>
 #include <entityHolder.h>
 #include <items/blocks.h>
+#include <player.h>
 
 void Slime::render(AssetManager& assetManager)
 {
@@ -25,7 +26,7 @@ void Slime::render(AssetManager& assetManager)
 	);
 }
 
-bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
+bool Slime::update(float deltaTime, EntityUpdateData& data)
 {
 	if (isRedTimer > 0)
 	{
@@ -41,13 +42,13 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 
 	if (changeStateTimer < 0)
 	{
-		changeStateTimer = getRandomFloat(entityUpdateData.rng, 1, 7);
+		changeStateTimer = getRandomFloat(data.rng, 1, 7);
 
-		float distance = Vector2Distance(getPosition(), entityUpdateData.playerPosition);
+		float distance = Vector2Distance(getPosition(), data.player.getPosition());
 
 		if (distance < 20.f)
 		{
-			if (getRandomChance(entityUpdateData.rng, 0.8f))
+			if (getRandomChance(data.rng, 0.8f))
 			{
 				currentState = STATE_CHASING;
 			}
@@ -79,25 +80,25 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 		case STATE_WONDERING:
 			if (jumpTimer < 0)
 			{
-				jumpTimer = getRandomFloat(entityUpdateData.rng, 3, 12);
+				jumpTimer = getRandomFloat(data.rng, 3, 12);
 				physics.jump(10);
-				moveSpeed = getRandomFloat(entityUpdateData.rng, -7, 7);
+				moveSpeed = getRandomFloat(data.rng, -7, 7);
 			}
 			break;
 
 		case STATE_CHASING:
 			if (jumpTimer < 0)
 			{
-				jumpTimer = getRandomFloat(entityUpdateData.rng, 2, 7);
+				jumpTimer = getRandomFloat(data.rng, 2, 7);
 				physics.jump(7);
 
-				if (entityUpdateData.playerPosition.x > getPosition().x)
+				if (data.player.getPosition().x > getPosition().x)
 				{
-					moveSpeed = getRandomFloat(entityUpdateData.rng, 1, 7);
+					moveSpeed = getRandomFloat(data.rng, 1, 7);
 				}
 				else
 				{
-					moveSpeed = -getRandomFloat(entityUpdateData.rng, 1, 7);
+					moveSpeed = -getRandomFloat(data.rng, 1, 7);
 				}
 			}
 			break;
@@ -105,7 +106,7 @@ bool Slime::update(float deltaTime, EntityUpdateData entityUpdateData)
 		case STATE_DEAD:
 		{
 			// drop loop
-			dropLoot(entityUpdateData.entityHolder, Block::woodenChest);
+			dropLoot(data.entityHolder, Block::woodenChest);
 			return false;
 		}
 
@@ -134,6 +135,7 @@ void Slime::dropLoot(EntityHolder& entityHolder, int type)
 	droppedItem.physics.velocity.y = -3.f;
 
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
+	entityHolder.droppedItems.push_back(&droppedItem);
 	entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
 }
 

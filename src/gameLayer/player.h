@@ -7,8 +7,8 @@ struct Player : public Entity
 {
 	Player()
 	{
+		isAlive = true;
 		setColliderSize();
-
 		life = getMaxLife();
 	}
 
@@ -23,7 +23,7 @@ struct Player : public Entity
 
 	void render(AssetManager& assetManager) override;
 
-	bool update(float deltaTime, EntityUpdateData entityUpdateData) override;
+	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
 	void dropLoot(EntityHolder& entityHolder, int type) override;
 	

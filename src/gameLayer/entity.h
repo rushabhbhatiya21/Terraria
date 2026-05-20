@@ -3,6 +3,7 @@
 #include <random>
 #include <nlohmann/json.hpp>
 
+struct Player;
 struct AssetManager;
 struct EntityHolder;
 struct Inventory;
@@ -18,7 +19,7 @@ enum EntityType
 
 struct EntityUpdateData
 {
-	Vector2 playerPosition = {};
+	Player& player;
 	std::ranlux24_base& rng;
 	EntityHolder& entityHolder;
 	Inventory& inventory;
@@ -30,10 +31,16 @@ struct EntityUpdateData
 struct Entity
 {
 	PhysicalEntity physics;
+	bool isAlive = false;
 	float life = 1;
 	bool isFacingRight = true;
 	float isRedTimer = 0.f;
 	float hitStopTimer = 0;
+
+	Entity()
+	{
+		isAlive = true;
+	}
 
 	Vector2& getPosition()
 	{
@@ -47,7 +54,7 @@ struct Entity
 
 	virtual void render(AssetManager& assetManager) = 0;
 
-	virtual bool update(float deltaTime, EntityUpdateData entityUpdateData) = 0;
+	virtual bool update(float deltaTime, EntityUpdateData& entityUpdateData) = 0;
 
 	virtual int getEntityType() = 0;
 

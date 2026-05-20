@@ -106,11 +106,13 @@ void spawnEnemy
 				{
 					printf("enemy spawn at {x, y}: {%d, %d}\n", x, y - 1);
 
-					Slime slime;
-					slime.teleport({ (float)x, (float)y - 1 });
-
 					auto id = entityHolder.idHolder.getEntityIdAndIncreament();
-					entityHolder.entities[id] = std::make_unique<Slime>(slime);
+					auto slime = std::make_unique<Slime>();
+					slime->teleport({ (float)x, (float)y - 1 });
+
+					Slime* enemyPtr = slime.get();
+					entityHolder.entities[id] = std::move(slime);
+					entityHolder.enemies.push_back(enemyPtr);
 
 					return;
 				}

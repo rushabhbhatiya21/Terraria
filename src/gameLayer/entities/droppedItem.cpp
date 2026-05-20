@@ -4,6 +4,8 @@
 #include "assetManager.h"
 #include "entityHolder.h"
 #include <items/item.h>
+#include <inventory.h>
+#include <player.h>
 
 void DroppedItem::render(AssetManager& assetManager)
 {
@@ -34,51 +36,104 @@ void DroppedItem::render(AssetManager& assetManager)
 	);
 }
 
-bool DroppedItem::update(float deltaTime, EntityUpdateData entityUpdateData)
+// need to test refractor that use new droppedItem specialized array
+
+bool DroppedItem::update(float deltaTime, EntityUpdateData& data)
 {
-	for (auto& e : entityUpdateData.entityHolder.entities)
+	if (physics.transform.intersectTransform(data.player.physics.transform))
 	{
-		if (e.first != entityUpdateData.ownId)
+		ItemStack itemStack
 		{
-			if (e.second->getEntityType() == EntityType::EntityType_DroppedItem)
+			itemType,
+			itemCounter
+		};
+		isAlive = data.inventory.storeItem(itemStack);
+	}
+
+	for (DroppedItem* other : data.entityHolder.droppedItems)
+	{
+		if (other == this)
+			continue;
+
+		// instead have id for dedup
+		if (this > other)
+			continue;
+
+		if (itemType == other->itemType)
+		{
+			if (Vector2Distance(getPosition(), other->getPosition()) < 0.7f)
 			{
-				DroppedItem* other = reinterpret_cast<DroppedItem*>(e.second.get());
+				int otherMaxStackSize = getMaxStackSize(other->itemType);
 
-				if (itemType == other->itemType)
+				if (otherMaxStackSize - other->itemCounter == 0)
 				{
-					if (Vector2Distance(getPosition(), other->getPosition()) < 0.7f)
-					{
-						other->itemCounter += itemCounter;
-						return false;
-
-						int otherMaxStackSize = getMaxStackSize(other->itemType);
-
-						if (other->itemCounter >= itemCounter)
-						{
-							if (other->itemCounter + itemCounter <= otherMaxStackSize)
-							{
-								other->itemCounter += itemCounter;
-								return false;
-							}
-							else if (otherMaxStackSize - other->itemCounter == 0)
-							{
-								return true;
-							}
-							else
-							{
-								int partialAdd = otherMaxStackSize - other->itemCounter;
-								other->itemCounter += partialAdd;
-								itemCounter -= partialAdd;
-							}
-						}
-					}
-
+					// Nearby stack is full, can't merge, keep looking
+					continue;
+				}
+				else if (other->itemCounter + itemCounter <= otherMaxStackSize)
+				{
+					// Full merge fits — absorb all and destroy this entity
+					other->itemCounter += itemCounter;
+					return false;
+				}
+				else
+				{
+					// Partial merge — fill nearby stack, keep remainder on this entity
+					int partialAdd = otherMaxStackSize - other->itemCounter;
+					other->itemCounter += partialAdd;
+					itemCounter -= partialAdd;
+					// Continue loop in case another nearby stack can absorb the rest
 				}
 			}
 		}
 	}
 
 	return true;
+
+
+	//for (auto& e : data.entityHolder.entities)
+	//{
+	//	if (e.first != data.ownId)
+	//	{
+	//		if (e.second->getEntityType() == EntityType::EntityType_DroppedItem)
+	//		{
+	//			DroppedItem* other = reinterpret_cast<DroppedItem*>(e.second.get());
+
+	//			if (itemType == other->itemType)
+	//			{
+	//				if (Vector2Distance(getPosition(), other->getPosition()) < 0.7f)
+	//				{
+	//					other->itemCounter += itemCounter;
+	//					return false;
+
+	//					int otherMaxStackSize = getMaxStackSize(other->itemType);
+
+	//					if (other->itemCounter >= itemCounter)
+	//					{
+	//						if (other->itemCounter + itemCounter <= otherMaxStackSize)
+	//						{
+	//							other->itemCounter += itemCounter;
+	//							return false;
+	//						}
+	//						else if (otherMaxStackSize - other->itemCounter == 0)
+	//						{
+	//							return true;
+	//						}
+	//						else
+	//						{
+	//							int partialAdd = otherMaxStackSize - other->itemCounter;
+	//							other->itemCounter += partialAdd;
+	//							itemCounter -= partialAdd;
+	//						}
+	//					}
+	//				}
+
+	//			}
+	//		}
+	//	}
+	//}
+
+	//return true;
 }
 
 int DroppedItem::getMaxStackSize(int type)

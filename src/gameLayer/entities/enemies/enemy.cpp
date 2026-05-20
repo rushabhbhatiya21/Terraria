@@ -61,6 +61,11 @@ void Enemy::renderHealthBar(AssetManager& assetManager)
 
 bool Enemy::updateHealthBar(float deltatime)
 {
+	if (life <= 0)
+	{
+		isAlive = false;
+	}
+
 	if (hurtTimer >= 0)
 	{
 		hurtTimer -= deltatime;

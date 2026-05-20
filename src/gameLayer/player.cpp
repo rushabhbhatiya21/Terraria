@@ -133,7 +133,7 @@ void Player::render(AssetManager& assetManager)
 //	EndBlendMode();
 //}
 
-bool Player::update(float deltaTime, EntityUpdateData entityUpdateData)
+bool Player::update(float deltaTime, EntityUpdateData& entityUpdateData)
 {
 	// --- HITSTOP ---
 	if (hitStopTimer > 0)

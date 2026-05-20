@@ -37,7 +37,7 @@ void spawnMeleeAttack(
 
 MeleeHitResult updateMeleeAttacks(
     float deltaTime,
-    std::unordered_map<std::uint64_t, std::unique_ptr<Entity>>& enemies
+    std::vector<Enemy*>& enemies
 )
 {
     MeleeHitResult result{};
@@ -55,26 +55,20 @@ MeleeHitResult updateMeleeAttacks(
             continue;
         }
 
+        Player* player = dynamic_cast<Player*>(attack.owner);
+        if (player == nullptr) continue;
+
         // collision against enemies
-        for (auto& e : enemies)
+        for (Enemy* enemy : enemies)
         {
-            if (e.second->getEntityType() != EntityType::EntityType_Enemy)
+            if (!enemy->isAlive)
                 continue;
-
-            Enemy* enemy = dynamic_cast<Enemy*>(e.second.get());
-
-            if (enemy->life <= 0)
-                continue;
-
-            Player* player = dynamic_cast<Player*>(attack.owner);
-
-            if (player == nullptr) continue;
 
             if (checkForHits(player->weaponBase, player->weaponTip, *enemy))
             {
-                if (enemy->isAlive())
+                if (enemy->isAlive)
                 {
-                    enemy->hitStopTimer  = .1f;
+                    enemy->hitStopTimer = .1f;
                     player->hitStopTimer = .1f; // same duration, they freeze together
                 }
 
@@ -89,11 +83,45 @@ MeleeHitResult updateMeleeAttacks(
                 return result;
             }
         }
+
+        //for (auto& e : enemies)
+        //{
+        //    if (e.second->getEntityType() != EntityType::EntityType_Enemy)
+        //        continue;
+
+        //    Enemy* enemy = dynamic_cast<Enemy*>(e.second.get());
+
+        //    if (enemy->life <= 0)
+        //        continue;
+
+        //    Player* player = dynamic_cast<Player*>(attack.owner);
+
+        //    if (player == nullptr) continue;
+
+        //    if (checkForHits(player->weaponBase, player->weaponTip, *enemy))
+        //    {
+        //        if (enemy->isAlive)
+        //        {
+        //            enemy->hitStopTimer  = .1f;
+        //            player->hitStopTimer = .1f; // same duration, they freeze together
+        //        }
+
+        //        enemy->hit(attack.damage, attack.owner->getPosition());
+
+        //        // prevent multi-hit from same swing
+        //        attack.lifetime = 0.f;
+
+        //        result.hit = true;
+        //        result.positon = enemy->getPosition();
+        //        result.damage = attack.damage;
+        //        return result;
+        //    }
+        //}
     }
     return result;
 }
 
-bool checkForHits(Vector2 base, Vector2 tip, Entity& enemy)
+bool checkForHits(Vector2 base, Vector2 tip, Enemy& enemy)
 {
     //DrawLineEx(base, tip, .05f, GREEN);
 
