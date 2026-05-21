@@ -78,3 +78,8 @@ bool Enemy::updateHealthBar(float deltatime)
 
 	return false;
 }
+
+void Enemy::onHit() override
+{
+	currentState = STATE_HURT;
+}

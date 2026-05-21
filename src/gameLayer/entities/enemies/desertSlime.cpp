@@ -105,7 +105,7 @@ bool DesertSlime::update(float deltaTime, EntityUpdateData& data)
 
 void DesertSlime::dropLoot(EntityHolder& entityHolder, int type)
 {
-	
+	// todo: implement
 }
 
 

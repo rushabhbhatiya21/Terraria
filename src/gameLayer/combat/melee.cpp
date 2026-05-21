@@ -5,6 +5,7 @@
 #include <player.h>
 #include <shake.h>
 #include <entities/enemies/enemy.h>
+#include <combat/combatSystem.h>
 
 std::vector<MeleeAttack> meleeAttacks;
 
@@ -55,6 +56,7 @@ MeleeHitResult updateMeleeAttacks(
             continue;
         }
 
+        // todo: keep it entity, will need to add weaponBase and weaponTip to entity
         Player* player = dynamic_cast<Player*>(attack.owner);
         if (player == nullptr) continue;
 
@@ -72,7 +74,14 @@ MeleeHitResult updateMeleeAttacks(
                     player->hitStopTimer = .1f; // same duration, they freeze together
                 }
 
-                enemy->hit(attack.damage, attack.owner->getPosition());
+                DamageInfo info;
+                info.damage = attack.damage;
+                info.knockback = attack.knockback;
+                info.hitDirection = attack.direction;
+
+                // this will trigger onHit for each entity
+                CombatSystem::applyDamage(enemy, info);
+                //enemy->hit(attack.damage, attack.owner->getPosition());
 
                 // prevent multi-hit from same swing
                 attack.lifetime = 0.f;
@@ -83,40 +92,6 @@ MeleeHitResult updateMeleeAttacks(
                 return result;
             }
         }
-
-        //for (auto& e : enemies)
-        //{
-        //    if (e.second->getEntityType() != EntityType::EntityType_Enemy)
-        //        continue;
-
-        //    Enemy* enemy = dynamic_cast<Enemy*>(e.second.get());
-
-        //    if (enemy->life <= 0)
-        //        continue;
-
-        //    Player* player = dynamic_cast<Player*>(attack.owner);
-
-        //    if (player == nullptr) continue;
-
-        //    if (checkForHits(player->weaponBase, player->weaponTip, *enemy))
-        //    {
-        //        if (enemy->isAlive)
-        //        {
-        //            enemy->hitStopTimer  = .1f;
-        //            player->hitStopTimer = .1f; // same duration, they freeze together
-        //        }
-
-        //        enemy->hit(attack.damage, attack.owner->getPosition());
-
-        //        // prevent multi-hit from same swing
-        //        attack.lifetime = 0.f;
-
-        //        result.hit = true;
-        //        result.positon = enemy->getPosition();
-        //        result.damage = attack.damage;
-        //        return result;
-        //    }
-        //}
     }
     return result;
 }

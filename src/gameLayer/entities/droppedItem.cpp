@@ -13,12 +13,13 @@ void DroppedItem::render(AssetManager& assetManager)
 
 	if (isItem(itemType))
 	{
-		// item rendered smaller
+		// item rendered little smaller
 		size = .6f;
 	}
 	else
 	{
-		size = 1.f;
+		// block rendered even smaller
+		size = .8f;
 	}
 
 	auto aabb = getRectangleForEntity(physics.transform, size, size);
@@ -36,7 +37,6 @@ void DroppedItem::render(AssetManager& assetManager)
 	);
 }
 
-// need to test refractor that use new droppedItem specialized array
 
 bool DroppedItem::update(float deltaTime, EntityUpdateData& data)
 {
@@ -89,51 +89,6 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData& data)
 	}
 
 	return true;
-
-
-	//for (auto& e : data.entityHolder.entities)
-	//{
-	//	if (e.first != data.ownId)
-	//	{
-	//		if (e.second->getEntityType() == EntityType::EntityType_DroppedItem)
-	//		{
-	//			DroppedItem* other = reinterpret_cast<DroppedItem*>(e.second.get());
-
-	//			if (itemType == other->itemType)
-	//			{
-	//				if (Vector2Distance(getPosition(), other->getPosition()) < 0.7f)
-	//				{
-	//					other->itemCounter += itemCounter;
-	//					return false;
-
-	//					int otherMaxStackSize = getMaxStackSize(other->itemType);
-
-	//					if (other->itemCounter >= itemCounter)
-	//					{
-	//						if (other->itemCounter + itemCounter <= otherMaxStackSize)
-	//						{
-	//							other->itemCounter += itemCounter;
-	//							return false;
-	//						}
-	//						else if (otherMaxStackSize - other->itemCounter == 0)
-	//						{
-	//							return true;
-	//						}
-	//						else
-	//						{
-	//							int partialAdd = otherMaxStackSize - other->itemCounter;
-	//							other->itemCounter += partialAdd;
-	//							itemCounter -= partialAdd;
-	//						}
-	//					}
-	//				}
-
-	//			}
-	//		}
-	//	}
-	//}
-
-	//return true;
 }
 
 int DroppedItem::getMaxStackSize(int type)

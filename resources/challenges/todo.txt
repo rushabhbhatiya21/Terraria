@@ -5,6 +5,7 @@
 
 -- Weapons
 - range projectile - start working
+- on knockback, also add slight player knockback in opposite dir
 - fall damage for player and enemies both
 - update player hearts based on player health
 - enemies hurt player
