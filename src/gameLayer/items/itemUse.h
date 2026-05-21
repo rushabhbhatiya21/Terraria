@@ -1,15 +1,15 @@
 #pragma once
 
-struct Player;
+struct Entity;
 struct ItemStack;
 struct ItemDefinition;
 
-void useItem(Player& player, ItemStack& stack, Vector2 mouseWorldPos);
+void useItem(Entity* entity, ItemStack& stack, Vector2 mouseWorldPos);
 
-void useWeapon(Player& player, const ItemDefinition& item);
+void useWeapon(Entity* entity, const ItemDefinition& item);
 
-void useTool(Player& player, const ItemDefinition& item, Vector2 mouseWorldPos);
+void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos);
 
-void useBlock(Player& player, const ItemDefinition& item, Vector2 mouseWorldPos);
+void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos);
 
-void useConsumable(Player& player, ItemStack& stack, const ItemDefinition& item);
+void useConsumable(Entity* entity, ItemStack& stack, const ItemDefinition& item);

@@ -22,23 +22,19 @@ struct MeleeAttack
     Entity* owner = nullptr;
 
     Vector2 position = {};
-
-    float radius = 0.f;
+    Vector2 direction = { 0,0 };
 
     int damage = 0;
-
+    float radius = 0.f;
     float knockback = 0.f;
-
     float lifetime = 0.f;
-
-    int direction = 1;
 };
 
 extern std::vector<MeleeAttack> meleeAttacks;
 
 void spawnMeleeAttack(
     Entity* owner,
-    int direction,
+    Vector2 direction,
     int damage,
     float radius,
     float knockback

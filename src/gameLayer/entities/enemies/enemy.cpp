@@ -79,7 +79,9 @@ bool Enemy::updateHealthBar(float deltatime)
 	return false;
 }
 
-void Enemy::onHit() override
+void Enemy::onHit()
 {
+	isRedTimer = hitStopTimer;
+	hurtTimer = 1;
 	currentState = STATE_HURT;
 }

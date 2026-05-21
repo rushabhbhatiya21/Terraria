@@ -1,11 +1,11 @@
 #include "items/item.h"
 #include "items/itemUse.h"
+#include "entity.h"
 #include <combat/melee.h>
 #include <combat/tool.h>
-#include <combat/blockSpawn..h>
-#include <player.h>
+#include <combat/blockSpawn.h>
 
-void useItem(Player& player, ItemStack& stack, Vector2 mouseWorldPos)
+void useItem(Entity* entity, ItemStack& stack, Vector2 mouseWorldPos)
 {
 	if (stack.count <= 0) return;
 
@@ -13,30 +13,30 @@ void useItem(Player& player, ItemStack& stack, Vector2 mouseWorldPos)
 
 	if (!item) return;
 
-	if (player.useTimer > 0.f) return;
+	if (entity->useTimer > 0.f) return;
 
-	player.useTimer = item->useTime;
+	entity->useTimer = item->useTime;
 
 	switch (item->category)
 	{
 	case ItemCategory::WEAPON:
-		player.attackDuration = item->useTime * .35f;
-		player.swingTimer = player.attackDuration;
-		useWeapon(player, *item);
+		entity->attackDuration = item->useTime * .35f;
+		entity->swingTimer = entity->attackDuration;
+		useWeapon(entity, *item);
 		break;
 
 	case ItemCategory::TOOL:
-		player.attackDuration = item->useTime * .35f;
-		player.swingTimer = player.attackDuration;
-		useTool(player, *item, mouseWorldPos);
+		entity->attackDuration = item->useTime * .35f;
+		entity->swingTimer = entity->attackDuration;
+		useTool(entity, *item, mouseWorldPos);
 		break;
 
 	case ItemCategory::BLOCK:
-		useBlock(player, *item, mouseWorldPos);
+		useBlock(entity, *item, mouseWorldPos);
 		break;
 
 	case ItemCategory::CONSUMABLE:
-		useConsumable(player, stack, *item);
+		useConsumable(entity, stack, *item);
 		break;
 
 	default:
@@ -44,38 +44,44 @@ void useItem(Player& player, ItemStack& stack, Vector2 mouseWorldPos)
 	}
 }
 
-void useWeapon(Player& player, const ItemDefinition& item)
+void useWeapon(Entity* entity, const ItemDefinition& item)
 {
 	const WeaponData& weapon = item.weapon;
 
+	Vector2 direction =
+	{
+		entity->isFacingRight ? 1.f : -1.f,
+		0.f
+	};
+
 	spawnMeleeAttack(
-		&player,
-		player.isFacingRight,
+		entity,
+		direction,
 		weapon.damage,
 		weapon.range,
 		weapon.knockback
 	);
 }
 
-void useTool(Player& player, const ItemDefinition& item, Vector2 mouseWorldPos)
+void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 {
 	const ToolData& tool = item.tool;
 
 	spawnToolSwing(
-		&player,
+		entity,
 		mouseWorldPos,
 		tool.range,
 		tool.power
 	);
 }
 
-void useBlock(Player& player, const ItemDefinition& item, Vector2 mouseWorldPos)
+void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 {
 	const BlockData& block = item.block;
-	spawnBlock(mouseWorldPos, player.getPosition(), (int)block.type);
+	spawnBlock(mouseWorldPos, entity->getPosition(), (int)block.type);
 }
 
-void useConsumable(Player& player, ItemStack& stack, const ItemDefinition& item)
+void useConsumable(Entity* entity, ItemStack& stack, const ItemDefinition& item)
 {
 	// todo implement
 	printf("todo - implement useConsumable\n");

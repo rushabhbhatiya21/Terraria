@@ -28,6 +28,9 @@ struct Enemy : public Entity
 		return physics.getPosition();
 	}
 
+	float isRedTimer = 0;
+	float hurtTimer = 0;
+
 	void renderHealthBar(AssetManager& assetManager);
 
 	bool updateHealthBar(float deltatime);

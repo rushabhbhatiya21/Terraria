@@ -25,3 +25,36 @@
 - weapon hit effect
 - running trail based on block
 - torch effect
+
+projectile render
+//void Projectile::render(AssetManager& assetManager)
+//{
+//	float size = 1.f;
+//
+//	// not using getRectangleForEntity because we do not want bottom anchored sprite
+//	//auto aabb = getRectangleForEntity(physics.transform, size, size);
+//
+//	Rectangle renderRect
+//	{
+//		physics.transform.pos.x,
+//		physics.transform.pos.y,
+//		size,
+//		size
+//	};
+//
+//	const Texture2D& texture = getTextureForItemType(itemType, assetManager);
+//
+//	Rectangle rectangle = getTextureCoordinatesForItemType(itemType);
+//
+//	DrawTexturePro(
+//		texture,
+//		rectangle,
+//		renderRect,
+//		{ size * 0.5f, size * 0.5f }, // want to rotate shuriken from middle
+//		rotation,
+//		WHITE
+//	);
+//}
+
+dir
+Vector2 direction = Vector2Normalize(GetMousePosition() - player.getCenter());

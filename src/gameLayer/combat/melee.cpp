@@ -11,7 +11,7 @@ std::vector<MeleeAttack> meleeAttacks;
 
 void spawnMeleeAttack(
     Entity* owner,
-    int direction,
+    Vector2 direction,
     int damage,
     float radius,
     float knockback
@@ -22,7 +22,8 @@ void spawnMeleeAttack(
     attack.owner = owner;
 
     attack.position = owner->getPosition();
-    attack.direction = direction;
+    attack.direction = Vector2Normalize(direction);
+
     attack.damage = damage;
     attack.radius = radius;
     attack.knockback = knockback;
@@ -31,7 +32,7 @@ void spawnMeleeAttack(
     attack.lifetime = 0.4f;
 
     // offset attack in facing direction
-    attack.position.x += direction * radius;
+    attack.position += direction * radius;
 
     meleeAttacks.push_back(attack);
 }

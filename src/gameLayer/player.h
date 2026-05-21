@@ -49,21 +49,13 @@ struct Player : public Entity
 
 	float getMaxLife() { return 50; }
 
-	// implement later
-	void hit(float damage, Vector2 hitFromPosition) override
-	{
-		life -= damage;
-	}
-
-	// for weapon swing animation
-	float weaponLength = 1.5f;
-	Vector2 weaponBase = {};
-	Vector2 weaponTip = {};
+	//// implement later
+	//void hit(float damage, Vector2 hitFromPosition) override
+	//{
+	//	life -= damage;
+	//}
 
 	bool isPlayingAttackAnimation = false;
-	float attackDuration = 0.f;
-	float swingTimer = 0.f;
-	float useTimer = 0.f;
 
 	int armourHead = 0;
 	int armourChest = 0;

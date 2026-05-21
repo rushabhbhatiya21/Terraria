@@ -31,11 +31,23 @@ struct EntityUpdateData
 struct Entity
 {
 	PhysicalEntity physics;
+
 	bool isAlive = false;
 	float life = 1;
+
+	// not sure to keep or not
 	bool isFacingRight = true;
-	float isRedTimer = 0.f;
+
+	float attackDuration = 0.f;
+	float swingTimer = 0.f;
+	float useTimer = 0.f;
 	float hitStopTimer = 0;
+	float damageTaken = 0;
+
+	// for weapon swing animation
+	float weaponLength = 1.5f;
+	Vector2 weaponBase = {};
+	Vector2 weaponTip = {};
 
 	Entity()
 	{
@@ -52,6 +64,15 @@ struct Entity
 		physics.teleport(pos);
 	}
 
+	void knockback(Vector2 hitFromPosition, float knockbackForce = 3.f)
+	{
+		// Push away from whoever hit us
+		float direction = (getPosition().x >= hitFromPosition.x) ? 1.f : -1.f;
+
+		physics.velocity.x = direction * knockbackForce;
+		physics.velocity.y = -3.f; // small upward bump, feels more impactful
+	}
+
 	virtual void render(AssetManager& assetManager) = 0;
 
 	virtual bool update(float deltaTime, EntityUpdateData& entityUpdateData) = 0;
@@ -64,7 +85,9 @@ struct Entity
 
 	virtual void dropLoot(EntityHolder& entityHolder, int type) = 0;
 
-	virtual void hit(float damage, Vector2 hitFromPosition) = 0;
+	virtual void onHit() {}
+
+	//virtual void hit(float damage, Vector2 hitFromPosition) = 0;
 
 	virtual Json formatToJson() = 0;
 	virtual bool loadFromJson(Json& j) = 0;

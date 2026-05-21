@@ -35,5 +35,5 @@ struct DroppedItem : public Entity
 
 	int getMaxStackSize(int type);
 
-	void hit(float damage, Vector2 hitFromPosition) override { /* no implementation */ }
+	//void hit(float damage, Vector2 hitFromPosition) override { /* no implementation */ }
 };

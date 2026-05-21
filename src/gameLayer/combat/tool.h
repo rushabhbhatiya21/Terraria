@@ -2,7 +2,7 @@
 #include <raylib.h>
 #include <vector>
 
-struct Player;
+struct Entity;
 struct GameMap;
 
 struct ToolHitResult
@@ -16,7 +16,7 @@ struct ToolHitResult
 
 struct ToolSwing
 {
-	Player* player = nullptr;
+	Entity* entity = nullptr;
 
 	Vector2	mousePosition = {};
 
@@ -30,7 +30,7 @@ struct ToolSwing
 extern std::vector<ToolSwing> toolSwings;
 
 void spawnToolSwing(
-	Player* player,
+	Entity* entity,
 	Vector2 mousePosition,
 	float range,
 	int power

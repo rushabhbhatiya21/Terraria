@@ -1,19 +1,19 @@
 #include "tool.h"
-#include <player.h>
+#include "entity.h"
 #include <gameMap.h>
 
 std::vector<ToolSwing> toolSwings;
 
-void spawnToolSwing(Player* player, Vector2 mousePosition, float range, int power)
+void spawnToolSwing(Entity* entity, Vector2 mousePosition, float range, int power)
 {
 	ToolSwing swing{};
-	swing.player = player;
+	swing.entity = entity;
 	swing.mousePosition = mousePosition;
 	swing.range = range;
 	swing.power = power;
 
 	swing.lifetime = .4f;
-	swing.direction = !player->animations.movingLeft;
+	swing.direction = entity->isFacingRight;
 
 	//swing.position.x += direction * range;
 
@@ -41,7 +41,7 @@ ToolHitResult updateToolSwing(float deltatime, GameMap& gameMap)
 
 		if (b == nullptr || b->type == b->air) return result;
 
-		float dist = Vector2Distance(swing.mousePosition, swing.player->getPosition());
+		float dist = Vector2Distance(swing.mousePosition, swing.entity->getPosition());
 
 		if (dist <= swing.range)
 		{

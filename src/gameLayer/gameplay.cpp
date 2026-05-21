@@ -21,7 +21,7 @@
 
 #include <combat/melee.h>
 #include <combat/tool.h>
-#include <combat/blockSpawn..h>
+#include <combat/blockSpawn.h>
 
 #include "ui/popupText.h"
 
@@ -653,9 +653,9 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 			{
-				// attack and tool done
-				// todo consumable and place block
-				useItem(player, ItemStack{ player.heldItem, 1 }, worldPos);
+				// attack, tool, place block done
+				// todo consumable and projectile
+				useItem(&player, ItemStack{ player.heldItem, 1 }, worldPos);
 			}
 		}
 
