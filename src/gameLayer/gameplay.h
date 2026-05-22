@@ -101,6 +101,13 @@ struct Gameplay
 	RenderTexture2D lightMask = { 0 };
 	std::vector<std::vector<int>> lightMap;
 
+	// shader
+	Shader blurShader = {};
+	Shader bloomShader = {};
+	RenderTexture2D sceneTexture = {};
+	RenderTexture2D blurTexture = {};
+	RenderTexture2D glowTexture = {};
+
 	// world time
 	float worldTime = 0;
 	WorldTimeClock clock = {};
@@ -133,7 +140,7 @@ struct Gameplay
 	Rectangle getRecipeRectangle(float w, float h, Rectangle craftRectangle);
 	Rectangle getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle);
 
-	void floodFillLight(int x, int y, int offsetX, int offsetY, int value);
+	void floodFillLight(int x, int y, int offsetX, int offsetY, int value, bool isTorch = false);
 
 	template<typename T>
 	void spawnEnemyHelper(Vector2 position)

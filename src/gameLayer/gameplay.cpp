@@ -215,7 +215,7 @@ Rectangle Gameplay::getIngredientsRectangle(float w, float h, Rectangle craftRec
 	return ingredientRectangle;
 }
 
-void Gameplay::floodFillLight(int x, int y, int offsetX, int offsetY, int value)
+void Gameplay::floodFillLight(int x, int y, int offsetX, int offsetY, int value, bool isTorch)
 {
 	if (x < 0 || y < 0 || x > lightMap.size() - 1 || y > lightMap[0].size() - 1) return;
 
@@ -223,17 +223,20 @@ void Gameplay::floodFillLight(int x, int y, int offsetX, int offsetY, int value)
 
 	if (!b) return;
 
-	if (b->isCollidable())
+	if (isTorch)
+		value -= 1;
+
+	if (!isTorch && b->isCollidable())
 		value -= 1;
 
 	if (lightMap[x][y] >= value) return;
 	
 	lightMap[x][y] = value;
 
-	floodFillLight(x - 1, y, offsetX, offsetY, value); // left
-	floodFillLight(x, y - 1, offsetX, offsetY, value); // top
-	floodFillLight(x + 1, y, offsetX, offsetY, value); // right
-	floodFillLight(x, y + 1, offsetX, offsetY, value); // bottom
+	floodFillLight(x - 1, y, offsetX, offsetY, value, isTorch); // left
+	floodFillLight(x, y - 1, offsetX, offsetY, value, isTorch); // top
+	floodFillLight(x + 1, y, offsetX, offsetY, value, isTorch); // right
+	floodFillLight(x, y + 1, offsetX, offsetY, value, isTorch); // bottom
 }
 
 static float tileNoise(int x, int y)
@@ -259,9 +262,12 @@ bool Gameplay::init()
 	camera.rotation = 0.f;
 	camera.zoom = CAMERA_ZOOM;
 
+	int screenW = GetScreenWidth();
+	int screenH = GetScreenHeight();
+
 	// coords for light
 	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, camera);
-	Vector2 bottomRightView = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, camera);
+	Vector2 bottomRightView = GetScreenToWorld2D({ (float)screenW, (float)screenH }, camera);
 
 	int startXView = (int)floorf(topLeftView.x - 1);
 	int endXView = (int)floorf(bottomRightView.x + 1);
@@ -283,7 +289,16 @@ bool Gameplay::init()
 	player.physics.transform.h = 1.8f;
 
 	// Light mask render texture
-	lightMask = LoadRenderTexture(GetScreenWidth(), GetScreenHeight());
+	lightMask = LoadRenderTexture(screenW, screenH);
+
+	// Load the shader
+	blurShader = LoadShader(0, RESOURCES_PATH "shaders/blur.fs");
+	bloomShader = LoadShader(0, RESOURCES_PATH "shaders/bloom.fs");
+
+	// Use a RenderTexture to capture the scene
+	sceneTexture = LoadRenderTexture(screenW, screenH);
+	blurTexture = LoadRenderTexture(screenW, screenH);
+	glowTexture = LoadRenderTexture(screenW, screenH);
 
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
@@ -299,11 +314,13 @@ bool Gameplay::init()
 
 	// start day at random time
 	std::ranlux24_base rng(std::random_device{}());
-	float randStartTime = getRandomFloat(rng, 0.375f, 0.75f);
+	float randStartTime = getRandomFloat(rng, 0.9f, 0.95f);
 	worldTime = randStartTime * FULL_DAY_LENGTH;
 
 	double loadEnd = GetTime();
 	TraceLog(LOG_INFO, "Load time: %.3f seconds", loadEnd - loadStart);
+	TraceLog(LOG_INFO, "Raylib version: %s", RAYLIB_VERSION);
+
 	return true;
 }
 
@@ -364,13 +381,6 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	camera.target.x = smoothTarget.x + camOffset.x;
 	camera.target.y = smoothTarget.y + camOffset.y;
-
-#pragma endregion
-
-
-#pragma region clear background
-
-	ClearBackground(BLACK);
 
 #pragma endregion
 
@@ -775,6 +785,8 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma endregion
 
+	BeginTextureMode(sceneTexture);
+	ClearBackground(BLACK);
 	BeginMode2D(camera);
 
 #pragma region calculate world coords
@@ -829,8 +841,9 @@ bool Gameplay::update(AssetManager& assetManager)
 	lightMap.assign(endXView - startXView + 1, std::vector<int>(endYView - startYView + 1, -1));
 	int localX = (int)player.getPosition().x - startXView;
 	int localY = (int)player.getPosition().y - startYView;
+	floodFillLight(29 - startXView, 59 - startYView, startXView, startYView, MAX_LIGHT + 4, true);
 
-	floodFillLight(localX, localY, startXView, startYView, MAX_LIGHT);
+	//floodFillLight(localX, localY, startXView, startYView, MAX_LIGHT);
 
 #pragma endregion
 
@@ -1058,7 +1071,75 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma endregion
 
+
 	EndMode2D();
+	EndTextureMode();
+
+#pragma region draw glow stuff
+
+	// draw only glow stuff here
+	BeginTextureMode(glowTexture);
+	ClearBackground(BLACK);
+	BeginMode2D(camera);
+
+	//Vector2 p = GetScreenToWorld2D(GetMousePosition(), camera);
+	//printf("%f %f\n", p.x, p.y);
+
+	// render torches here
+	// static torch at 29, 59
+	DrawCircleGradient(
+		29,
+		59,
+		1.2f,
+		Color{ 255,255,0,255 },
+		Color{ 0,0,0,0 }
+	);
+
+	EndMode2D();
+	EndTextureMode();
+
+#pragma endregion
+
+
+#pragma region glow shader
+
+	// blur glow texture
+	BeginTextureMode(blurTexture);
+	BeginShaderMode(blurShader);
+	ClearBackground(BLACK);
+	DrawTextureRec(
+		glowTexture.texture,
+		Rectangle{ 0, 0, (float)glowTexture.texture.width, (float)-glowTexture.texture.height },
+		Vector2{ 0, 0 },
+		WHITE
+	);
+	EndShaderMode();
+	EndTextureMode();
+
+#pragma endregion
+
+
+#pragma region draw both shaders on screen
+
+	// texture -> screen
+	ClearBackground(BLACK);
+	DrawTextureRec(
+		sceneTexture.texture,
+		Rectangle{ 0, 0, (float)sceneTexture.texture.width, (float)-sceneTexture.texture.height },
+		Vector2{ 0, 0 },
+		WHITE
+	);
+	BeginBlendMode(BLEND_ADDITIVE);
+	DrawTextureRec(
+		blurTexture.texture,
+		Rectangle{ 0, 0, (float)blurTexture.texture.width, (float)-blurTexture.texture.height },
+		Vector2{ 0, 0 },
+		WHITE
+	);
+	EndBlendMode();
+
+#pragma endregion
+
 
 #pragma region day/night cycle render
 
@@ -1637,4 +1718,9 @@ bool Gameplay::update(AssetManager& assetManager)
 void Gameplay::closeGame() const
 {
 	UnloadRenderTexture(lightMask);
+	UnloadRenderTexture(sceneTexture);
+	UnloadRenderTexture(blurTexture);
+	UnloadRenderTexture(glowTexture);
+	UnloadShader(blurShader);
+	UnloadShader(bloomShader);
 }
