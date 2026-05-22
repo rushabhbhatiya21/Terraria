@@ -19,7 +19,7 @@ ItemDefinition* getItem(ItemId itemId)
     return nullptr;
 }
 
-bool isItem(int itemType)
+bool isItem(ItemId itemType)
 {
     return itemType >= Items::firstItem && itemType < Items::LAST_ITEM;
 }
@@ -224,7 +224,7 @@ void registerItems()
     reg(Items::iceDagger, D::makeWeapon(22, 0.8f, 0.5f, 1.2f));
 
     // ── Weapons — thrown ──────────────────────────────────────────────────────
-    reg(Items::shuriken, D::makeWeapon(10, 0.4f, 0.3f, 1.0f));
+    reg(Items::shuriken, D::makeProjectile(10, 0.4f, 0.3f, 1.0f));
 
     // ── Consumables (healAmount, manaAmount, useTime, maxStack) ───────────────
     reg(Items::healthPotion, D::makeConsumable(50, 0, 1.5f, 20));

@@ -529,11 +529,8 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle entities
 
-	// cleanup before fresh update
-	entityHolder.cleanup();
-
 	// update all entities
-	for (auto it = entityHolder.entities.begin(); it != entityHolder.entities.end();)
+	for (auto it = entityHolder.entities.begin(); it != entityHolder.entities.end(); ++it)
 	{
 		EntityUpdateData entityUpdateData
 		{
@@ -550,13 +547,15 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			it->second->isAlive = false;
 		}
+		// update physics
 		else
 		{
-			// physics
 			updateEntityPhysics(*it->second, it->second->shouldApplyGravity);
-			++it;
 		}
 	}
+
+	// cleanup after update
+	entityHolder.cleanup();
 
 #pragma endregion
 
@@ -649,9 +648,14 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 			{
-				// attack, tool, place block done
-				// todo consumable and projectile
-				useItem(&player, ItemStack{ player.heldItem, 1 }, worldPos);
+				// attack, tool, place block, projectile done
+				// todo consumable 
+				useItem(
+					&player,
+					ItemStack{ player.heldItem, 1 }, 
+					entityHolder,
+					worldPos
+				);
 			}
 		}
 
@@ -949,14 +953,13 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	for (auto& e : entityHolder.entities)
 	{
+		DrawRectangleLinesEx(
+			e.second->physics.transform.getAABB(),
+			.1f,
+			PURPLE
+		);
+
 		e.second->render(assetManager);
-		//DrawRectangleLines(
-		//	e.second->physics.transform.pos.x,
-		//	e.second->physics.transform.pos.y,
-		//	e.second->physics.transform.w,
-		//	e.second->physics.transform.h,
-		//	PURPLE
-		//);
 	}
 
 #pragma endregion
@@ -1494,7 +1497,11 @@ bool Gameplay::update(AssetManager& assetManager)
 	{
 		ImGui::Begin("Game Control");
 
-		ImGui::InputFloat("lifetime", &lifetime);
+		std::string s = "Projectiles: ";
+		s += std::to_string(entityHolder.projectiles.size());
+		ImGui::Text(s.c_str());
+
+		//ImGui::InputFloat("lifetime", &lifetime);
 
 		ImGui::SliderFloat("Camera Zoom: ", &camera.zoom, 10, 150);
 		//ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 100);

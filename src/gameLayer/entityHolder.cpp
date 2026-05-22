@@ -1,7 +1,8 @@
 #include "entityHolder.h"
-#include <asserts.h>
-#include <entities/droppedItem.h>
-#include <entities/enemies/enemy.h>
+#include "asserts.h"
+#include "entities/droppedItem.h"
+#include "entities/projectile.h"
+#include "entities/enemies/enemy.h"
 
 std::uint64_t EntityIdHolder::getEntityIdAndIncreament()
 {
@@ -54,6 +55,16 @@ void EntityHolder::removeFromArrays(Entity* entity)
 		droppedItems.erase(
 			std::remove(droppedItems.begin(), droppedItems.end(), item),
 			droppedItems.end()
+		);
+		break;
+	}
+
+	case EntityType::EntityType_Projectile:
+	{
+		Projectile* p = static_cast<Projectile*>(entity);
+		projectiles.erase(
+			std::remove(projectiles.begin(), projectiles.end(), p),
+			projectiles.end()
 		);
 		break;
 	}

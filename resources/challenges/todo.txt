@@ -4,57 +4,25 @@
 
 
 -- Weapons
-- range projectile - start working
 - on knockback, also add slight player knockback in opposite dir
 - fall damage for player and enemies both
 - update player hearts based on player health
 - enemies hurt player
 - update enemy behaviour
-- add more enemies, make them throw ice balls, fire balls, lightning balls, etc. 
 - status effects implementation.
+- add more enemies, make them throw ice balls, fire balls, lightning balls, etc. 
 
+- range projectile - done
 - spawn zombies and more enemies at night - done
 - implement useBlock to place block on map - done
 - implement melee weapons - done
 - weapon animation with physics - done
 - hit pause - done
 
--- Effects
-- apply day/night cycle color to background only, not whole game - done
 
+-- Effects
 - weapon hit effect
 - running trail based on block
 - torch effect
 
-projectile render
-//void Projectile::render(AssetManager& assetManager)
-//{
-//	float size = 1.f;
-//
-//	// not using getRectangleForEntity because we do not want bottom anchored sprite
-//	//auto aabb = getRectangleForEntity(physics.transform, size, size);
-//
-//	Rectangle renderRect
-//	{
-//		physics.transform.pos.x,
-//		physics.transform.pos.y,
-//		size,
-//		size
-//	};
-//
-//	const Texture2D& texture = getTextureForItemType(itemType, assetManager);
-//
-//	Rectangle rectangle = getTextureCoordinatesForItemType(itemType);
-//
-//	DrawTexturePro(
-//		texture,
-//		rectangle,
-//		renderRect,
-//		{ size * 0.5f, size * 0.5f }, // want to rotate shuriken from middle
-//		rotation,
-//		WHITE
-//	);
-//}
-
-dir
-Vector2 direction = Vector2Normalize(GetMousePosition() - player.getCenter());
+- apply day/night cycle color to background only, not whole game - done

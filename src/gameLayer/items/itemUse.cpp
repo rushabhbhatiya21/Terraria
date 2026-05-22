@@ -1,11 +1,12 @@
 #include "items/item.h"
 #include "items/itemUse.h"
 #include "entity.h"
+#include "entities/projectile.h"
 #include <combat/melee.h>
 #include <combat/tool.h>
 #include <combat/blockSpawn.h>
 
-void useItem(Entity* entity, ItemStack& stack, Vector2 mouseWorldPos)
+void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos)
 {
 	if (stack.count <= 0) return;
 
@@ -23,6 +24,10 @@ void useItem(Entity* entity, ItemStack& stack, Vector2 mouseWorldPos)
 		entity->attackDuration = item->useTime * .35f;
 		entity->swingTimer = entity->attackDuration;
 		useWeapon(entity, *item);
+		break;
+
+	case ItemCategory::PROJECTILE:
+		useProjectile(entity, stack, entityHolder, mouseWorldPos);
 		break;
 
 	case ItemCategory::TOOL:
@@ -61,6 +66,12 @@ void useWeapon(Entity* entity, const ItemDefinition& item)
 		weapon.range,
 		weapon.knockback
 	);
+}
+
+void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos)
+{
+	Vector2 direction = Vector2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
+	Projectile::spawn(entity, stack, entityHolder, direction);
 }
 
 void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)

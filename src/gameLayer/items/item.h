@@ -15,6 +15,7 @@ enum class ItemCategory
     BLOCK,
     TOOL,
     WEAPON,
+    PROJECTILE,
     ARMOR,
     ACCESSORY,
     CONSUMABLE
@@ -220,6 +221,19 @@ struct ItemDefinition
         return d;
     }
 
+    static ItemDefinition makeProjectile(int damage, float useTime, float knockback, float range)
+    {
+        ItemDefinition d;
+        d.category = ItemCategory::PROJECTILE;
+        d.maxStack = 99;
+        d.useTime = useTime;
+        d.weapon.damage = damage;
+        d.weapon.knockback = knockback;
+        d.weapon.range = range;
+        d.isWeapon = true;
+        return d;
+    }
+
     static ItemDefinition makeArmor(ArmorSlot slot, int defense)
     {
         ItemDefinition d;
@@ -269,8 +283,8 @@ struct ItemStack
 void registerItems();
 extern std::unordered_map<ItemId, ItemDefinition> itemDatabase;
 
-ItemDefinition* getItem(int itemType);
-bool            isItem(int itemType);
+ItemDefinition* getItem(ItemId itemType);
+bool            isItem(ItemId itemType);
 
 // ─── Texture helpers ──────────────────────────────────────────────────────────
 

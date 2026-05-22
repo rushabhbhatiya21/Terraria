@@ -14,7 +14,8 @@ enum EntityType
 {
 	EntityType_Player = 0,
 	EntityType_DroppedItem,
-	EntityType_Enemy
+	EntityType_Enemy,
+	EntityType_Projectile
 };
 
 struct EntityUpdateData
@@ -84,7 +85,7 @@ struct Entity
 
 	virtual float getMaxLife() = 0;
 
-	virtual void dropLoot(EntityHolder& entityHolder, int type) = 0;
+	virtual void dropLoot(EntityHolder& entityHolder, int type) {};
 
 	virtual void onHit() {}
 
