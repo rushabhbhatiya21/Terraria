@@ -10,6 +10,7 @@ struct Player : public Entity
 		isAlive = true;
 		setColliderSize();
 		life = getMaxLife();
+		shouldApplyGravity = false;
 	}
 
 	EntityAnimation animations;
@@ -48,12 +49,6 @@ struct Player : public Entity
 	int getEntityType() { return EntityType_Player; }
 
 	float getMaxLife() { return 50; }
-
-	//// implement later
-	//void hit(float damage, Vector2 hitFromPosition) override
-	//{
-	//	life -= damage;
-	//}
 
 	bool isPlayingAttackAnimation = false;
 

@@ -425,7 +425,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			entity.physics.updateFinal();
 		};
 
-	updateEntityPhysics(player, false);
+	updateEntityPhysics(player, player.shouldApplyGravity); // gravity = false for player
 
 	bool justLanded = !wasTouchingGround && player.physics.downTouch;
 
@@ -529,10 +529,6 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle entities
 
-	bool shouldApplyGravity = true;
-	float groundDistance = 0;
-	bool shouldStepUp = false;
-
 	// cleanup before fresh update
 	entityHolder.cleanup();
 
@@ -557,7 +553,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		else
 		{
 			// physics
-			updateEntityPhysics(*it->second, shouldApplyGravity);
+			updateEntityPhysics(*it->second, it->second->shouldApplyGravity);
 			++it;
 		}
 	}

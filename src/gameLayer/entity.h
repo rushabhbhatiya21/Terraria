@@ -34,6 +34,7 @@ struct Entity
 
 	bool isAlive = false;
 	float life = 1;
+	bool shouldApplyGravity = true;
 
 	// not sure to keep or not
 	bool isFacingRight = true;
