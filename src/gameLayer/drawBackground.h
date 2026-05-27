@@ -8,6 +8,7 @@ struct DrawBackground
 	enum BackgroundType
 	{
 		none = 0,
+		night,
 		forest,
 		desert,
 		snow,

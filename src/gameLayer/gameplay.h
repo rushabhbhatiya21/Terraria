@@ -19,7 +19,7 @@
 #include <enemySpawner.h>
 
 #define CAMERA_ZOOM 30.0f
-#define MAX_LIGHT 5
+#define TILE_SIZE 1
 
 enum class DayPhase
 {
@@ -99,13 +99,14 @@ struct Gameplay
 	int lastScreenWidth = 0;
 	int lastScreenHeight = 0;
 	RenderTexture2D lightMask = { 0 };
-	std::vector<std::vector<int>> lightMap;
+	std::vector<std::vector<float>> lightMap;
 
 	// shader
 	Shader blurShader = {};
 	Shader bloomShader = {};
 	RenderTexture2D sceneTexture = {};
-	RenderTexture2D blurTexture = {};
+	RenderTexture2D blurredLightTexture = {};
+	RenderTexture2D blurredGlowTexture = {};
 	RenderTexture2D glowTexture = {};
 
 	// world time
@@ -140,7 +141,9 @@ struct Gameplay
 	Rectangle getRecipeRectangle(float w, float h, Rectangle craftRectangle);
 	Rectangle getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle);
 
-	void floodFillLight(int x, int y, int offsetX, int offsetY, int value, bool isTorch = false);
+	//void floodFillLight(int x, int y, int offsetX, int offsetY, float value, bool isTorch = false);
+
+	void addLight(int worldX, int worldY, float radius, float intensity, bool isTorch = false);
 
 	template<typename T>
 	void spawnEnemyHelper(Vector2 position)

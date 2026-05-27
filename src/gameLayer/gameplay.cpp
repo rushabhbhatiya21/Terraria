@@ -215,29 +215,83 @@ Rectangle Gameplay::getIngredientsRectangle(float w, float h, Rectangle craftRec
 	return ingredientRectangle;
 }
 
-void Gameplay::floodFillLight(int x, int y, int offsetX, int offsetY, int value, bool isTorch)
+void Gameplay::addLight(int worldX, int worldY, float radius, float intensity, bool isTorch)
 {
-	if (x < 0 || y < 0 || x > lightMap.size() - 1 || y > lightMap[0].size() - 1) return;
+	// visible lightmap range
+	int lightW = (int)lightMap.size();
+	int lightH = (int)lightMap[0].size();
 
-	auto* b = gameMap.getBlockSafe(x + offsetX, y + offsetY - 2);
+	for (int dy = -(int)radius; dy <= (int)radius; dy++)
+	{
+		for (int dx = -(int)radius; dx <= (int)radius; dx++)
+		{
+			float dist = sqrtf((float)(dx * dx + dy * dy));
 
-	if (!b) return;
+			// outside circle
+			if (dist > radius)
+				continue;
 
-	if (isTorch)
-		value -= 1;
+			// convert world -> local lightmap coords
+			int lx = worldX + dx;
+			int ly = worldY + dy;
 
-	if (!isTorch && b->isCollidable())
-		value -= 1;
+			if (lx < 0 || ly < 0 || lx >= lightW || ly >= lightH)
+				continue;
 
-	if (lightMap[x][y] >= value) return;
-	
-	lightMap[x][y] = value;
+			// smooth falloff
+			float t = 1.0f - (dist / (float)radius);
 
-	floodFillLight(x - 1, y, offsetX, offsetY, value, isTorch); // left
-	floodFillLight(x, y - 1, offsetX, offsetY, value, isTorch); // top
-	floodFillLight(x + 1, y, offsetX, offsetY, value, isTorch); // right
-	floodFillLight(x, y + 1, offsetX, offsetY, value, isTorch); // bottom
+			// gamma curve (VERY IMPORTANT)
+			t = powf(t, 2.f);
+
+			// convert to light value
+			float lightValue = t * intensity;
+
+			// optional wall attenuation
+			if (!isTorch)
+			{
+				auto* b = gameMap.getBlockSafe(
+					lx,
+					ly - 2
+				);
+
+				if (b && b->isCollidable())
+				{
+					lightValue *= 0.7f;
+				}
+			}
+
+			lightValue = Clamp(lightValue, 0.0f, 1.0f);
+
+			// keep brightest light
+			lightMap[lx][ly] = std::max(lightMap[lx][ly], lightValue);
+		}
+	}
 }
+
+//void Gameplay::floodFillLight(int x, int y, int offsetX, int offsetY, int value, bool isTorch)
+//{
+//	if (x < 0 || y < 0 || x > lightMap.size() - 1 || y > lightMap[0].size() - 1) return;
+//
+//	auto* b = gameMap.getBlockSafe(x + offsetX, y + offsetY - 2);
+//
+//	if (!b) return;
+//
+//	if (isTorch)
+//		value -= 1;
+//
+//	if (!isTorch && b->isCollidable())
+//		value -= 1;
+//
+//	if (lightMap[x][y] >= value) return;
+//	
+//	lightMap[x][y] = value;
+//
+//	floodFillLight(x - 1, y, offsetX, offsetY, value, isTorch); // left
+//	floodFillLight(x, y - 1, offsetX, offsetY, value, isTorch); // top
+//	floodFillLight(x + 1, y, offsetX, offsetY, value, isTorch); // right
+//	floodFillLight(x, y + 1, offsetX, offsetY, value, isTorch); // bottom
+//}
 
 static float tileNoise(int x, int y)
 {
@@ -265,24 +319,6 @@ bool Gameplay::init()
 	int screenW = GetScreenWidth();
 	int screenH = GetScreenHeight();
 
-	// coords for light
-	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, camera);
-	Vector2 bottomRightView = GetScreenToWorld2D({ (float)screenW, (float)screenH }, camera);
-
-	int startXView = (int)floorf(topLeftView.x - 1);
-	int endXView = (int)floorf(bottomRightView.x + 1);
-	int startYView = (int)floorf(topLeftView.y - 1);
-	int endYView = (int)floorf(bottomRightView.y + 1);
-
-	startXView = Clamp((float)startXView, 0.f, (float)gameMap.w - 1);
-	endXView = Clamp((float)endXView, 0.f, (float)gameMap.w - 1);
-
-	startYView = Clamp((float)startYView, 0.f, (float)gameMap.h - 1);
-	endYView = Clamp((float)endYView, 0.f, (float)gameMap.h - 1);
-
-	// light
-	lightMap.assign(endXView - startXView + 1, std::vector<int>(endYView - startYView + 1, -1));
-
 	// player spawn
 	player.teleport({ 20, 60 });
 	player.physics.transform.w = 0.9f;
@@ -297,7 +333,8 @@ bool Gameplay::init()
 
 	// Use a RenderTexture to capture the scene
 	sceneTexture = LoadRenderTexture(screenW, screenH);
-	blurTexture = LoadRenderTexture(screenW, screenH);
+	blurredLightTexture = LoadRenderTexture(screenW, screenH);
+	blurredGlowTexture = LoadRenderTexture(screenW, screenH);
 	glowTexture = LoadRenderTexture(screenW, screenH);
 
 	// cam foloow player
@@ -755,55 +792,21 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region draw background
+#pragma region get screen coords
 
-	// background
-	{
-		int backgroundType = DrawBackground::forest;
+	// visible tile range
+	int startXView = (int)(camera.target.x / TILE_SIZE) - 30;
+	int endXView = startXView + 60;
 
-		if (player.getPosition().x > gameMap.desertStart &&
-			player.getPosition().x < gameMap.desertEnd)
-		{
-			backgroundType = DrawBackground::desert;
-		}
+	int startYView = (int)(camera.target.y / TILE_SIZE) - 20;
+	int endYView = startYView + 40;
 
-		if (player.getPosition().y > 130)
-		{
-			backgroundType = DrawBackground::cave;
-		}
+	// clamp
+	startXView = std::max(0, startXView);
+	startYView = std::max(0, startYView);
 
-		background.setBackground(backgroundType);
-
-		background.draw(
-			deltaTime,
-			assetManager,
-			camera,
-			{ (float)gameMap.w, (float)gameMap.h },
-			skyData.skyColor
-		);
-	}
-
-#pragma endregion
-
-	BeginTextureMode(sceneTexture);
-	ClearBackground(BLACK);
-	BeginMode2D(camera);
-
-#pragma region calculate world coords
-
-	Vector2 topLeftView = GetScreenToWorld2D({ 0,0 }, camera);
-	Vector2 bottomRightView = GetScreenToWorld2D({ (float)GetScreenWidth(), (float)GetScreenHeight() }, camera);
-
-	int startXView = (int)floorf(topLeftView.x - 1);
-	int endXView = (int)floorf(bottomRightView.x + 1);
-	int startYView = (int)floorf(topLeftView.y - 1);
-	int endYView = (int)floorf(bottomRightView.y + 1);
-
-	startXView = Clamp((float)startXView, 0.f, (float)gameMap.w - 1);
-	endXView = Clamp((float)endXView, 0.f, (float)gameMap.w - 1);
-
-	startYView = Clamp((float)startYView, 0.f, (float)gameMap.h - 1);
-	endYView = Clamp((float)endYView, 0.f, (float)gameMap.h - 1);
+	endXView = std::min(gameMap.w - 1, endXView);
+	endYView = std::min(gameMap.h - 1, endYView);
 
 #pragma endregion
 
@@ -835,20 +838,211 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region light flood fill
+#pragma region adjust lightmask for screen size
 
-	// create light map
-	lightMap.assign(endXView - startXView + 1, std::vector<int>(endYView - startYView + 1, -1));
-	int localX = (int)player.getPosition().x - startXView;
-	int localY = (int)player.getPosition().y - startYView;
-	floodFillLight(29 - startXView, 59 - startYView, startXView, startYView, MAX_LIGHT + 4, true);
+	// resize render textures if screen resized
+	int screenW = GetScreenWidth();
+	int screenH = GetScreenHeight();
 
-	//floodFillLight(localX, localY, startXView, startYView, MAX_LIGHT);
+	if (lightMask.id == 0 ||
+		sceneTexture.id == 0 ||
+		glowTexture.id == 0 ||
+		blurredLightTexture.id == 0 ||
+		blurredGlowTexture.id == 0 ||
+		screenW != lastScreenWidth ||
+		screenH != lastScreenHeight)
+	{
+		if (lightMask.id != 0)
+			UnloadRenderTexture(lightMask);
+
+		if (sceneTexture.id != 0)
+			UnloadRenderTexture(sceneTexture);
+
+		if (glowTexture.id != 0)
+			UnloadRenderTexture(glowTexture);
+
+		if (blurredLightTexture.id != 0)
+			UnloadRenderTexture(blurredLightTexture);
+
+		if (blurredGlowTexture.id != 0)
+			UnloadRenderTexture(blurredGlowTexture);
+
+		lightMask = LoadRenderTexture(screenW, screenH);
+		sceneTexture = LoadRenderTexture(screenW, screenH);
+		glowTexture = LoadRenderTexture(screenW, screenH);
+		blurredLightTexture = LoadRenderTexture(screenW, screenH);
+		blurredGlowTexture = LoadRenderTexture(screenW, screenH);
+
+		lastScreenWidth = screenW;
+		lastScreenHeight = screenH;
+	}
 
 #pragma endregion
 
 
-#pragma region draw world
+#pragma region build tile lightmap
+
+	// reset light map
+	lightMap.assign(
+		endXView - startXView + 1,
+		std::vector<float>(endYView - startYView + 1, 0.0f)
+	);
+
+#pragma endregion
+
+
+#pragma region add light sources
+
+	// player light
+	{
+		int localX = (int)player.getPosition().x - startXView;
+		int localY = (int)player.getPosition().y - startYView;
+
+		addLight(
+			localX,
+			localY,
+			10.f,
+			1.f
+		);
+	}
+
+
+	// torch light example
+	{
+		int torchX = 29;
+		int torchY = 59;
+
+		float intensity =
+			0.92f +
+			sinf(::GetTime() * 23.0f) * 0.10f +
+			sinf(::GetTime() * 37.0f) * 0.05f;
+
+		addLight(
+			torchX - startXView,
+			torchY - startYView,
+			8.f,
+			intensity,
+			true
+		);
+	}
+
+#pragma endregion
+
+
+#pragma region build lightmask texture
+
+	BeginTextureMode(lightMask);
+	
+	unsigned char ambientByte = (unsigned char)(0.08f * 255.f);
+
+	ClearBackground(Color{
+		ambientByte,
+		ambientByte,
+		ambientByte,
+		255
+	});
+
+	BeginMode2D(camera);
+
+	for (int x = startXView; x <= endXView; x++)
+	{
+		for (int y = startYView; y <= endYView; y++)
+		{
+			float light = lightMap[x - startXView][y - startYView];
+
+			float ambient = 0.08f;
+
+			float t = ambient + light * (1.0f - ambient);
+
+			t = Clamp(t, 0.0f, 1.0f);
+
+			unsigned char c = (unsigned char)(t * 255.0f);
+
+			DrawRectangle(
+				x,
+				y,
+				1,
+				1,
+				Color{ c, c, c, 255 }
+			);
+		}
+	}
+
+	EndMode2D();
+	EndTextureMode();
+
+#pragma endregion
+
+
+#pragma region add blur pass
+
+	BeginTextureMode(blurredLightTexture);
+
+	BeginShaderMode(blurShader);
+
+	ClearBackground(BLACK);
+
+	DrawTextureRec(
+		lightMask.texture,
+		{
+			0,
+			0,
+			(float)lightMask.texture.width,
+			-(float)lightMask.texture.height
+		},
+		{ 0,0 },
+		WHITE
+	);
+
+	EndShaderMode();
+
+	EndTextureMode();
+
+#pragma endregion
+	
+
+	BeginTextureMode(sceneTexture);
+	ClearBackground(BLACK);
+	BeginMode2D(camera);
+
+
+#pragma region draw background
+
+	// background
+	{
+		int backgroundType = DrawBackground::forest;
+
+		if (isNight(t))
+		{
+			backgroundType = DrawBackground::night;
+		}
+
+		if (player.getPosition().x > gameMap.desertStart &&
+			player.getPosition().x < gameMap.desertEnd)
+		{
+			backgroundType = DrawBackground::desert;
+		}
+
+		if (player.getPosition().y > 130)
+		{
+			backgroundType = DrawBackground::cave;
+		}
+
+		background.setBackground(backgroundType);
+
+		background.draw(
+			deltaTime,
+			assetManager,
+			camera,
+			{ (float)gameMap.w, (float)gameMap.h },
+			skyData.skyColor
+		);
+	}
+
+#pragma endregion
+
+
+#pragma region render world
 
 	for (int y = startYView; y <= endYView; y++)
 	{
@@ -898,34 +1092,13 @@ bool Gameplay::update(AssetManager& assetManager)
 				float drawX = posX + shake.x;
 				float drawY = posY + shake.y;
 
-				int mapValue = lightMap[x - startXView][y - startYView];
-
-				float brightness = (float)mapValue / (float)(MAX_LIGHT - 1);
-
-				float ambient = 0.08f;
-				brightness = ambient + brightness * (1.f - ambient);
-
-				if (mapValue > 0)
-				{
-					float noise = tileNoise(x, y);
-					brightness *= 0.92f + noise * ambient;
-				}
-
-				brightness = Clamp(brightness, 0.f, 1.f);
-
-
-				// optional gamma-ish curve
-				brightness = brightness * brightness;
-
-				unsigned char light = (unsigned char)(brightness * 255.f);
-
 				DrawTexturePro(
 					assetManager.textures,
 					getTextureAtlas(atlasX, b.variation, 32, 32), //source (in sprite)
 					{ drawX,drawY,size,size }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
-					Color{ light,light,light,255 }
+					Color{ 255,255,255,255 }
 				);
 			}
 		}
@@ -934,7 +1107,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region draw frame and selected block
+#pragma region render frame and selected block
 
 	//draw selected block
 	if (!insideInventoryMenu && !insideCraftingMenu)
@@ -978,7 +1151,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region enemy health bars
+#pragma region render enemy health bars
 
 
 	for (auto& e : entityHolder.enemies)
@@ -1104,7 +1277,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma region glow shader
 
 	// blur glow texture
-	BeginTextureMode(blurTexture);
+	BeginTextureMode(blurredGlowTexture);
 	BeginShaderMode(blurShader);
 	ClearBackground(BLACK);
 	DrawTextureRec(
@@ -1119,23 +1292,41 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region draw both shaders on screen
+#pragma region final screen pass
 
-	// texture -> screen
-	ClearBackground(BLACK);
+	//ClearBackground(BLACK);
+
+	// draw scene
 	DrawTextureRec(
 		sceneTexture.texture,
-		Rectangle{ 0, 0, (float)sceneTexture.texture.width, (float)-sceneTexture.texture.height },
-		Vector2{ 0, 0 },
+		{ 0, 0, (float)screenW, -(float)screenH },
+		{ 0, 0 },
 		WHITE
 	);
-	BeginBlendMode(BLEND_ADDITIVE);
+
+
+	// multiply lighting
+	BeginBlendMode(BLEND_MULTIPLIED);
+
 	DrawTextureRec(
-		blurTexture.texture,
-		Rectangle{ 0, 0, (float)blurTexture.texture.width, (float)-blurTexture.texture.height },
-		Vector2{ 0, 0 },
+		blurredLightTexture.texture,
+		{ 0, 0, (float)screenW, -(float)screenH },
+		{ 0, 0 },
 		WHITE
 	);
+
+	EndBlendMode();
+
+	// ADD GLOW/TORCHES ON TOP
+	BeginBlendMode(BLEND_ADDITIVE);
+
+	DrawTextureRec(
+		blurredGlowTexture.texture,
+		{ 0, 0, (float)blurredGlowTexture.texture.width, -(float)blurredGlowTexture.texture.height },
+		{ 0, 0 },
+		WHITE
+	);
+
 	EndBlendMode();
 
 #pragma endregion
@@ -1143,63 +1334,13 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region day/night cycle render
 
-	DrawRectangle(
-		0,
-		0,
-		GetScreenWidth(),
-		GetScreenHeight(),
-		Fade(ambientColor, darkness)
-	);
-
-#pragma endregion
-
-
-#pragma region lighting
-
-	int screenW = GetScreenWidth();
-	int screenH = GetScreenHeight();
-
-	if (lightMask.id == 0 || screenW != lastScreenWidth || screenH != lastScreenHeight)
-	{
-		// Free old one if exists
-		if (lightMask.id != 0)
-		{
-			UnloadRenderTexture(lightMask);
-		}
-
-		// Create new render texture
-		lightMask = LoadRenderTexture(screenW, screenH);
-
-		lastScreenWidth = screenW;
-		lastScreenHeight = screenH;
-	}
-
-	// Apply cave lighting ONLY when underground
-	if (player.getPosition().y > 130)
-	{
-
-		// Convert player world pos -> screen pos
-		Vector2 playerScreen = GetWorldToScreen2D(
-			player.physics.transform.getCenter(),
-			camera
-		);
-
-		// Update light mask in screen space
-		BeginTextureMode(lightMask);
-		ClearBackground(BLACK);
-		DrawCircleGradient(playerScreen.x, playerScreen.y, 600, WHITE, BLACK);
-		EndTextureMode();
-
-		// Overlay mask on screen
-		BeginBlendMode(BLEND_MULTIPLIED);
-		DrawTextureRec(
-			lightMask.texture,
-			{ 0, 0, (float)screenW, (float)-screenH }, // negative H = flip Y
-			{ 0, 0 },
-			WHITE
-		);
-		EndBlendMode();
-	}
+	//DrawRectangle(
+	//	0,
+	//	0,
+	//	GetScreenWidth(),
+	//	GetScreenHeight(),
+	//	Fade(ambientColor, darkness)
+	//);
 
 #pragma endregion
 
@@ -1719,8 +1860,9 @@ void Gameplay::closeGame() const
 {
 	UnloadRenderTexture(lightMask);
 	UnloadRenderTexture(sceneTexture);
-	UnloadRenderTexture(blurTexture);
 	UnloadRenderTexture(glowTexture);
+	UnloadRenderTexture(blurredLightTexture);
+	UnloadRenderTexture(blurredGlowTexture);
 	UnloadShader(blurShader);
 	UnloadShader(bloomShader);
 }

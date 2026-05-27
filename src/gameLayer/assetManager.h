@@ -30,6 +30,7 @@ struct AssetManager
 	Texture2D desertBG = {};
 	Texture2D snowBG = {};
 	Texture2D caveBG = {};
+	Texture2D nightBG = {};
 
 	//Texture2D playerBack = {};
 	//Texture2D playerFeet = {};
@@ -59,7 +60,8 @@ struct AssetManager
 		{&forestBG, "forestBG.png"},
 		{&desertBG, "desertBG.png"},
 		{&snowBG, "snowBG.png"},
-		{&caveBG, "caveBG.png"}
+		{&caveBG, "caveBG.png"},
+		{&nightBG, "backgroundsLayred/sky/nightSky.png"}
 		//{&playerBack, "body/player_back.png"},
 		//{&playerFeet, "body/player_feet.png"},
 		//{&playerHead, "body/player_head.png"},
