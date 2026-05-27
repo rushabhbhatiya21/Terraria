@@ -20,6 +20,7 @@
 
 #define CAMERA_ZOOM 30.0f
 #define TILE_SIZE 1
+#define LIGHT_SCALE 4
 
 enum class DayPhase
 {
@@ -112,7 +113,7 @@ struct Gameplay
 	// world time
 	float worldTime = 0;
 	WorldTimeClock clock = {};
-	float FULL_DAY_LENGTH = 600;
+	float FULL_DAY_LENGTH = 20;
 
 	// enemy spawner
 	EnemySpawner enemySpawner = {};

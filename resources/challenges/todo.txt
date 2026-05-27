@@ -22,6 +22,7 @@
 
 
 -- Effects
+- add layered backgrounds
 - weapon hit effect
 - running trail based on block
 
