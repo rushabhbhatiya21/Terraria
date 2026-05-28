@@ -8,7 +8,7 @@
 #include <entityHolder.h>
 #include <player.h>
 
-void Zombie::render(AssetManager& assetManager)
+void Zombie::drawSprite(AssetManager& assetManager)
 {
 	Transform2D zombieSprite = physics.transform;
 	zombieSprite.w = 1;
@@ -17,9 +17,6 @@ void Zombie::render(AssetManager& assetManager)
 	zombieSprite.pos.y -= (zombieSprite.h - physics.transform.h) / 2;
 
 	auto aabb = getRectangleForEntity(zombieSprite, 1, 2);
-	Color color = WHITE;
-
-	if (isRedTimer > 0) { color = { 255,0,0,255 }; }
 
 	DrawTexturePro(
 		assetManager.zombie,
@@ -27,12 +24,37 @@ void Zombie::render(AssetManager& assetManager)
 		aabb, // dest
 		{ 0, 0 }, // origin top-left corner
 		0.f, // rotation
-		color // tint
+		WHITE // tint
 	);
+
+	if (flashTimer > 0)
+	{
+		float flash = (flashTimer > 0) ? 1.0f : 0.0f;
+
+		BeginShaderMode(assetManager.flashShader);
+
+		SetShaderValue(
+			assetManager.flashShader,
+			GetShaderLocation(assetManager.flashShader, "flash"),
+			&flash,
+			SHADER_UNIFORM_FLOAT
+		);
+
+		DrawTexturePro(
+			assetManager.zombie,
+			getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft),
+			aabb,
+			{ 0,0 },
+			0.f,
+			Color{ 255,255,255,255 }
+		);
+		EndShaderMode();
+	}
 }
 
 bool Zombie::update(float deltaTime, EntityUpdateData& data)
 {
+	//printf("hitStopTimer: %f\n", hitStopTimer);
 	// --- HITSTOP ---
 	if (hitStopTimer > 0)
 	{
@@ -42,7 +64,6 @@ bool Zombie::update(float deltaTime, EntityUpdateData& data)
 	}
 
 	// --- TIMERS ---
-	if (isRedTimer > 0) isRedTimer -= deltaTime;
 	changeStateTimer -= deltaTime;
 
 	// --- DEATH CHECK (highest priority, overrides everything) ---

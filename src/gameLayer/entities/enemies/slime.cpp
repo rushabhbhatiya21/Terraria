@@ -7,12 +7,12 @@
 #include <items/blocks.h>
 #include <player.h>
 
-void Slime::render(AssetManager& assetManager)
+void Slime::drawSprite(AssetManager& assetManager)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
 	Color color = WHITE;
 
-	if (isRedTimer > 0) { color = { 255,0,0,255 }; }
+	if (flashTimer > 0) { color = { 255,0,0,255 }; }
 
 	float facingValue = isFacingRight ? 32 : -32;
 
@@ -28,9 +28,9 @@ void Slime::render(AssetManager& assetManager)
 
 bool Slime::update(float deltaTime, EntityUpdateData& data)
 {
-	if (isRedTimer > 0)
+	if (flashTimer > 0)
 	{
-		isRedTimer -= deltaTime;
+		flashTimer -= deltaTime;
 	}
 
 	changeStateTimer -= deltaTime;

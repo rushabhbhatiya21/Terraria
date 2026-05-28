@@ -69,11 +69,12 @@ MeleeHitResult updateMeleeAttacks(
 
             if (checkForHits(player->weaponBase, player->weaponTip, *enemy))
             {
-                if (enemy->isAlive)
-                {
-                    enemy->hitStopTimer = .1f;
-                    player->hitStopTimer = .1f; // same duration, they freeze together
-                }
+                // hit stop timer set in combat system
+                //if (enemy->isAlive)
+                //{
+                //    enemy->hitStopTimer = .1f;
+                //    player->hitStopTimer = .1f; // same duration, they freeze together
+                //}
 
                 DamageInfo info;
                 info.damage = attack.damage;
@@ -82,7 +83,6 @@ MeleeHitResult updateMeleeAttacks(
 
                 // this will trigger onHit for each entity
                 CombatSystem::applyDamage(enemy, info);
-                //enemy->hit(attack.damage, attack.owner->getPosition());
 
                 // prevent multi-hit from same swing
                 attack.lifetime = 0.f;

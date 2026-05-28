@@ -99,21 +99,18 @@ struct Gameplay
 	// lighting
 	int lastScreenWidth = 0;
 	int lastScreenHeight = 0;
-	RenderTexture2D lightMask = { 0 };
 	std::vector<std::vector<float>> lightMap;
 
-	// shader
-	Shader blurShader = {};
-	Shader bloomShader = {};
-	RenderTexture2D sceneTexture = {};
-	RenderTexture2D blurredLightTexture = {};
-	RenderTexture2D blurredGlowTexture = {};
-	RenderTexture2D glowTexture = {};
+	RenderTexture2D lightMask = { 0 };
+	RenderTexture2D sceneTexture = { 0 };
+	RenderTexture2D blurredLightTexture = { 0 };
+	RenderTexture2D blurredGlowTexture = { 0 };
+	RenderTexture2D glowTexture = { 0 };
 
 	// world time
 	float worldTime = 0;
 	WorldTimeClock clock = {};
-	float FULL_DAY_LENGTH = 20;
+	float FULL_DAY_LENGTH = 600;
 
 	// enemy spawner
 	EnemySpawner enemySpawner = {};
@@ -161,5 +158,5 @@ struct Gameplay
 
 	bool update(AssetManager& assetManager);
 
-	void closeGame() const;
+	void closeGame(AssetManager& assetManager) const;
 };

@@ -325,9 +325,9 @@ bool Gameplay::init()
 	player.physics.transform.h = 1.8f;
 
 
-	// Load the shader
-	blurShader = LoadShader(0, RESOURCES_PATH "shaders/blur.fs");
-	bloomShader = LoadShader(0, RESOURCES_PATH "shaders/bloom.fs");
+	//// Load the shader
+	//blurShader = LoadShader(0, RESOURCES_PATH "shaders/blur.fs");
+	//bloomShader = LoadShader(0, RESOURCES_PATH "shaders/bloom.fs");
 
 	// Use a RenderTexture to capture the scene
 	sceneTexture =        LoadRenderTexture(screenW, screenH);
@@ -1015,7 +1015,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	BeginTextureMode(blurredLightTexture);
 
-	BeginShaderMode(blurShader);
+	BeginShaderMode(assetManager.blurShader);
 
 	ClearBackground(BLACK);
 
@@ -1276,7 +1276,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	// blur glow texture
 	BeginTextureMode(blurredGlowTexture);
-	BeginShaderMode(blurShader);
+	BeginShaderMode(assetManager.blurShader);
 	ClearBackground(BLACK);
 	DrawTextureRec(
 		glowTexture.texture,
@@ -1364,19 +1364,6 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		EndBlendMode();
 	}
-
-#pragma endregion
-
-
-#pragma region day/night cycle render
-
-	//DrawRectangle(
-	//	0,
-	//	0,
-	//	GetScreenWidth(),
-	//	GetScreenHeight(),
-	//	Fade(ambientColor, darkness)
-	//);
 
 #pragma endregion
 
@@ -1892,13 +1879,15 @@ bool Gameplay::update(AssetManager& assetManager)
 	return true;
 }
 
-void Gameplay::closeGame() const
+void Gameplay::closeGame(AssetManager& assetManager) const
 {
 	UnloadRenderTexture(lightMask);
 	UnloadRenderTexture(sceneTexture);
 	UnloadRenderTexture(glowTexture);
 	UnloadRenderTexture(blurredLightTexture);
 	UnloadRenderTexture(blurredGlowTexture);
-	UnloadShader(blurShader);
-	UnloadShader(bloomShader);
+
+	UnloadShader(assetManager.blurShader);
+	UnloadShader(assetManager.bloomShader);
+	UnloadShader(assetManager.flashShader);
 }

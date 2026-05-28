@@ -1,6 +1,33 @@
 #include "enemy.h"
 #include <assetManager.h>
 
+void Enemy::render(AssetManager& assetManager)
+{
+	bool flashing = flashTimer > 0;
+
+	if (flashing)
+	{
+		float flash = 1.f;
+
+		BeginShaderMode(assetManager.flashShader);
+
+		SetShaderValue(
+			assetManager.flashShader,
+			GetShaderLocation(assetManager.flashShader, "flash"),
+			&flash,
+			SHADER_UNIFORM_FLOAT
+		);
+	}
+
+	drawSprite(assetManager);
+
+	if (flashing)
+	{
+		EndShaderMode();
+	}
+
+}
+
 void Enemy::renderHealthBar(AssetManager& assetManager)
 {
 	float healthWidth = 1.6f;
@@ -59,8 +86,10 @@ void Enemy::renderHealthBar(AssetManager& assetManager)
 	}
 }
 
-bool Enemy::updateHealthBar(float deltatime)
+bool Enemy::updateHealthBar(float deltaTime)
 {
+	if (flashTimer > 0) flashTimer -= deltaTime;
+
 	if (life <= 0)
 	{
 		isAlive = false;
@@ -68,7 +97,7 @@ bool Enemy::updateHealthBar(float deltatime)
 
 	if (hurtTimer >= 0)
 	{
-		hurtTimer -= deltatime;
+		hurtTimer -= deltaTime;
 	}
 
 	if (hurtTimer < 0)
@@ -81,7 +110,7 @@ bool Enemy::updateHealthBar(float deltatime)
 
 void Enemy::onHit()
 {
-	isRedTimer = hitStopTimer;
+	flashTimer = .2f;
 	hurtTimer = 1;
 	currentState = STATE_HURT;
 }

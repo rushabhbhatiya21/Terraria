@@ -28,14 +28,16 @@ struct Enemy : public Entity
 		return physics.getPosition();
 	}
 
-	float isRedTimer = 0;
+	float flashTimer = 0;
 	float hurtTimer = 0;
 
 	void renderHealthBar(AssetManager& assetManager);
 
 	bool updateHealthBar(float deltatime);
 
-	virtual void render(AssetManager& assetManager) override = 0;
+	virtual void render(AssetManager& assetManager) override;
+
+	virtual void drawSprite(AssetManager& assetManager) = 0;
 
 	virtual bool update(float deltaTime, EntityUpdateData& entityUpdateData) override = 0;
 
@@ -58,29 +60,6 @@ struct Enemy : public Entity
 	virtual int getEnemyType() = 0;
 
 	virtual float getMaxLife() override = 0;
-
-	//void knockback(float damage, Vector2 hitFromPosition, float knockbackForce = 3.f)
-	//{
-	//	// Push away from whoever hit us
-	//	float direction = (getPosition().x >= hitFromPosition.x) ? 1.f : -1.f;
-
-	//	physics.velocity.x = direction * knockbackForce;
-	//	physics.velocity.y = -3.f; // small upward bump, feels more impactful
-	//}
-
-	//void hit(float damage, Vector2 hitFromPosition) override
-	//{
-	//	isRedTimer = hitStopTimer;
-	//	life -= damage;
-	//	damageTaken = damage;
-	//	hurtTimer = 1;
-
-	//	if (life <= 0) return;
-	//	knockback(damage, hitFromPosition);
-
-	//	// Force into hurt state — you'll call enterState from the subclass
-	//	currentState = STATE_HURT;
-	//}
 
 	virtual void onHit();
 

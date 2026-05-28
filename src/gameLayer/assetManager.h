@@ -10,6 +10,12 @@ struct TexEntry
 	const char* path;
 };
 
+struct ShaderEntry
+{
+	Shader* shader;
+	const char* path;
+};
+
 struct AssetManager
 {
 	Texture2D dirt = {};
@@ -31,6 +37,10 @@ struct AssetManager
 	Texture2D snowBG = {};
 	Texture2D caveBG = {};
 	Texture2D nightBG = {};
+
+	Shader blurShader = {};
+	Shader bloomShader = {};
+	Shader flashShader = {};
 
 	//Texture2D playerBack = {};
 	//Texture2D playerFeet = {};
@@ -66,6 +76,12 @@ struct AssetManager
 		//{&playerFeet, "body/player_feet.png"},
 		//{&playerHead, "body/player_head.png"},
 		//{&playerFront, "body/player_front.png"}
+	};
+
+	std::vector<ShaderEntry> shaderList = {
+		{&blurShader,  "shaders/blur.fs"},
+		{&bloomShader, "shaders/bloom.fs"},
+		{&flashShader, "shaders/flash.fs"}
 	};
 
 	void loadAll();

@@ -75,6 +75,6 @@ bool updateGame()
 
 void closeGame()
 {
-	gameplay.closeGame();
+	gameplay.closeGame(assetManager);
 	printf("\n\nCLOSED!!!!!!!!!\n\n");
 }

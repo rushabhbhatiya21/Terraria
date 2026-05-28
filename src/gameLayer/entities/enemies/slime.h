@@ -9,7 +9,7 @@ struct Slime : public Enemy
 		life = getMaxLife();
 	}
 
-	void render(AssetManager& assetManager) override;
+	void drawSprite(AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 

@@ -6,7 +6,7 @@
 #include <entityHolder.h>
 #include <player.h>
 
-void DesertSlime::render(AssetManager& assetManager)
+void DesertSlime::drawSprite(AssetManager& assetManager)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
 

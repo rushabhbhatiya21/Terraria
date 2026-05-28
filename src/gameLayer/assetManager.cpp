@@ -13,6 +13,11 @@ void AssetManager::loadAll()
 		*t.tex = LoadTexture((std::string(RESOURCES_PATH) + t.path).c_str());
 	}
 
+	for (auto& s : shaderList)
+	{
+		*s.shader = LoadShader(0, (std::string(RESOURCES_PATH) + s.path).c_str());
+	}
+
 	//optional blur the background
 	//SetTextureFilter(forestBG, TEXTURE_FILTER_TRILINEAR);
 

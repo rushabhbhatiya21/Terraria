@@ -9,7 +9,7 @@ struct Zombie : public Enemy
 		life = getMaxLife();
 	}
 
-	void render(AssetManager& assetManager) override;
+	void drawSprite(AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
@@ -22,6 +22,7 @@ struct Zombie : public Enemy
 	bool isOnLedge(GameMap& gameMap);
 
 	void doAttack(EntityUpdateData& entityUpdateData);
+
 
 	//void enterState(int newState, EntityUpdateData& entityUpdateData) override;
 
