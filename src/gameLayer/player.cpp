@@ -19,9 +19,9 @@ void Player::render(AssetManager& assetManager)
 		textureUV = getTextureAtlas(animations.positionX, animations.positionY + 3, 32, 64, animations.movingLeft);
 
 	// --- BACK LAYER ---
-	DrawTexturePro(assetManager.getBackTexture(armourChest), textureUV, aabb, { 0,0 }, 0.f, WHITE);
-	DrawTexturePro(assetManager.getFeetTexture(armoutLegs), textureUV, aabb, { 0,0 }, 0.f, WHITE);
-	DrawTexturePro(assetManager.getHeadTexture(armourHead), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	DrawTexturePro(assetManager.getBackTexture(equipments.chest.itemId),  textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId),  textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	DrawTexturePro(assetManager.getHeadTexture(equipments.helmet.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 
 	// --- HELD ITEM ---
 	if (heldItem)

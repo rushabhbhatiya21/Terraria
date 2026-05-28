@@ -52,11 +52,7 @@ struct Player : public Entity
 
 	bool isPlayingAttackAnimation = false;
 
-	int armourHead = 0;
-	int armourChest = 0;
-	int armoutLegs = 0;
-
-	ItemId heldItem = Items::shuriken;
+	ItemId heldItem = Items::air;
 	int selectedHotbarSlot = -1;
 
 	int numberOfParticlesOnLand = 1;

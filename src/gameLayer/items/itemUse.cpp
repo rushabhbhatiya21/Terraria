@@ -5,8 +5,10 @@
 #include <combat/melee.h>
 #include <combat/tool.h>
 #include <combat/blockSpawn.h>
+#include "equipmentInventory.h"
+#include "inventory.h"
 
-void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos)
+void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inventory& inventory, Vector2 mouseWorldPos)
 {
 	if (stack.count <= 0) return;
 
@@ -38,6 +40,10 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vecto
 
 	case ItemCategory::BLOCK:
 		useBlock(entity, *item, mouseWorldPos);
+		break;
+
+	case ItemCategory::ARMOR:
+		useArmor(entity, stack, item->armor.slot, inventory);
 		break;
 
 	case ItemCategory::CONSUMABLE:
@@ -90,6 +96,35 @@ void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 {
 	const BlockData& block = item.block;
 	spawnBlock(mouseWorldPos, entity->getPosition(), (int)block.type);
+}
+
+void useArmor(Entity* entity, const ItemStack& stack, ArmorSlot slot, Inventory& inventory)
+{
+	ItemStack& old = { 0,0 };
+
+	switch (slot)
+	{
+		case ArmorSlot::HELMET:
+		{
+			old = entity->equipments.equipHelmet(stack);
+			break;
+		}
+		case ArmorSlot::CHEST:
+		{
+			old = entity->equipments.equipChest(stack);
+			break;
+		}
+		case ArmorSlot::BOOTS:
+		{
+			old = entity->equipments.equipBoots(stack);
+			break;
+		}
+
+		default:
+			break;
+	}
+
+	inventory.storeItem(old);
 }
 
 void useConsumable(Entity* entity, ItemStack& stack, const ItemDefinition& item)

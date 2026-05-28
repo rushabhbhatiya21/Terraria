@@ -704,6 +704,7 @@ bool Gameplay::update(AssetManager& assetManager)
 					&player,
 					ItemStack{ player.heldItem, 1 }, 
 					entityHolder,
+					inventory,
 					worldPos
 				);
 			}
@@ -1590,7 +1591,6 @@ bool Gameplay::update(AssetManager& assetManager)
 			if (canCraft)
 			{
 				Crafting::craft(inventory, selectedItemType);
-				//spawnDroppedItem(player.getPosition(), item);
 			}
 		}
 
@@ -1600,9 +1600,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		for (int i = Crafting::startPointer; i < std::min(Crafting::startPointer + Crafting::maxRecipeToShow, maxRecipeSize); i++)
 		{
 			ItemId itemType = availableRecipes[i];
-			//ItemId itemType = 6001;
 			bool canCraft = Crafting::canCraft(inventory.slots, itemType);
-			//printf("itemType: %d, can craft: %d\n", itemType, canCraft);
 
 			// item rectangle
 			Rectangle rr = oneCellRectangleRecipe;
@@ -1621,7 +1619,6 @@ bool Gameplay::update(AssetManager& assetManager)
 				if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT) && canCraft)
 				{
 					Crafting::craft(inventory, selectedItemType);
-					//spawnDroppedItem(player.getPosition(), item);
 				}
 			}
 

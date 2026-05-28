@@ -7,6 +7,7 @@ struct Player;
 struct AssetManager;
 struct EntityHolder;
 struct Inventory;
+struct EquipmentInventory;
 
 using Json = nlohmann::json;
 
@@ -32,6 +33,8 @@ struct EntityUpdateData
 struct Entity
 {
 	PhysicalEntity physics;
+
+	EquipmentInventory equipments;
 
 	bool isAlive = false;
 	float life = 1;
