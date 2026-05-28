@@ -18,6 +18,8 @@ struct ShaderEntry
 
 struct AssetManager
 {
+	int flashShaderLocation = 0;
+
 	Texture2D dirt = {};
 	Texture2D textures = {};
 	Texture2D items = {};

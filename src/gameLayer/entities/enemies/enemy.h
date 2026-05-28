@@ -22,6 +22,7 @@ struct Enemy : public Entity
 	EntityAnimation animations;
 
 	float baseX = 0;
+	int shaderLoc = -1;
 
 	Vector2& getPosition()
 	{

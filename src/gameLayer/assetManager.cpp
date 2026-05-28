@@ -7,7 +7,6 @@
 
 void AssetManager::loadAll()
 {
-
 	for (auto& t : texList)
 	{
 		*t.tex = LoadTexture((std::string(RESOURCES_PATH) + t.path).c_str());
@@ -17,6 +16,8 @@ void AssetManager::loadAll()
 	{
 		*s.shader = LoadShader(0, (std::string(RESOURCES_PATH) + s.path).c_str());
 	}
+
+	flashShaderLocation = GetShaderLocation(flashShader, "flash");
 
 	//optional blur the background
 	//SetTextureFilter(forestBG, TEXTURE_FILTER_TRILINEAR);

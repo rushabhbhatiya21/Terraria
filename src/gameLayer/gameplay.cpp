@@ -324,11 +324,6 @@ bool Gameplay::init()
 	player.physics.transform.w = 0.9f;
 	player.physics.transform.h = 1.8f;
 
-
-	//// Load the shader
-	//blurShader = LoadShader(0, RESOURCES_PATH "shaders/blur.fs");
-	//bloomShader = LoadShader(0, RESOURCES_PATH "shaders/bloom.fs");
-
 	// Use a RenderTexture to capture the scene
 	sceneTexture =        LoadRenderTexture(screenW, screenH);
 	lightMask =           LoadRenderTexture(screenW / LIGHT_SCALE, screenH / LIGHT_SCALE);

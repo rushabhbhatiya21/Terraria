@@ -13,7 +13,7 @@ void Enemy::render(AssetManager& assetManager)
 
 		SetShaderValue(
 			assetManager.flashShader,
-			GetShaderLocation(assetManager.flashShader, "flash"),
+			assetManager.flashShaderLocation,
 			&flash,
 			SHADER_UNIFORM_FLOAT
 		);
