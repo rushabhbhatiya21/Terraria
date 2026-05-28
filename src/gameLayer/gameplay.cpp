@@ -9,6 +9,9 @@
 #include <saveMap.h>
 #include <worldGenerator.h>
 
+#include <recipe.h>
+#include <crafting.h>
+
 #include <shake.h>
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>
@@ -156,8 +159,8 @@ Rectangle Gameplay::getCraftRectangle(float w, float h)
 	Rectangle craftRectangle = {};
 
 	// Base size
-	craftRectangle.width = w * 0.15f;
-	craftRectangle.height = h * 0.35f;
+	craftRectangle.width = w * 0.25f;
+	craftRectangle.height = h * 0.45f;
 
 	//// Clamp
 	//craftRectangle.width = Clamp(craftRectangle.width, 180.f, 420.f);
@@ -344,6 +347,7 @@ bool Gameplay::init()
 
 	// start item in inventory
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
+	inventory.storeItem(ItemStack{ Block::woodLog, 5 });
 
 	// for debug only
 	lifetime = 3;
@@ -1541,7 +1545,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		oneCellRectangleRecipe.height = baseCellSize;
 		oneCellRectangleRecipe.x = recipeRect.x + (recipeRect.width - oneCellRectangleRecipe.width) * 0.5f;
 		oneCellRectangleRecipe.y = recipeRect.y;
-		oneCellRectangleRecipe = shrinkRectanglePercentage(oneCellRectangleRecipe, 0.1f, 0.1f);
+		oneCellRectangleRecipe = shrinkRectanglePercentage(oneCellRectangleRecipe, 0.01f, 0.01f);
 		//DrawRectangleLinesEx(oneCellRectangleRecipe, 1, BLUE);
 
 		// INGREDIENT
@@ -1550,52 +1554,59 @@ bool Gameplay::update(AssetManager& assetManager)
 		oneCellRectangleIngredient.height = baseCellSize;
 		oneCellRectangleIngredient.x = ingredientRect.x;
 		oneCellRectangleIngredient.y = ingredientRect.y;
-		oneCellRectangleIngredient = shrinkRectanglePercentage(oneCellRectangleIngredient, 0.1f, 0.1f);
+		oneCellRectangleIngredient = shrinkRectanglePercentage(oneCellRectangleIngredient, 0.01f, 0.01f);
 		//DrawRectangleLinesEx(oneCellRectangleIngredient, 1, DARKPURPLE);
 
-		int maxRecipeSize = inventory.visibleRecipes.size();
+		std::vector<ItemId> availableRecipes = Crafting::getAvailableRecipes(false);
+		int maxRecipeSize = availableRecipes.size();
 		float scroll = GetMouseWheelMove();
 
 		if (scroll < 0)
 		{
 			if (selectedRecipeIndex < maxRecipeSize - 1)
 			{
-				selectedRecipeIndex += 1;
-				selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize);
+				selectedRecipeIndex++;
+				selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize - 1);
 			}
+			if (Crafting::startPointer < maxRecipeSize - Crafting::maxRecipeToShow)
+				Crafting::startPointer++;
 		}
 		else if (scroll > 0)
 		{
 			if (selectedRecipeIndex > 0)
 			{
-				selectedRecipeIndex -= 1;
-				selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize);
+				selectedRecipeIndex--;
+				selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize - 1);
 			}
+			if (Crafting::startPointer > 0)
+				Crafting::startPointer--;
 		}
 
 		if (IsKeyPressed(KEY_ENTER))
 		{
-			int selectedItemType = inventory.visibleRecipes[selectedRecipeIndex];
-			bool canCraft = inventory.canCraft(selectedItemType);
+			ItemId selectedItemType = availableRecipes[selectedRecipeIndex];
+			bool canCraft = Crafting::canCraft(inventory.slots, selectedItemType);
 
 			if (canCraft)
 			{
-				int item = inventory.craft(selectedItemType);
-				spawnDroppedItem(player.getPosition(), item);
+				Crafting::craft(inventory, selectedItemType);
+				//spawnDroppedItem(player.getPosition(), item);
 			}
 		}
 
+		ItemId selectedItemType = availableRecipes[selectedRecipeIndex];
 		int padding = 10;
 
-		for (int i = 0; i < maxRecipeSize; i++)
+		for (int i = Crafting::startPointer; i < std::min(Crafting::startPointer + Crafting::maxRecipeToShow, maxRecipeSize); i++)
 		{
-			int itemType = inventory.visibleRecipes[i];
-			bool canCraft = inventory.canCraft(itemType);
-			int selectedItemType = inventory.visibleRecipes[selectedRecipeIndex];
+			ItemId itemType = availableRecipes[i];
+			//ItemId itemType = 6001;
+			bool canCraft = Crafting::canCraft(inventory.slots, itemType);
+			//printf("itemType: %d, can craft: %d\n", itemType, canCraft);
 
 			// item rectangle
 			Rectangle rr = oneCellRectangleRecipe;
-			rr.y += i * (oneCellRectangleRecipe.height + padding);
+			rr.y += (i - Crafting::startPointer) * (oneCellRectangleRecipe.height + padding);
 			rr = shrinkRectanglePercentage(rr, .1f, .1f);
 
 			// item and bg colors
@@ -1609,8 +1620,8 @@ bool Gameplay::update(AssetManager& assetManager)
 				// craft item if clicked
 				if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT) && canCraft)
 				{
-					int item = inventory.craft(selectedItemType);
-					spawnDroppedItem(player.getPosition(), item);
+					Crafting::craft(inventory, selectedItemType);
+					//spawnDroppedItem(player.getPosition(), item);
 				}
 			}
 
@@ -1645,15 +1656,15 @@ bool Gameplay::update(AssetManager& assetManager)
 
 			if (itemType != selectedItemType) continue;
 
-			for (int j = 0; j < inventory.receipes[itemType].ingredients.size(); j++)
+			for (int j = 0; j < Recipes::all[itemType].ingredients.size(); j++)
 			{
 				Rectangle ri = oneCellRectangleIngredient;
 				ri.x += j * oneCellRectangleIngredient.width;
-				ri.y += i * oneCellRectangleIngredient.height + padding;
+				ri.y += (i - Crafting::startPointer) * (oneCellRectangleRecipe.height + padding);
 				ri = shrinkRectanglePercentage(ri, .3f, .3f);
-				std::vector<ItemStack> selectedItemIngredients = inventory.receipes[itemType].ingredients;
+				std::vector<ItemStack> selectedItemIngredients = Recipes::all[itemType].ingredients;
 				int ingredient = selectedItemIngredients[j].itemId;
-				bool hasEnoughIngredients = inventory.hasEnoughIngredients(selectedItemIngredients[j]);
+				bool hasEnoughIngredients = Crafting::hasEnoughIngredients(inventory.slots, selectedItemIngredients[j]);
 
 				DrawRectangleRounded(ri, .3f, 1.f, { 48, 125, 255, 255 }); // blue color
 

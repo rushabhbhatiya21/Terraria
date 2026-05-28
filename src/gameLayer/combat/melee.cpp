@@ -57,9 +57,10 @@ MeleeHitResult updateMeleeAttacks(
             continue;
         }
 
+        if (attack.owner == nullptr) continue;
+
         // todo: keep it entity, will need to add weaponBase and weaponTip to entity
         Player* player = dynamic_cast<Player*>(attack.owner);
-        if (player == nullptr) continue;
 
         // collision against enemies
         for (Enemy* enemy : enemies)
@@ -69,14 +70,8 @@ MeleeHitResult updateMeleeAttacks(
 
             if (checkForHits(player->weaponBase, player->weaponTip, *enemy))
             {
-                // hit stop timer set in combat system
-                //if (enemy->isAlive)
-                //{
-                //    enemy->hitStopTimer = .1f;
-                //    player->hitStopTimer = .1f; // same duration, they freeze together
-                //}
-
                 DamageInfo info;
+                info.attacker = attack.owner;
                 info.damage = attack.damage;
                 info.knockback = attack.knockback;
                 info.hitDirection = attack.direction;
