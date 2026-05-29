@@ -85,8 +85,10 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 
 			float shakeDuration = result.crit ? .2f   : .1f;
 			float shakeOffset   = result.crit ? .3f   : .15f;
-			Color color         = result.crit ? WHITE : ORANGE;
-			float textSize      = result.crit ? .8f   : .4f;
+			//Color color         = result.crit ? WHITE : ORANGE;
+			//float textSize      = result.crit ? .8f   : .4f;
+			//float offset        = result.crit ? -2.f : -1.f;
+
 
 			triggerCameraShake(shakeDuration, shakeOffset);
 			spawnPopupText(
@@ -94,9 +96,10 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 				Vector2{ .1f, .1f },
 				std::to_string(int(std::floor(result.finalDamage))),
 				1,
-				textSize,
+				.4f,
 				-1.f,
-				color
+				WHITE,
+				result.crit
 			);
 
 			return false;

@@ -16,9 +16,21 @@ struct PopupText
 	float baseSize = 0;
 
 	Color color = WHITE;
+	bool crit = false;
 };
 
 extern std::vector<PopupText> popupTexts;
+
+void DrawTextOutlined(
+	Font font,
+	const std::string& text,
+	Vector2 position,
+	float fontSize,
+	float spacing,
+	Color textColor,
+	Color outlineColor,
+	float thickness
+);
 
 void spawnPopupText(
 	Vector2 position,
@@ -27,7 +39,8 @@ void spawnPopupText(
 	float lifetime,
 	float size,
 	float offset,
-	Color color
+	Color color,
+	bool crit
 );
 
 void updatePopupText(

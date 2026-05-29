@@ -2,14 +2,16 @@
 #include <raymath.h>
 
 std::vector<PopupText> popupTexts;
+static std::string critText = "CRITICAL";
 
-void spawnPopupText(Vector2 position, Vector2 velocity, std::string text, float lifetime, float size, float offset, Color color)
+void spawnPopupText(Vector2 position, Vector2 velocity, std::string text, float lifetime, float size, float offset, Color color, bool crit)
 {
 	PopupText popup{};
 
 	popup.position = position;
 	popup.startX = position.x;
-	popup.position.y += offset;
+
+	popup.position.y += crit ? (offset * 2.f) : offset;
 
 	popup.velocity = velocity;
 	popup.text = text;
@@ -17,6 +19,7 @@ void spawnPopupText(Vector2 position, Vector2 velocity, std::string text, float 
 	popup.timer = lifetime;
 	popup.baseSize = size;
 	popup.color = color;
+	popup.crit = crit;
 
 	popupTexts.push_back(popup);
 }
@@ -59,18 +62,119 @@ void updatePopupText(float deltaTime)
 	}
 }
 
+void DrawTextOutlined(
+	Font font,
+	const std::string& text,
+	Vector2 position,
+	float fontSize,
+	float spacing,
+	Color textColor,
+	Color outlineColor,
+	float thickness
+)
+{
+	// outline
+	for (int x = -1; x <= 1; x++)
+	{
+		for (int y = -1; y <= 1; y++)
+		{
+			if (x == 0 && y == 0)
+				continue;
+
+			DrawTextEx(
+				font,
+				text.c_str(),
+				{
+					position.x + x * thickness,
+					position.y + y * thickness
+				},
+				fontSize,
+				spacing,
+				outlineColor
+			);
+		}
+	}
+
+	// main text
+	DrawTextEx(
+		font,
+		text.c_str(),
+		position,
+		fontSize,
+		spacing,
+		textColor
+	);
+}
+
 void drawPopuptext()
 {
 	for (int i = (int)popupTexts.size() - 1; i >= 0; --i)
 	{
 		PopupText& popup = popupTexts[i];
-		DrawTextEx(
-			GetFontDefault(),
-			popup.text.c_str(),
-			popup.position,
-			popup.size,
-			.02f,
-			popup.color
-		);
+		if (popup.crit)
+		{
+			Vector2 critSize = MeasureTextEx(
+				GetFontDefault(),
+				critText.c_str(),
+				popup.size,
+				0.02f
+			);
+
+			Vector2 damageSize = MeasureTextEx(
+				GetFontDefault(),
+				popup.text.c_str(),
+				popup.size,
+				0.02f
+			);
+
+			float maxWidth = std::max(critSize.x, damageSize.x);
+
+			float critX = popup.position.x + (maxWidth - critSize.x) / 2.f;
+
+			float damageX = popup.position.x + (maxWidth - damageSize.x) / 2.f;
+
+			DrawTextOutlined(
+				GetFontDefault(), 
+				critText,
+				{ critX, popup.position.y },
+				popup.size,
+				0.02f,
+				Color{ 255, 80, 80, 255 },
+				BLACK,
+				.05f
+			);
+
+			DrawTextOutlined(
+				GetFontDefault(),
+				popup.text.c_str(),
+				{ damageX, popup.position.y + popup.size },
+				popup.size,
+				0.02f,
+				Color{ 255, 80, 80, 255 },
+				BLACK,
+				.03f
+			);
+		}
+		else
+		{
+			DrawTextOutlined(
+				GetFontDefault(),
+				popup.text.c_str(),
+				popup.position,
+				popup.size,
+				0.02f,
+				WHITE,
+				BLACK,
+				.03f
+			);
+		}
+		//DrawTextEx(
+		//	GetFontDefault(),
+		//	popup.text.c_str(),
+		//	popup.position,
+		//	popup.size,
+		//	.02f,
+		//	popup.color
+		//);
 	}
 }

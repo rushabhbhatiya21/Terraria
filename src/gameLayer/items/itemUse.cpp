@@ -127,6 +127,7 @@ void useArmor(Entity* entity, const ItemDefinition& item, const ItemStack& stack
 
 	entity->stats.armor += item.armor.defense;
 	entity->stats.critChance = 100;
+	entity->stats.critDamage = 100;
 
 	// remove equipped armor from inventory
 	inventory.removeItem(index);

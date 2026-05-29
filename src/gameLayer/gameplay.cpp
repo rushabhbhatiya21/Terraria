@@ -721,13 +721,11 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	if (meleeResult.hit)
 	{
-		printf("crit chance: %d, ", player.stats.critChance);
-		printf("was crit: %d, ", meleeResult.crit);
-		printf("damage: %f\n", meleeResult.damage);
 		float shakeDuration = meleeResult.crit ? .2f : .1f;
-		float shakeOffset = meleeResult.crit ? .3f : .15f;
-		Color color = meleeResult.crit ? WHITE : ORANGE;
-		float textSize = meleeResult.crit ? .8f : .4f;
+		float shakeOffset   = meleeResult.crit ? .3f : .15f;
+		//Color color         = meleeResult.crit ? ORANGE : WHITE;
+		//float textSize      = meleeResult.crit ? .8f : .4f;
+		//float offset        = meleeResult.crit ? -2.f : -1.f;
 
 		triggerCameraShake(shakeDuration, shakeOffset);
 		spawnPopupText(
@@ -735,9 +733,10 @@ bool Gameplay::update(AssetManager& assetManager)
 			Vector2{ .1f, .1f },
 			std::to_string(int(std::floor(meleeResult.damage))),
 			1,
-			textSize,
+			.4f,
 			-1.f,
-			color
+			WHITE,
+			meleeResult.crit
 		);
 	}
 
@@ -764,7 +763,8 @@ bool Gameplay::update(AssetManager& assetManager)
 			1,
 			.2f,
 			-1.f,
-			WHITE
+			WHITE,
+			false
 		);
 	}
 
