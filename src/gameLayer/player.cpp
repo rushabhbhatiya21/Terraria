@@ -78,7 +78,7 @@ void Player::render(AssetManager& assetManager)
 	}
 
 	// --- FRONT LAYER ---
-	DrawTexturePro(assetManager.getFrontTexture(armourChest), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 }
 
 //void Player::renderTrailPass(float expand, unsigned char maxAlpha)

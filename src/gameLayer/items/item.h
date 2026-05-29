@@ -8,6 +8,13 @@ struct AssetManager;
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
+enum class ItemUseContext
+{
+    NONE,
+    WORLD,
+    INVENTORY
+};
+
 enum class ItemCategory
 {
     NONE,

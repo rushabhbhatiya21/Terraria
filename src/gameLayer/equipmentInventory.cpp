@@ -7,11 +7,12 @@ bool EquipmentInventory::canEquip(const ItemDefinition& item, ArmorSlot slot) co
 
 ItemStack EquipmentInventory::equipHelmet(const ItemStack& item)
 {
+	printf("helmet equipped...\n");
 	ItemDefinition* itemDefinition = getItem(item.itemId);
 
 	if (canEquip(*itemDefinition, ArmorSlot::HELMET))
 	{
-		ItemStack& old = helmet;
+		ItemStack old = helmet;
 		helmet = item;
 		return old;
 	}
@@ -24,7 +25,7 @@ ItemStack EquipmentInventory::equipChest(const ItemStack& item)
 
 	if (canEquip(*itemDefinition, ArmorSlot::CHEST))
 	{
-		ItemStack& old = chest;
+		ItemStack old = chest;
 		chest = item;
 		return old;
 	}
@@ -37,7 +38,7 @@ ItemStack EquipmentInventory::equipBoots(const ItemStack& item)
 
 	if (canEquip(*itemDefinition, ArmorSlot::BOOTS))
 	{
-		ItemStack& old = boots;
+		ItemStack old = boots;
 		boots = item;
 		return old;
 	}

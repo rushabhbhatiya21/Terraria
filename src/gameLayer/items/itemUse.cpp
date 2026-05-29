@@ -42,9 +42,9 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inven
 		useBlock(entity, *item, mouseWorldPos);
 		break;
 
-	case ItemCategory::ARMOR:
-		useArmor(entity, stack, item->armor.slot, inventory);
-		break;
+	//case ItemCategory::ARMOR:
+	//	useArmor(entity, stack, item->armor.slot, inventory);
+	//	break;
 
 	case ItemCategory::CONSUMABLE:
 		useConsumable(entity, stack, *item);
@@ -98,9 +98,9 @@ void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 	spawnBlock(mouseWorldPos, entity->getPosition(), (int)block.type);
 }
 
-void useArmor(Entity* entity, const ItemStack& stack, ArmorSlot slot, Inventory& inventory)
+void useArmor(Entity* entity, const ItemStack& stack, ArmorSlot slot, Inventory& inventory, int index)
 {
-	ItemStack& old = { 0,0 };
+	ItemStack old = { 0,0 };
 
 	switch (slot)
 	{
@@ -124,7 +124,14 @@ void useArmor(Entity* entity, const ItemStack& stack, ArmorSlot slot, Inventory&
 			break;
 	}
 
+	// remove equipped armor from inventory
+	inventory.removeItem(index);
+
+	if (old.itemId == 0 || old.count == 0) return;
+
+	// store old armor back into inventory
 	inventory.storeItem(old);
+	printf("storing old helmet back...\n");
 }
 
 void useConsumable(Entity* entity, ItemStack& stack, const ItemDefinition& item)

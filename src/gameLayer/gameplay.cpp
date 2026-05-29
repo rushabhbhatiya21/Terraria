@@ -343,6 +343,7 @@ bool Gameplay::init()
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
 	spawnEnemyHelper<Zombie>({ 25,60 });
+	spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
 	maxEnemyCount = 5;
 
 	// start item in inventory
@@ -709,33 +710,6 @@ bool Gameplay::update(AssetManager& assetManager)
 				);
 			}
 		}
-
-		//if (!insideInventoryMenu && !insideCraftingMenu)
-		//{
-		//	if (IsMouseButtonDown(MOUSE_BUTTON_RIGHT))
-		//	{
-		//		float magnitude = Vector2Distance(player.getPosition(), worldPos);
-		//		if (magnitude <= 5 || creative)
-		//		{
-		//			// place block only if its withing reach, 
-		//			// no existing blocks and 
-		//			// adjecent block exists
-		//			auto b = gameMap.getBlockSafe(blockX, blockY);
-		//			if (b && b->type == Block::air && gameMap.isAdjacentBlock(blockX, blockY))
-		//			{
-		//				for (auto& i : inventory.slots)
-		//				{
-		//					// check inventory to see if we have same type of item and have more than 0
-		//					if (creativeSelectedBlock == i.itemId && i.count > 0)
-		//					{
-		//						b->type = i.itemId;
-		//						i.count -= 1;
-		//					}
-		//				}
-		//			}
-		//		}
-		//	}
-		//}
 	}
 
 #pragma endregion
@@ -1443,6 +1417,20 @@ bool Gameplay::update(AssetManager& assetManager)
 					// equip item on left click
 					if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 					{
+						ItemStack& clickedStack = inventory.slots[index];
+
+						if (clickedStack.count <= 0) continue;
+
+						ItemDefinition* item = getItem(clickedStack.itemId);
+
+						if (!item) continue;
+
+						if (item->category == ItemCategory::ARMOR)
+						{
+							useArmor(&player, clickedStack, item->armor.slot, inventory, index);
+							continue;
+						}
+
 						if (player.selectedHotbarSlot == index)
 						{
 							player.heldItem = 0;

@@ -2,6 +2,7 @@
 #include <physics.h>
 #include <random>
 #include <nlohmann/json.hpp>
+#include "equipmentInventory.h"
 
 struct Player;
 struct AssetManager;
