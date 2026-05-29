@@ -14,7 +14,7 @@ void Slime::drawSprite(AssetManager& assetManager)
 
 	if (flashTimer > 0) { color = { 255,0,0,255 }; }
 
-	float facingValue = isFacingRight ? 32 : -32;
+	int facingValue = isFacingRight ? 32 : -32;
 
 	DrawTexturePro(
 		assetManager.slime,

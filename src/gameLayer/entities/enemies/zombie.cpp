@@ -275,8 +275,8 @@ bool Zombie::shouldStepUp(Vector2 playerPos, GameMap& gameMap)
 	int nextX = int(getPosition().x) + 1;
 	int prevX = int(getPosition().x) - 1;
 
-	auto bNext = gameMap.getBlockSafe(nextX, getPosition().y);
-	auto bPrev = gameMap.getBlockSafe(prevX, getPosition().y);
+	auto bNext = gameMap.getBlockSafe(nextX, (int)getPosition().y);
+	auto bPrev = gameMap.getBlockSafe(prevX, (int)getPosition().y);
 
 	if (bNext && zTotPlayerDirection.x >= 0 && isCollidable(bNext->type))
 		return true;

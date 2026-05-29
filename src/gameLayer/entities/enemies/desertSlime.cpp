@@ -10,7 +10,7 @@ void DesertSlime::drawSprite(AssetManager& assetManager)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
 
-	float facingValue = isFacingRight ? 32 : -32;
+	int facingValue = isFacingRight ? 32 : -32;
 
 	DrawTexturePro(
 		assetManager.desertSlime,

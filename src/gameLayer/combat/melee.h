@@ -14,7 +14,8 @@ struct MeleeHitResult
 {
     bool hit = false;
     Vector2 positon = {};
-    int damage = 0;
+    float damage = 0;
+    bool crit = false;
 };
 
 struct MeleeAttack

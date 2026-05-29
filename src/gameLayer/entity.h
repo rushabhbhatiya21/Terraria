@@ -3,12 +3,12 @@
 #include <random>
 #include <nlohmann/json.hpp>
 #include "equipmentInventory.h"
+#include "combat/stats.h"
 
 struct Player;
-struct AssetManager;
-struct EntityHolder;
 struct Inventory;
-struct EquipmentInventory;
+struct EntityHolder;
+struct AssetManager;
 
 using Json = nlohmann::json;
 
@@ -36,6 +36,7 @@ struct Entity
 	PhysicalEntity physics;
 
 	EquipmentInventory equipments;
+	Stats stats;
 
 	bool isAlive = false;
 	float life = 1;

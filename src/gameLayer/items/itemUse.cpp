@@ -7,6 +7,7 @@
 #include <combat/blockSpawn.h>
 #include "equipmentInventory.h"
 #include "inventory.h"
+#include "combat/stats.h"
 
 void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inventory& inventory, Vector2 mouseWorldPos)
 {
@@ -98,11 +99,11 @@ void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 	spawnBlock(mouseWorldPos, entity->getPosition(), (int)block.type);
 }
 
-void useArmor(Entity* entity, const ItemStack& stack, ArmorSlot slot, Inventory& inventory, int index)
+void useArmor(Entity* entity, const ItemDefinition& item, const ItemStack& stack, Inventory& inventory, int index)
 {
 	ItemStack old = { 0,0 };
 
-	switch (slot)
+	switch (item.armor.slot)
 	{
 		case ArmorSlot::HELMET:
 		{
@@ -124,6 +125,9 @@ void useArmor(Entity* entity, const ItemStack& stack, ArmorSlot slot, Inventory&
 			break;
 	}
 
+	entity->stats.armor += item.armor.defense;
+	entity->stats.critChance = 100;
+
 	// remove equipped armor from inventory
 	inventory.removeItem(index);
 
@@ -131,7 +135,8 @@ void useArmor(Entity* entity, const ItemStack& stack, ArmorSlot slot, Inventory&
 
 	// store old armor back into inventory
 	inventory.storeItem(old);
-	printf("storing old helmet back...\n");
+	ItemDefinition* oldItem = getItem(old.itemId);
+	entity->stats.armor -= oldItem->armor.defense;
 }
 
 void useConsumable(Entity* entity, ItemStack& stack, const ItemDefinition& item)

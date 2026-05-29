@@ -59,7 +59,8 @@ MeleeHitResult updateMeleeAttacks(
 
         if (attack.owner == nullptr) continue;
 
-        // todo: keep it entity, will need to add weaponBase and weaponTip to entity
+        // done: keep it entity, will need to add weaponBase and weaponTip to entity
+        // todo: need to add heldItem to entity
         Player* player = dynamic_cast<Player*>(attack.owner);
 
         // collision against enemies
@@ -70,21 +71,24 @@ MeleeHitResult updateMeleeAttacks(
 
             if (checkForHits(player->weaponBase, player->weaponTip, *enemy))
             {
+                ItemDefinition* item = getItem(player->heldItem);
                 DamageInfo info;
                 info.attacker = attack.owner;
-                info.damage = attack.damage;
-                info.knockback = attack.knockback;
+                info.item = item;
+                //info.damage = attack.damage;
+                //info.knockback = attack.knockback;
                 info.hitDirection = attack.direction;
 
                 // this will trigger onHit for each entity
-                CombatSystem::applyDamage(enemy, info);
+                auto damageResult = CombatSystem::applyDamage(enemy, info);
 
                 // prevent multi-hit from same swing
                 attack.lifetime = 0.f;
 
                 result.hit = true;
                 result.positon = enemy->getPosition();
-                result.damage = attack.damage;
+                result.damage = damageResult.finalDamage;
+                result.crit = damageResult.crit;
                 return result;
             }
         }

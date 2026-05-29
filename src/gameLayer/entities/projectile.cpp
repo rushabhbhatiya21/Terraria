@@ -5,6 +5,8 @@
 #include "entityHolder.h"
 #include "combat/combatSystem.h"
 #include "gameMap.h"
+#include "shake.h"
+#include "ui/popupText.h"
 
 #include "player.h"
 #include "entities/enemies/enemy.h"
@@ -45,21 +47,23 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 		return false;
 
 	float dist = Vector2Distance(physics.transform.pos, data.player.getPosition());
-	float maxDist = std::max(GetScreenWidth(), GetScreenHeight());
+	float maxDist = 50.f; // world units
 
 	if (dist > maxDist * 2.f)
 		return false;
 
-	if (rotation >= 360)
-		rotation = 0;
-
 	rotation += rotationSpeed * deltaTime;
+
+	rotation = fmod(rotation, 360.f);
+
 	physics.transform.pos += physics.velocity * deltaTime;
 
 	if (checkCollisionWithTile(data.gameMap))
 		return false;
 
 	ItemDefinition* item = getItem(itemType);
+
+	if (!item) return false;
 
 	for (Enemy* e : data.entityHolder.enemies)
 	{
@@ -70,11 +74,30 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 
 			DamageInfo info;
 			info.attacker = owner;
-			info.damage = item->weapon.damage;
-			info.knockback = item->weapon.knockback;
+			info.item = item;
+			//info.damage = item->weapon.damage;
+			//info.knockback = item->weapon.knockback;
 			info.hitDirection = Vector2Normalize(physics.velocity);
 
-			CombatSystem::applyDamage(e, info);
+			auto result = CombatSystem::applyDamage(e, info);
+
+			if (result.finalDamage <= 0) return false;
+
+			float shakeDuration = result.crit ? .2f   : .1f;
+			float shakeOffset   = result.crit ? .3f   : .15f;
+			Color color         = result.crit ? WHITE : ORANGE;
+			float textSize      = result.crit ? .8f   : .4f;
+
+			triggerCameraShake(shakeDuration, shakeOffset);
+			spawnPopupText(
+				e->physics.getPosition(),
+				Vector2{ .1f, .1f },
+				std::to_string(int(std::floor(result.finalDamage))),
+				1,
+				textSize,
+				-1.f,
+				color
+			);
 
 			return false;
 		}

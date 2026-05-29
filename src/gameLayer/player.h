@@ -2,6 +2,7 @@
 #include <entity.h>
 #include <entityAnimation.h>
 #include <items/item.h>
+#include "combat/stats.h"
 
 struct Player : public Entity
 {
@@ -14,8 +15,6 @@ struct Player : public Entity
 	}
 
 	EntityAnimation animations;
-
-	float damage = 5.f;
 
 	Vector2& getPosition()
 	{
@@ -52,7 +51,7 @@ struct Player : public Entity
 
 	bool isPlayingAttackAnimation = false;
 
-	ItemId heldItem = Items::air;
+	ItemId heldItem = Items::goldSword;
 	int selectedHotbarSlot = -1;
 
 	int numberOfParticlesOnLand = 1;

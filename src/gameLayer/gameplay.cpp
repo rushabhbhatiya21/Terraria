@@ -490,7 +490,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		// get block below feet
 		// check collider left
-		auto b = gameMap.getBlockSafe(playerPosLeft.x, playerPosLeft.y);
+		auto b = gameMap.getBlockSafe((int)playerPosLeft.x, (int)playerPosLeft.y);
 		if (b && b->type != Block::air)
 		{
 			blockType = b->type;
@@ -499,7 +499,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			// check collider right
 			Vector2 playerPosRight = player.physics.transform.getBottomRight();
-			auto b = gameMap.getBlockSafe(playerPosRight.x, playerPosRight.y);
+			auto b = gameMap.getBlockSafe((int)playerPosRight.x, (int)playerPosRight.y);
 			if (b && b->type != Block::air) blockType = b->type;
 		}
 
@@ -543,8 +543,8 @@ bool Gameplay::update(AssetManager& assetManager)
 	{
 		float zoom = camera.zoom;
 
-		float screenWidth = GetScreenWidth();
-		float screenHeight = GetScreenHeight();
+		float screenWidth  = (float)GetScreenWidth();
+		float screenHeight = (float)GetScreenHeight();
 
 		// half of visible area (adjusted for zoom)
 		float halfViewWidth = (screenWidth * 0.5f) / zoom;
@@ -631,7 +631,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma region handle input
 
 	bool insideInventoryMenu = false;
-	Rectangle inventoryRectangle = getInventoryRectangle(GetScreenWidth(), GetScreenHeight());
+	Rectangle inventoryRectangle = getInventoryRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
 
 	if (insideInventory && CheckCollisionPointRec(GetMousePosition(), inventoryRectangle))
 	{
@@ -639,7 +639,7 @@ bool Gameplay::update(AssetManager& assetManager)
 	}
 
 	bool insideCraftingMenu = false;
-	Rectangle craftRectangle = getCraftRectangle(GetScreenWidth(), GetScreenHeight());
+	Rectangle craftRectangle = getCraftRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
 
 	if (insideCraft && CheckCollisionPointRec(GetMousePosition(), craftRectangle))
 	{
@@ -721,15 +721,23 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	if (meleeResult.hit)
 	{
-		triggerCameraShake(.1f, .15f);
+		printf("crit chance: %d, ", player.stats.critChance);
+		printf("was crit: %d, ", meleeResult.crit);
+		printf("damage: %f\n", meleeResult.damage);
+		float shakeDuration = meleeResult.crit ? .2f : .1f;
+		float shakeOffset = meleeResult.crit ? .3f : .15f;
+		Color color = meleeResult.crit ? WHITE : ORANGE;
+		float textSize = meleeResult.crit ? .8f : .4f;
+
+		triggerCameraShake(shakeDuration, shakeOffset);
 		spawnPopupText(
 			meleeResult.positon,
 			Vector2{ .1f, .1f },
-			std::to_string(meleeResult.damage),
+			std::to_string(int(std::floor(meleeResult.damage))),
 			1,
-			.4f,
+			textSize,
 			-1.f,
-			WHITE
+			color
 		);
 	}
 
@@ -1168,7 +1176,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		DrawRectangleLinesEx(
 			rect,
-			0.1,
+			0.1f,
 			{ 20,101,250,145 }
 		);
 	}
@@ -1344,8 +1352,8 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma	region ui
 
-	float w = GetScreenWidth();
-	float h = GetScreenHeight();
+	float w = (float)GetScreenWidth();
+	float h = (float)GetScreenHeight();
 
 #pragma region life ui
 
@@ -1382,10 +1390,10 @@ bool Gameplay::update(AssetManager& assetManager)
 		Rectangle inventoryRectangle = getInventoryRectangle(w, h);
 
 		DrawRectangle(
-			inventoryRectangle.x,
-			inventoryRectangle.y,
-			inventoryRectangle.width,
-			inventoryRectangle.height,
+			(int)inventoryRectangle.x,
+			(int)inventoryRectangle.y,
+			(int)inventoryRectangle.width,
+			(int)inventoryRectangle.height,
 			{ 100,100,100,100 }
 		);
 
@@ -1427,7 +1435,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 						if (item->category == ItemCategory::ARMOR)
 						{
-							useArmor(&player, clickedStack, item->armor.slot, inventory, index);
+							useArmor(&player, *item, clickedStack, inventory, index);
 							continue;
 						}
 
@@ -1458,7 +1466,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 				DrawTexturePro(
 					assetManager.frame,
-					getTextureAtlas(0, 0, (float)assetManager.frame.width, (float)assetManager.frame.height),
+					getTextureAtlas(0, 0, assetManager.frame.width, assetManager.frame.height),
 					r,
 					{ 0,0 },
 					0.f,
@@ -1511,8 +1519,8 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	if (insideCraft)
 	{
-		float w = GetScreenWidth();
-		float h = GetScreenHeight();
+		float w = (float)GetScreenWidth();
+		float h = (float)GetScreenHeight();
 
 		Rectangle craftRectangle = getCraftRectangle(w, h);
 		craftRectangle = shrinkRectanglePercentage(craftRectangle, .01f, .01f);
@@ -1651,7 +1659,7 @@ bool Gameplay::update(AssetManager& assetManager)
 				int ingredient = selectedItemIngredients[j].itemId;
 				bool hasEnoughIngredients = Crafting::hasEnoughIngredients(inventory.slots, selectedItemIngredients[j]);
 
-				DrawRectangleRounded(ri, .3f, 1.f, { 48, 125, 255, 255 }); // blue color
+				DrawRectangleRounded(ri, .3f, 1, { 48, 125, 255, 255 }); // blue color
 
 				ri = shrinkRectanglePercentage(ri, .25f, .25f);
 
@@ -1737,7 +1745,15 @@ bool Gameplay::update(AssetManager& assetManager)
 		s += std::to_string(entityHolder.projectiles.size());
 		ImGui::Text(s.c_str());
 
-		//ImGui::InputFloat("lifetime", &lifetime);
+		ImGui::Separator();
+
+		ImGui::Text("Player Stats");
+		ImGui::Text("Damage:      %d", player.stats.baseDamage);
+		ImGui::Text("Armor:       %d", player.stats.armor);
+		ImGui::Text("Crit Chance: %d", player.stats.critChance);
+		ImGui::Text("Crit Damage: %d", player.stats.critDamage);
+
+		ImGui::Separator();
 
 		ImGui::SliderFloat("Camera Zoom: ", &camera.zoom, 10, 150);
 		//ImGui::SliderFloat("Camera Speed: ", &CAMERA_SPEED, 5, 100);

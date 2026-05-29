@@ -16,6 +16,6 @@ void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos);
 
 void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos);
 
-void useArmor(Entity* entity, const ItemStack& stack, ArmorSlot slot, Inventory& inventory, int index);
+void useArmor(Entity* entity, const ItemDefinition& item, const ItemStack& stack, Inventory& inventory, int index);
 
 void useConsumable(Entity* entity, ItemStack& stack, const ItemDefinition& item);
