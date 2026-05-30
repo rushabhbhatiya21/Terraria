@@ -106,10 +106,10 @@ void generateWorld(GameMap& gameMap, int seed)
     //   verydeep = stoneHeight + 180
     // These are relative; we compare against absolute y below.
 
-    // ── Stone height random walk ─────────────────────────────────────────────
-    int keepDirectionTimeStone = getRandomInt(rng, 5, 40);
-    int directionStone = getRandomInt(rng, -2, 2);
-    int stoneHeight = 90;
+    //// ── Stone height random walk ─────────────────────────────────────────────
+    //int keepDirectionTimeStone = getRandomInt(rng, 30, 100);
+    //int directionStone = getRandomInt(rng, -2, 2);
+    //int stoneHeight = 90;
 
     // ── Dirt offset: thick layer like Terraria ───────────────────────────────
     // Was [-5, 35]. Now [-8, 55] → ~20–55 block thick dirt layer.
@@ -122,29 +122,44 @@ void generateWorld(GameMap& gameMap, int seed)
     // ═══════════════════════════════════════════════════════════════════════════
     //  PASS 1 — Terrain + ores
     // ═══════════════════════════════════════════════════════════════════════════
+    int previousStoneHeight = 90;
+
     for (int x = 0; x < w; x++)
     {
         bool inDesert = (x >= desertStart && x <= desertEnd);
 
-        // Stone height random walk
-        keepDirectionTimeStone--;
-        if (keepDirectionTimeStone <= 0)
-        {
-            keepDirectionTimeStone = getRandomInt(rng, 5, 40);
-            directionStone = getRandomInt(rng, -2, 2);
-        }
+        // Smooth noise-based terrain
+        int targetStoneHeight = 90 + int((dirtNoise[x] - 0.5f) * 10.f);
 
-        auto nudge = [&](int dir, int& height)
-            {
-                if (dir == -1 && getRandomChance(rng, 0.25f))                         height--;
-                if (dir == -2 && getRandomChance(rng, 0.25f))                         height--;
-                if (dir == -2 && getRandomChance(rng, 0.25f))                         height--;
-                if (dir == 1 && getRandomChance(rng, 0.25f))                         height++;
-                if (dir == 2 && getRandomChance(rng, 0.25f))                         height++;
-                if (dir == 2 && getRandomChance(rng, 0.25f))                         height++;
-            };
-        nudge(directionStone, stoneHeight);
-        stoneHeight = std::clamp(stoneHeight, 60, 120);
+        // Prevent sudden cliffs
+        int stoneHeight =
+            std::clamp(
+                targetStoneHeight,
+                previousStoneHeight - 1,
+                previousStoneHeight + 1
+            );
+
+        previousStoneHeight = stoneHeight;
+
+        //// Stone height random walk
+        //keepDirectionTimeStone--;
+        //if (keepDirectionTimeStone <= 0)
+        //{
+        //    keepDirectionTimeStone = getRandomInt(rng, 5, 40);
+        //    directionStone = getRandomInt(rng, -2, 2);
+        //}
+
+        //auto nudge = [&](int dir, int& height)
+        //    {
+        //        if (dir == -1 && getRandomChance(rng, 0.1f))                         height--;
+        //        if (dir == -2 && getRandomChance(rng, 0.1f))                         height--;
+        //        if (dir == -2 && getRandomChance(rng, 0.1f))                         height--;
+        //        if (dir ==  1 && getRandomChance(rng, 0.1f))                         height++;
+        //        if (dir ==  2 && getRandomChance(rng, 0.1f))                         height++;
+        //        if (dir ==  2 && getRandomChance(rng, 0.1f))                         height++;
+        //    };
+        //nudge(directionStone, stoneHeight);
+        //stoneHeight = std::clamp(stoneHeight, 60, 120);
 
         int dirtHeight = dirtOffsetStart + (dirtOffsetEnd - dirtOffsetStart) * dirtNoise[x];
         dirtHeight = stoneHeight - dirtHeight;
