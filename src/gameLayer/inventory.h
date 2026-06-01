@@ -7,12 +7,12 @@
 
 struct Inventory
 {
-	int rows = 9;
-	int cols = 3;
+	int columns = 10;
+	int rows = 3;
 
-	int HOTBAR_SIZE = rows;
+	int HOTBAR_SIZE = columns;
 
-	int slotCount = rows * cols;
+	int slotCount = columns * rows;
 	std::vector<ItemStack> slots;
 
 	Inventory()

@@ -53,8 +53,8 @@ struct Player : public Entity
 
 	bool isPlayingAttackAnimation = false;
 
-	ItemId heldItem = Items::goldSword;
-	int selectedHotbarSlot = -1;
+	ItemId heldItem = Items::air;
+	int selectedHotbarSlot = 0;
 
 	int numberOfParticlesOnLand = 1;
 
