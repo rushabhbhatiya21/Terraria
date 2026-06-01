@@ -342,16 +342,13 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnEnemyHelper<Zombie>({ 25,60 });
-	spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
+	spawnEnemyHelper<Zombie>({ 30,60 });
+	//spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
 	maxEnemyCount = 5;
 
 	// start item in inventory
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 	inventory.storeItem(ItemStack{ Block::woodLog, 5 });
-
-	// for debug only
-	lifetime = 3;
 
 	// start day at random time
 	std::ranlux24_base rng(std::random_device{}());
@@ -394,7 +391,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma region updates (deltatime dependent)
 
 	updateShake(deltaTime);
-	updateCameraShake(deltaTime);
+	camShake.updateCameraShake(deltaTime);
 	updateParticles(particles, deltaTime);
 	updatePopupText(deltaTime);
 
@@ -727,7 +724,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		//float textSize      = meleeResult.crit ? .8f : .4f;
 		//float offset        = meleeResult.crit ? -2.f : -1.f;
 
-		triggerCameraShake(shakeDuration, shakeOffset);
+		camShake.triggerCameraShake(shakeDuration, shakeOffset);
 		spawnPopupText(
 			meleeResult.positon,
 			Vector2{ .1f, .1f },
@@ -815,11 +812,11 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	//maxEnemyCount = 5;
 
-	if (enemySpawner.enemySpawnTimer <= 0 && enemyCount < maxEnemyCount)
-	{
-		spawnEnemy(entityHolder, gameMap, rng, startXView, endXView, startYView, endYView);
-		enemySpawner.enemySpawnTimer = 2;
-	}
+	//if (enemySpawner.enemySpawnTimer <= 0 && enemyCount < maxEnemyCount)
+	//{
+	//	spawnEnemy(entityHolder, gameMap, rng, startXView, endXView, startYView, endYView);
+	//	enemySpawner.enemySpawnTimer = 2;
+	//}
 
 #pragma endregion
 
@@ -1744,6 +1741,12 @@ bool Gameplay::update(AssetManager& assetManager)
 		std::string s = "Projectiles: ";
 		s += std::to_string(entityHolder.projectiles.size());
 		ImGui::Text(s.c_str());
+
+		ImGui::Separator();
+
+		std::string enemyCount = "Enemy Count: ";
+		enemyCount += std::to_string(entityHolder.enemies.size());
+		ImGui::Text(enemyCount.c_str());
 
 		ImGui::Separator();
 

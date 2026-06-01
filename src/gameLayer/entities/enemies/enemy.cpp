@@ -63,9 +63,9 @@ void Enemy::renderHealthBar(AssetManager& assetManager)
 		WHITE
 	);
 
-	if (hurtTimer >= 0)
+	if (damageTakenHealthBarTimer >= 0)
 	{
-		float progress = 1.f - (hurtTimer / 2);
+		float progress = 1.f - (damageTakenHealthBarTimer / 2);
 		float fade = 1.f - pow(progress, 3.f);
 
 		Rectangle r{
@@ -95,12 +95,12 @@ bool Enemy::updateHealthBar(float deltaTime)
 		isAlive = false;
 	}
 
-	if (hurtTimer >= 0)
+	if (damageTakenHealthBarTimer >= 0)
 	{
-		hurtTimer -= deltaTime;
+		damageTakenHealthBarTimer -= deltaTime;
 	}
 
-	if (hurtTimer < 0)
+	if (damageTakenHealthBarTimer < 0)
 	{
 		damageTaken = 0;
 	}
@@ -110,7 +110,6 @@ bool Enemy::updateHealthBar(float deltaTime)
 
 void Enemy::onHit()
 {
-	flashTimer = .2f;
-	hurtTimer = 1;
-	currentState = STATE_HURT;
+	flashTimer = .15f;
+	damageTakenHealthBarTimer = 1;
 }

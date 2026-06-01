@@ -90,7 +90,7 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			//float offset        = result.crit ? -2.f : -1.f;
 
 
-			triggerCameraShake(shakeDuration, shakeOffset);
+			camShake.triggerCameraShake(shakeDuration, shakeOffset);
 			spawnPopupText(
 				e->physics.getPosition(),
 				Vector2{ .1f, .1f },

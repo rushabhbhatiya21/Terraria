@@ -9,20 +9,35 @@ struct Zombie : public Enemy
 		life = getMaxLife();
 	}
 
+	enum class Zombie_State
+	{
+		IDLE = 0,
+		PATROL,         // 1
+		CHASING,        // 2
+		ATTACK_WINDUP,  // 3
+		ATTACK_RECOVER, // 4
+		HURT,           // 5
+		DEAD            // 6
+	};
+
+	Zombie_State currentState = Zombie_State::IDLE;
+	Zombie_State previouseState = Zombie_State::IDLE;
+
 	void drawSprite(AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
 	void dropLoot(EntityHolder& entityHolder, int type) override;
 
-	void enterState(int newState, EntityUpdateData& entityUpdateData);
+	//void enterState(int newState, EntityUpdateData& entityUpdateData);
 
 	bool shouldStepUp(Vector2 playerPos, GameMap& gameMap);
 
 	bool isOnLedge(GameMap& gameMap);
 
-	void doAttack(EntityUpdateData& entityUpdateData);
+	void doAttack(Player* player);
 
+	void enterState(Zombie_State newState) override;
 
 	//void enterState(int newState, EntityUpdateData& entityUpdateData) override;
 
@@ -46,8 +61,13 @@ struct Zombie : public Enemy
 
 	float getMaxLife() override { return 50; }
 
+	virtual void onHit() override;
+
 	// Zombie.h — tweak these freely
-	static constexpr float SIGHT_RANGE = 15.f;
+	bool isMoving = false;
+	bool movingLeft = false;
+	static constexpr float SIGHT_RANGE = 10.f;
+	static constexpr float FORGET_RANGE = 15.f;
 	static constexpr float ATTACK_RANGE = 1.5f;
 	static constexpr float WANDER_SPEED = 1.5f;   // px/s
 	static constexpr float CHASE_SPEED = 3.f;

@@ -91,24 +91,10 @@ struct CameraShake
     float duration = 0.0f;
     float strength = 0.0f;
     float phase = 0.0f;
+
+    void triggerCameraShake(float duration, float strength);
+
+    void updateCameraShake(float dt);
 };
 
-static CameraShake camShake;
-
-inline void triggerCameraShake(float duration, float strength)
-{
-    camShake.time = duration;
-    camShake.duration = duration;
-    camShake.strength = strength;
-    camShake.phase = GetRandomValue(0, 1000) / 100.0f;
-}
-
-inline void updateCameraShake(float dt)
-{
-    if (camShake.time > 0.0f)
-    {
-        camShake.time -= dt;
-        if (camShake.time < 0.0f)
-            camShake.time = 0.0f;
-    }
-}
+extern CameraShake camShake;

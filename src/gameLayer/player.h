@@ -49,6 +49,8 @@ struct Player : public Entity
 
 	float getMaxLife() { return 50; }
 
+	virtual void onHit();
+
 	bool isPlayingAttackAnimation = false;
 
 	ItemId heldItem = Items::goldSword;

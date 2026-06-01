@@ -43,9 +43,14 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 	// min damage 1
 	result.finalDamage = std::max(1.f, result.finalDamage);
 
+	float knockback = 1;
+
+	if (info.item)
+		knockback = info.item->weapon.knockback;
+
 	target->life -= result.finalDamage;
 	target->damageTaken = result.finalDamage;
-	target->knockback(info.hitDirection, info.item->weapon.knockback);
+	target->knockback(info.hitDirection, knockback);
 	target->onHit();
 
 	return result;

@@ -30,7 +30,7 @@ struct Enemy : public Entity
 	}
 
 	float flashTimer = 0;
-	float hurtTimer = 0;
+	//float hurtTimer = 0;
 
 	void renderHealthBar(AssetManager& assetManager);
 
@@ -41,6 +41,8 @@ struct Enemy : public Entity
 	virtual void drawSprite(AssetManager& assetManager) = 0;
 
 	virtual bool update(float deltaTime, EntityUpdateData& entityUpdateData) override = 0;
+
+	virtual void enterState(int newState) {};
 
 	virtual void dropLoot(EntityHolder& entityHolder, int type) override = 0;
 
@@ -64,15 +66,19 @@ struct Enemy : public Entity
 
 	virtual void onHit();
 
-	int currentState = STATE_IDLE;
+	float attackWindUpTimer = 0;
+	float attackRecoverTimer = 0;
+
+	//static float constexpr attackWindUpTime  = .4f;
+	//static float constexpr attackRecoverTime = .6f;
+
+	int currentState = 0;
+	//int previouseState = 0;
 
 	enum
 	{
-		STATE_IDLE = 0,
 		STATE_WONDERING,
 		STATE_CHASING,
-		STATE_ATTACK,
-		STATE_HURT,
 		STATE_DEAD
 	};
 };

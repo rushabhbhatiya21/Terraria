@@ -265,6 +265,12 @@ void Player::dropLoot(EntityHolder& entityHolder, int type)
 	// no need to implement
 }
 
+void Player::onHit()
+{
+	//flashTimer = .2f;
+	//hurtTimer = 1;
+	//currentState = STATE_HURT;
+}
 
 Json Player::formatToJson()
 {

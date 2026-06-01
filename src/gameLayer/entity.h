@@ -48,8 +48,10 @@ struct Entity
 	float attackDuration = 0.f;
 	float swingTimer = 0.f;
 	float useTimer = 0.f;
-	float hitStopTimer = 0;
-	float damageTaken = 0;
+	float hitStopTimer = 0.f;
+	float damageTaken = 0.f;
+	float damageTakenHealthBarTimer = 0.f;
+	float hurtTimer = 0.f;
 
 	// for weapon swing animation
 	float weaponLength = 1.5f;
@@ -71,7 +73,7 @@ struct Entity
 		physics.teleport(pos);
 	}
 
-	void knockback(Vector2 hitFromPosition, float knockbackForce = 3.f)
+	void knockback(Vector2 hitFromPosition, float knockbackForce)
 	{
 		// Push away from whoever hit us
 		float direction = (getPosition().x >= hitFromPosition.x) ? 1.f : -1.f;
