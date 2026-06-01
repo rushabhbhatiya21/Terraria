@@ -57,6 +57,8 @@ void Zombie::drawSprite(AssetManager& assetManager)
 
 bool Zombie::update(float deltaTime, EntityUpdateData& data)
 {
+	if (life <= 0 && isAlive) return false;
+
 	// set variable for flipping sprite
 	if (moveSpeed >= 0)
 	{
@@ -83,21 +85,21 @@ bool Zombie::update(float deltaTime, EntityUpdateData& data)
 	// exit chasing
 	if (dist > FORGET_RANGE && currentState == Zombie_State::CHASING)
 	{
-		printf("exiting state chasing.\n");
+		// printf("exiting state chasing.\n");
 		enterState(Zombie_State::IDLE);
 	}
 
 	// exit attack
 	if (currentState == Zombie_State::ATTACK_RECOVER && attackRecoverTimer <= 0)
 	{
-		printf("exiting state attack.\n");
+		// printf("exiting state attack.\n");
 		enterState(Zombie_State::CHASING);
 	}
 
 	// exit hurt
 	if (currentState == Zombie_State::HURT && hurtTimer <= 0)
 	{
-		printf("exiting state hurt.\n");
+		// printf("exiting state hurt.\n");
 		enterState(Zombie_State::CHASING);
 	}
 
@@ -110,7 +112,7 @@ bool Zombie::update(float deltaTime, EntityUpdateData& data)
 		}
 		else if (currentState == Zombie_State::PATROL)
 		{
-			printf("exiting state patrol.\n");
+			// printf("exiting state patrol.\n");
 			enterState(Zombie_State::IDLE);
 		}
 	}
@@ -140,7 +142,7 @@ bool Zombie::update(float deltaTime, EntityUpdateData& data)
 		// actual hit, player damage
 		if (dist <= ATTACK_RANGE)
 		{
-			printf("entering state attack.\n");
+			// printf("entering state attack.\n");
 			doAttack(&data.player);
 		}
 
@@ -227,26 +229,26 @@ void Zombie::enterState(Zombie_State newState)
 		changeStateTimer = 1.f;
 		break;
 	case Zombie_State::PATROL:
-		printf("entering state patrol.\n");
+		// printf("entering state patrol.\n");
 		changeStateTimer = 3.f;
 		movingLeft = !movingLeft;
 		break;
 	case Zombie_State::CHASING:
-		printf("entering state chasing.\n");
+		// printf("entering state chasing.\n");
 		hurtTimer = 0.f;
 		attackWindUpTimer = 0.f;
 		attackRecoverTimer = 0.f;
 		break;
 	case Zombie_State::ATTACK_WINDUP:
-		printf("entering state attack windup.\n");
+		// printf("entering state attack windup.\n");
 		attackWindUpTimer = .4f;
 		break;
 	case Zombie_State::ATTACK_RECOVER:
-		printf("entering state attack recover.\n");
+		// printf("entering state attack recover.\n");
 		attackRecoverTimer = .6f;
 		break;
 	case Zombie_State::HURT:
-		printf("entering state hurt.\n");
+		// printf("entering state hurt.\n");
 		hurtTimer = .15f;
 		break;
 	default:

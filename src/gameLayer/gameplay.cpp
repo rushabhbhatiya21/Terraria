@@ -324,8 +324,8 @@ bool Gameplay::init()
 
 	// player spawn
 	player.teleport({ 20, 60 });
-	player.physics.transform.w = 0.9f;
-	player.physics.transform.h = 1.8f;
+	//player.physics.transform.w = 0.9f;
+	//player.physics.transform.h = 1.8f;
 
 	// Use a RenderTexture to capture the scene
 	sceneTexture =        LoadRenderTexture(screenW, screenH);
@@ -344,7 +344,7 @@ bool Gameplay::init()
 
 	spawnEnemyHelper<Zombie>({ 30,60 });
 	//spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
-	maxEnemyCount = 5;
+	maxEnemyCount = 1;
 
 	// start item in inventory
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
@@ -522,7 +522,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		particles.insert(particles.end(), rightParticles.begin(), rightParticles.end());
 	}
 
-	player.update(deltaTime, EntityUpdateData
+	player.isAlive = player.update(deltaTime, EntityUpdateData
 		{
 			player,
 			rng,
@@ -531,6 +531,13 @@ bool Gameplay::update(AssetManager& assetManager)
 			gameMap
 		}
 	);
+
+	if (!player.isAlive)
+	{
+		player = Player{};
+		player.teleport({ 20,60 });
+	}
+
 #pragma endregion
 
 
@@ -1131,7 +1138,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region render enemy health bars
+#pragma region render & update enemy health bars
 
 
 	for (auto& e : entityHolder.enemies)
@@ -1362,15 +1369,25 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	//DrawRectangle(heartRectangle.x, heartRectangle.y, heartRectangle.width, heartRectangle.height, RED);
 
-	for (int i = 0; i < 5; i++)
+	float damagedLife = std::min(player.getMaxLife() - player.life, player.getMaxLife());
+
+	for (int i = 0; i < (int)(player.getMaxLife() / 10); i++, damagedLife -= 10)
 	{
 		Rectangle oneHeartRectangle = heartRectangle;
 		oneHeartRectangle.width = oneHeartRectangle.height;
 		oneHeartRectangle.x += oneHeartRectangle.width * i;
 
+
+		int x = 0;
+
+		if(damagedLife >= 10)
+			x = assetManager.hearts.width / 3;
+		else if (damagedLife >= 5)
+			x = assetManager.hearts.width * 2 / 3;
+
 		DrawTexturePro(
 			assetManager.hearts,
-			getTextureAtlas(0, 0, assetManager.hearts.width / 3, assetManager.hearts.height),
+			getTextureAtlas(x, 0, assetManager.hearts.width / 3, assetManager.hearts.height),
 			oneHeartRectangle,
 			{ 0,0 },
 			0.f,
@@ -1747,6 +1764,12 @@ bool Gameplay::update(AssetManager& assetManager)
 		std::string enemyCount = "Enemy Count: ";
 		enemyCount += std::to_string(entityHolder.enemies.size());
 		ImGui::Text(enemyCount.c_str());
+
+		ImGui::Separator();
+
+		std::string entityCount = "Entity Count: ";
+		entityCount += std::to_string(entityHolder.entities.size());
+		ImGui::Text(entityCount.c_str());
 
 		ImGui::Separator();
 

@@ -90,10 +90,10 @@ bool Enemy::updateHealthBar(float deltaTime)
 {
 	if (flashTimer > 0) flashTimer -= deltaTime;
 
-	if (life <= 0)
-	{
-		isAlive = false;
-	}
+	//if (life <= 0 && isAlive)
+	//{
+	//	isAlive = false;
+	//}
 
 	if (damageTakenHealthBarTimer >= 0)
 	{

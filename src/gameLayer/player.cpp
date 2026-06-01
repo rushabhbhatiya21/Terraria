@@ -133,7 +133,7 @@ void Player::render(AssetManager& assetManager)
 //	EndBlendMode();
 //}
 
-bool Player::update(float deltaTime, EntityUpdateData& entityUpdateData)
+bool Player::update(float deltaTime, EntityUpdateData& data)
 {
 	// --- HITSTOP ---
 	if (hitStopTimer > 0)
@@ -142,6 +142,8 @@ bool Player::update(float deltaTime, EntityUpdateData& entityUpdateData)
 		physics.velocity = { 0.f, 0.f };
 		return true;
 	}
+
+	if (life <= 0) return false;
 
 	updateTimers(deltaTime);
 	updateMovement(deltaTime);

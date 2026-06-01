@@ -37,7 +37,7 @@ struct Zombie : public Enemy
 
 	void doAttack(Player* player);
 
-	void enterState(Zombie_State newState) override;
+	void enterState(Zombie_State newState);
 
 	//void enterState(int newState, EntityUpdateData& entityUpdateData) override;
 
