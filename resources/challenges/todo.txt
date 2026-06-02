@@ -1,5 +1,5 @@
 1. Hotbar number keys - done
-2. Inventory drag and drop items
+2. Inventory drag and drop items - done
 3. Slime/Zombie drops
 4. Workbench + Furnace system
 5. King Slime boss

@@ -15,6 +15,8 @@ struct Inventory
 	int slotCount = columns * rows;
 	std::vector<ItemStack> slots;
 
+	int draggedSlot = -1;
+
 	Inventory()
 	{
 		slots.resize(slotCount, { 0,0 });
