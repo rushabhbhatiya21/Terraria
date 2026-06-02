@@ -15,6 +15,8 @@ struct Slime : public Enemy
 
 	void dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder) override;
 
+	void doAttack(Player* player);
+
 	Json formatToJson() override;
 
 	bool loadFromJson(Json& j) override;

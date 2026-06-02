@@ -6,6 +6,9 @@
 #include <entityHolder.h>
 #include <items/blocks.h>
 #include <player.h>
+#include "combat/combatSystem.h"
+#include "shake.h"
+#include "ui/popupText.h"
 
 void Slime::drawSprite(AssetManager& assetManager)
 {
@@ -39,6 +42,13 @@ bool Slime::update(float deltaTime, EntityUpdateData& data)
 	{
 		currentState = STATE_DEAD;
 	}
+
+	// damage player
+	// add attack state
+	//if (physics.transform.intersectTransform(data.player.physics.transform))
+	//{
+	//	doAttack(&data.player);
+	//}
 
 	if (changeStateTimer < 0)
 	{
@@ -123,6 +133,35 @@ bool Slime::update(float deltaTime, EntityUpdateData& data)
 
 	return true;
 
+}
+
+// put this in enemy.h
+void Slime::doAttack(Player* player)
+{
+	// implement attack here
+	DamageInfo info;
+	info.attacker = this;
+	info.item = nullptr;
+	info.hitDirection = getPosition() - player->getPosition();
+
+	DamageResult& result = CombatSystem::applyDamage(player, info);
+
+	float shakeDuration = result.crit ? .2f : .1f;
+	float shakeStength = result.crit ? .3f : .2f;
+	camShake.triggerCameraShake(shakeDuration, shakeStength);
+
+	spawnPopupText(
+		player->getPosition(),
+		Vector2{ .1f, .1f },
+		std::to_string(int(std::floor(result.finalDamage))),
+		1,
+		.4f,
+		-1.f,
+		WHITE,
+		result.crit
+	);
+
+	return;
 }
 
 void Slime::dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder)

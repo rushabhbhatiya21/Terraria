@@ -4,6 +4,8 @@
 4. Workbench + Furnace system
 5. King Slime boss
 
+bug with drag and drop - if left click instead of drag and drop causes weird bugs
+
 -- Craft UI
 - add more items - done
 - make items scrollable - done

@@ -532,6 +532,7 @@ bool Gameplay::init()
 	spawnEnemyHelper<Slime>({ 31,60 });
 	spawnEnemyHelper<Slime>({ 29,60 });
 	spawnEnemyHelper<Slime>({ 32,60 });
+	spawnEnemyHelper<Zombie>({ 25,60 });
 	//spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
 	maxEnemyCount = 1;
 

@@ -253,7 +253,7 @@ void Player::updateAnimation(float deltaTime)
 	if (falling && physics.velocity.y < 0.f)
 		animations.setAnimation(2); // jump (rising)
 	else if (falling)
-		animations.setAnimation(3); // fall (descending)
+		animations.setAnimation(0); // fall (descending)
 	else if (physics.velocity.x != 0.f)
 		animations.setAnimation(1); // walk
 	else

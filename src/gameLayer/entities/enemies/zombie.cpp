@@ -77,10 +77,6 @@ bool Zombie::update(float deltaTime, EntityUpdateData& data)
 
 	Vector2 dirVector = data.player.getPosition() - getPosition();
 	float dist = Vector2Length(dirVector);
-	//printf("windup: %f, recover: %f\n", attackWindUpTimer, attackRecoverTimer);
-	//if (previouseState != currentState)
-	//printf("state: %d, hurtTimer: %f\n", currentState, hurtTimer);
-	//printf("timer: %f, state: %d, movespeed: %f, dist: %f\n", changeStateTimer, currentState, moveSpeed, dist);
 
 	// exit chasing
 	if (dist > FORGET_RANGE && currentState == Zombie_State::CHASING)
@@ -175,16 +171,19 @@ bool Zombie::update(float deltaTime, EntityUpdateData& data)
 	case Zombie_State::ATTACK_WINDUP:
 	{
 		moveSpeed = 0;
+		animations.setAnimation(ANIM_ATTACK);
 		break;
 	}
 	case Zombie_State::ATTACK_RECOVER:
 	{
 		moveSpeed = 0;
+		//animations.setAnimation(ANIM_ATTACK);
 		break;
 	}
 	case Zombie_State::HURT:
 	{
 		moveSpeed = 0;
+		//animations.setAnimation(ANIM_HURT);
 		break;
 	}
 	case Zombie_State::DEAD:
@@ -202,11 +201,17 @@ bool Zombie::update(float deltaTime, EntityUpdateData& data)
 		getPosition().x += moveSpeed * deltaTime;
 	}
 
-		// --- ANIMATION ---
+	// --- ANIMATION ---
 	if (!physics.downTouch)
 		animations.setAnimation(ANIM_JUMP);
 	else if (moveSpeed == 0.f)
 		animations.setAnimation(ANIM_IDLE);
+	// todo: need to test this 2 animations
+	// todo: a bug where if zombie is attacking, it turns to 1 side
+	if (currentState == Zombie_State::ATTACK_WINDUP || currentState == Zombie_State::ATTACK_RECOVER)
+		animations.setAnimation(ANIM_ATTACK);
+	else if (currentState == Zombie_State::HURT)
+		animations.setAnimation(ANIM_HURT);
 	else
 		animations.setAnimation(ANIM_WALK);
 

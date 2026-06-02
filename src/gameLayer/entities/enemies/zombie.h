@@ -79,7 +79,8 @@ struct Zombie : public Enemy
 	static constexpr int ANIM_JUMP = 0;
 	static constexpr int ANIM_IDLE = 0;
 	static constexpr int ANIM_WALK = 1;
-	static constexpr int ANIM_DEAD = 4;
+	static constexpr int ANIM_ATTACK = 2;
+	static constexpr int ANIM_HURT = 3;
 
 	float changeStateTimer = 3.f;
 	float moveSpeed = 0.f; // also represents direction
