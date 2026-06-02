@@ -262,10 +262,10 @@ void Player::updateAnimation(float deltaTime)
 	animations.update(deltaTime, 0.08f, 7);
 }
 
-void Player::dropLoot(EntityHolder& entityHolder, int type)
-{
-	// no need to implement
-}
+//void Player::dropLoot(EntityHolder& entityHolder, int type)
+//{
+//	// no need to implement
+//}
 
 void Player::onHit()
 {

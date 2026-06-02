@@ -290,16 +290,41 @@ void Zombie::onHit()
 	enterState(Zombie_State::HURT);
 }
 
-void Zombie::dropLoot(EntityHolder& entityHolder, int type)
+void Zombie::dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder)
 {
-	DroppedItem droppedItem;
-	droppedItem.teleport(getPosition());
+	int dropsCount = 0;
+	//bool legendary = false;
+	//bool epic      = false;
+	//bool rare      = false;
+	//bool common    = false;
 
-	droppedItem.itemType = type;
-	droppedItem.physics.velocity.y = -3.f;
+	if (getRandomChance(rng, .1f))
+		dropsCount = 10;
+	else if (getRandomChance(rng, .2f))
+		dropsCount = 6;
+	else if (getRandomChance(rng, .4f))
+		dropsCount = 4;
+	else
+		dropsCount = 2;
 
-	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
-	entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+	bool isLeft = false;
+	for (int i = 0; i < dropsCount; i++)
+	{
+		DroppedItem droppedItem;
+		droppedItem.teleport(getPosition());
+
+		// make it drop rarer chests with low chance
+		droppedItem.itemType = Items::slime;
+		float x = getRandomFloat(rng, -3.f, 3.f);
+		if ((isLeft && x < 0) || (!isLeft && x > 0)) x *= -1.f;
+		isLeft = !isLeft;
+		droppedItem.physics.velocity.x = x;
+		droppedItem.physics.velocity.y = -3.f;
+
+		auto id = entityHolder.idHolder.getEntityIdAndIncreament();
+		entityHolder.droppedItems.push_back(&droppedItem);
+		entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+	}
 }
 
 bool Zombie::shouldStepUp(Vector2 playerPos, GameMap& gameMap)

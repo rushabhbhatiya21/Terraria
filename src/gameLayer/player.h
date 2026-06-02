@@ -25,7 +25,7 @@ struct Player : public Entity
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
-	void dropLoot(EntityHolder& entityHolder, int type) override;
+	//void dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder) override;
 	
 	Json formatToJson() override;
 

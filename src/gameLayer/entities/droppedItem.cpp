@@ -95,12 +95,8 @@ int DroppedItem::getMaxStackSize(int type)
 {
 	if (type <= 0) { permaAssertDevelopement("item type should not be less or equal to 0 to get max stack size!"); return -1; }
 	if (type < Items::firstItem) { return 999; }
+	if (type == Items::slime) { return 999; }
 	return 1;
-}
-
-void DroppedItem::dropLoot(EntityHolder& entityHolder, int type)
-{
-	// no implementation
 }
 
 Json DroppedItem::formatToJson()

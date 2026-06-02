@@ -291,7 +291,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const It
 			c
 		);
 
-		if (stack.count != 0 && !isItem(stack.itemId))
+		if (stack.count != 0 && isStackable(stack.itemId))
 		{
 			Vector2 textPos =
 			{
@@ -509,6 +509,7 @@ bool Gameplay::init()
 
 	// player spawn
 	player.teleport({ 20, 60 });
+
 	//player.physics.transform.w = 0.9f;
 	//player.physics.transform.h = 1.8f;
 
@@ -527,11 +528,15 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnEnemyHelper<Zombie>({ 30,60 });
+	spawnEnemyHelper<Slime>({ 30,60 });
+	spawnEnemyHelper<Slime>({ 31,60 });
+	spawnEnemyHelper<Slime>({ 29,60 });
+	spawnEnemyHelper<Slime>({ 32,60 });
 	//spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
 	maxEnemyCount = 1;
 
 	// start item in inventory
+	inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 	inventory.storeItem(ItemStack{ Block::woodLog, 5 });
 

@@ -19,6 +19,20 @@ ItemDefinition* getItem(ItemId itemId)
     return nullptr;
 }
 
+int getMaxStackSize(ItemId itemId)
+{
+    ItemDefinition* item = getItem(itemId);
+    
+    if (!item) return -1;
+
+    return item->maxStack;
+}
+
+bool isStackable(ItemId itemId)
+{
+    return getMaxStackSize(itemId) > 1;
+}
+
 bool isItem(ItemId itemType)
 {
     return itemType >= Items::firstItem && itemType < Items::LAST_ITEM;

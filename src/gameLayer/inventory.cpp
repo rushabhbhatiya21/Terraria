@@ -1,6 +1,7 @@
 #include "inventory.h"
 #include <asserts.h>
 #include <items/blocks.h>
+#include <iostream>
 
 int Inventory::getEmptySlot()
 {
@@ -14,8 +15,9 @@ int Inventory::getEmptySlot()
 
 bool Inventory::storeItem(ItemStack& droppedItem)
 {
-	bool isTypeItem = isItem(droppedItem.itemId);
-	if (!isTypeItem)
+	bool isItemStackable = isStackable(droppedItem.itemId);
+
+	if (isStackable)
 	{
 		for (auto& i : slots)
 		{
@@ -63,10 +65,11 @@ bool Inventory::storeItem(ItemStack& droppedItem)
 	}
 	else
 	{
-		if (!isTypeItem && droppedItem.count > 999)
+		int maxStack = getMaxStackSize(droppedItem.itemId);
+		if (isItemStackable && droppedItem.count > maxStack)
 		{
-			droppedItem.count -= 999;
-			slots[emptySlot] = { droppedItem.itemId, 999 };
+			droppedItem.count -= maxStack;
+			slots[emptySlot] = { droppedItem.itemId, maxStack };
 			return true;
 		}
 		else

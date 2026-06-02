@@ -27,7 +27,7 @@ struct Zombie : public Enemy
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
-	void dropLoot(EntityHolder& entityHolder, int type) override;
+	void dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder) override;
 
 	//void enterState(int newState, EntityUpdateData& entityUpdateData);
 
