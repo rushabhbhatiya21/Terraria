@@ -161,6 +161,7 @@ struct BlockData
 
 struct ItemDefinition
 {
+    const char*  displayName = "Unknown Item";
     ItemCategory category = ItemCategory::NONE;
     int          maxStack = 1;
     float        useTime = 0.f;
@@ -183,9 +184,10 @@ struct ItemDefinition
     // Default (material / block / accessory — no stat block needed)
     ItemDefinition() : category(ItemCategory::NONE), maxStack(99), tool{} {}
 
-    static ItemDefinition makeMaterial(float useTime, int maxStack = 99)
+    static ItemDefinition makeMaterial(const char* name, float useTime, int maxStack = 99)
     {
         ItemDefinition d;
+        d.displayName = name;
         d.category = ItemCategory::MATERIAL;
         d.maxStack = maxStack;
         d.useTime = useTime;
@@ -193,18 +195,20 @@ struct ItemDefinition
         return d;
     }
 
-    static ItemDefinition makeAccessory(float useTime)
+    static ItemDefinition makeAccessory(const char* name, float useTime)
     {
         ItemDefinition d;
+        d.displayName = name;
         d.category = ItemCategory::ACCESSORY;
         d.maxStack = 1;
         d.useTime = useTime;
         return d;
     }
 
-    static ItemDefinition makeTool(ToolType type, int power, float useTime, float range)
+    static ItemDefinition makeTool(const char* name, ToolType type, int power, float useTime, float range)
     {
         ItemDefinition d;
+        d.displayName = name;
         d.category = ItemCategory::TOOL;
         d.maxStack = 1;
         d.useTime = useTime;
@@ -215,9 +219,10 @@ struct ItemDefinition
         return d;
     }
 
-    static ItemDefinition makeWeapon(int damage, float useTime, float knockback, float range)
+    static ItemDefinition makeWeapon(const char* name, int damage, float useTime, float knockback, float range)
     {
         ItemDefinition d;
+        d.displayName = name;
         d.category = ItemCategory::WEAPON;
         d.maxStack = 1;
         d.useTime = useTime;
@@ -228,9 +233,10 @@ struct ItemDefinition
         return d;
     }
 
-    static ItemDefinition makeProjectile(int damage, float useTime, float knockback, float range)
+    static ItemDefinition makeProjectile(const char* name, int damage, float useTime, float knockback, float range)
     {
         ItemDefinition d;
+        d.displayName = name;
         d.category = ItemCategory::PROJECTILE;
         d.maxStack = 99;
         d.useTime = useTime;
@@ -241,9 +247,10 @@ struct ItemDefinition
         return d;
     }
 
-    static ItemDefinition makeArmor(ArmorSlot slot, int defense)
+    static ItemDefinition makeArmor(const char* name, ArmorSlot slot, int defense)
     {
         ItemDefinition d;
+        d.displayName = name;
         d.category = ItemCategory::ARMOR;
         d.maxStack = 1;
         d.armor.slot = slot;
@@ -252,9 +259,10 @@ struct ItemDefinition
         return d;
     }
 
-    static ItemDefinition makeConsumable(int healAmount, int manaAmount, float useTime, int maxStack = 20)
+    static ItemDefinition makeConsumable(const char* name, int healAmount, int manaAmount, float useTime, int maxStack = 20)
     {
         ItemDefinition d;
+        d.displayName = name;
         d.category = ItemCategory::CONSUMABLE;
         d.maxStack = maxStack;
         d.useTime = useTime;
@@ -264,9 +272,10 @@ struct ItemDefinition
         return d;
     }
 
-    static ItemDefinition makeBlock(BlockType type, int hp, int bestTool, float useTime = 0.15f, int maxStack = 999)
+    static ItemDefinition makeBlock(const char* name, BlockType type, int hp, int bestTool, float useTime = 0.15f, int maxStack = 999)
     {
         ItemDefinition d;
+        d.displayName = name;
         d.category = ItemCategory::BLOCK;
         d.maxStack = maxStack;
         d.useTime = useTime;

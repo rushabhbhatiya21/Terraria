@@ -1,50 +1,73 @@
 ﻿#include "recipe.h"
-#include "items/blocks.h"
+//#include "items/blocks.h"
 
 std::unordered_map<ItemId, Recipes::Recipe> Recipes::all =
 {
-    // ── Tools ────────────────────────────────────────────────────────────────
-    {Items::woodPickaxe,      {false, 1, {{Block::woodLog, 3}}}},
-    {Items::woodAxe,          {false, 1, {{Block::woodLog, 1}, {Block::stone, 1}}}},
+    // workbench
+    {Items::workBench, {1, {{Items::woodLog, 10}}, Recipes::CraftingStation::NONE}},
+
+    // furnace
+    {Items::furnace, {1, {{Items::stone, 20}, {Items::woodLog, 4}}, Recipes::CraftingStation::WORKBENCH}},
+
+    // Smelting
+    {Items::copperIngot, {1, {{Items::copper, 3}}, Recipes::CraftingStation::FURNACE}},
+    {Items::ironIngot,   {1, {{Items::iron,   3}}, Recipes::CraftingStation::FURNACE}},
+    {Items::goldIngot,   {1, {{Items::gold,   3}}, Recipes::CraftingStation::FURNACE}},
+
+    // Basic wooden tools
+    {Items::woodPickaxe, {1, {{Items::woodLog, 3}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::woodAxe,     {1, {{Items::woodLog, 1}, {Items::stone, 1}}, Recipes::CraftingStation::WORKBENCH}},
+
+    // Copper tier
+    {Items::copperPickaxe, {1, {{Items::copperIngot, 8}, {Items::woodLog, 2}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::copperAxe,     {1, {{Items::copperIngot, 6}, {Items::woodLog, 2}}, Recipes::CraftingStation::WORKBENCH}},
+
+    // Iron tier
+    {Items::ironPickaxe, {1, {{Items::ironIngot, 8}, {Items::woodLog, 2}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::ironAxe,     {1, {{Items::ironIngot, 6}, {Items::woodLog, 2}}, Recipes::CraftingStation::WORKBENCH}},
+
+    // Gold tier
+    {Items::goldPickaxe, {1, {{Items::goldIngot, 8}, {Items::woodLog, 2}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::goldAxe,     {1, {{Items::goldIngot, 6}, {Items::woodLog, 2}}, Recipes::CraftingStation::WORKBENCH}},
 
     // ── Swords ───────────────────────────────────────────────────────────────
-    {Items::woodenSword,      {false, 1, {{Block::woodLog, 3}}}},
-    {Items::stoneSword,       {false, 1, {{Block::stone, 5}}}},
-    {Items::copperSword,      {false, 1, {{Block::copper, 5}}}},
-    {Items::ironSword,        {false, 1, {{Block::iron, 5}}}},
-    {Items::goldSword,        {false, 1, {{Block::gold, 5}}}},
+    {Items::woodenSword,      {1, {{Items::woodLog, 3}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::stoneSword,       {1, {{Items::stone, 5}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::copperSword,      {1, {{Items::copperIngot, 5}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::ironSword,        {1, {{Items::ironIngot, 5}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::goldSword,        {1, {{Items::goldIngot, 5}}, Recipes::CraftingStation::WORKBENCH}},
 
     // ── Spears ───────────────────────────────────────────────────────────────
-    {Items::copperSpear,      {false, 1, {{Block::copper, 6}}}},
-    {Items::ironSpear,        {false, 1, {{Block::iron, 6}}}},
-    {Items::goldSpear,        {false, 1, {{Block::gold, 6}}}},
-    {Items::iceSpear,         {false, 1, {{Block::ice, 6}}}},
+    {Items::copperSpear,      {1, {{Items::copperIngot, 6}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::ironSpear,        {1, {{Items::ironIngot, 6}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::goldSpear,        {1, {{Items::goldIngot, 6}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::iceSpear,         {1, {{Items::ice, 6}}, Recipes::CraftingStation::WORKBENCH}},
 
     // ── Daggers ──────────────────────────────────────────────────────────────
-    {Items::copperDagger,     {false, 1, {{Block::copper, 4}}}},
-    {Items::ironDagger,       {false, 1, {{Block::iron, 4}}}},
-    {Items::iceDagger,        {false, 1, {{Block::ice, 4}}}},
+    {Items::copperDagger,     {1, {{Items::copperIngot, 4}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::ironDagger,       {1, {{Items::ironIngot, 4}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::iceDagger,        {1, {{Items::ice, 4}}, Recipes::CraftingStation::WORKBENCH}},
 
     // ── Thrown ───────────────────────────────────────────────────────────────
-    {Items::shuriken,         {false, 5, {{Block::iron, 1}}}},
+    {Items::shuriken,         {5, {{Items::ironIngot, 1}}, Recipes::CraftingStation::WORKBENCH}},
 
     // ── Armor — Copper ───────────────────────────────────────────────────────
-    {Items::copperHelmet,     {false, 1, {{Block::copper, 5}}}},
-    {Items::copperChestPlate, {false, 1, {{Block::copper, 8}}}},
-    {Items::copperBoots,      {false, 1, {{Block::copper, 4}}}},
+    {Items::copperHelmet,     {1, {{Items::copperIngot, 5}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::copperChestPlate, {1, {{Items::copperIngot, 8}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::copperBoots,      {1, {{Items::copperIngot, 4}}, Recipes::CraftingStation::WORKBENCH}},
 
     // ── Armor — Iron ─────────────────────────────────────────────────────────
-    {Items::ironHelmet,       {false, 1, {{Block::iron, 5}}}},
-    {Items::ironChestPlate,   {false, 1, {{Block::iron, 8}}}},
-    {Items::ironBoots,        {false, 1, {{Block::iron, 4}}}},
+    {Items::ironHelmet,       {1, {{Items::ironIngot, 5}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::ironChestPlate,   {1, {{Items::ironIngot, 8}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::ironBoots,        {1, {{Items::ironIngot, 4}}, Recipes::CraftingStation::WORKBENCH}},
 
     // ── Armor — Gold ─────────────────────────────────────────────────────────
-    {Items::goldHelmet,       {false, 1, {{Block::gold, 5}}}},
-    {Items::goldChestPlate,   {false, 1, {{Block::gold, 8}}}},
-    {Items::goldBoots,        {false, 1, {{Block::gold, 5}}}},
+    {Items::goldHelmet,       {1, {{Items::goldIngot, 5}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::goldChestPlate,   {1, {{Items::goldIngot, 8}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::goldBoots,        {1, {{Items::goldIngot, 5}}, Recipes::CraftingStation::WORKBENCH}},
 
     // ── Armor — Ice ──────────────────────────────────────────────────────────
-    {Items::iceHelmet,        {false, 1, {{Block::ice, 5}}}},
-    {Items::iceChestPlate,    {false, 1, {{Block::ice, 8}}}},
-    {Items::iceBoots,         {false, 1, {{Block::ice, 4}}}},
+    {Items::iceHelmet,        {1, {{Items::ice, 5}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::iceChestPlate,    {1, {{Items::ice, 8}}, Recipes::CraftingStation::WORKBENCH}},
+    {Items::iceBoots,         {1, {{Items::ice, 4}}, Recipes::CraftingStation::WORKBENCH}}
 };

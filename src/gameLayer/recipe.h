@@ -5,11 +5,19 @@
 
 namespace Recipes
 {
+	enum class CraftingStation
+	{
+		NONE,
+		WORKBENCH,
+		FURNACE
+	};
+
 	struct Recipe
 	{
-		bool isBenchRequired = false;
 		int itemQuantity = 1;
 		std::vector<ItemStack> ingredients;
+
+		CraftingStation station;
 	};
 
 	extern std::unordered_map<ItemId, Recipe> all;

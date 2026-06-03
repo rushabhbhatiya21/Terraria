@@ -89,7 +89,7 @@ std::vector<ItemId> Crafting::getAvailableRecipes(bool nearWorkbench)
 
 	for (const auto& r : Recipes::all)
 	{
-		if (r.second.isBenchRequired && !nearWorkbench)
+		if (!nearWorkbench)
 			continue;
 
 		result.push_back(r.first);

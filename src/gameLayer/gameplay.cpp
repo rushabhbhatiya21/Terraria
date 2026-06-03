@@ -1718,7 +1718,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		oneCellRectangleIngredient = shrinkRectanglePercentage(oneCellRectangleIngredient, 0.01f, 0.01f);
 		//DrawRectangleLinesEx(oneCellRectangleIngredient, 1, DARKPURPLE);
 
-		std::vector<ItemId> availableRecipes = Crafting::getAvailableRecipes(false);
+		std::vector<ItemId> availableRecipes = Crafting::getAvailableRecipes(true);
 		int maxRecipeSize = availableRecipes.size();
 		float scroll = GetMouseWheelMove();
 
@@ -1754,108 +1754,115 @@ bool Gameplay::update(AssetManager& assetManager)
 			}
 		}
 
-		ItemId selectedItemType = availableRecipes[selectedRecipeIndex];
-		int padding = 10;
-
-		for (int i = Crafting::startPointer; i < std::min(Crafting::startPointer + Crafting::maxRecipeToShow, maxRecipeSize); i++)
+		if (availableRecipes.size() != 0)
 		{
-			ItemId itemType = availableRecipes[i];
-			bool canCraft = Crafting::canCraft(inventory.slots, itemType);
+			ItemId selectedItemType = availableRecipes[selectedRecipeIndex];
 
-			// item rectangle
-			Rectangle rr = oneCellRectangleRecipe;
-			rr.y += (i - Crafting::startPointer) * (oneCellRectangleRecipe.height + padding);
-			rr = shrinkRectanglePercentage(rr, .1f, .1f);
+			int padding = 10;
 
-			// item and bg colors
-			Color bg;
-			Color itemColor;
-
-			if (CheckCollisionPointRec(GetMousePosition(), rr))
+			for (int i = Crafting::startPointer; i < std::min(Crafting::startPointer + Crafting::maxRecipeToShow, maxRecipeSize); i++)
 			{
-				selectedRecipeIndex = i;
+				if (availableRecipes.size() == 0)
+					break;
 
-				// craft item if clicked
-				if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT) && canCraft)
+				ItemId itemType = availableRecipes[i];
+				bool canCraft = Crafting::canCraft(inventory.slots, itemType);
+
+				// item rectangle
+				Rectangle rr = oneCellRectangleRecipe;
+				rr.y += (i - Crafting::startPointer) * (oneCellRectangleRecipe.height + padding);
+				rr = shrinkRectanglePercentage(rr, .1f, .1f);
+
+				// item and bg colors
+				Color bg;
+				Color itemColor;
+
+				if (CheckCollisionPointRec(GetMousePosition(), rr))
 				{
-					Crafting::craft(inventory, selectedItemType);
+					selectedRecipeIndex = i;
+
+					// craft item if clicked
+					if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT) && canCraft)
+					{
+						Crafting::craft(inventory, selectedItemType);
+					}
 				}
-			}
 
-			if (selectedRecipeIndex == i)
-			{
-				// Selected item
-				rr = enlargeRectanglePercentage(rr, .2f, .2f);
-				bg = { 255, 220, 20, 255 };
-				itemColor = canCraft ? WHITE : ColorAlpha(WHITE, 0.55f);
-			}
-			else
-			{
-				// Normal slot
-				bg = canCraft ? Color{ 48, 125, 255, 255 } : Color{ 28, 55, 110, 255 };
-				itemColor = canCraft ? WHITE : ColorAlpha(WHITE, 0.4f);
-			}
+				if (selectedRecipeIndex == i)
+				{
+					// Selected item
+					rr = enlargeRectanglePercentage(rr, .2f, .2f);
+					bg = { 255, 220, 20, 255 };
+					itemColor = canCraft ? WHITE : ColorAlpha(WHITE, 0.55f);
+				}
+				else
+				{
+					// Normal slot
+					bg = canCraft ? Color{ 48, 125, 255, 255 } : Color{ 28, 55, 110, 255 };
+					itemColor = canCraft ? WHITE : ColorAlpha(WHITE, 0.4f);
+				}
 
-			DrawRectangleRounded(rr, .3f, 6, bg);
+				DrawRectangleRounded(rr, .3f, 6, bg);
 
-			rr = shrinkRectanglePercentage(rr, .4f, .4f);
+				rr = shrinkRectanglePercentage(rr, .4f, .4f);
 
-			auto atlas = getTextureCoordinatesForItemType(itemType);
-			Texture2D tex = getTextureForItemType(itemType, assetManager);
-			DrawTexturePro(
-				tex,
-				atlas,
-				rr,
-				{ 0,0 },
-				0.f,
-				itemColor
-			);
-
-			if (itemType != selectedItemType) continue;
-
-			for (int j = 0; j < Recipes::all[itemType].ingredients.size(); j++)
-			{
-				Rectangle ri = oneCellRectangleIngredient;
-				ri.x += j * oneCellRectangleIngredient.width;
-				ri.y += (i - Crafting::startPointer) * (oneCellRectangleRecipe.height + padding);
-				ri = shrinkRectanglePercentage(ri, .3f, .3f);
-				std::vector<ItemStack> selectedItemIngredients = Recipes::all[itemType].ingredients;
-				int ingredient = selectedItemIngredients[j].itemId;
-				bool hasEnoughIngredients = Crafting::hasEnoughIngredients(inventory.slots, selectedItemIngredients[j]);
-
-				DrawRectangleRounded(ri, .3f, 1, { 48, 125, 255, 255 }); // blue color
-
-				ri = shrinkRectanglePercentage(ri, .25f, .25f);
-
-				auto atlas = getTextureCoordinatesForItemType(ingredient);
-				Texture2D tex = getTextureForItemType(ingredient, assetManager);
+				auto atlas = getTextureCoordinatesForItemType(itemType);
+				Texture2D tex = getTextureForItemType(itemType, assetManager);
 				DrawTexturePro(
 					tex,
 					atlas,
-					ri,
+					rr,
 					{ 0,0 },
 					0.f,
 					itemColor
 				);
 
-				std::string str = std::to_string(selectedItemIngredients[j].count);
-				Vector2 textPos =
-				{
-					ri.x + ri.width * 0.5f,
-					ri.y + ri.height * 0.85f
-				};
-				Vector2 textSize = MeasureTextEx(GetFontDefault(), str.c_str(), 10.f, 1.f);
+				if (itemType != selectedItemType) continue;
 
-				DrawTextPro(
-					GetFontDefault(),
-					str.c_str(),
-					textPos,
-					{ textSize.x / 2.f, textSize.y / 2.f },
-					0.f,
-					10.f,
-					1.f,
-					hasEnoughIngredients ? Color{ 255, 255, 255, 200 } : RED
-				);
+				for (int j = 0; j < Recipes::all[itemType].ingredients.size(); j++)
+				{
+					Rectangle ri = oneCellRectangleIngredient;
+					ri.x += j * oneCellRectangleIngredient.width;
+					ri.y += (i - Crafting::startPointer) * (oneCellRectangleRecipe.height + padding);
+					ri = shrinkRectanglePercentage(ri, .3f, .3f);
+					std::vector<ItemStack> selectedItemIngredients = Recipes::all[itemType].ingredients;
+					int ingredient = selectedItemIngredients[j].itemId;
+					bool hasEnoughIngredients = Crafting::hasEnoughIngredients(inventory.slots, selectedItemIngredients[j]);
+
+					DrawRectangleRounded(ri, .3f, 1, { 48, 125, 255, 255 }); // blue color
+
+					ri = shrinkRectanglePercentage(ri, .25f, .25f);
+
+					auto atlas = getTextureCoordinatesForItemType(ingredient);
+					Texture2D tex = getTextureForItemType(ingredient, assetManager);
+					DrawTexturePro(
+						tex,
+						atlas,
+						ri,
+						{ 0,0 },
+						0.f,
+						itemColor
+					);
+
+					std::string str = std::to_string(selectedItemIngredients[j].count);
+					Vector2 textPos =
+					{
+						ri.x + ri.width * 0.5f,
+						ri.y + ri.height * 0.85f
+					};
+					Vector2 textSize = MeasureTextEx(GetFontDefault(), str.c_str(), 10.f, 1.f);
+
+					DrawTextPro(
+						GetFontDefault(),
+						str.c_str(),
+						textPos,
+						{ textSize.x / 2.f, textSize.y / 2.f },
+						0.f,
+						10.f,
+						1.f,
+						hasEnoughIngredients ? Color{ 255, 255, 255, 200 } : RED
+					);
+				}
 			}
 		}
 	}
