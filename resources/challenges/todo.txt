@@ -3,16 +3,18 @@
 - make items scrollable
 
 
--- Weapons
+-- Core
+- add miniboss
+- add workbench for crafting
 - add torches (craft, add as item)
 - on knockback, also add slight player knockback in opposite dir
 - fall damage for player and enemies both
-- update player hearts based on player health
-- enemies hurt player
-- update enemy behaviour
 - status effects implementation.
 - add more enemies, make them throw ice balls, fire balls, lightning balls, etc. 
 
+- update player hearts based on player health - done
+- enemies hurt player - done
+- update enemy behaviour done
 - range projectile - done
 - spawn zombies and more enemies at night - done
 - implement useBlock to place block on map - done
