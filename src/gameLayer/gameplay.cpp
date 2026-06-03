@@ -163,7 +163,7 @@ Rectangle Gameplay::getInventoryRectangle(float w, float h)
 	inventoryRectangle = placeRectangleTopLeft(inventoryRectangle);
 
 	inventoryRectangle.x += w * .01f;
-	inventoryRectangle.y += h * .01f;
+	inventoryRectangle.y += h * .03f;
 
 	return inventoryRectangle;
 }
@@ -317,7 +317,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const It
 
 }
 
-void Gameplay::drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, AssetManager& assetManager)
+Rectangle Gameplay::getInventorySlotRect(int index, const Rectangle& inventoryRectangle, const Inventory& inventory)
 {
 	Rectangle rect = shrinkRectanglePercentage(
 		inventoryRectangle,
@@ -331,17 +331,24 @@ void Gameplay::drawInventorySlotByIndex(int index, bool isDragged, const Rectang
 	int row = index / inventory.columns;
 	int col = index % inventory.columns;
 
-	Rectangle slotRect;
-	slotRect.x = rect.x + col * cellWidth;
-	slotRect.y = rect.y + row * cellHeight;
-	slotRect.width = cellWidth;
-	slotRect.height = cellHeight;
+	Rectangle newRect;
+	newRect.x = rect.x + col * cellWidth;
+	newRect.y = rect.y + row * cellHeight;
+	newRect.width = cellWidth;
+	newRect.height = cellHeight;
 
-	slotRect = shrinkRectanglePercentage(
-		slotRect,
+	newRect = shrinkRectanglePercentage(
+		newRect,
 		0.1f,
 		0.1f
 	);
+
+	return newRect;
+}
+
+void Gameplay::drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, AssetManager& assetManager)
+{
+	Rectangle slotRect = getInventorySlotRect(index, inventoryRectangle, inventory);
 
 	const ItemStack& stack = inventory.slots[index];
 
@@ -400,6 +407,50 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, AssetManager& assetManage
 		{ 0,0 },
 		0.f,
 		Color{ 255,255,255,180 }
+	);
+}
+
+void Gameplay::drawDisplauNameUI(ItemId itemId, Rectangle parentRect, float fontSize, float spacing, float paddingX, float paddingY, Color rectColor, Color textColor)
+{
+	ItemDefinition* selectedIngredient = getItem(itemId);
+
+	if (!selectedIngredient)
+		return;
+
+	//float fontSize = 9.f;
+	//float spacing = 1.f;
+	//float paddingX = 6.f;
+	//float paddingY = 2.f;
+
+	Vector2 textSize = MeasureTextEx(GetFontDefault(), selectedIngredient->displayName, fontSize, spacing);
+
+	Rectangle rectPos{
+		parentRect.x + parentRect.width / 2 - (textSize.x + paddingX * 2) / 2, // center horizontally
+		parentRect.y - textSize.y - paddingY * 2 - 5,                   // above item slot
+		textSize.x + paddingX * 2,
+		textSize.y + paddingY * 2
+	};
+
+	DrawRectangleRounded(
+		rectPos,
+		.7f,
+		1,
+		//Color{ 255,255,255,200 }
+		rectColor
+	);
+
+	DrawTextPro(
+		GetFontDefault(),
+		selectedIngredient->displayName,
+		{
+			rectPos.x + paddingX,
+			rectPos.y + paddingY
+		},
+		{ 0, 0 },
+		0.f,
+		fontSize,
+		spacing,
+		textColor
 	);
 }
 
@@ -528,18 +579,18 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnEnemyHelper<Slime>({ 30,60 });
-	spawnEnemyHelper<Slime>({ 31,60 });
-	spawnEnemyHelper<Slime>({ 29,60 });
-	spawnEnemyHelper<Slime>({ 32,60 });
-	spawnEnemyHelper<Zombie>({ 25,60 });
+	//spawnEnemyHelper<Slime>({ 30,60 });
+	//spawnEnemyHelper<Slime>({ 31,60 });
+	//spawnEnemyHelper<Slime>({ 29,60 });
+	//spawnEnemyHelper<Slime>({ 32,60 });
+	//spawnEnemyHelper<Zombie>({ 25,60 });
 	//spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
 	maxEnemyCount = 1;
 
 	// start item in inventory
 	inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
-	inventory.storeItem(ItemStack{ Block::woodLog, 5 });
+	inventory.storeItem(ItemStack{ Items::woodLog, 5 });
 
 	// start day at random time
 	std::ranlux24_base rng(std::random_device{}());
@@ -1650,6 +1701,15 @@ bool Gameplay::update(AssetManager& assetManager)
 		inventory,
 		insideInventory
 	);
+	
+	// draw display name of item
+	if (hoveredSlot != -1)
+	{
+		Rectangle slotRect = getInventorySlotRect(hoveredSlot, inventoryRectangle, inventory);
+		ItemId hoveredItem = inventory.slots[hoveredSlot].itemId;
+		drawDisplauNameUI(hoveredItem, slotRect);
+	}
+
 
 	if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 	{
@@ -1782,6 +1842,8 @@ bool Gameplay::update(AssetManager& assetManager)
 				{
 					selectedRecipeIndex = i;
 
+					drawDisplauNameUI(selectedItemType, rr);
+
 					// craft item if clicked
 					if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT) && canCraft)
 					{
@@ -1863,6 +1925,11 @@ bool Gameplay::update(AssetManager& assetManager)
 						1.f,
 						hasEnoughIngredients ? Color{ 255, 255, 255, 200 } : RED
 					);
+
+					if (CheckCollisionPointRec(GetMousePosition(), ri))
+					{
+						drawDisplauNameUI(selectedItemIngredients[j].itemId, ri);
+					}
 				}
 			}
 		}

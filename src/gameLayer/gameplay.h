@@ -143,9 +143,20 @@ struct Gameplay
 
 	void drawInventoryBackground(const Rectangle& inventoryRectangle, const Inventory& inventory, bool insideInventory);
 	void drawInventorySlot(bool isDragged, const Rectangle& rect, const ItemStack& stack, bool selected, AssetManager& assetManager);
+	Rectangle getInventorySlotRect(int index, const Rectangle& inventoryRectangle, const Inventory& inventory);
 	void drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, AssetManager& assetManager);
 	int getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRectangle, const Inventory& inventory, bool insideInventory);
 	void drawDraggedItem(const ItemStack& stack, AssetManager& assetManager);
+	void drawDisplauNameUI(
+		ItemId itemId, 
+		Rectangle parentRect, 
+		float fontSize  = 10.f,
+		float spacing   = 1.f,
+		float paddingX  = 8.f, 
+		float paddingY  = 4.f,
+		Color rectColor = Color{255,255,255,200},
+		Color textColor = BLACK
+	);
 
 	//void floodFillLight(int x, int y, int offsetX, int offsetY, float value, bool isTorch = false);
 
