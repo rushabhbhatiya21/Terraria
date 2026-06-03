@@ -1754,6 +1754,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			}
 		}
 
+		// need to change this
 		if (availableRecipes.size() != 0)
 		{
 			ItemId selectedItemType = availableRecipes[selectedRecipeIndex];
