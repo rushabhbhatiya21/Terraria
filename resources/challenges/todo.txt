@@ -1,6 +1,14 @@
+1. Hotbar number keys - done
+2. Inventory drag and drop items - done
+3. Slime/Zombie drops - done
+4. Workbench + Furnace system
+5. King Slime boss
+
+bug with drag and drop - if left click instead of drag and drop causes weird bugs
+
 -- Craft UI
-- add more items
-- make items scrollable
+- add more items - done
+- make items scrollable - done
 
 
 -- Core
@@ -12,9 +20,9 @@
 - status effects implementation.
 - add more enemies, make them throw ice balls, fire balls, lightning balls, etc. 
 
-- update player hearts based on player health - done
+- update enemy behaviour - done
 - enemies hurt player - done
-- update enemy behaviour done
+- update player hearts based on player health - done
 - range projectile - done
 - spawn zombies and more enemies at night - done
 - implement useBlock to place block on map - done

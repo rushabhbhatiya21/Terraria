@@ -141,6 +141,12 @@ struct Gameplay
 	Rectangle getRecipeRectangle(float w, float h, Rectangle craftRectangle);
 	Rectangle getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle);
 
+	void drawInventoryBackground(const Rectangle& inventoryRectangle, const Inventory& inventory, bool insideInventory);
+	void drawInventorySlot(bool isDragged, const Rectangle& rect, const ItemStack& stack, bool selected, AssetManager& assetManager);
+	void drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, AssetManager& assetManager);
+	int getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRectangle, const Inventory& inventory, bool insideInventory);
+	void drawDraggedItem(const ItemStack& stack, AssetManager& assetManager);
+
 	//void floodFillLight(int x, int y, int offsetX, int offsetY, float value, bool isTorch = false);
 
 	void addLight(int worldX, int worldY, float radius, float intensity, bool isTorch = false);

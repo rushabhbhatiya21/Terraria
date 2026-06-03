@@ -133,7 +133,7 @@ void Player::render(AssetManager& assetManager)
 //	EndBlendMode();
 //}
 
-bool Player::update(float deltaTime, EntityUpdateData& entityUpdateData)
+bool Player::update(float deltaTime, EntityUpdateData& data)
 {
 	// --- HITSTOP ---
 	if (hitStopTimer > 0)
@@ -142,6 +142,8 @@ bool Player::update(float deltaTime, EntityUpdateData& entityUpdateData)
 		physics.velocity = { 0.f, 0.f };
 		return true;
 	}
+
+	if (life <= 0) return false;
 
 	updateTimers(deltaTime);
 	updateMovement(deltaTime);
@@ -251,7 +253,7 @@ void Player::updateAnimation(float deltaTime)
 	if (falling && physics.velocity.y < 0.f)
 		animations.setAnimation(2); // jump (rising)
 	else if (falling)
-		animations.setAnimation(3); // fall (descending)
+		animations.setAnimation(0); // fall (descending)
 	else if (physics.velocity.x != 0.f)
 		animations.setAnimation(1); // walk
 	else
@@ -260,10 +262,10 @@ void Player::updateAnimation(float deltaTime)
 	animations.update(deltaTime, 0.08f, 7);
 }
 
-void Player::dropLoot(EntityHolder& entityHolder, int type)
-{
-	// no need to implement
-}
+//void Player::dropLoot(EntityHolder& entityHolder, int type)
+//{
+//	// no need to implement
+//}
 
 void Player::onHit()
 {

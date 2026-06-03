@@ -48,6 +48,20 @@ const Color sunsetSky = { 100,  60, 130, 255 };  // dusky purple
 const Color nightColor = { 20,  35,  80, 255 };
 const Color nightSky = { 8,  12,  40, 255 };  // near-black deep blue
 
+const KeyboardKey hotbarKeys[] =
+{
+	KEY_ONE,
+	KEY_TWO,
+	KEY_THREE,
+	KEY_FOUR,
+	KEY_FIVE,
+	KEY_SIX,
+	KEY_SEVEN,
+	KEY_EIGHT,
+	KEY_NINE,
+	KEY_ZERO
+};
+
 static Color lerpColor(Color a, Color b, float t)
 {
 	return
@@ -136,7 +150,7 @@ Rectangle Gameplay::getInventoryRectangle(float w, float h)
 	Rectangle inventoryRectangle = {};
 
 	inventoryRectangle.height = h * .3f;
-	inventoryRectangle.width = inventoryRectangle.height * 3;
+	inventoryRectangle.width = inventoryRectangle.height * 3.34; // 3 for 9 cols, 3.34 for 10 cols
 
 	float maxWidth = w * .9f;
 	if (inventoryRectangle.width > maxWidth)
@@ -216,6 +230,177 @@ Rectangle Gameplay::getIngredientsRectangle(float w, float h, Rectangle craftRec
 	ingredientRectangle.y =	craftRectangle.y + padding;
 
 	return ingredientRectangle;
+}
+
+void Gameplay::drawInventoryBackground(const Rectangle& inventoryRectangle, const Inventory& inventory, bool insideInventory)
+{
+	// hotbar always visible
+	DrawRectangle(
+		(int)inventoryRectangle.x,
+		(int)inventoryRectangle.y,
+		(int)inventoryRectangle.width,
+		(int)inventoryRectangle.height / inventory.rows,
+		{ 100,100,100,100 }
+	);
+
+	// remaining rows only when inventory is open
+	if (insideInventory)
+	{
+		DrawRectangle(
+			(int)inventoryRectangle.x,
+			(int)inventoryRectangle.y + (int)inventoryRectangle.height / inventory.rows,
+			(int)inventoryRectangle.width,
+			(int)inventoryRectangle.height * (inventory.rows - 1) / inventory.rows,
+			{ 100,100,100,100 }
+		);
+	}
+}
+
+void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const ItemStack& stack, bool selected, AssetManager& assetManager)
+{
+	Color c = { 180,180,200,240 };
+
+	if (CheckCollisionPointRec(GetMousePosition(), rect))
+		c = { 220,250,220,250 };
+
+	if (selected)
+		c = { 255,230,80,255 };
+
+	DrawTexturePro(
+		assetManager.frame,
+		getTextureAtlas(0, 0,
+			assetManager.frame.width,
+			assetManager.frame.height),
+		rect,
+		{ 0,0 },
+		0.f,
+		c
+	);
+
+	auto atlas = getTextureCoordinatesForItemType(stack.itemId);
+	Texture2D tex = getTextureForItemType(stack.itemId, assetManager);
+
+	if (!isDragged)
+	{
+		DrawTexturePro(
+			tex,
+			atlas,
+			shrinkRectanglePercentage(rect, .3f, .3f),
+			{ 0,0 },
+			0.f,
+			c
+		);
+
+		if (stack.count != 0 && isStackable(stack.itemId))
+		{
+			Vector2 textPos =
+			{
+				rect.x + rect.width * 0.5f,
+				rect.y + rect.height * 0.75f
+			};
+			std::string str = std::to_string(stack.count);
+			Vector2 textSize = MeasureTextEx(GetFontDefault(), str.c_str(), 25.f, 2.f);
+
+			// write item count as text
+			DrawTextPro(
+				GetFontDefault(),
+				str.c_str(),
+				textPos,
+				{ textSize.x / 2.f, textSize.y / 2.f },
+				0.f,
+				25.f,
+				1.f,
+				{ 255, 255, 255, 200 }
+			);
+		}
+	}
+
+}
+
+void Gameplay::drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, AssetManager& assetManager)
+{
+	Rectangle rect = shrinkRectanglePercentage(
+		inventoryRectangle,
+		0.01f,
+		0.01f
+	);
+
+	float cellHeight = rect.height / inventory.rows;
+	float cellWidth = cellHeight;
+
+	int row = index / inventory.columns;
+	int col = index % inventory.columns;
+
+	Rectangle slotRect;
+	slotRect.x = rect.x + col * cellWidth;
+	slotRect.y = rect.y + row * cellHeight;
+	slotRect.width = cellWidth;
+	slotRect.height = cellHeight;
+
+	slotRect = shrinkRectanglePercentage(
+		slotRect,
+		0.1f,
+		0.1f
+	);
+
+	const ItemStack& stack = inventory.slots[index];
+
+	drawInventorySlot(
+		isDragged,
+		slotRect,
+		stack,
+		player.selectedHotbarSlot == index,
+		assetManager
+	);
+}
+
+int Gameplay::getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRectangle, const Inventory& inventory, bool insideInventory)
+{
+	inventoryRectangle = shrinkRectanglePercentage(
+		inventoryRectangle,
+		0.01f,
+		0.01f
+	);
+
+	float cellHeight = inventoryRectangle.height / inventory.rows;
+	float cellWidth = cellHeight;
+
+	int maxRows = insideInventory ? inventory.rows : 1;
+
+	int col = (int)((mousePos.x - inventoryRectangle.x) / cellWidth);
+	int row = (int)((mousePos.y - inventoryRectangle.y) / cellHeight);
+
+	if (col < 0 || col >= inventory.columns)
+		return -1;
+
+	if (row < 0 || row >= maxRows)
+		return -1;
+
+	return row * inventory.columns + col;
+}
+
+void Gameplay::drawDraggedItem(const ItemStack& stack, AssetManager& assetManager)
+{
+	Vector2 mouse = GetMousePosition();
+
+	Rectangle r;
+	r.width = 48;
+	r.height = 48;
+	r.x = mouse.x - r.width / 2.f;
+	r.y = mouse.y - r.height / 2.f;
+
+	auto atlas = getTextureCoordinatesForItemType(stack.itemId);
+
+	Texture2D tex = getTextureForItemType(stack.itemId, assetManager);
+
+	DrawTexturePro(
+		tex,
+		atlas,
+		r,
+		{ 0,0 },
+		0.f,
+		Color{ 255,255,255,180 }
+	);
 }
 
 void Gameplay::addLight(int worldX, int worldY, float radius, float intensity, bool isTorch)
@@ -324,8 +509,9 @@ bool Gameplay::init()
 
 	// player spawn
 	player.teleport({ 20, 60 });
-	player.physics.transform.w = 0.9f;
-	player.physics.transform.h = 1.8f;
+
+	//player.physics.transform.w = 0.9f;
+	//player.physics.transform.h = 1.8f;
 
 	// Use a RenderTexture to capture the scene
 	sceneTexture =        LoadRenderTexture(screenW, screenH);
@@ -342,11 +528,16 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnEnemyHelper<Zombie>({ 30,60 });
+	spawnEnemyHelper<Slime>({ 30,60 });
+	spawnEnemyHelper<Slime>({ 31,60 });
+	spawnEnemyHelper<Slime>({ 29,60 });
+	spawnEnemyHelper<Slime>({ 32,60 });
+	spawnEnemyHelper<Zombie>({ 25,60 });
 	//spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
-	maxEnemyCount = 5;
+	maxEnemyCount = 1;
 
 	// start item in inventory
+	inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 	inventory.storeItem(ItemStack{ Block::woodLog, 5 });
 
@@ -522,7 +713,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		particles.insert(particles.end(), rightParticles.begin(), rightParticles.end());
 	}
 
-	player.update(deltaTime, EntityUpdateData
+	player.isAlive = player.update(deltaTime, EntityUpdateData
 		{
 			player,
 			rng,
@@ -531,6 +722,13 @@ bool Gameplay::update(AssetManager& assetManager)
 			gameMap
 		}
 	);
+
+	if (!player.isAlive)
+	{
+		player = Player{};
+		player.teleport({ 20,60 });
+	}
+
 #pragma endregion
 
 
@@ -629,6 +827,10 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	bool insideInventoryMenu = false;
 	Rectangle inventoryRectangle = getInventoryRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
+	Rectangle hotbarRectangle = inventoryRectangle;
+	hotbarRectangle.height /= inventory.rows;
+
+	insideInventoryMenu = CheckCollisionPointRec(GetMousePosition(), hotbarRectangle);
 
 	if (insideInventory && CheckCollisionPointRec(GetMousePosition(), inventoryRectangle))
 	{
@@ -1131,7 +1333,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region render enemy health bars
+#pragma region render & update enemy health bars
 
 
 	for (auto& e : entityHolder.enemies)
@@ -1362,15 +1564,26 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	//DrawRectangle(heartRectangle.x, heartRectangle.y, heartRectangle.width, heartRectangle.height, RED);
 
-	for (int i = 0; i < 5; i++)
+	float damagedLife = std::min(player.getMaxLife() - player.life, player.getMaxLife());
+
+	// todo: create maxLife variable since we can increase it with items
+	for (int i = 0; i < (int)(player.getMaxLife() / 10); i++, damagedLife -= 10)
 	{
 		Rectangle oneHeartRectangle = heartRectangle;
 		oneHeartRectangle.width = oneHeartRectangle.height;
 		oneHeartRectangle.x += oneHeartRectangle.width * i;
 
+
+		int x = 0;
+
+		if(damagedLife >= 10)
+			x = assetManager.hearts.width / 3;
+		else if (damagedLife >= 5)
+			x = assetManager.hearts.width * 2 / 3;
+
 		DrawTexturePro(
 			assetManager.hearts,
-			getTextureAtlas(0, 0, assetManager.hearts.width / 3, assetManager.hearts.height),
+			getTextureAtlas(x, 0, assetManager.hearts.width / 3, assetManager.hearts.height),
 			oneHeartRectangle,
 			{ 0,0 },
 			0.f,
@@ -1382,132 +1595,86 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region inventory ui
 
-	if (insideInventory)
+	// draw inventory rect
+	drawInventoryBackground(
+		inventoryRectangle,
+		inventory,
+		insideInventory
+	);
+
+	int slotsToDraw = insideInventory ? inventory.rows * inventory.columns : inventory.columns;
+	// draw hotbar + inventory
+	for (int i = 0; i < slotsToDraw; i++)
 	{
-		Rectangle inventoryRectangle = getInventoryRectangle(w, h);
+		bool isDragged = (i == inventory.draggedSlot);
 
-		DrawRectangle(
-			(int)inventoryRectangle.x,
-			(int)inventoryRectangle.y,
-			(int)inventoryRectangle.width,
-			(int)inventoryRectangle.height,
-			{ 100,100,100,100 }
+		drawInventorySlotByIndex(
+			i,
+			isDragged,
+			inventoryRectangle,
+			inventory,
+			player,
+			assetManager
 		);
+	}
 
-		inventoryRectangle = shrinkRectanglePercentage(inventoryRectangle, .01f, .01f);
+	// hotbar selection
+	for (int i = 0; i < sizeof(hotbarKeys) / sizeof(hotbarKeys[0]); i++)
+	{
 
-		Rectangle oneCellRectangle{};
-		oneCellRectangle.height = inventoryRectangle.height / 3;
-		oneCellRectangle.width = oneCellRectangle.height;
-		oneCellRectangle.x = inventoryRectangle.x;
-		oneCellRectangle.y = inventoryRectangle.y;
-
-		for (int i = 0; i < inventory.rows; i++)
+		if (IsKeyPressed(hotbarKeys[i]))
 		{
-			for (int j = 0; j < inventory.cols; j++)
-			{
-				int index = j * inventory.rows + i;
-				Rectangle r = oneCellRectangle;
-				r.x += i * oneCellRectangle.width;
-				r.y += j * oneCellRectangle.height;
-
-				r = shrinkRectanglePercentage(r, .1f, .1f);
-
-				Color c = { 180,180,200,240 };
-
-				if (CheckCollisionPointRec(GetMousePosition(), r))
-				{
-					c = { 220,250,220,250 };
-
-					// equip item on left click
-					if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
-					{
-						ItemStack& clickedStack = inventory.slots[index];
-
-						if (clickedStack.count <= 0) continue;
-
-						ItemDefinition* item = getItem(clickedStack.itemId);
-
-						if (!item) continue;
-
-						if (item->category == ItemCategory::ARMOR)
-						{
-							useArmor(&player, *item, clickedStack, inventory, index);
-							continue;
-						}
-
-						if (player.selectedHotbarSlot == index)
-						{
-							player.heldItem = 0;
-							player.selectedHotbarSlot = -1;
-						}
-						else
-						{
-							if (!inventory.isHotbarSlot(index)) continue;
-
-							player.selectedHotbarSlot = index;
-							player.heldItem = inventory.slots[index].itemId;
-						}
-					}
-				}
-				else
-				{
-					c = { 180,180,200,240 };
-				}
-
-				// selected override
-				if (player.selectedHotbarSlot == index)
-				{
-					c = { 255,230,80,255 };
-				}
-
-				DrawTexturePro(
-					assetManager.frame,
-					getTextureAtlas(0, 0, assetManager.frame.width, assetManager.frame.height),
-					r,
-					{ 0,0 },
-					0.f,
-					c
-				);
-
-				// display item from inventory
-				auto atlas = getTextureCoordinatesForItemType(inventory.slots[index].itemId);
-				Texture2D tex = getTextureForItemType(inventory.slots[index].itemId, assetManager);
-
-				DrawTexturePro(
-					tex,
-					atlas,
-					shrinkRectanglePercentage(r, .3f, .3f),
-					{ 0,0 },
-					0.f,
-					c
-				);
-
-				if (inventory.slots[index].count != 0 && !isItem(inventory.slots[index].itemId))
-				{
-					Vector2 textPos =
-					{
-						r.x + r.width * 0.5f,
-						r.y + r.height * 0.75f
-					};
-					std::string str = std::to_string(inventory.slots[index].count);
-					Vector2 textSize = MeasureTextEx(GetFontDefault(), str.c_str(), 25.f, 2.f);
-
-					// write item count as text
-					DrawTextPro(
-						GetFontDefault(),
-						str.c_str(),
-						textPos,
-						{ textSize.x / 2.f, textSize.y / 2.f },
-						0.f,
-						25.f,
-						1.f,
-						{ 255, 255, 255, 200 }
-					);
-				}
-			}
+			player.selectedHotbarSlot = i;
+			break;
 		}
 	}
+
+	 //equip item from hotbar
+	{
+		ItemStack& selectedStack = inventory.slots[player.selectedHotbarSlot];
+
+		ItemDefinition* item = getItem(selectedStack.itemId);
+
+		if (item && item->category == ItemCategory::ARMOR)
+		{
+			useArmor(&player, *item, selectedStack, inventory, player.selectedHotbarSlot);
+		}
+
+		player.heldItem = inventory.slots[player.selectedHotbarSlot].itemId;
+	}
+
+	// swap item
+	int hoveredSlot = getHoveredInventorySlot(
+		GetMousePosition(),
+		inventoryRectangle,
+		inventory,
+		insideInventory
+	);
+
+	if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+	{
+		if (hoveredSlot != -1)
+		{
+			inventory.draggedSlot = hoveredSlot;
+		}
+	}
+
+	if (IsMouseButtonReleased(MouseButton::MOUSE_BUTTON_LEFT))
+	{
+		if (hoveredSlot == -1)
+		{
+			inventory.draggedSlot = -1;
+		}
+
+		if (inventory.draggedSlot != -1 && hoveredSlot != -1)
+		{
+			std::swap(inventory.slots[inventory.draggedSlot], inventory.slots[hoveredSlot]);
+		}
+	}
+
+	// draw dragged item at mouse
+	if (inventory.draggedSlot != -1)
+		drawDraggedItem(inventory.slots[inventory.draggedSlot], assetManager);
 
 #pragma endregion
 
@@ -1747,6 +1914,12 @@ bool Gameplay::update(AssetManager& assetManager)
 		std::string enemyCount = "Enemy Count: ";
 		enemyCount += std::to_string(entityHolder.enemies.size());
 		ImGui::Text(enemyCount.c_str());
+
+		ImGui::Separator();
+
+		std::string entityCount = "Entity Count: ";
+		entityCount += std::to_string(entityHolder.entities.size());
+		ImGui::Text(entityCount.c_str());
 
 		ImGui::Separator();
 

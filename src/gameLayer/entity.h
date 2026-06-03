@@ -92,7 +92,7 @@ struct Entity
 
 	virtual float getMaxLife() = 0;
 
-	virtual void dropLoot(EntityHolder& entityHolder, int type) {};
+	virtual void dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder) {};
 
 	virtual void onHit() {}
 

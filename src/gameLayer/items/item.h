@@ -291,6 +291,8 @@ void registerItems();
 extern std::unordered_map<ItemId, ItemDefinition> itemDatabase;
 
 ItemDefinition* getItem(ItemId itemType);
+int             getMaxStackSize(ItemId itemId);
+bool            isStackable(ItemId itemId);
 bool            isItem(ItemId itemType);
 
 // ─── Texture helpers ──────────────────────────────────────────────────────────

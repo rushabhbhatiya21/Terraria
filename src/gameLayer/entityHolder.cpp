@@ -70,7 +70,7 @@ void EntityHolder::removeFromArrays(Entity* entity)
 	}
 
 	case EntityType::EntityType_Player:
-		// alreay removed from master vector
+		// game over or respawn
 		break;
 	default:
 		break;

@@ -5,6 +5,7 @@
 #include <randomStuff.h>
 #include <entityHolder.h>
 #include <player.h>
+#include "entities/droppedItem.h"
 
 void DesertSlime::drawSprite(AssetManager& assetManager)
 {
@@ -103,9 +104,41 @@ bool DesertSlime::update(float deltaTime, EntityUpdateData& data)
 	return true;
 }
 
-void DesertSlime::dropLoot(EntityHolder& entityHolder, int type)
+void DesertSlime::dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder)
 {
-	// todo: implement
+	int dropsCount = 0;
+	//bool legendary = false;
+	//bool epic      = false;
+	//bool rare      = false;
+	//bool common    = false;
+
+	if (getRandomChance(rng, .05f))
+		dropsCount = 10;
+	else if (getRandomChance(rng, .15f))
+		dropsCount = 6;
+	else if (getRandomChance(rng, .35f))
+		dropsCount = 4;
+	else
+		dropsCount = 2;
+
+	bool isLeft = false;
+	for (int i = 0; i < dropsCount; i++)
+	{
+		DroppedItem droppedItem;
+		droppedItem.teleport(getPosition());
+
+		// make it drop rarer chests with low chance
+		droppedItem.itemType = Items::slime;
+		float x = getRandomFloat(rng, -3.f, 3.f);
+		if ((isLeft && x < 0) || (!isLeft && x > 0)) x *= -1.f;
+		isLeft = !isLeft;
+		droppedItem.physics.velocity.x = x;
+		droppedItem.physics.velocity.y = -3.f;
+
+		auto id = entityHolder.idHolder.getEntityIdAndIncreament();
+		entityHolder.droppedItems.push_back(&droppedItem);
+		entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+	}
 }
 
 

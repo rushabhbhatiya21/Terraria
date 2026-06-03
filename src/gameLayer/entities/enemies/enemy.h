@@ -44,7 +44,7 @@ struct Enemy : public Entity
 
 	virtual void enterState(int newState) {};
 
-	virtual void dropLoot(EntityHolder& entityHolder, int type) override = 0;
+	virtual void dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder) override = 0;
 
 	//virtual void enterState(int newState, EntityUpdateData& entityUpdateData) = 0;
 

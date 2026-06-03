@@ -6,6 +6,9 @@
 #include <entityHolder.h>
 #include <items/blocks.h>
 #include <player.h>
+#include "combat/combatSystem.h"
+#include "shake.h"
+#include "ui/popupText.h"
 
 void Slime::drawSprite(AssetManager& assetManager)
 {
@@ -39,6 +42,13 @@ bool Slime::update(float deltaTime, EntityUpdateData& data)
 	{
 		currentState = STATE_DEAD;
 	}
+
+	// damage player
+	// add attack state
+	//if (physics.transform.intersectTransform(data.player.physics.transform))
+	//{
+	//	doAttack(&data.player);
+	//}
 
 	if (changeStateTimer < 0)
 	{
@@ -106,7 +116,7 @@ bool Slime::update(float deltaTime, EntityUpdateData& data)
 		case STATE_DEAD:
 		{
 			// drop loop
-			dropLoot(data.entityHolder, Block::woodenChest);
+			dropLoot(Items::slime, data.rng, data.entityHolder);
 			return false;
 		}
 
@@ -125,18 +135,70 @@ bool Slime::update(float deltaTime, EntityUpdateData& data)
 
 }
 
-void Slime::dropLoot(EntityHolder& entityHolder, int type)
+// put this in enemy.h
+void Slime::doAttack(Player* player)
 {
-	DroppedItem droppedItem;
-	droppedItem.teleport(getPosition());
+	// implement attack here
+	DamageInfo info;
+	info.attacker = this;
+	info.item = nullptr;
+	info.hitDirection = getPosition() - player->getPosition();
 
-	// make it drop rarer chests with low chance
-	droppedItem.itemType = type;
-	droppedItem.physics.velocity.y = -3.f;
+	DamageResult& result = CombatSystem::applyDamage(player, info);
 
-	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
-	entityHolder.droppedItems.push_back(&droppedItem);
-	entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+	float shakeDuration = result.crit ? .2f : .1f;
+	float shakeStength = result.crit ? .3f : .2f;
+	camShake.triggerCameraShake(shakeDuration, shakeStength);
+
+	spawnPopupText(
+		player->getPosition(),
+		Vector2{ .1f, .1f },
+		std::to_string(int(std::floor(result.finalDamage))),
+		1,
+		.4f,
+		-1.f,
+		WHITE,
+		result.crit
+	);
+
+	return;
+}
+
+void Slime::dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder)
+{
+	int dropsCount = 0;
+	//bool legendary = false;
+	//bool epic      = false;
+	//bool rare      = false;
+	//bool common    = false;
+
+	if (getRandomChance(rng, .05f))
+		dropsCount = 10;
+	else if (getRandomChance(rng, .15f))
+		dropsCount = 6;
+	else if (getRandomChance(rng, .35f))
+		dropsCount = 4;
+	else
+		dropsCount = 2;
+
+	bool isLeft = false;
+	for (int i = 0; i < dropsCount; i++)
+	{
+		DroppedItem droppedItem;
+		droppedItem.teleport(getPosition());
+
+		// make it drop rarer chests with low chance
+		droppedItem.itemType = Items::slime;
+		float x = getRandomFloat(rng, -3.f, 3.f);
+		if ((isLeft && x < 0) || (!isLeft && x > 0)) x *= -1.f;
+		isLeft = !isLeft;
+		droppedItem.physics.velocity.x = x;
+		droppedItem.physics.velocity.y = -3.f;
+
+		auto id = entityHolder.idHolder.getEntityIdAndIncreament();
+		entityHolder.droppedItems.push_back(&droppedItem);
+		entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+	}
 }
 
 Json Slime::formatToJson()

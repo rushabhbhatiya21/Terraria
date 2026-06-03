@@ -25,7 +25,7 @@ struct Player : public Entity
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
-	void dropLoot(EntityHolder& entityHolder, int type) override;
+	//void dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder) override;
 	
 	Json formatToJson() override;
 
@@ -53,8 +53,8 @@ struct Player : public Entity
 
 	bool isPlayingAttackAnimation = false;
 
-	ItemId heldItem = Items::goldSword;
-	int selectedHotbarSlot = -1;
+	ItemId heldItem = Items::air;
+	int selectedHotbarSlot = 0;
 
 	int numberOfParticlesOnLand = 1;
 
