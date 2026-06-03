@@ -28,6 +28,8 @@
 
 #include "ui/popupText.h"
 
+#pragma region sky colors
+
 // Bright, slightly warm white — more natural than pure white
 const Color dayColor = { 255, 250, 230, 255 };
 
@@ -48,6 +50,11 @@ const Color sunsetSky = { 100,  60, 130, 255 };  // dusky purple
 const Color nightColor = { 20,  35,  80, 255 };
 const Color nightSky = { 8,  12,  40, 255 };  // near-black deep blue
 
+#pragma endregion
+
+
+#pragma region hotbar keys
+
 const KeyboardKey hotbarKeys[] =
 {
 	KEY_ONE,
@@ -61,6 +68,11 @@ const KeyboardKey hotbarKeys[] =
 	KEY_NINE,
 	KEY_ZERO
 };
+
+#pragma endregion
+
+
+#pragma region sky color helpers
 
 static Color lerpColor(Color a, Color b, float t)
 {
@@ -111,6 +123,11 @@ static SkyData getSkyData(float t)
 	return { nightSky, nightColor, 0.65f, DayPhase::NIGHT };
 }
 
+#pragma endregion
+
+
+#pragma region day/night cyle helpers
+
 bool Gameplay::isNight(float t)
 {
 	return (t >= 0.875f || t < 0.25f);
@@ -132,6 +149,11 @@ WorldTimeClock Gameplay::getWorldTimeClock(float t)
 	return WorldTimeClock{ h, m, 0 };
 }
 
+#pragma endregion
+
+
+#pragma region spawn helpers
+
 void Gameplay::spawnDroppedItem(Vector2 position, int type)
 {
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
@@ -144,6 +166,11 @@ void Gameplay::spawnDroppedItem(Vector2 position, int type)
 	entityHolder.entities[id] = std::move(item);
 	entityHolder.droppedItems.push_back(itemPtr);
 }
+
+#pragma endregion
+
+
+#pragma region rect ui helpers
 
 Rectangle Gameplay::getInventoryRectangle(float w, float h)
 {
@@ -454,6 +481,11 @@ void Gameplay::drawDisplauNameUI(ItemId itemId, Rectangle parentRect, float font
 	);
 }
 
+#pragma endregion
+
+
+#pragma region light helpers
+
 void Gameplay::addLight(int worldX, int worldY, float radius, float intensity, bool isTorch)
 {
 	// visible lightmap range
@@ -540,6 +572,9 @@ static float tileNoise(int x, int y)
 
 	return (n & 255) / 255.f;
 }
+
+#pragma endregion
+
 
 bool Gameplay::init()
 {
