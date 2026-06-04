@@ -18,19 +18,29 @@ int Crafting::getItemIndexFromInventory(const std::vector<ItemStack>& slots, con
 	return -1; // item not found, not gonna happen but still
 }
 
-bool Crafting::canCraft(const std::vector<ItemStack>& slots, const ItemId item)
+Crafting::CraftCheckResult Crafting::canCraft(const std::vector<ItemStack>& slots, const ItemId item, Recipes::CraftingStation station)
 {
+	Crafting::CraftCheckResult result = {};
+	result.canCraft = true;
+
 	const Recipes::Recipe& recipe = Recipes::all[item];
+
+	if (station != recipe.station)
+	{
+		result.canCraft = false;
+		result.missingStation = recipe.station;
+	}
 
 	for (const auto& ingredient : recipe.ingredients)
 	{
 		if (!hasEnoughIngredients(slots, ingredient))
 		{
-			return false;
+			result.canCraft = false;
+			result.missingItems.push_back(ingredient);
 		}
 	}
 
-	return true;
+	return result;
 }
 
 void Crafting::craft(Inventory& inventory, const ItemId item)
@@ -83,13 +93,16 @@ bool Crafting::hasEnoughIngredients(const std::vector<ItemStack>& slots, const I
 	return total >= itemStack.count;
 }
 
-std::vector<ItemId> Crafting::getAvailableRecipes(bool nearWorkbench)
+std::vector<ItemId> Crafting::getAvailableRecipes(Recipes::CraftingStation station)
 {
 	std::vector<ItemId> result;
 
 	for (const auto& r : Recipes::all)
 	{
-		if (!nearWorkbench)
+		//if (!nearWorkbench)
+		//	continue;
+
+		if (r.second.station != station)
 			continue;
 
 		result.push_back(r.first);

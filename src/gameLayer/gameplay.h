@@ -20,6 +20,8 @@
 #include <inventory.h>
 #include <enemySpawner.h>
 
+#include "recipe.h"
+
 #define CAMERA_ZOOM 30.0f
 #define TILE_SIZE 1
 #define LIGHT_SCALE 4
@@ -157,6 +159,8 @@ struct Gameplay
 		Color rectColor = Color{255,255,255,200},
 		Color textColor = BLACK
 	);
+
+	Recipes::CraftingStation getNearbyStation(Vector2 playerPos);
 
 	//void floodFillLight(int x, int y, int offsetX, int offsetY, float value, bool isTorch = false);
 

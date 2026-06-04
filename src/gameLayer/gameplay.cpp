@@ -9,7 +9,7 @@
 #include <saveMap.h>
 #include <worldGenerator.h>
 
-#include <recipe.h>
+//#include <recipe.h>
 #include <crafting.h>
 
 #include <shake.h>
@@ -482,6 +482,37 @@ void Gameplay::drawDisplauNameUI(ItemId itemId, Rectangle parentRect, float font
 }
 
 #pragma endregion
+
+
+Recipes::CraftingStation Gameplay::getNearbyStation(Vector2 playerPos)
+{
+	Recipes::CraftingStation nearbyCraftingStation = Recipes::CraftingStation::NONE;
+	for (int y = playerPos.y - 3; y <= playerPos.y + 3; y++)
+	{
+		for (int x = playerPos.x - 3; x <= playerPos.x + 3; x++)
+		{
+			auto b = gameMap.getBlockSafe(x, y);
+
+			if (!b) break;
+
+			if (b->type == Items::workBench)
+			{
+				nearbyCraftingStation = Recipes::CraftingStation::WORKBENCH;
+				break;
+			}
+
+			if (b->type == Items::furnace)
+			{
+				nearbyCraftingStation = Recipes::CraftingStation::FURNACE;
+				break;
+			}
+		}
+
+		if (nearbyCraftingStation != Recipes::CraftingStation::NONE) break;
+	}
+
+	return nearbyCraftingStation;
+}
 
 
 #pragma region light helpers
@@ -1813,7 +1844,8 @@ bool Gameplay::update(AssetManager& assetManager)
 		oneCellRectangleIngredient = shrinkRectanglePercentage(oneCellRectangleIngredient, 0.01f, 0.01f);
 		//DrawRectangleLinesEx(oneCellRectangleIngredient, 1, DARKPURPLE);
 
-		std::vector<ItemId> availableRecipes = Crafting::getAvailableRecipes(true);
+		auto nearbyStation = getNearbyStation(player.getPosition());
+		std::vector<ItemId> availableRecipes = Crafting::getAvailableRecipes(nearbyStation);
 		int maxRecipeSize = availableRecipes.size();
 		float scroll = GetMouseWheelMove();
 
@@ -1841,7 +1873,9 @@ bool Gameplay::update(AssetManager& assetManager)
 		if (IsKeyPressed(KEY_ENTER))
 		{
 			ItemId selectedItemType = availableRecipes[selectedRecipeIndex];
-			bool canCraft = Crafting::canCraft(inventory.slots, selectedItemType);
+			auto nearbyStation = getNearbyStation(player.getPosition());
+			Crafting::CraftCheckResult craftingResult = Crafting::canCraft(inventory.slots, selectedItemType, nearbyStation);
+			bool canCraft = craftingResult.canCraft;
 
 			if (canCraft)
 			{
@@ -1850,7 +1884,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		}
 
 		// need to change this
-		if (availableRecipes.size() != 0)
+		if (maxRecipeSize != 0)
 		{
 			ItemId selectedItemType = availableRecipes[selectedRecipeIndex];
 
@@ -1858,11 +1892,15 @@ bool Gameplay::update(AssetManager& assetManager)
 
 			for (int i = Crafting::startPointer; i < std::min(Crafting::startPointer + Crafting::maxRecipeToShow, maxRecipeSize); i++)
 			{
-				if (availableRecipes.size() == 0)
-					break;
+				//if (availableRecipes.size() == 0)
+				//	break;
+
+				// check nearby station
+				auto nearbyStation = getNearbyStation(player.getPosition());
 
 				ItemId itemType = availableRecipes[i];
-				bool canCraft = Crafting::canCraft(inventory.slots, itemType);
+				Crafting::CraftCheckResult craftingResult = Crafting::canCraft(inventory.slots, itemType, nearbyStation);
+				bool canCraft = craftingResult.canCraft;
 
 				// item rectangle
 				Rectangle rr = oneCellRectangleRecipe;
