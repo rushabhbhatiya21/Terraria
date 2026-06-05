@@ -8,8 +8,6 @@
 #include <helper.h>
 #include <saveMap.h>
 #include <worldGenerator.h>
-
-//#include <recipe.h>
 #include <crafting.h>
 
 #include <shake.h>
@@ -484,6 +482,8 @@ void Gameplay::drawDisplauNameUI(ItemId itemId, Rectangle parentRect, float font
 #pragma endregion
 
 
+#pragma region craft helpers
+
 Recipes::CraftingStation Gameplay::getNearbyStation(Vector2 playerPos)
 {
 	Recipes::CraftingStation nearbyCraftingStation = Recipes::CraftingStation::NONE;
@@ -513,6 +513,8 @@ Recipes::CraftingStation Gameplay::getNearbyStation(Vector2 playerPos)
 
 	return nearbyCraftingStation;
 }
+
+#pragma endregion
 
 
 #pragma region light helpers
@@ -942,25 +944,25 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle input
 
-	bool insideInventoryMenu = false;
 	Rectangle inventoryRectangle = getInventoryRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
+
+	// inside hotbar meu
+	bool insideHotbarMenu = false;
 	Rectangle hotbarRectangle = inventoryRectangle;
 	hotbarRectangle.height /= inventory.rows;
+	insideHotbarMenu = CheckCollisionPointRec(GetMousePosition(), hotbarRectangle);
 
-	insideInventoryMenu = CheckCollisionPointRec(GetMousePosition(), hotbarRectangle);
+	// inside inventory except hotbar
+	bool insideInventoryGrid = false;
+	insideInventoryGrid = CheckCollisionPointRec(GetMousePosition(), inventoryRectangle) && insideInventory && !insideHotbarMenu;
 
-	if (insideInventory && CheckCollisionPointRec(GetMousePosition(), inventoryRectangle))
-	{
-		insideInventoryMenu = true;
-	}
+	//bool insideInventoryMenu = false; 
+	//insideInventoryMenu = CheckCollisionPointRec(GetMousePosition(), inventoryRectangle) && insideInventory;
 
+	// inside craft menu
 	bool insideCraftingMenu = false;
 	Rectangle craftRectangle = getCraftRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
-
-	if (insideCraft && CheckCollisionPointRec(GetMousePosition(), craftRectangle))
-	{
-		insideCraftingMenu = true;
-	}
+	insideCraftingMenu = CheckCollisionPointRec(GetMousePosition(), craftRectangle) && insideCraft;
 
 	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), camera);
 	int blockX = (int)floor(worldPos.x);
@@ -998,7 +1000,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	if (!showImgui)
 	{
-		if (!insideInventoryMenu && !insideCraftingMenu)
+		if (!insideInventoryGrid && !insideCraftingMenu && !insideHotbarMenu)
 		{
 			if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_MIDDLE))
 			{
@@ -1011,7 +1013,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			}
 		}
 
-		if (!insideInventoryMenu && !insideCraftingMenu)
+		if (!insideInventoryGrid && !insideCraftingMenu && !insideHotbarMenu)
 		{
 			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
 			{
@@ -1409,7 +1411,7 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma region render frame and selected block
 
 	//draw selected block
-	if (!insideInventoryMenu && !insideCraftingMenu)
+	if (!insideInventoryGrid && !insideCraftingMenu && !insideHotbarMenu)
 	{
 		DrawTexturePro(
 			assetManager.frame,
@@ -1776,31 +1778,33 @@ bool Gameplay::update(AssetManager& assetManager)
 		drawDisplauNameUI(hoveredItem, slotRect);
 	}
 
-
-	if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+	if (insideInventoryGrid)
 	{
-		if (hoveredSlot != -1)
+		if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 		{
-			inventory.draggedSlot = hoveredSlot;
+			if (hoveredSlot != -1)
+			{
+				inventory.draggedSlot = hoveredSlot;
+			}
 		}
+
+		if (IsMouseButtonReleased(MouseButton::MOUSE_BUTTON_LEFT))
+		{
+			if (hoveredSlot == -1)
+			{
+				inventory.draggedSlot = -1;
+			}
+
+			if (inventory.draggedSlot != -1 && hoveredSlot != -1)
+			{
+				std::swap(inventory.slots[inventory.draggedSlot], inventory.slots[hoveredSlot]);
+			}
+		}
+
+		// draw dragged item at mouse
+		if (inventory.draggedSlot != -1)
+			drawDraggedItem(inventory.slots[inventory.draggedSlot], assetManager);
 	}
-
-	if (IsMouseButtonReleased(MouseButton::MOUSE_BUTTON_LEFT))
-	{
-		if (hoveredSlot == -1)
-		{
-			inventory.draggedSlot = -1;
-		}
-
-		if (inventory.draggedSlot != -1 && hoveredSlot != -1)
-		{
-			std::swap(inventory.slots[inventory.draggedSlot], inventory.slots[hoveredSlot]);
-		}
-	}
-
-	// draw dragged item at mouse
-	if (inventory.draggedSlot != -1)
-		drawDraggedItem(inventory.slots[inventory.draggedSlot], assetManager);
 
 #pragma endregion
 
