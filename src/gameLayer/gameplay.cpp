@@ -1836,6 +1836,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma endregion
 
+	// todo: put them in functions - cleanup
 #pragma region craft ui
 
 
