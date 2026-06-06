@@ -30,7 +30,12 @@ int getMaxStackSize(ItemId itemId)
 
 bool isStackable(ItemId itemId)
 {
-    return getMaxStackSize(itemId) > 1;
+    int maxStackStack = getMaxStackSize(itemId);
+
+    if (maxStackStack == -1)
+        return false;
+
+    return maxStackStack > 1;
 }
 
 bool isItem(ItemId itemType)

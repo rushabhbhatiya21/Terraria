@@ -17,7 +17,7 @@ bool Inventory::storeItem(ItemStack& droppedItem)
 {
 	bool isItemStackable = isStackable(droppedItem.itemId);
 
-	if (isStackable)
+	if (isItemStackable)
 	{
 		for (auto& i : slots)
 		{

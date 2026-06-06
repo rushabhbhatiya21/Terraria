@@ -1,9 +1,9 @@
 note: recipes only visible when near crafting station
 
-1. Hotbar number keys - done
+1. Hotbar number keys            - done
 2. Inventory drag and drop items - done
-3. Slime/Zombie drops - done
-4. Workbench + Furnace system
+3. Slime/Zombie drops            - done
+4. Workbench + Furnace system    - done
 5. King Slime boss
 
 bug with drag and drop - if left click instead of drag and drop causes weird bugs
