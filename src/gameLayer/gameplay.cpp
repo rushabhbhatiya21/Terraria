@@ -399,13 +399,16 @@ int Gameplay::getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRecta
 
 	int maxRows = insideInventory ? inventory.rows : 1;
 
-	int col = (int)((mousePos.x - inventoryRectangle.x) / cellWidth);
-	int row = (int)((mousePos.y - inventoryRectangle.y) / cellHeight);
+	float rawCol = (mousePos.x - inventoryRectangle.x) / cellWidth;
+	float rawRow = (mousePos.y - inventoryRectangle.y) / cellHeight;
 
-	if (col < 0 || col >= inventory.columns)
+	if (rawCol < 0 || rawRow < 0 )
 		return -1;
 
-	if (row < 0 || row >= maxRows)
+	int col = (int)rawCol;
+	int row = (int)rawRow;
+
+	if (col >= inventory.columns || row >= maxRows)
 		return -1;
 
 	return row * inventory.columns + col;
@@ -954,10 +957,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	// inside inventory except hotbar
 	bool insideInventoryGrid = false;
-	insideInventoryGrid = CheckCollisionPointRec(GetMousePosition(), inventoryRectangle) && insideInventory && !insideHotbarMenu;
-
-	//bool insideInventoryMenu = false; 
-	//insideInventoryMenu = CheckCollisionPointRec(GetMousePosition(), inventoryRectangle) && insideInventory;
+	insideInventoryGrid = CheckCollisionPointRec(GetMousePosition(), inventoryRectangle) && insideInventory;
 
 	// inside craft menu
 	bool insideCraftingMenu = false;
@@ -1714,6 +1714,8 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region inventory ui
 
+	//DrawRectangleLinesEx(inventoryRectangle, 2, RED);
+
 	// draw inventory rect
 	drawInventoryBackground(
 		inventoryRectangle,
@@ -1721,8 +1723,8 @@ bool Gameplay::update(AssetManager& assetManager)
 		insideInventory
 	);
 
-	int slotsToDraw = insideInventory ? inventory.rows * inventory.columns : inventory.columns;
 	// draw hotbar + inventory
+	int slotsToDraw = insideInventory ? inventory.rows * inventory.columns : inventory.columns;
 	for (int i = 0; i < slotsToDraw; i++)
 	{
 		bool isDragged = (i == inventory.draggedSlot);
@@ -1748,6 +1750,29 @@ bool Gameplay::update(AssetManager& assetManager)
 		}
 	}
 
+	// swap item
+	int hoveredSlot = getHoveredInventorySlot(
+		GetMousePosition(),
+		inventoryRectangle,
+		inventory,
+		insideInventory
+	);
+
+	// hovered slot out of inventory
+	if (hoveredSlot == -1)
+	{
+		inventory.draggedSlot = -1;
+	}
+
+	// hotbar menu click to select
+	if (insideHotbarMenu && !insideInventory)
+	{
+		if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+		{
+			player.selectedHotbarSlot = hoveredSlot;
+		}
+	}
+
 	 //equip item from hotbar
 	{
 		ItemStack& selectedStack = inventory.slots[player.selectedHotbarSlot];
@@ -1761,14 +1786,6 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		player.heldItem = inventory.slots[player.selectedHotbarSlot].itemId;
 	}
-
-	// swap item
-	int hoveredSlot = getHoveredInventorySlot(
-		GetMousePosition(),
-		inventoryRectangle,
-		inventory,
-		insideInventory
-	);
 	
 	// draw display name of item
 	if (hoveredSlot != -1)
@@ -1795,6 +1812,12 @@ bool Gameplay::update(AssetManager& assetManager)
 				inventory.draggedSlot = -1;
 			}
 
+			if (hoveredSlot == inventory.draggedSlot)
+			{
+				hoveredSlot = -1;
+				inventory.draggedSlot = -1;
+			}
+
 			if (inventory.draggedSlot != -1 && hoveredSlot != -1)
 			{
 				std::swap(inventory.slots[inventory.draggedSlot], inventory.slots[hoveredSlot]);
@@ -1802,7 +1825,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		}
 
 		// draw dragged item at mouse
-		if (inventory.draggedSlot != -1)
+		if (hoveredSlot != -1 && inventory.draggedSlot != -1)
 			drawDraggedItem(inventory.slots[inventory.draggedSlot], assetManager);
 	}
 
