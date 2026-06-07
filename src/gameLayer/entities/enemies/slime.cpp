@@ -17,11 +17,11 @@ void Slime::drawSprite(AssetManager& assetManager)
 
 	if (flashTimer > 0) { color = { 255,0,0,255 }; }
 
-	int facingValue = isFacingRight ? 32 : -32;
+	//int facingValue = isFacingRight ? 32 : -32;
 
 	DrawTexturePro(
 		assetManager.slime,
-		getTextureAtlas(animations.positionX, animations.positionY, facingValue, 32),
+		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
 		aabb, // dest
 		{ 0, 0 }, // origin top-left corner
 		0.f, // rotation

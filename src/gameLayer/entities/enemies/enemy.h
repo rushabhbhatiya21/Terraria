@@ -8,8 +8,8 @@ enum EnemyType
 {
 	EnemyType_Slime = 101,
 	EnemyType_DesertSlime,
-	EnemyType_EvilEye,
-	EnemyType_Zombie
+	EnemyType_Zombie,
+	EnemyType_EvilEye
 };
 
 struct Enemy : public Entity

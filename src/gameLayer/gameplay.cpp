@@ -16,6 +16,7 @@
 #include <entities/enemies/slime.h>
 #include <entities/enemies/desetSlime.h>
 #include <entities/enemies/zombie.h>
+#include <entities/enemies/evilEye.h>
 
 #include <items/item.h>
 #include <items/itemUse.h>
@@ -650,7 +651,7 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	//spawnEnemyHelper<Slime>({ 30,60 });
+	spawnEnemyHelper<EvilEye>({ 35,55 });
 	//spawnEnemyHelper<Slime>({ 31,60 });
 	//spawnEnemyHelper<Slime>({ 29,60 });
 	//spawnEnemyHelper<Slime>({ 32,60 });
@@ -661,10 +662,10 @@ bool Gameplay::init()
 	// start item in inventory
 	inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
-	inventory.storeItem(ItemStack{ Items::woodLog, 20 });
-	inventory.storeItem(ItemStack{ Items::furnace, 1 });
-	inventory.storeItem(ItemStack{ Items::workBench, 1 });
-	inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
+	inventory.storeItem(ItemStack{ Items::dirt, 20 });
+	//inventory.storeItem(ItemStack{ Items::furnace, 1 });
+	//inventory.storeItem(ItemStack{ Items::workBench, 1 });
+	//inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
 
 	// start day at random time
 	std::ranlux24_base rng(std::random_device{}());
@@ -781,11 +782,11 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle player
 
-	auto updateEntityPhysics = [&](auto& entity, bool applyGravity = true)
+	auto updateEntityPhysics = [&](auto& entity, bool applyGravity = true, bool shouldResolveConstraints = true)
 		{
-			if (applyGravity) { entity.physics.applyGravity(); }
+			if (applyGravity)             { entity.physics.applyGravity(); }
 			entity.physics.updateForces(deltaTime);
-			entity.physics.resolveConstrains(gameMap);
+			if (shouldResolveConstraints) { entity.physics.resolveConstrains(gameMap); }
 			entity.physics.updateFinal();
 		};
 
@@ -921,7 +922,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		// update physics
 		else
 		{
-			updateEntityPhysics(*it->second, it->second->shouldApplyGravity);
+			updateEntityPhysics(*it->second, it->second->shouldApplyGravity, it->second->shouldResolveConstraints);
 		}
 	}
 

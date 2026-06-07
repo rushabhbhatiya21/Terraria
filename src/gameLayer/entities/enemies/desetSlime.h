@@ -35,6 +35,7 @@ struct DesertSlime: public Enemy
 	//	STATE_CHASING
 	//};
 
+	//currentState = STATE_WONDERING;
 	int currentState = STATE_WONDERING;
 	float changeStateTimer = 1.f;
 	float jumpTimer = 5.f;

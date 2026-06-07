@@ -29,7 +29,9 @@ struct AssetManager
 	Texture2D hearts = {};
 	Texture2D slime = {};
 	Texture2D desertSlime = {};
-	Texture2D evilEye = {};
+	Texture2D evilEyePhase1 = {};
+	Texture2D evilEyePhase2 = {};
+	Texture2D evilEyePieces = {};
 	Texture2D zombie = {};
 	Texture2D health = {};
 	Texture2D healthBar = {};
@@ -65,7 +67,9 @@ struct AssetManager
 		{&hearts, "hearts.png"},
 		{&slime, "slime.png"},
 		{&desertSlime, "desertSlime.png"},
-		{&evilEye, "evilEye.png"},
+		{&evilEyePhase1, "eyeOfCthulhuPhase1.png"},
+		{&evilEyePhase2, "eyeOfCthulhuPhase2.png"},
+		{&evilEyePieces, "eyeOfCthulhuPieces.png"},
 		{&zombie, "zombie.png"},
 		{&health, "health.png"},
 		{&healthBar, "healthBar.png"},
