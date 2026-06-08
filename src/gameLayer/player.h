@@ -8,9 +8,11 @@ struct Player : public Entity
 {
 	Player()
 	{
+		stats = makePlayerStats();
+		life = (float)stats.maxHealth;
+
 		isAlive = true;
 		setColliderSize();
-		life = getMaxLife();
 		shouldApplyGravity = false;
 	}
 
@@ -46,8 +48,6 @@ struct Player : public Entity
 	}
 
 	int getEntityType() { return EntityType_Player; }
-
-	float getMaxLife() { return 50; }
 
 	virtual void onHit();
 

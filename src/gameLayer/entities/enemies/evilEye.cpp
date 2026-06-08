@@ -3,6 +3,7 @@
 #include <helper.h>
 #include <assetManager.h>
 #include <player.h>
+#include "../../combat/combatSystem.h"
 
 void EvilEye::drawSprite(AssetManager& assetManager)
 {
@@ -75,12 +76,26 @@ void EvilEye::drawSprite(AssetManager& assetManager)
 	}
 }
 
-// todo: keeps on dashing if in range, have 3 dashes and hover for some time
+// done - keeps on dashing if in range, have 3 dashes and hover for some time
 bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 {
 	if (stateChangeTimer > 0) stateChangeTimer -= deltaTime;
 
 	Vector2 facingDirection = data.player.getPosition() - getPosition();
+
+	isColliding = physics.transform.intersectTransform(data.player.physics.transform);
+
+	// todo: have player flash on hit
+	if (isColliding && !wasColliding)
+	{
+		wasColliding = true;
+		DamageInfo info;
+		info.attacker = this;
+		info.hitDirection = facingDirection;
+		CombatSystem::applyDamage(&data.player, info);
+	}
+	
+	wasColliding = isColliding;
 
 	// look toward player
 	if (currentState == EvilEyeState::DASH_WINDUP || currentState == EvilEyeState::DASH)
@@ -92,14 +107,18 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 		rotation = atan2f(facingDirection.y, facingDirection.x) * RAD2DEG - 90.f;
 	}
 
-	// to player distance
-	float dist = Vector2Length(facingDirection);
-
 	// state transitions
-	if (currentState == EvilEyeState::HOVERING && dist <= DASH_INIT_RANGE)
+	if (currentState == EvilEyeState::HOVERING && stateChangeTimer <= 0)
 	{
-		printf("entering state hovering.\n");
-		enterState(EvilEyeState::POSITION_FOR_DASH, data);
+		if (dashCounter >= MAX_DASH_COUNT)
+		{
+			dashCounter = 0;
+			stateChangeTimer = getRandomFloat(data.rng, 1.f, 4.f);
+		}
+		else
+		{
+			enterState(EvilEyeState::POSITION_FOR_DASH, data);
+		}
 	}
 
 	if (currentState == EvilEyeState::POSITION_FOR_DASH)
@@ -112,58 +131,42 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 
 	if (currentState == EvilEyeState::DASH_WINDUP && stateChangeTimer <= 0)
 	{
-		printf("entering state dash.\n");
 		enterState(EvilEyeState::DASH, data);
 	}
 
 	if (currentState == EvilEyeState::DASH && stateChangeTimer <= 0)
 	{
-		printf("entering state dash recover.\n");
 		enterState(EvilEyeState::DASH_RECOVER, data);
 	}
 
 	if (currentState == EvilEyeState::DASH_RECOVER && stateChangeTimer <= 0)
 	{
-		printf("entering state hovering.\n");
+		if (dashCounter < MAX_DASH_COUNT)
+		{
+			enterState(EvilEyeState::POSITION_FOR_DASH, data);
+		}
+
 		enterState(EvilEyeState::HOVERING, data);
 	}
 
 	// movement
 	switch (currentState)
 	{
-	case EvilEye::EvilEyeState::IDLE:
-		break;
-	//case EvilEyeState::HOVERING:
-	//{
-	//	Vector2 toTarget = hoverTarget - getPosition();
-
-	//	if (Vector2Length(toTarget) < 20.f)
-	//	{
-	//		float angle = getRandomInt(data.rng, 0, 359) * DEG2RAD;
-
-	//		hoverTarget =
-	//		{
-	//			data.player.getPosition().x + cosf(angle) * HOVER_RANGE,
-	//			data.player.getPosition().y + sinf(angle) * HOVER_RANGE
-	//		};
-
-	//		toTarget = hoverTarget - getPosition();
-	//	}
-
-	//	moveDirection = toTarget;
-	//	moveSpeed = 3.f;
-	//	break;
-	//}
 	case EvilEyeState::HOVERING:
 	{
+		hoverTarget =
+		{
+			data.player.getPosition().x + getRandomFloat(data.rng, -1.f, 1.f),
+			data.player.getPosition().y - HOVER_RANGE
+		};
 		moveDirection = hoverTarget - getPosition();
-		moveSpeed = 3.f;
+		moveSpeed = HOVER_SPEED;
 		break;
 	}
 	case EvilEyeState::POSITION_FOR_DASH:
 	{
 		moveDirection = dashPosition - getPosition();
-		moveSpeed = 4.f;
+		moveSpeed = POSITION_SPEED;
 		break;
 	}
 	case EvilEye::EvilEyeState::DASH_WINDUP:
@@ -173,15 +176,14 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 	}
 	case EvilEye::EvilEyeState::DASH:
 	{
-		//physics.velocity *= Vector2{ 1.5f,1.5f };
 		moveDirection = dashDirection;
-		moveSpeed = 12.f;
+		moveSpeed = DASH_SPEED;
 		break;
 	}
 	case EvilEyeState::DASH_RECOVER:
 	{
 		moveDirection = dashDirection;
-		moveSpeed = 2.f;
+		moveSpeed = RECOVER_SPEED;
 		break;
 	}
 	case EvilEye::EvilEyeState::DEAD:
@@ -195,10 +197,23 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 		break;
 	}
 
-	moveDirection = Vector2Normalize(moveDirection);
+	if (Vector2LengthSqr(moveDirection) > 0.0001f)
+	{
+		moveDirection = Vector2Normalize(moveDirection);
+	}
+
+	if (moveSpeed == 0.f)
+	{
+		physics.velocity = Vector2Lerp(physics.velocity, Vector2Zero(), 10.f * deltaTime);
+	}
 
 	if (moveSpeed != 0.f && moveDirection != Vector2{ 0,0 })
-		physics.transform.pos += (moveDirection * moveSpeed * deltaTime);
+	{
+		Vector2 desiredVelocity = moveDirection * moveSpeed;
+		Vector2 steering = desiredVelocity - physics.velocity;
+		physics.velocity += steering * MOVE_ACCELERATION * deltaTime;
+		physics.transform.pos += physics.velocity * deltaTime;
+	}
 
 	animations.setAnimation(0);
 	animations.update(deltaTime, 0.18f, 3);
@@ -216,38 +231,19 @@ void EvilEye::enterState(EvilEyeState newState, EntityUpdateData& data)
 
 	switch (currentState)
 	{
-	case EvilEye::EvilEyeState::IDLE:
-		break;
-	//case EvilEyeState::HOVERING:
-	//{
-	//	float angle = getRandomInt(data.rng, 0, 359) * DEG2RAD;
-
-	//	hoverTarget =
-	//	{
-	//		data.player.getPosition().x + cosf(angle) * HOVER_RANGE,
-	//		data.player.getPosition().y + sinf(angle) * HOVER_RANGE
-	//	};
-
-	//	break;
-	//}
 	case EvilEyeState::HOVERING:
 	{
-		hoverTarget =
-		{
-			data.player.getPosition().x,
-			data.player.getPosition().y - HOVER_RANGE
-		};
-
+		stateChangeTimer = getRandomFloat(data.rng, 1.f, 4.f);
 		break;
 	}
 	case EvilEyeState::POSITION_FOR_DASH:
 	{
 		Vector2 toPlayer = Vector2Normalize(data.player.getPosition() - getPosition());
-
+		Vector2 side = { -toPlayer.y,  toPlayer.x };
 		dashPosition =
 		{
-			data.player.getPosition().x - toPlayer.x * DASH_SIDE_OFFSET,
-			data.player.getPosition().y - toPlayer.y * DASH_SIDE_OFFSET
+			data.player.getPosition().x + side.x * DASH_SIDE_OFFSET,
+			data.player.getPosition().y + side.y * DASH_SIDE_OFFSET
 		};
 
 		break;
@@ -260,6 +256,7 @@ void EvilEye::enterState(EvilEyeState newState, EntityUpdateData& data)
 	}
 	case EvilEyeState::DASH:
 	{
+		dashCounter++;
 		moveDirection = dashDirection;
 		stateChangeTimer = DASH_TIME;
 		break;

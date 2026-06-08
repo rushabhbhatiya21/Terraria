@@ -1687,10 +1687,10 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	//DrawRectangle(heartRectangle.x, heartRectangle.y, heartRectangle.width, heartRectangle.height, RED);
 
-	float damagedLife = std::min(player.getMaxLife() - player.life, player.getMaxLife());
+	float damagedLife = std::min((float)player.stats.maxHealth - player.life, (float)player.stats.maxHealth);
 
 	// todo: create maxLife variable since we can increase it with items
-	for (int i = 0; i < (int)(player.getMaxLife() / 10); i++, damagedLife -= 10)
+	for (int i = 0; i < (player.stats.maxHealth / 10); i++, damagedLife -= 10)
 	{
 		Rectangle oneHeartRectangle = heartRectangle;
 		oneHeartRectangle.width = oneHeartRectangle.height;

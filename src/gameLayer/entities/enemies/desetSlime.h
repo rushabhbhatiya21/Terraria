@@ -6,7 +6,6 @@ struct DesertSlime: public Enemy
 	DesertSlime()
 	{
 		setColliderSize();
-		life = getMaxLife();
 	}
 
 	void drawSprite(AssetManager& assetManager) override;
@@ -26,8 +25,6 @@ struct DesertSlime: public Enemy
 	}
 
 	int getEnemyType() override { return EnemyType_DesertSlime; }
-
-	float getMaxLife() override { return 15; }
 
 	//enum
 	//{

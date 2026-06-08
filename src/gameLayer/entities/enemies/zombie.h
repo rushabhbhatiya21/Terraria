@@ -6,7 +6,6 @@ struct Zombie : public Enemy
 	Zombie()
 	{
 		setColliderSize();
-		life = getMaxLife();
 	}
 
 	enum class Zombie_State
@@ -58,8 +57,6 @@ struct Zombie : public Enemy
 	}
 
 	int getEnemyType() override { return EnemyType_Zombie; }
-
-	float getMaxLife() override { return 50; }
 
 	virtual void onHit() override;
 

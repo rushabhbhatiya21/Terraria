@@ -91,8 +91,6 @@ struct Entity
 
 	virtual void setColliderSize() = 0;
 
-	virtual float getMaxLife() = 0;
-
 	virtual void dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder) {};
 
 	virtual void onHit() {}

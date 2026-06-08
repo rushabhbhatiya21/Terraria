@@ -14,11 +14,6 @@ enum EnemyType
 
 struct Enemy : public Entity
 {
-	//Enemy()
-	//{
-	//	isAlive = true;
-	//}
-
 	EntityAnimation animations;
 
 	float baseX = 0;
@@ -61,8 +56,6 @@ struct Enemy : public Entity
 	int getEntityType() override { return EntityType_Enemy; }
 
 	virtual int getEnemyType() = 0;
-
-	virtual float getMaxLife() override = 0;
 
 	virtual void onHit();
 

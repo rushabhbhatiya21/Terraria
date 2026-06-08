@@ -6,7 +6,6 @@ struct Slime : public Enemy
 	Slime()
 	{
 		setColliderSize();
-		life = getMaxLife();
 	}
 
 	void drawSprite(AssetManager& assetManager) override;
@@ -28,8 +27,6 @@ struct Slime : public Enemy
 	}
 
 	int getEnemyType() override { return EnemyType_Slime; }
-
-	float getMaxLife() override { return 35; }
 
 	//enum
 	//{

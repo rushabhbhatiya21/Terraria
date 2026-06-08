@@ -1,21 +1,23 @@
 #pragma once
 #include "enemy.h"
+#include <combat/stats.h>
 
 struct EvilEye : public Enemy
 {
 	EvilEye()
 	{
+		stats = makeEvilEyeStats();
+		life = (float)stats.maxHealth;
+
 		shouldApplyGravity = false;
 		shouldResolveConstraints = false;
 
 		setColliderSize();
-		life = getMaxLife();
 	}
 
 	enum class EvilEyeState
 	{
-		IDLE = 0,
-		HOVERING,
+		HOVERING = 0,
 		POSITION_FOR_DASH,
 		DASH_WINDUP,
 		DASH,
@@ -41,6 +43,11 @@ struct EvilEye : public Enemy
 	Vector2 dashDirection{};
 	Vector2 dashPosition{};
 
+	bool wasColliding = false;
+	bool isColliding  = false;
+
+	int dashCounter = 0;
+
 	float moveSpeed = 0.f;
 	float rotation = 0.f;
 	
@@ -53,9 +60,17 @@ struct EvilEye : public Enemy
 	static constexpr float DASH_TIME         = 0.7f;
 	static constexpr float DASH_RECOVER_TIME = 0.25f;
 
-	static constexpr float DASH_SIDE_OFFSET = 8.f;
-	static constexpr float DASH_HEIGHT_OFFSET = 0.f;
+	static constexpr float DASH_SIDE_OFFSET      = 8.f;
+	static constexpr float DASH_HEIGHT_OFFSET    = 0.f;
 	static constexpr float DASH_POSITION_EPSILON = 0.5f;
+	static constexpr int   MAX_DASH_COUNT        = 3;
+
+	static constexpr float HOVER_SPEED = 3.f;
+	static constexpr float POSITION_SPEED = 4.f;
+	static constexpr float DASH_SPEED = 10.f;
+	static constexpr float RECOVER_SPEED = 2.f;
+
+	static constexpr float MOVE_ACCELERATION = 5.f;
 
 	static constexpr int PHASE_ONE_CELL_SIZE_X = 111;
 	static constexpr int PHASE_ONE_CELL_SIZE_Y = 163;
@@ -69,8 +84,6 @@ struct EvilEye : public Enemy
 	EvilEyePhase currentPhase = EvilEyePhase::ONE;
 
 	int getEnemyType() override { return EnemyType_EvilEye; }
-
-	float getMaxLife() override { return 100; }
 
 	void drawSprite(AssetManager& assetManager) override;
 
