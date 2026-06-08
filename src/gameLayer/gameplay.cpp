@@ -663,6 +663,7 @@ bool Gameplay::init()
 	inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
 	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 	inventory.storeItem(ItemStack{ Items::dirt, 20 });
+	inventory.storeItem(ItemStack{ Items::shuriken, 100 });
 	//inventory.storeItem(ItemStack{ Items::furnace, 1 });
 	//inventory.storeItem(ItemStack{ Items::workBench, 1 });
 	//inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
@@ -1023,9 +1024,10 @@ bool Gameplay::update(AssetManager& assetManager)
 			{
 				// attack, tool, place block, projectile done
 				// todo consumable 
+
 				useItem(
 					&player,
-					ItemStack{ player.heldItem, 1 }, 
+					inventory.slots[player.selectedHotbarSlot],
 					entityHolder,
 					inventory,
 					worldPos
@@ -1045,21 +1047,8 @@ bool Gameplay::update(AssetManager& assetManager)
 	{
 		float shakeDuration = meleeResult.crit ? .2f : .1f;
 		float shakeOffset   = meleeResult.crit ? .3f : .15f;
-		//Color color         = meleeResult.crit ? ORANGE : WHITE;
-		//float textSize      = meleeResult.crit ? .8f : .4f;
-		//float offset        = meleeResult.crit ? -2.f : -1.f;
 
 		camShake.triggerCameraShake(shakeDuration, shakeOffset);
-		spawnPopupText(
-			meleeResult.positon,
-			Vector2{ .1f, .1f },
-			std::to_string(int(std::floor(meleeResult.damage))),
-			1,
-			.4f,
-			-1.f,
-			WHITE,
-			meleeResult.crit
-		);
 	}
 
 #pragma endregion

@@ -13,7 +13,7 @@
 
 void Projectile::render(AssetManager& assetManager)
 {
-	float size = 1.f;
+	float size = .5f;
 
 	// not using getRectangleForEntity because we do not want bottom anchored sprite
 	//auto aabb = getRectangleForEntity(physics.transform, size, size);
@@ -46,11 +46,16 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 	if (lifetime <= 0)
 		return false;
 
-	float dist = Vector2Distance(physics.transform.pos, data.player.getPosition());
-	float maxDist = 50.f; // world units
+	if (hitCountTimer >= 0)
+		hitCountTimer -= deltaTime;
+	else
+		isHit = false;
 
-	if (dist > maxDist * 2.f)
-		return false;
+	//float dist = Vector2Distance(physics.transform.pos, data.player.getPosition());
+	//float maxDist = 50.f; // world units
+
+	//if (dist > maxDist * 2.f)
+	//	return false;
 
 	rotation += rotationSpeed * deltaTime;
 
@@ -65,18 +70,23 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 
 	if (!item) return false;
 
+	// todo: have factions in entity
 	for (Enemy* e : data.entityHolder.enemies)
 	{
 		if (physics.transform.intersectTransform(e->physics.transform))
 		{
+			if (isHit)
+				continue;
+
 			if (owner == nullptr)
 				continue;
+
+			isHit = true;
+			hitCountTimer = HIT_COUNT_TIME;
 
 			DamageInfo info;
 			info.attacker = owner;
 			info.item = item;
-			//info.damage = item->weapon.damage;
-			//info.knockback = item->weapon.knockback;
 			info.hitDirection = Vector2Normalize(physics.velocity);
 
 			auto result = CombatSystem::applyDamage(e, info);
@@ -85,32 +95,57 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 
 			float shakeDuration = result.crit ? .2f   : .1f;
 			float shakeOffset   = result.crit ? .3f   : .15f;
-			//Color color         = result.crit ? WHITE : ORANGE;
-			//float textSize      = result.crit ? .8f   : .4f;
-			//float offset        = result.crit ? -2.f : -1.f;
-
-
 			camShake.triggerCameraShake(shakeDuration, shakeOffset);
-			spawnPopupText(
-				e->physics.getPosition(),
-				Vector2{ .1f, .1f },
-				std::to_string(int(std::floor(result.finalDamage))),
-				1,
-				.4f,
-				-1.f,
-				WHITE,
-				result.crit
-			);
 
-			return false;
+			if (remainingPierceCount <= 0)
+				return false;
+
+			remainingPierceCount--;
+			return true;
+		}
+	}
+
+	Player* player = dynamic_cast<Player*>(owner);
+
+	// once we implement factions, this will be arr and we can continue
+	if (!player)
+	{
+		if (physics.transform.intersectTransform(data.player.physics.transform))
+		{
+			if (isHit) return true;
+				//continue;
+
+			if (owner == nullptr) return true;
+				//continue;
+
+			isHit = true;
+			hitCountTimer = HIT_COUNT_TIME;
+			DamageInfo info;
+			info.attacker = owner;
+			info.item = item;
+			info.hitDirection = Vector2Normalize(physics.velocity);
+
+			auto result = CombatSystem::applyDamage(&data.player, info);
+
+			if (result.finalDamage <= 0) return false;
+
+			float shakeDuration = result.crit ? .2f : .1f;
+			float shakeOffset = result.crit ? .3f : .15f;
+			camShake.triggerCameraShake(shakeDuration, shakeOffset);
+
+			if (remainingPierceCount <= 0)
+				return false;
+
+			remainingPierceCount--;
+			return true;
 		}
 	}
 
 	return true;
 }
 
-
-void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction)
+// todo: have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item
+void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction, int pierceCount)
 {
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
 	auto projectile = std::make_unique<Projectile>();
@@ -120,7 +155,8 @@ void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHold
 
 	projectile->teleport(position);
 	projectile->itemType = stack.itemId;
-	projectile->physics.velocity = Vector2Scale(Vector2Normalize(direction), 20.f);
+	projectile->physics.velocity = Vector2Scale(Vector2Normalize(direction), 14.f); // projectile speed here, maybe take it from item
+	projectile->remainingPierceCount = pierceCount;
 	projectile->lifetime = 5.f;
 
 	Projectile* projectilePtr = projectile.get();
@@ -134,19 +170,21 @@ bool Projectile::checkCollisionWithTile(GameMap& gameMap)
 
 	// projectile bounds in tile coordinates
 	int minX = (int)floor(projectileRect.x);
-	int maxX = (int)floor(projectileRect.x + projectileRect.width);
+	int maxX = (int)ceil(projectileRect.x + projectileRect.width) - 1;
 
 	int minY = (int)floor(projectileRect.y);
-	int maxY = (int)floor(projectileRect.y + projectileRect.height);
+	int maxY = (int)ceil(projectileRect.y + projectileRect.height) - 1;
 
 	// check all overlapping tiles
 	for (int y = minY; y <= maxY; y++)
 	{
+		// out of map
 		if (y < 0 || y >= gameMap.h)
 			return true;
 
 		for (int x = minX; x <= maxX; x++)
 		{
+			// out of map
 			if (x < 0 || x >= gameMap.w)
 				return true;
 

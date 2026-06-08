@@ -124,6 +124,7 @@ enum class BlockType
 
 // ─── Stat blocks ──────────────────────────────────────────────────────────────
 
+// need to add other stats like crit
 struct WeaponData
 {
     int   damage = 0;
@@ -182,9 +183,9 @@ struct ItemDefinition
     // ── Constructors ──────────────────────────────────────────────────────────
 
     // Default (material / block / accessory — no stat block needed)
-    ItemDefinition() : category(ItemCategory::NONE), maxStack(99), tool{} {}
+    ItemDefinition() : category(ItemCategory::NONE), maxStack(0), tool{} {}
 
-    static ItemDefinition makeMaterial(const char* name, float useTime, int maxStack = 99)
+    static ItemDefinition makeMaterial(const char* name, float useTime, int maxStack = 999)
     {
         ItemDefinition d;
         d.displayName = name;
@@ -238,7 +239,7 @@ struct ItemDefinition
         ItemDefinition d;
         d.displayName = name;
         d.category = ItemCategory::PROJECTILE;
-        d.maxStack = 99;
+        d.maxStack = 999;
         d.useTime = useTime;
         d.weapon.damage = damage;
         d.weapon.knockback = knockback;

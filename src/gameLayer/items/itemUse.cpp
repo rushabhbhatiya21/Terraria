@@ -8,6 +8,7 @@
 #include "equipmentInventory.h"
 #include "inventory.h"
 #include "combat/stats.h"
+#include "player.h"
 
 void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inventory& inventory, Vector2 mouseWorldPos)
 {
@@ -30,7 +31,7 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inven
 		break;
 
 	case ItemCategory::PROJECTILE:
-		useProjectile(entity, stack, entityHolder, mouseWorldPos);
+		useProjectile(entity, stack, entityHolder, inventory, mouseWorldPos);
 		break;
 
 	case ItemCategory::TOOL:
@@ -75,10 +76,21 @@ void useWeapon(Entity* entity, const ItemDefinition& item)
 	);
 }
 
-void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos)
+void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inventory& inventory, Vector2 mouseWorldPos)
 {
+	if (!entity)
+		return;
+
+	Player* player = dynamic_cast<Player*>(entity);
+
+	if (player)
+	{
+		if (stack.count <= 0) return;
+		stack.count--;
+	}
+
 	Vector2 direction = Vector2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
-	Projectile::spawn(entity, stack, entityHolder, direction);
+	Projectile::spawn(entity, stack, entityHolder, direction, 4);
 }
 
 void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
@@ -125,9 +137,8 @@ void useArmor(Entity* entity, const ItemDefinition& item, const ItemStack& stack
 			break;
 	}
 
+	// todo: does armor only has defence or all stats? what about set stats?
 	entity->stats.armor += item.armor.defense;
-	entity->stats.critChance = 100;
-	entity->stats.critDamage = 100;
 
 	// remove equipped armor from inventory
 	inventory.removeItem(index);

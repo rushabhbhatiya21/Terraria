@@ -4,10 +4,16 @@ note: recipes only visible when near crafting station
 2. Inventory drag and drop items - done
 3. Slime/Zombie drops            - done
 4. Workbench + Furnace system    - done
-5. King Slime boss
+5. Eye of Cthulhu boss           - done
+6. King Slime boss
 
-bug with drag and drop - if left click instead of drag and drop causes weird bugs
-have weapons and armor have actual stats that we implemented, so equipping them boost stats
+1. implement factions in entity
+2. add all stats to weapons
+3. have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item
+4. have inventory for each entity - then change useProjectile
+
+- bug with drag and drop - if left click instead of drag and drop causes weird bugs - done i think
+- have weapons and armor have actual stats that we implemented, so equipping them boost stats (2)
 - add buffs/debuffs
 
 -- Craft UI
@@ -16,14 +22,14 @@ have weapons and armor have actual stats that we implemented, so equipping them 
 
 
 -- Core
-- add miniboss
-- add workbench for crafting
 - add torches (craft, add as item)
 - on knockback, also add slight player knockback in opposite dir
 - fall damage for player and enemies both
 - status effects implementation.
 - add more enemies, make them throw ice balls, fire balls, lightning balls, etc. 
 
+- add workbench for crafting - done
+- add miniboss - done
 - update enemy behaviour - done
 - enemies hurt player - done
 - update player hearts based on player health - done

@@ -243,7 +243,7 @@ void registerItems()
     reg(Items::iceDagger, D::makeWeapon("Ice Dagger", 22, 0.8f, 0.5f, 1.2f));
 
     // ── Weapons — thrown ──────────────────────────────────────────────────────
-    reg(Items::shuriken, D::makeProjectile("Shuriken", 10, 0.4f, 0.3f, 1.0f));
+    reg(Items::shuriken, D::makeProjectile("Shuriken", 10, 0.3f, 0.f, 1.0f));
 
     // ── Consumables ───────────────────────────────────────────────────────────
     reg(Items::healthPotion, D::makeConsumable("Health Potion", 50, 0, 1.5f, 20));

@@ -29,30 +29,6 @@ void Zombie::drawSprite(AssetManager& assetManager)
 		0.f, // rotation
 		WHITE // tint
 	);
-
-	if (flashTimer > 0)
-	{
-		float flash = (flashTimer > 0) ? 1.0f : 0.0f;
-
-		BeginShaderMode(assetManager.flashShader);
-
-		SetShaderValue(
-			assetManager.flashShader,
-			GetShaderLocation(assetManager.flashShader, "flash"),
-			&flash,
-			SHADER_UNIFORM_FLOAT
-		);
-
-		DrawTexturePro(
-			assetManager.zombie,
-			getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft),
-			aabb,
-			{ 0,0 },
-			0.f,
-			Color{ 255,255,255,255 }
-		);
-		EndShaderMode();
-	}
 }
 
 bool Zombie::update(float deltaTime, EntityUpdateData& data)
@@ -275,16 +251,16 @@ void Zombie::doAttack(Player* player)
 	float shakeStength = result.crit ? .3f : .2f;
 	camShake.triggerCameraShake(shakeDuration, shakeStength);
 
-	spawnPopupText(
-		player->getPosition(),
-		Vector2{ .1f, .1f },
-		std::to_string(int(std::floor(result.finalDamage))),
-		1,
-		.4f,
-		-1.f,
-		WHITE,
-		result.crit
-	);
+	//spawnPopupText(
+	//	player->getPosition(),
+	//	Vector2{ .1f, .1f },
+	//	std::to_string(int(std::floor(result.finalDamage))),
+	//	1,
+	//	.4f,
+	//	-1.f,
+	//	WHITE,
+	//	result.crit
+	//);
 
 	return;
 }

@@ -11,8 +11,6 @@ void spawnBlock(Vector2 position, Vector2 playerPos, int type)
 
 	if (dist >= 5) return;
 
-	printf("ADDING BLOCK\n");
-
 	BlockSpawn block;
 	block.position = position;
 	block.type = type;
@@ -35,27 +33,17 @@ void updateBlock(GameMap& gameMap, Inventory& inventory)
 
 		auto* b = gameMap.getBlockSafe((int)block.position.x, (int)block.position.y);
 
-		printf(
-			"processing block at %.1f %.1f\n",
-			block.position.x,
-			block.position.y
-		);
-
 		if (!b || b->type != Items::air || !gameMap.isAdjacentBlock((int)block.position.x, (int)block.position.y))
 		{
 			block.used = true;
 			continue;
 		}
 
-		printf("checking inventory...\n");
-
 		for (auto& i : inventory.slots)
 		{
-			printf("block type: %d, item type: %d\n", block.type, i.itemId);
 			// check inventory to see if we have same type of item and have more than 0
 			if (block.type == i.itemId && i.count > 0)
 			{
-				printf("is in inventory\n");
 				b->type = i.itemId;
 				i.count -= 1;
 

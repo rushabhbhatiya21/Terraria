@@ -12,9 +12,9 @@ struct Projectile : public Entity
 	Projectile()
 	{
 		isAlive = true;
-		shouldApplyGravity = false;
+		//shouldApplyGravity = false;
 		setColliderSize();
-		life = getMaxLife();
+		life = 1.f;
 	}
 
 	void setColliderSize()
@@ -24,7 +24,6 @@ struct Projectile : public Entity
 	}
 
 	Entity* owner = nullptr;
-	//ItemDefinition* item = nullptr;
 
 	int itemType = 0;
 	int itemCounter = 1;
@@ -34,11 +33,18 @@ struct Projectile : public Entity
 	float rotation = 0;
 	float rotationSpeed = 800;
 
+	int remainingPierceCount = 0;
+
+	bool isHit = false;
+	float hitCountTimer = 0.f;
+
+	static constexpr float HIT_COUNT_TIME = .2f;
+
 	void render(AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
-	static void spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction);
+	static void spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction, int pierceCount);
 
 	bool checkCollisionWithTile(GameMap& gameMap);
 
@@ -47,8 +53,6 @@ struct Projectile : public Entity
 	bool loadFromJson(Json& j) override;
 
 	int getEntityType() { return EntityType_Projectile; }
-
-	float getMaxLife() { return 1; }
 
 	int getMaxStackSize(int type) { return 1; }
 };

@@ -39,7 +39,7 @@ struct Entity
 	Stats stats;
 
 	bool isAlive = false;
-	float life = 1;
+	float life = 0.f;
 	bool shouldApplyGravity = true;
 	bool shouldResolveConstraints = true;
 
@@ -48,6 +48,8 @@ struct Entity
 
 	float attackDuration = 0.f;
 	float swingTimer = 0.f;
+
+	float flashTimer = 0.f;
 	float useTimer = 0.f;
 	float hitStopTimer = 0.f;
 	float damageTaken = 0.f;

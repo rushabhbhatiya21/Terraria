@@ -25,7 +25,6 @@ void Enemy::render(AssetManager& assetManager)
 	{
 		EndShaderMode();
 	}
-
 }
 
 void Enemy::renderHealthBar(AssetManager& assetManager)

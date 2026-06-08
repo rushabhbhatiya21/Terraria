@@ -9,34 +9,25 @@ void EvilEye::drawSprite(AssetManager& assetManager)
 {
 	Transform2D evilEyeSprite = physics.transform;
 
-	//static constexpr float phaseOneOffsetX = 1.25f;
-	//static constexpr float phaseOneOffsetY = 2.75f;
-
-	//static constexpr float phaseOneTextureW = 2.72f;
-	//static constexpr float phaseOneTextureH = 4.f;
-
-	//static constexpr float phaseOneOriginX = 1.2f;
-	//static constexpr float phaseOneOriginY = 2.5f;
-
 	// position below center 
 	evilEyeSprite.pos.x += 1.25f;
 	evilEyeSprite.pos.y += 2.7f;
 
-	float cellSizeX = 0;
-	float cellSizeY = 0;
 	Texture2D tex = {};
 
-	if (currentPhase == EvilEyePhase::ONE)
+	switch (currentPhase)
 	{
-		cellSizeX = PHASE_ONE_CELL_SIZE_X;
-		cellSizeY = PHASE_ONE_CELL_SIZE_Y;
+	case EvilEye::EvilEyePhase::ONE:
 		tex = assetManager.evilEyePhase1;
-	}
-	else
-	{
-		cellSizeX = PHASE_TWO_CELL_SIZE_X;
-		cellSizeY = PHASE_TWO_CELL_SIZE_Y;
+		break;
+	case EvilEye::EvilEyePhase::TWO:
 		tex = assetManager.evilEyePhase2;
+		break;
+	case EvilEyePhase::DEAD:
+		tex = assetManager.evilEyePieces;
+		break;
+	default:
+		break;
 	}
 
 	// draw size in scene
@@ -44,41 +35,24 @@ void EvilEye::drawSprite(AssetManager& assetManager)
 
 	DrawTexturePro(
 		tex,
-		getTextureAtlas(animations.positionX, animations.positionY, cellSizeX, cellSizeY),
+		getTextureAtlas(animations.positionX, animations.positionY, currentPhaseData->cellSizeX, currentPhaseData->cellSizeY),
 		aabb, // dest
 		{ 1.2f, 2.5f }, // origin
 		rotation, // rotation
 		WHITE // tint
 	);
-
-	if (flashTimer > 0)
-	{
-		float flash = (flashTimer > 0) ? 1.0f : 0.0f;
-
-		BeginShaderMode(assetManager.flashShader);
-
-		SetShaderValue(
-			assetManager.flashShader,
-			GetShaderLocation(assetManager.flashShader, "flash"),
-			&flash,
-			SHADER_UNIFORM_FLOAT
-		);
-
-		DrawTexturePro(
-			tex,
-			getTextureAtlas(animations.positionX, animations.positionY, cellSizeX, cellSizeY),
-			aabb,
-			{ 1.2f, 2.5f }, // origin
-			rotation,
-			Color{ 255,255,255,255 }
-		);
-		EndShaderMode();
-	}
 }
 
 // done - keeps on dashing if in range, have 3 dashes and hover for some time
+// todo: implement new transition state, from phase 1 to 2
 bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 {
+	if (life <= (float)stats.maxHealth / 2)
+	{
+		currentPhase = EvilEyePhase::TWO;
+		currentPhaseData = &PHASE_2;
+	}
+
 	if (stateChangeTimer > 0) stateChangeTimer -= deltaTime;
 
 	Vector2 facingDirection = data.player.getPosition() - getPosition();
@@ -110,7 +84,7 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 	// state transitions
 	if (currentState == EvilEyeState::HOVERING && stateChangeTimer <= 0)
 	{
-		if (dashCounter >= MAX_DASH_COUNT)
+		if (dashCounter >= currentPhaseData->maxDashCount)
 		{
 			dashCounter = 0;
 			stateChangeTimer = getRandomFloat(data.rng, 1.f, 4.f);
@@ -123,7 +97,7 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 
 	if (currentState == EvilEyeState::POSITION_FOR_DASH)
 	{
-		if (Vector2Distance(getPosition(), dashPosition) < DASH_POSITION_EPSILON)
+		if (Vector2Distance(getPosition(), dashPosition) < currentPhaseData->dashPositionEpsilon)
 		{
 			enterState(EvilEyeState::DASH_WINDUP, data);
 		}
@@ -141,9 +115,16 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 
 	if (currentState == EvilEyeState::DASH_RECOVER && stateChangeTimer <= 0)
 	{
-		if (dashCounter < MAX_DASH_COUNT)
+		if (dashCounter < currentPhaseData->maxDashCount)
 		{
-			enterState(EvilEyeState::POSITION_FOR_DASH, data);
+			if (currentPhase == EvilEyePhase::ONE)
+			{
+				enterState(EvilEyeState::POSITION_FOR_DASH, data);
+			}
+			else
+			{
+				enterState(EvilEyeState::DASH, data);
+			}
 		}
 
 		enterState(EvilEyeState::HOVERING, data);
@@ -157,16 +138,16 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 		hoverTarget =
 		{
 			data.player.getPosition().x + getRandomFloat(data.rng, -1.f, 1.f),
-			data.player.getPosition().y - HOVER_RANGE
+			data.player.getPosition().y - currentPhaseData->hoverRange
 		};
 		moveDirection = hoverTarget - getPosition();
-		moveSpeed = HOVER_SPEED;
+		moveSpeed = currentPhaseData->hoverSpeed;
 		break;
 	}
 	case EvilEyeState::POSITION_FOR_DASH:
 	{
 		moveDirection = dashPosition - getPosition();
-		moveSpeed = POSITION_SPEED;
+		moveSpeed = currentPhaseData->positionSpeed;
 		break;
 	}
 	case EvilEye::EvilEyeState::DASH_WINDUP:
@@ -177,13 +158,13 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 	case EvilEye::EvilEyeState::DASH:
 	{
 		moveDirection = dashDirection;
-		moveSpeed = DASH_SPEED;
+		moveSpeed = currentPhaseData->dashSpeed;
 		break;
 	}
 	case EvilEyeState::DASH_RECOVER:
 	{
 		moveDirection = dashDirection;
-		moveSpeed = RECOVER_SPEED;
+		moveSpeed = currentPhaseData->recoverSpeed;
 		break;
 	}
 	case EvilEye::EvilEyeState::DEAD:
@@ -211,7 +192,7 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 	{
 		Vector2 desiredVelocity = moveDirection * moveSpeed;
 		Vector2 steering = desiredVelocity - physics.velocity;
-		physics.velocity += steering * MOVE_ACCELERATION * deltaTime;
+		physics.velocity += steering * currentPhaseData->moveAcceleration * deltaTime;
 		physics.transform.pos += physics.velocity * deltaTime;
 	}
 
@@ -242,8 +223,8 @@ void EvilEye::enterState(EvilEyeState newState, EntityUpdateData& data)
 		Vector2 side = { -toPlayer.y,  toPlayer.x };
 		dashPosition =
 		{
-			data.player.getPosition().x + side.x * DASH_SIDE_OFFSET,
-			data.player.getPosition().y + side.y * DASH_SIDE_OFFSET
+			data.player.getPosition().x + side.x * currentPhaseData->dashSideOffset,
+			data.player.getPosition().y + side.y * currentPhaseData->dashSideOffset
 		};
 
 		break;
@@ -251,19 +232,19 @@ void EvilEye::enterState(EvilEyeState newState, EntityUpdateData& data)
 	case EvilEyeState::DASH_WINDUP:
 	{
 		dashDirection = Vector2Normalize(data.player.getPosition() - getPosition());
-		stateChangeTimer = DASH_WINDUP_TIME;
+		stateChangeTimer = currentPhaseData->dashWindupTime;
 		break;
 	}
 	case EvilEyeState::DASH:
 	{
 		dashCounter++;
 		moveDirection = dashDirection;
-		stateChangeTimer = DASH_TIME;
+		stateChangeTimer = currentPhaseData->dashTime;
 		break;
 	}
 	case EvilEye::EvilEyeState::DASH_RECOVER:
 	{
-		stateChangeTimer = DASH_RECOVER_TIME;
+		stateChangeTimer = currentPhaseData->dashRecoverTime;
 		break;
 	}
 	case EvilEye::EvilEyeState::DEAD:

@@ -24,7 +24,7 @@ struct Enemy : public Entity
 		return physics.getPosition();
 	}
 
-	float flashTimer = 0;
+	//float flashTimer = 0;
 	//float hurtTimer = 0;
 
 	void renderHealthBar(AssetManager& assetManager);

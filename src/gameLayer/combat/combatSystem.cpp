@@ -2,6 +2,7 @@
 #include "entity.h"
 #include "stats.h"
 #include "randomStuff.h"
+#include "ui/popupText.h"
 
 static std::ranlux24_base rng(std::random_device{}());
 
@@ -58,6 +59,17 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 	{
 		target->knockback(info.hitDirection, knockback);
 	}
+
+	spawnPopupText(
+		target->getPosition(),
+		Vector2{ .1f, .1f },
+		std::to_string(int(std::floor(result.finalDamage))),
+		1,
+		.4f,
+		-1.f,
+		WHITE,
+		result.crit
+	);
 
 	return result;
 }

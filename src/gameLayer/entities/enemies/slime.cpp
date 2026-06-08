@@ -17,8 +17,6 @@ void Slime::drawSprite(AssetManager& assetManager)
 
 	if (flashTimer > 0) { color = { 255,0,0,255 }; }
 
-	//int facingValue = isFacingRight ? 32 : -32;
-
 	DrawTexturePro(
 		assetManager.slime,
 		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
@@ -150,16 +148,16 @@ void Slime::doAttack(Player* player)
 	float shakeStength = result.crit ? .3f : .2f;
 	camShake.triggerCameraShake(shakeDuration, shakeStength);
 
-	spawnPopupText(
-		player->getPosition(),
-		Vector2{ .1f, .1f },
-		std::to_string(int(std::floor(result.finalDamage))),
-		1,
-		.4f,
-		-1.f,
-		WHITE,
-		result.crit
-	);
+	//spawnPopupText(
+	//	player->getPosition(),
+	//	Vector2{ .1f, .1f },
+	//	std::to_string(int(std::floor(result.finalDamage))),
+	//	1,
+	//	.4f,
+	//	-1.f,
+	//	WHITE,
+	//	result.crit
+	//);
 
 	return;
 }

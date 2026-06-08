@@ -2,6 +2,81 @@
 #include "enemy.h"
 #include <combat/stats.h>
 
+struct PhaseData
+{
+	float hoverRange;
+	float dashInitRange;
+
+	float dashWindupTime;
+	float dashTime;
+	float dashRecoverTime;
+
+	float dashSideOffset;
+	float dashHeightOffset;
+	float dashPositionEpsilon;
+	int   maxDashCount;
+
+	float hoverSpeed;
+	float positionSpeed;
+	float dashSpeed;
+	float recoverSpeed;
+
+	float moveAcceleration;
+
+	int cellSizeX;
+	int cellSizeY;
+};
+
+static constexpr PhaseData PHASE_1 =
+{
+	8.f,    // hoverRange
+	12.f,   // dashInitRange
+
+	0.5f,   // dashWindupTime
+	0.7f,   // dashTime
+	0.25f,  // dashRecoverTime
+
+	8.f,    // dashSideOffset
+	0.f,    // dashHeightOffset
+	0.5f,   // dashPositionEpsilon
+	3,      // maxDashCount
+
+	2.f,    // hoverSpeed
+	3.f,    // positionSpeed
+	8.f,    // dashSpeed
+	2.f,    // recoverSpeed
+
+	5.f,    // moveAcceleration
+
+	111,    // cellSizeX
+	163     // cellSizeY
+};
+
+static constexpr PhaseData PHASE_2 =
+{
+	6.f,    // hoverRange
+	10.f,   // dashInitRange
+
+	0.25f,  // dashWindupTime
+	0.6f,   // dashTime
+	0.1f,   // dashRecoverTime
+
+	6.f,    // dashSideOffset
+	0.f,    // dashHeightOffset
+	0.5f,   // dashPositionEpsilon
+	5,      // maxDashCount
+
+	4.f,    // hoverSpeed
+	6.f,    // positionSpeed
+	16.f,   // dashSpeed
+	3.f,    // recoverSpeed
+
+	8.f,    // moveAcceleration
+
+	111,    // cellSizeX
+	147     // cellSizeY
+};
+
 struct EvilEye : public Enemy
 {
 	EvilEye()
@@ -28,7 +103,8 @@ struct EvilEye : public Enemy
 	enum class EvilEyePhase
 	{
 		ONE,
-		TWO
+		TWO,
+		DEAD
 	};
 
 	void setColliderSize()
@@ -53,35 +129,11 @@ struct EvilEye : public Enemy
 	
 	float stateChangeTimer = 0.f;
 
-	static constexpr float HOVER_RANGE     = 8;
-	static constexpr float DASH_INIT_RANGE = 12.f;
-
-	static constexpr float DASH_WINDUP_TIME  = 0.5f;
-	static constexpr float DASH_TIME         = 0.7f;
-	static constexpr float DASH_RECOVER_TIME = 0.25f;
-
-	static constexpr float DASH_SIDE_OFFSET      = 8.f;
-	static constexpr float DASH_HEIGHT_OFFSET    = 0.f;
-	static constexpr float DASH_POSITION_EPSILON = 0.5f;
-	static constexpr int   MAX_DASH_COUNT        = 3;
-
-	static constexpr float HOVER_SPEED = 3.f;
-	static constexpr float POSITION_SPEED = 4.f;
-	static constexpr float DASH_SPEED = 10.f;
-	static constexpr float RECOVER_SPEED = 2.f;
-
-	static constexpr float MOVE_ACCELERATION = 5.f;
-
-	static constexpr int PHASE_ONE_CELL_SIZE_X = 111;
-	static constexpr int PHASE_ONE_CELL_SIZE_Y = 163;
-
-	static constexpr int PHASE_TWO_CELL_SIZE_X = 111;
-	static constexpr int PHASE_TWO_CELL_SIZE_Y = 147;
-
 	EvilEyeState currentState = EvilEyeState::HOVERING;
 	EvilEyeState previousState = currentState;
 
 	EvilEyePhase currentPhase = EvilEyePhase::ONE;
+	const PhaseData* currentPhaseData = &PHASE_1;
 
 	int getEnemyType() override { return EnemyType_EvilEye; }
 

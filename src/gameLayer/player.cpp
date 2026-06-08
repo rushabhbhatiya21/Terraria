@@ -7,6 +7,32 @@
 
 void Player::render(AssetManager& assetManager)
 {
+	bool flashing = flashTimer > 0;
+
+	if (flashing)
+	{
+		float flash = 1.f;
+
+		BeginShaderMode(assetManager.flashShader);
+
+		SetShaderValue(
+			assetManager.flashShader,
+			assetManager.flashShaderLocation,
+			&flash,
+			SHADER_UNIFORM_FLOAT
+		);
+	}
+
+	drawSprite(assetManager);
+
+	if (flashing)
+	{
+		EndShaderMode();
+	}
+}
+
+void Player::drawSprite(AssetManager& assetManager)
+{
 	Transform2D playerSprite = physics.transform;
 	playerSprite.w = 1;
 	playerSprite.h = 2;
@@ -19,9 +45,10 @@ void Player::render(AssetManager& assetManager)
 		textureUV = getTextureAtlas(animations.positionX, animations.positionY + 3, 32, 64, animations.movingLeft);
 
 	// --- BACK LAYER ---
-	DrawTexturePro(assetManager.getBackTexture(equipments.chest.itemId),  textureUV, aabb, { 0,0 }, 0.f, WHITE);
 	DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId),  textureUV, aabb, { 0,0 }, 0.f, WHITE);
 	DrawTexturePro(assetManager.getHeadTexture(equipments.helmet.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	// --- FRONT LAYER ---
+	DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 
 	// --- HELD ITEM ---
 	if (heldItem)
@@ -76,9 +103,6 @@ void Player::render(AssetManager& assetManager)
 
 		DrawTexturePro(texture, textureUVItem, pos, origin, rotation, WHITE);
 	}
-
-	// --- FRONT LAYER ---
-	DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 }
 
 //void Player::renderTrailPass(float expand, unsigned char maxAlpha)
@@ -140,7 +164,7 @@ bool Player::update(float deltaTime, EntityUpdateData& data)
 	{
 		hitStopTimer -= deltaTime;
 		physics.velocity = { 0.f, 0.f };
-		return true;
+		return true; // stop all movements
 	}
 
 	if (life <= 0) return false;
@@ -160,6 +184,9 @@ void Player::updateTimers(float deltaTime)
 
 	if (swingTimer > 0.f)
 		swingTimer -= deltaTime;
+
+	if (flashTimer > 0)
+		flashTimer -= deltaTime;
 
 	if (swingTimer <= 0.f)
 	{
@@ -269,9 +296,7 @@ void Player::updateAnimation(float deltaTime)
 
 void Player::onHit()
 {
-	//flashTimer = .2f;
-	//hurtTimer = 1;
-	//currentState = STATE_HURT;
+	flashTimer = .15f;
 }
 
 Json Player::formatToJson()
