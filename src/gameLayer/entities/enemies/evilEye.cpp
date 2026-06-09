@@ -59,7 +59,6 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 
 	isColliding = physics.transform.intersectTransform(data.player.physics.transform);
 
-	// todo: have player flash on hit
 	if (isColliding && !wasColliding)
 	{
 		wasColliding = true;

@@ -11,6 +11,7 @@ note: recipes only visible when near crafting station
 2. add all stats to weapons
 3. have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item
 4. have inventory for each entity - then change useProjectile
+5. bfs for tree
 
 - bug with drag and drop - if left click instead of drag and drop causes weird bugs - done i think
 - have weapons and armor have actual stats that we implemented, so equipping them boost stats (2)

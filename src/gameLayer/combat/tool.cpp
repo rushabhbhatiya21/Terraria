@@ -1,6 +1,8 @@
 #include "tool.h"
 #include "entity.h"
 #include <gameMap.h>
+#include <vector>
+#include <queue>
 
 std::vector<ToolSwing> toolSwings;
 
@@ -69,3 +71,22 @@ ToolHitResult updateToolSwing(float deltatime, GameMap& gameMap)
 
 	return result;
 }
+
+std::vector<int, int> findTreeLogs(GameMap& gameMap, int x, int y)
+{
+	std::vector<int, int> visited;
+	std::vector<int, int> res;
+	std::queue<Vector2i> q;
+
+	int src = 0;
+	visited[x,y]
+
+	auto* b = gameMap.getBlockSafe(x, y);
+
+	if (!b) return res;
+
+	return std::vector<int, int>();
+}
+
+
+

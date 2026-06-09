@@ -40,3 +40,5 @@ ToolHitResult updateToolSwing(
 	float deltatime,
 	GameMap& gameMap
 );
+
+std::vector<int, int> findTreeLogs(GameMap& gameMap, int x, int y);
