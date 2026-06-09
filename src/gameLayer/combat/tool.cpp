@@ -2,7 +2,13 @@
 #include "entity.h"
 #include <gameMap.h>
 #include <vector>
-#include <queue>
+#include "bfs.h"
+#include "shake.h"
+#include "particles.h"
+#include "ui/popupText.h"
+#include "items/blocks.h"
+#include "entityHolder.h"
+#include "entities/droppedItem.h"
 
 std::vector<ToolSwing> toolSwings;
 
@@ -22,10 +28,8 @@ void spawnToolSwing(Entity* entity, Vector2 mousePosition, float range, int powe
 	toolSwings.push_back(swing);
 }
 
-ToolHitResult updateToolSwing(float deltatime, GameMap& gameMap)
+void updateToolSwing(float deltatime, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
-	ToolHitResult result;
-
 	for (int i = (int)toolSwings.size() - 1; i >= 0; --i)
 	{
 		ToolSwing& swing = toolSwings[i];
@@ -39,54 +43,88 @@ ToolHitResult updateToolSwing(float deltatime, GameMap& gameMap)
 			continue;
 		}
 
-		auto* b = gameMap.getBlockSafe((int)swing.mousePosition.x, (int)swing.mousePosition.y);
+		Vector2i blockPos{
+			(int)swing.mousePosition.x,
+			(int)swing.mousePosition.y
+		};
 
-		if (b == nullptr || b->type == b->air) return result;
+		auto* b = gameMap.getBlockSafe(blockPos.x, blockPos.y);
 
-		float dist = Vector2Distance(swing.mousePosition, swing.entity->getPosition());
+		if (b == nullptr || b->type == b->air) continue;
+
+		float dist = Vector2Distance(blockPos.toVector2(), swing.entity->getPosition());
+
+		bool broke = false;
 
 		if (dist <= swing.range)
 		{
 			// todo: if best tool, does double damage
 			// hit block
-			b->hp -= swing.power;
-
-			result.hit = true;
-			result.type = b->type;
-			result.position = Vector2{ swing.mousePosition.x, swing.mousePosition.y };
-			result.power = swing.power;
-
-			// block broken
-			if (b->hp <= 0)
+			auto brokenType = b->type;
+			if (damageBlock(swing.power, blockPos, *b, particles, rng))
 			{
-				*b = {};
-				result.broke = true;
+				destroyBlock(blockPos, *b, entityHolder);
+
+				// check for tree collapse
+				if (brokenType == b->woodLog || brokenType == b->leaves)
+				{
+					auto res = bfs(blockPos, gameMap);
+
+					if (!res.empty())
+					{
+						for (auto& block : res)
+						{
+							auto* tb = gameMap.getBlockSafe(block.x, block.y);
+							if (!tb) continue;
+							destroyBlock(block, *tb, entityHolder);
+						}
+					}
+				}
 			}
-
 			swing.lifetime = 0;
-
-			return result;
+			return;
 		}
 	}
-
-	return result;
+	return;
 }
 
-std::vector<int, int> findTreeLogs(GameMap& gameMap, int x, int y)
+bool damageBlock(int power, const Vector2i& blockPos, Block& block, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
-	std::vector<int, int> visited;
-	std::vector<int, int> res;
-	std::queue<Vector2i> q;
+	triggerShake(blockPos.x, blockPos.y);
+	auto newParticles = spawnParticles({ (float)blockPos.x, (float)blockPos.y }, rng, block.type, 10);
+	particles.insert(particles.end(), newParticles.begin(), newParticles.end());
 
-	int src = 0;
-	visited[x,y]
+	spawnPopupText(
+		blockPos.toVector2(),
+		Vector2{ 0, .1f },
+		std::to_string(power),
+		1,
+		.2f,
+		-1.f,
+		WHITE,
+		false
+	);
 
-	auto* b = gameMap.getBlockSafe(x, y);
+	block.hp -= power;
 
-	if (!b) return res;
-
-	return std::vector<int, int>();
+	return block.hp <= 0;
 }
 
+void destroyBlock(const Vector2i& blockPos, Block& block, EntityHolder& entityHolder)
+{
+	if (block.type == block.air)
+		return;
 
+	// drop item
+	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
+	auto item = std::make_unique<DroppedItem>();
+	item->teleport(blockPos.center());
+	item->itemType = block.type;
+	item->physics.velocity.y = -3.f;
 
+	DroppedItem* itemPtr = item.get();
+	entityHolder.entities[id] = std::move(item);
+	entityHolder.droppedItems.push_back(itemPtr);
+
+	block = {};
+}

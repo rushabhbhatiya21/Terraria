@@ -3,25 +3,32 @@
 #include "gameMap.h"
 
 
-bool isValid(Vector2i pos, GameMap& gameMap)
+Vector2i directions[3] =
+{
+	{ 1, 0 },
+	{-1, 0 },
+	//{ 0, 1 },
+	{ 0,-1 }
+};
+
+bool isValidTree(Vector2i pos, GameMap& gameMap)
 {
 	auto* b = gameMap.getBlockSafe(pos.x, pos.y);
 
 	if (!b) return false;
+	if (b->type != b->woodLog && b->type != b->leaves) return false;
 
 	return true;
 }
 
-std::vector<Vector2i> bfs(Vector2i startPosition, GameMap& gameMap, int w, int h)
+std::vector<Vector2i> bfs(Vector2i startPosition, GameMap& gameMap)
 {
 	std::queue<Vector2i> q;
 	std::vector<Vector2i> component;
-	std::vector<std::vector<bool>> visited(
-		h,
-		std::vector<bool>(w, false)
-	);
+	std::unordered_set<Vector2i, Vector2iHash> visited;
 
 	q.push(startPosition);
+	//component.push_back(startPosition); // its already broken, so no need to include it
 	visited.insert(startPosition);
 
 	while (!q.empty())
@@ -33,13 +40,17 @@ std::vector<Vector2i> bfs(Vector2i startPosition, GameMap& gameMap, int w, int h
 		{
 			Vector2i next = curr + dir;
 
-			if (!isValid(next))
+			if (!isValidTree(next, gameMap))
 				continue;
 
-			if (visited[next.y][next.x])
+			if (visited.find(next) != visited.end())
 				continue;
+
+			component.push_back(next);
+			q.push(next);
+			visited.insert(next);
 		}
 	}
 
-	return std::vector<Vector2i>();
+	return component;
 }

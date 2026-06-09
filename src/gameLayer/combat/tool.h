@@ -1,9 +1,14 @@
 #pragma once
-#include <raylib.h>
+#include <random>
 #include <vector>
+#include <raylib.h>
 
+struct Block;
 struct Entity;
 struct GameMap;
+struct Particle;
+struct Vector2i;
+struct EntityHolder;
 
 struct ToolHitResult
 {
@@ -36,9 +41,8 @@ void spawnToolSwing(
 	int power
 );
 
-ToolHitResult updateToolSwing(
-	float deltatime,
-	GameMap& gameMap
-);
+void updateToolSwing(float deltatime, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng);
 
-std::vector<int, int> findTreeLogs(GameMap& gameMap, int x, int y);
+bool damageBlock(int power, const Vector2i& blockPos, Block& block, std::vector<Particle>& particles, std::ranlux24_base& rng);
+
+void destroyBlock(const Vector2i& blockPos, Block& block, EntityHolder& entityHolder);

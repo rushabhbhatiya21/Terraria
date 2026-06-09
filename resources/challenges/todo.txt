@@ -7,7 +7,7 @@ note: recipes only visible when near crafting station
 5. Eye of Cthulhu boss           - done
 6. King Slime boss
 
-1. implement factions in entity
+1. implement factions in entity - diff in projectile so same faction will not hurt each other
 2. add all stats to weapons
 3. have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item
 4. have inventory for each entity - then change useProjectile

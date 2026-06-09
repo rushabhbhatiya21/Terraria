@@ -651,7 +651,7 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnEnemyHelper<EvilEye>({ 35,55 });
+	//spawnEnemyHelper<EvilEye>({ 35,55 });
 	//spawnEnemyHelper<Slime>({ 31,60 });
 	//spawnEnemyHelper<Slime>({ 29,60 });
 	//spawnEnemyHelper<Slime>({ 32,60 });
@@ -1056,28 +1056,30 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle tools
 
-	ToolHitResult swingResult = updateToolSwing(deltaTime, gameMap);
+	updateToolSwing(deltaTime, gameMap, entityHolder, particles, rng);
 
-	if (swingResult.hit)
-	{
-		triggerShake((int)swingResult.position.x, (int)swingResult.position.y);
-		auto newParticles = spawnParticles({ swingResult.position.x, swingResult.position.y }, rng, swingResult.type, 10);
-		particles.insert(particles.end(), newParticles.begin(), newParticles.end());
+	//ToolHitResult swingResult = updateToolSwing(deltaTime, gameMap);
 
-		if (swingResult.broke)
-			spawnDroppedItem({ std::floor(swingResult.position.x) + 0.5f, swingResult.position.y + 0.5f }, swingResult.type);
+	//if (swingResult.hit)
+	//{
+	//	triggerShake((int)swingResult.position.x, (int)swingResult.position.y);
+	//	auto newParticles = spawnParticles({ swingResult.position.x, swingResult.position.y }, rng, swingResult.type, 10);
+	//	particles.insert(particles.end(), newParticles.begin(), newParticles.end());
 
-		spawnPopupText(
-			swingResult.position,
-			Vector2{ 0, .1f },
-			std::to_string(swingResult.power),
-			1,
-			.2f,
-			-1.f,
-			WHITE,
-			false
-		);
-	}
+	//	if (swingResult.broke)
+	//		spawnDroppedItem({ std::floor(swingResult.position.x) + 0.5f, swingResult.position.y + 0.5f }, swingResult.type);
+
+	//	spawnPopupText(
+	//		swingResult.position,
+	//		Vector2{ 0, .1f },
+	//		std::to_string(swingResult.power),
+	//		1,
+	//		.2f,
+	//		-1.f,
+	//		WHITE,
+	//		false
+	//	);
+	//}
 
 #pragma endregion
 
