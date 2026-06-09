@@ -2,7 +2,7 @@
 #include <raymath.h>
 
 std::vector<PopupText> popupTexts;
-static std::string critText = "CRITICAL";
+//static std::string critText = "CRITICAL";
 
 void spawnPopupText(Vector2 position, Vector2 velocity, std::string text, float lifetime, float size, float offset, Color color, bool crit)
 {
@@ -113,45 +113,45 @@ void drawPopuptext()
 		PopupText& popup = popupTexts[i];
 		if (popup.crit)
 		{
-			Vector2 critSize = MeasureTextEx(
-				GetFontDefault(),
-				critText.c_str(),
-				popup.size,
-				0.02f
-			);
+			//Vector2 critSize = MeasureTextEx(
+			//	GetFontDefault(),
+			//	critText.c_str(),
+			//	popup.size,
+			//	0.02f
+			//);
 
-			Vector2 damageSize = MeasureTextEx(
-				GetFontDefault(),
-				popup.text.c_str(),
-				popup.size,
-				0.02f
-			);
+			//Vector2 damageSize = MeasureTextEx(
+			//	GetFontDefault(),
+			//	popup.text.c_str(),
+			//	popup.size,
+			//	0.02f
+			//);
 
-			float maxWidth = std::max(critSize.x, damageSize.x);
+			//float maxWidth = std::max(critSize.x, damageSize.x);
 
-			float critX = popup.position.x + (maxWidth - critSize.x) / 2.f;
+			//float critX = popup.position.x + (maxWidth - critSize.x) / 2.f;
 
-			float damageX = popup.position.x + (maxWidth - damageSize.x) / 2.f;
+			//float damageX = popup.position.x + (maxWidth - damageSize.x) / 2.f;
+
+			//DrawTextOutlined(
+			//	GetFontDefault(), 
+			//	critText,
+			//	{ critX, popup.position.y },
+			//	popup.size,
+			//	0.02f,
+			//	Color{ 255, 80, 80, 255 },
+			//	BLACK,
+			//	.05f
+			//);
 
 			DrawTextOutlined(
-				GetFontDefault(), 
-				critText,
-				{ critX, popup.position.y },
-				popup.size,
-				0.02f,
-				Color{ 255, 80, 80, 255 },
-				BLACK,
-				.05f
-			);
-
-			DrawTextOutlined(
 				GetFontDefault(),
 				popup.text.c_str(),
-				{ damageX, popup.position.y + popup.size },
-				popup.size,
-				0.02f,
+				popup.position,
+				popup.size * 2,
+				0.05f,
 				Color{ 255, 80, 80, 255 },
-				BLACK,
+				Color{ 0,0,0,160 },
 				.03f
 			);
 		}
@@ -162,9 +162,9 @@ void drawPopuptext()
 				popup.text.c_str(),
 				popup.position,
 				popup.size,
-				0.02f,
-				WHITE,
-				BLACK,
+				0.05f,
+				popup.color,
+				Color{ 0,0,0,160 },
 				.03f
 			);
 		}

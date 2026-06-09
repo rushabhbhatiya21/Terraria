@@ -3,6 +3,7 @@
 #include "stats.h"
 #include "randomStuff.h"
 #include "ui/popupText.h"
+#include <iostream>
 
 static std::ranlux24_base rng(std::random_device{}());
 
@@ -32,6 +33,10 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 	// armor
 	result.finalDamage *= (100.f / (100.f + effectiveArmor));
 
+	// slight randomness to damage
+	float multiplier = getRandomFloat(rng, 0.85f, 1.15f);
+	result.finalDamage *= multiplier;
+
 	// crit
 	result.crit = getRandomChance(rng, (float)info.attacker->stats.offensive.critChance / 100.f);
 	if (result.crit)
@@ -40,6 +45,7 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 	// min damage 1
 	result.finalDamage = std::max(1.f, result.finalDamage);
 
+	// knockback
 	int knockback = info.attacker->stats.offensive.knockback;
 
 	knockback = Clamp(knockback, 0, 100);
@@ -61,7 +67,7 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 		1,
 		.4f,
 		-1.f,
-		WHITE,
+		ORANGE,
 		result.crit
 	);
 

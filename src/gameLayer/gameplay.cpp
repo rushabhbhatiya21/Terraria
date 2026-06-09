@@ -1413,11 +1413,11 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	for (auto& e : entityHolder.entities)
 	{
-		DrawRectangleLinesEx(
-			e.second->physics.transform.getAABB(),
-			.1f,
-			PURPLE
-		);
+		//DrawRectangleLinesEx(
+		//	e.second->physics.transform.getAABB(),
+		//	.1f,
+		//	PURPLE
+		//);
 
 		e.second->render(assetManager);
 	}
