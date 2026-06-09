@@ -29,7 +29,7 @@ void spawnMeleeAttack(
     attack.knockback = knockback;
 
     // attack exists briefly
-    attack.lifetime = 0.4f;
+    attack.lifetime = 0.5f;
 
     // offset attack in facing direction
     attack.position += direction * radius;
@@ -74,9 +74,6 @@ MeleeHitResult updateMeleeAttacks(
                 ItemDefinition* item = getItem(player->heldItem);
                 DamageInfo info;
                 info.attacker = attack.owner;
-                info.item = item;
-                //info.damage = attack.damage;
-                //info.knockback = attack.knockback;
                 info.hitDirection = attack.direction;
 
                 // this will trigger onHit for each entity

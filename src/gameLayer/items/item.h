@@ -3,6 +3,7 @@
 #include <unordered_map>
 #include <raylib.h>
 #include "itemIds.h"
+#include "../combat/stats.h"
 
 struct AssetManager;
 
@@ -26,6 +27,30 @@ enum class ItemCategory
     ARMOR,
     ACCESSORY,
     CONSUMABLE
+};
+
+enum class WeaponType
+{
+    NONE,
+
+    SWORD,
+    DAGGER,
+    SPEAR,
+
+    BOW,
+    GUN,
+
+    STAFF,
+    WAND
+};
+
+enum class DamageType
+{
+    NONE,
+    MELEE,
+    RANGED,
+    MAGIC,
+    SUMMON
 };
 
 enum class ToolType
@@ -127,16 +152,26 @@ enum class BlockType
 // need to add other stats like crit
 struct WeaponData
 {
-    int   damage = 0;
-    float knockback = 0.f;   // 0 = none, 1 = light, 2 = heavy
-    float range = 0.f;
+    WeaponType type = WeaponType::NONE;
+    DamageType damageType = DamageType::NONE;
+    OffensiveStats offensive;
+};
+
+struct ProjectileData
+{
+    DamageType damageType = DamageType::NONE;
+    OffensiveStats offensive;
+    float speed = 0.f;
+    float lifetime = 0.f;
+
+    bool affectedByGravity = false;
+    bool shouldPassThroughWorld = false;
 };
 
 struct ToolData
 {
     ToolType type = ToolType::NONE;
-    int      power = 0;
-    float    range = 0.f;
+    ToolStats tool;
 };
 
 struct ConsumableData
@@ -148,7 +183,7 @@ struct ConsumableData
 struct ArmorData
 {
     ArmorSlot slot = ArmorSlot::NONE;
-    int       defense = 0;  // flat damage reduction
+    DefensiveStats defensive;
 };
 
 struct BlockData
@@ -166,15 +201,12 @@ struct ItemDefinition
     ItemCategory category = ItemCategory::NONE;
     int          maxStack = 1;
     float        useTime = 0.f;
-    bool         isTool = false;
-    bool         isWeapon = false;
-    bool         isConsumable = false;
-    bool         isArmor = false;
 
     union
     {
         ToolData       tool;
         WeaponData     weapon;
+        ProjectileData projectile;
         ConsumableData consumable;
         ArmorData      armor;
         BlockData      block;
@@ -214,53 +246,67 @@ struct ItemDefinition
         d.maxStack = 1;
         d.useTime = useTime;
         d.tool.type = type;
-        d.tool.power = power;
-        d.tool.range = range;
-        d.isTool = true;
+        d.tool.tool.miningPower = power;
+        d.tool.tool.range = range;
         return d;
     }
 
-    static ItemDefinition makeWeapon(const char* name, int damage, float useTime, float knockback, float range)
+    static ItemDefinition makeWeapon(const char* name, int damage, int critChance, int critDamage, int armorPen, int knockback, 
+        int pierceCount, int range, float useTime)
     {
         ItemDefinition d;
         d.displayName = name;
         d.category = ItemCategory::WEAPON;
         d.maxStack = 1;
         d.useTime = useTime;
-        d.weapon.damage = damage;
-        d.weapon.knockback = knockback;
-        d.weapon.range = range;
-        d.isWeapon = true;
+        d.weapon.offensive.damage = damage;
+        d.weapon.offensive.critChance = critChance;
+        d.weapon.offensive.critDamage = critDamage;
+        d.weapon.offensive.armorPen = armorPen;
+        d.weapon.offensive.knockback = knockback;
+        d.weapon.offensive.pierceCount = pierceCount;
+        d.weapon.offensive.range = range;
         return d;
     }
 
-    static ItemDefinition makeProjectile(const char* name, int damage, float useTime, float knockback, float range)
+    static ItemDefinition makeProjectile(const char* name, int damage, int critChance, int critDamage, int armorPen, int knockback, int pierceCount, int range,
+        float speed, float lifetime, bool affectedByGravity, bool shouldPassThroughWorld, float useTime)
     {
         ItemDefinition d;
         d.displayName = name;
         d.category = ItemCategory::PROJECTILE;
         d.maxStack = 999;
         d.useTime = useTime;
-        d.weapon.damage = damage;
-        d.weapon.knockback = knockback;
-        d.weapon.range = range;
-        d.isWeapon = true;
+        d.projectile.offensive.damage = damage;
+        d.projectile.offensive.critChance = critChance;
+        d.projectile.offensive.critDamage = critDamage;
+        d.projectile.offensive.armorPen = armorPen;
+        d.projectile.offensive.knockback = knockback;
+        d.projectile.offensive.pierceCount = pierceCount;
+        d.projectile.offensive.range = range;
+        d.projectile.speed = speed;
+        d.projectile.lifetime = lifetime;
+        d.projectile.affectedByGravity = affectedByGravity;
+        d.projectile.shouldPassThroughWorld = shouldPassThroughWorld;
+
         return d;
     }
 
-    static ItemDefinition makeArmor(const char* name, ArmorSlot slot, int defense)
+    static ItemDefinition makeArmor(const char* name, ArmorSlot slot, int armor, int maxHealth, int knockbackResist)
     {
         ItemDefinition d;
         d.displayName = name;
         d.category = ItemCategory::ARMOR;
         d.maxStack = 1;
         d.armor.slot = slot;
-        d.armor.defense = defense;
-        d.isArmor = true;
+        d.armor.defensive.armor = armor;
+        d.armor.defensive.maxHealth = maxHealth;
+        d.armor.defensive.knockbackResist = knockbackResist;
+
         return d;
     }
 
-    static ItemDefinition makeConsumable(const char* name, int healAmount, int manaAmount, float useTime, int maxStack = 20)
+    static ItemDefinition makeConsumable(const char* name, int healAmount, int manaAmount, float useTime, int maxStack = 99)
     {
         ItemDefinition d;
         d.displayName = name;
@@ -269,7 +315,6 @@ struct ItemDefinition
         d.useTime = useTime;
         d.consumable.healAmount = healAmount;
         d.consumable.manaAmount = manaAmount;
-        d.isConsumable = true;
         return d;
     }
 

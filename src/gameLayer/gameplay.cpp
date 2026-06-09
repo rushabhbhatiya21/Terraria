@@ -651,7 +651,7 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	//spawnEnemyHelper<EvilEye>({ 35,55 });
+	spawnEnemyHelper<EvilEye>({ 35,55 });
 	//spawnEnemyHelper<Slime>({ 31,60 });
 	//spawnEnemyHelper<Slime>({ 29,60 });
 	//spawnEnemyHelper<Slime>({ 32,60 });
@@ -944,6 +944,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			// clear selection
 			creativeSelectedBlock = 0;
 			player.heldItem = 0;
+			player.recalculateStats();
 		}
 	}
 
@@ -1057,29 +1058,6 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma region handle tools
 
 	updateToolSwing(deltaTime, gameMap, entityHolder, particles, rng);
-
-	//ToolHitResult swingResult = updateToolSwing(deltaTime, gameMap);
-
-	//if (swingResult.hit)
-	//{
-	//	triggerShake((int)swingResult.position.x, (int)swingResult.position.y);
-	//	auto newParticles = spawnParticles({ swingResult.position.x, swingResult.position.y }, rng, swingResult.type, 10);
-	//	particles.insert(particles.end(), newParticles.begin(), newParticles.end());
-
-	//	if (swingResult.broke)
-	//		spawnDroppedItem({ std::floor(swingResult.position.x) + 0.5f, swingResult.position.y + 0.5f }, swingResult.type);
-
-	//	spawnPopupText(
-	//		swingResult.position,
-	//		Vector2{ 0, .1f },
-	//		std::to_string(swingResult.power),
-	//		1,
-	//		.2f,
-	//		-1.f,
-	//		WHITE,
-	//		false
-	//	);
-	//}
 
 #pragma endregion
 
@@ -1678,10 +1656,10 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	//DrawRectangle(heartRectangle.x, heartRectangle.y, heartRectangle.width, heartRectangle.height, RED);
 
-	float damagedLife = std::min((float)player.stats.maxHealth - player.life, (float)player.stats.maxHealth);
+	float damagedLife = std::min((float)player.stats.defensive.maxHealth - player.life, (float)player.stats.defensive.maxHealth);
 
 	// todo: create maxLife variable since we can increase it with items
-	for (int i = 0; i < (player.stats.maxHealth / 10); i++, damagedLife -= 10)
+	for (int i = 0; i < (player.stats.defensive.maxHealth / 10); i++, damagedLife -= 10)
 	{
 		Rectangle oneHeartRectangle = heartRectangle;
 		oneHeartRectangle.width = oneHeartRectangle.height;
@@ -1780,6 +1758,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		}
 
 		player.heldItem = inventory.slots[player.selectedHotbarSlot].itemId;
+		player.recalculateStats();
 	}
 	
 	// draw display name of item
@@ -2090,10 +2069,11 @@ bool Gameplay::update(AssetManager& assetManager)
 		ImGui::Separator();
 
 		ImGui::Text("Player Stats");
-		ImGui::Text("Damage:      %d", player.stats.baseDamage);
-		ImGui::Text("Armor:       %d", player.stats.armor);
-		ImGui::Text("Crit Chance: %d", player.stats.critChance);
-		ImGui::Text("Crit Damage: %d", player.stats.critDamage);
+		ImGui::Text("MaxHealth:   %d", player.stats.defensive.maxHealth);
+		ImGui::Text("Damage:      %d", player.stats.offensive.damage);
+		ImGui::Text("Armor:       %d", player.stats.defensive.armor);
+		ImGui::Text("Crit Chance: %d", player.stats.offensive.critChance);
+		ImGui::Text("Crit Damage: %d", player.stats.offensive.critDamage);
 
 		ImGui::Separator();
 

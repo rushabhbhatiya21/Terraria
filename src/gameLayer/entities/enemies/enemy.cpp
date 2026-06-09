@@ -51,7 +51,7 @@ void Enemy::renderHealthBar(AssetManager& assetManager)
 		WHITE
 	);
 
-	healthBarPos.width = life * healthWidth / stats.maxHealth;
+	healthBarPos.width = life * healthWidth / stats.defensive.maxHealth;
 
 	DrawTexturePro(
 		assetManager.health,
@@ -70,7 +70,7 @@ void Enemy::renderHealthBar(AssetManager& assetManager)
 		Rectangle r{
 			baseX + healthBarPos.width,
 			healthBarPos.y,
-			damageTaken * fade * healthWidth / stats.maxHealth,
+			damageTaken * fade * healthWidth / stats.defensive.maxHealth,
 			healthHeight
 		};
 

@@ -139,7 +139,6 @@ void Slime::doAttack(Player* player)
 	// implement attack here
 	DamageInfo info;
 	info.attacker = this;
-	info.item = nullptr;
 	info.hitDirection = getPosition() - player->getPosition();
 
 	DamageResult& result = CombatSystem::applyDamage(player, info);

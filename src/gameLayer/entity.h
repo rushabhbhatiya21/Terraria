@@ -17,6 +17,7 @@ enum EntityType
 	EntityType_Player = 0,
 	EntityType_DroppedItem,
 	EntityType_Enemy,
+	EntityType_Boss,
 	EntityType_Projectile
 };
 
@@ -36,7 +37,9 @@ struct Entity
 	PhysicalEntity physics;
 
 	EquipmentInventory equipments;
-	Stats stats;
+
+	EntityStats baseStats;
+	EntityStats stats;
 
 	bool isAlive = false;
 	float life = 0.f;
@@ -61,6 +64,8 @@ struct Entity
 	Vector2 weaponBase = {};
 	Vector2 weaponTip = {};
 
+	static constexpr float MAX_FORCE = 10.f;
+
 	Entity()
 	{
 		isAlive = true;
@@ -76,13 +81,10 @@ struct Entity
 		physics.teleport(pos);
 	}
 
-	void knockback(Vector2 hitFromPosition, float knockbackForce)
+	void knockback(Vector2 hitDirection, float finalKnockback)
 	{
-		// Push away from whoever hit us
-		float direction = (getPosition().x >= hitFromPosition.x) ? 1.f : -1.f;
-
-		physics.velocity.x = direction * knockbackForce;
-		physics.velocity.y = -3.f; // small upward bump, feels more impactful
+		float force = MAX_FORCE * (finalKnockback / 100.0f);
+		physics.velocity += hitDirection * force;
 	}
 
 	virtual void render(AssetManager& assetManager) = 0;
@@ -96,6 +98,8 @@ struct Entity
 	virtual void dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder) {};
 
 	virtual void onHit() {}
+
+	virtual void recalculateStats() {};
 
 	//virtual void hit(float damage, Vector2 hitFromPosition) = 0;
 

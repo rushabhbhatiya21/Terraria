@@ -70,9 +70,9 @@ void useWeapon(Entity* entity, const ItemDefinition& item)
 	spawnMeleeAttack(
 		entity,
 		direction,
-		weapon.damage,
-		weapon.range,
-		weapon.knockback
+		weapon.offensive.damage,
+		weapon.offensive.range,
+		weapon.offensive.knockback
 	);
 }
 
@@ -90,7 +90,7 @@ void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder,
 	}
 
 	Vector2 direction = Vector2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
-	Projectile::spawn(entity, stack, entityHolder, direction, 4);
+	Projectile::spawn(entity, stack, entityHolder, direction);
 }
 
 void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
@@ -100,8 +100,8 @@ void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 	spawnToolSwing(
 		entity,
 		mouseWorldPos,
-		tool.range,
-		tool.power
+		tool.tool.range,
+		tool.tool.miningPower
 	);
 }
 
@@ -137,18 +137,41 @@ void useArmor(Entity* entity, const ItemDefinition& item, const ItemStack& stack
 			break;
 	}
 
-	// todo: does armor only has defence or all stats? what about set stats?
-	entity->stats.armor += item.armor.defense;
-
-	// remove equipped armor from inventory
 	inventory.removeItem(index);
 
-	if (old.itemId == 0 || old.count == 0) return;
+	if (old.itemId != 0)
+		inventory.storeItem(old);
 
-	// store old armor back into inventory
-	inventory.storeItem(old);
-	ItemDefinition* oldItem = getItem(old.itemId);
-	entity->stats.armor -= oldItem->armor.defense;
+	entity->recalculateStats();
+
+	//// Remove old armor first
+	//if (old.itemId != 0 && old.count > 0)
+	//{
+	//	ItemDefinition* oldItem = getItem(old.itemId);
+	//	entity->stats.defensive -= oldItem->armor.defensive;
+	//}
+
+	//// Apply new armor
+	//entity->stats.defensive += item.armor.defensive;
+
+	//// Move items
+	//inventory.removeItem(index);
+
+	//if (old.itemId != 0 && old.count > 0)
+	//	inventory.storeItem(old);
+
+	//// todo: does armor only has defence or all stats? what about set stats?
+	//entity->stats.defensive += item.armor.defensive;
+
+	//// remove equipped armor from inventory
+	//inventory.removeItem(index);
+
+	//if (old.itemId == 0 || old.count == 0) return;
+
+	//// store old armor back into inventory
+	//inventory.storeItem(old);
+	//ItemDefinition* oldItem = getItem(old.itemId);
+	//entity->stats.defensive -= oldItem->armor.defensive;
 }
 
 void useConsumable(Entity* entity, ItemStack& stack, const ItemDefinition& item)

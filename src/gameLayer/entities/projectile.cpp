@@ -51,14 +51,7 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 	else
 		isHit = false;
 
-	//float dist = Vector2Distance(physics.transform.pos, data.player.getPosition());
-	//float maxDist = 50.f; // world units
-
-	//if (dist > maxDist * 2.f)
-	//	return false;
-
 	rotation += rotationSpeed * deltaTime;
-
 	rotation = fmod(rotation, 360.f);
 
 	physics.transform.pos += physics.velocity * deltaTime;
@@ -78,15 +71,12 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			if (isHit)
 				continue;
 
-			if (owner == nullptr)
-				continue;
-
+			// todo: if it hits diff enemy then reset counter
 			isHit = true;
 			hitCountTimer = HIT_COUNT_TIME;
 
 			DamageInfo info;
-			info.attacker = owner;
-			info.item = item;
+			info.attacker = this;
 			info.hitDirection = Vector2Normalize(physics.velocity);
 
 			auto result = CombatSystem::applyDamage(e, info);
@@ -97,10 +87,11 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			float shakeOffset   = result.crit ? .3f   : .15f;
 			camShake.triggerCameraShake(shakeDuration, shakeOffset);
 
-			if (remainingPierceCount <= 0)
+			item->projectile.offensive.pierceCount--;
+
+			if (item->projectile.offensive.pierceCount <= 0)
 				return false;
 
-			remainingPierceCount--;
 			return true;
 		}
 	}
@@ -115,14 +106,10 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			if (isHit) return true;
 				//continue;
 
-			if (owner == nullptr) return true;
-				//continue;
-
 			isHit = true;
 			hitCountTimer = HIT_COUNT_TIME;
 			DamageInfo info;
-			info.attacker = owner;
-			info.item = item;
+			info.attacker = this;
 			info.hitDirection = Vector2Normalize(physics.velocity);
 
 			auto result = CombatSystem::applyDamage(&data.player, info);
@@ -133,10 +120,11 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			float shakeOffset = result.crit ? .3f : .15f;
 			camShake.triggerCameraShake(shakeDuration, shakeOffset);
 
-			if (remainingPierceCount <= 0)
+			item->projectile.offensive.pierceCount--;
+
+			if (item->projectile.offensive.pierceCount <= 0)
 				return false;
 
-			remainingPierceCount--;
 			return true;
 		}
 	}
@@ -145,19 +133,26 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 }
 
 // todo: have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item
-void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction, int pierceCount)
+void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction)
 {
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
 	auto projectile = std::make_unique<Projectile>();
-	projectile->owner = owner;
 
 	Vector2 position = { owner->getPosition().x + 0.2f, owner->getPosition().y };
+	ItemDefinition* item = getItem(stack.itemId);
 
-	projectile->teleport(position);
+	if (!owner) return;
+	if (!item) return;
+
+	projectile->owner = owner;
 	projectile->itemType = stack.itemId;
-	projectile->physics.velocity = Vector2Scale(Vector2Normalize(direction), 14.f); // projectile speed here, maybe take it from item
-	projectile->remainingPierceCount = pierceCount;
-	projectile->lifetime = 5.f;
+	projectile->stats.offensive = item->projectile.offensive;
+	projectile->stats.offensive += owner->stats.offensive;
+	projectile->teleport(position);
+	projectile->physics.velocity = Vector2Scale(Vector2Normalize(direction), item->projectile.speed);
+	projectile->lifetime = item->projectile.lifetime;
+	projectile->shouldApplyGravity = item->projectile.affectedByGravity;
+	projectile->shouldResolveConstraints = item->projectile.shouldPassThroughWorld;
 
 	Projectile* projectilePtr = projectile.get();
 	entityHolder.entities[id] = std::move(projectile);

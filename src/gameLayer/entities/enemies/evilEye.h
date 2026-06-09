@@ -81,8 +81,9 @@ struct EvilEye : public Enemy
 {
 	EvilEye()
 	{
-		stats = makeEvilEyeStats();
-		life = (float)stats.maxHealth;
+		baseStats = makeEvilEyeStats();
+		stats = baseStats;
+		life = (float)stats.defensive.maxHealth;
 
 		shouldApplyGravity = false;
 		shouldResolveConstraints = false;
@@ -134,6 +135,8 @@ struct EvilEye : public Enemy
 
 	EvilEyePhase currentPhase = EvilEyePhase::ONE;
 	const PhaseData* currentPhaseData = &PHASE_1;
+
+	int getEntityType() override { return EntityType::EntityType_Boss; }
 
 	int getEnemyType() override { return EnemyType_EvilEye; }
 

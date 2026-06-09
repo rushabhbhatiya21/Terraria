@@ -22,43 +22,37 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 	target->hitStopTimer = .1f;
 	info.attacker->hitStopTimer = .1f; // same duration, they freeze together
 
-	// base damage
-	result.finalDamage = info.attacker->stats.baseDamage;
-
-	// weapon damage
-	if (info.item)
-		result.finalDamage += info.item->weapon.damage;
+	// base damage + item damage from recalculate stats
+	result.finalDamage = info.attacker->stats.offensive.damage;
 
 	// armor penetration
-	float effectiveArmor = target->stats.armor - info.attacker->stats.armorPen;
+	float effectiveArmor = target->stats.defensive.armor - info.attacker->stats.offensive.armorPen;
 	effectiveArmor = std::max(0.f, effectiveArmor);
 
 	// armor
 	result.finalDamage *= (100.f / (100.f + effectiveArmor));
 
 	// crit
-	result.crit = getRandomChance(rng, (float)info.attacker->stats.critChance / 100.f);
+	result.crit = getRandomChance(rng, (float)info.attacker->stats.offensive.critChance / 100.f);
 	if (result.crit)
-		result.finalDamage *= (1.f + (float)info.attacker->stats.critDamage / 100.f);
+		result.finalDamage *= (1.f + (float)info.attacker->stats.offensive.critDamage / 100.f);
 
 	// min damage 1
 	result.finalDamage = std::max(1.f, result.finalDamage);
 
-	int knockback = info.attacker->stats.knockback;
-
-	if (info.item)
-		knockback += (int)info.item->weapon.knockback;
+	int knockback = info.attacker->stats.offensive.knockback;
 
 	knockback = Clamp(knockback, 0, 100);
+
+	int resist = target->stats.defensive.knockbackResist;
+	resist = Clamp(resist, 0, 100);
+
+	int finalKnockback = knockback * (100 - resist) / 100;
 
 	target->life -= result.finalDamage;
 	target->damageTaken = result.finalDamage;
 	target->onHit();
-
-	if (knockback > target->stats.knockbackResist)
-	{
-		target->knockback(info.hitDirection, knockback);
-	}
+	target->knockback(info.hitDirection, finalKnockback);
 
 	spawnPopupText(
 		target->getPosition(),

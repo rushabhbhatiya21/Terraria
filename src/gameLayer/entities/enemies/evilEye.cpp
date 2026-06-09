@@ -47,7 +47,7 @@ void EvilEye::drawSprite(AssetManager& assetManager)
 // todo: implement new transition state, from phase 1 to 2
 bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 {
-	if (life <= (float)stats.maxHealth / 2)
+	if (life <= (float)stats.defensive.maxHealth / 2)
 	{
 		currentPhase = EvilEyePhase::TWO;
 		currentPhaseData = &PHASE_2;

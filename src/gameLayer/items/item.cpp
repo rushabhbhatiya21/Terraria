@@ -225,49 +225,92 @@ void registerItems()
     reg(Items::bone, D::makeMaterial("Bone", .2f));
 
     // ── Weapons — swords ─────────────────────────────────────────────────────
-    reg(Items::woodenSword, D::makeWeapon("Wooden Sword", 8, 1.f, 1.5f, 2.0f));
-    reg(Items::stoneSword, D::makeWeapon("Stone Sword", 12, 1.0f, 1.5f, 2.0f));
-    reg(Items::copperSword, D::makeWeapon("Copper Sword", 16, 1.0f, 1.5f, 2.0f));
-    reg(Items::ironSword, D::makeWeapon("Iron Sword", 22, 1.0f, 1.5f, 2.0f));
-    reg(Items::goldSword, D::makeWeapon("Gold Sword", 30, 1.0f, 1.5f, 2.0f));
 
-    // ── Weapons — spears ──────────────────────────────────────────────────────
-    reg(Items::copperSpear, D::makeWeapon("Copper Spear", 18, 1.2f, 1.0f, 3.0f));
-    reg(Items::ironSpear, D::makeWeapon("Iron Spear", 25, 1.2f, 1.0f, 3.0f));
-    reg(Items::goldSpear, D::makeWeapon("Gold Spear", 34, 1.2f, 1.0f, 3.0f));
-    reg(Items::iceSpear, D::makeWeapon("Ice Spear", 28, 1.2f, 1.0f, 3.0f));
+    reg(Items::woodenSword,
+        D::makeWeapon("Wooden Sword",
+            8,      // damage
+            5,      // critChance
+            150,    // critDamage
+            0,      // armorPen
+            2,      // knockback
+            0,      // pierceCount
+            3,      // range
+            0.50f   // useTime
+        ));
 
-    // ── Weapons — daggers ─────────────────────────────────────────────────────
-    reg(Items::copperDagger, D::makeWeapon("Copper Dagger", 14, 0.8f, 0.5f, 1.2f));
-    reg(Items::ironDagger, D::makeWeapon("Iron Dagger", 20, 0.8f, 0.5f, 1.2f));
-    reg(Items::iceDagger, D::makeWeapon("Ice Dagger", 22, 0.8f, 0.5f, 1.2f));
+    reg(Items::stoneSword, D::makeWeapon("Stone Sword", 12, 5, 150, 0, 3, 0, 3, 0.50f));
+    reg(Items::copperSword, D::makeWeapon("Copper Sword", 16, 6, 150, 1, 3, 0, 3, 0.45f));
+    reg(Items::ironSword, D::makeWeapon("Iron Sword", 22, 8, 175, 2, 4, 0, 3, 0.40f));
+    reg(Items::goldSword, D::makeWeapon("Gold Sword", 30, 10, 200, 3, 5, 0, 3, 0.35f));
 
-    // ── Weapons — thrown ──────────────────────────────────────────────────────
-    reg(Items::shuriken, D::makeProjectile("Shuriken", 10, 0.3f, 0.f, 1.0f));
+    // ── Weapons — spears ─────────────────────────────────────────────────────
+
+    reg(Items::copperSpear, D::makeWeapon("Copper Spear", 18, 5, 150, 1, 3, 0, 5, 0.70f));
+    reg(Items::ironSpear, D::makeWeapon("Iron Spear", 25, 7, 175, 2, 4, 0, 5, 0.65f));
+    reg(Items::goldSpear, D::makeWeapon("Gold Spear", 34, 10, 200, 3, 5, 0, 5, 0.60f));
+    reg(Items::iceSpear, D::makeWeapon("Ice Spear", 28, 8, 200, 2, 4, 1, 5, 0.60f));
+
+    // ── Weapons — daggers ────────────────────────────────────────────────────
+
+    reg(Items::copperDagger, D::makeWeapon("Copper Dagger", 14, 12, 175, 1, 1, 0, 2, 0.25f));
+    reg(Items::ironDagger, D::makeWeapon("Iron Dagger", 20, 15, 175, 2, 1, 0, 2, 0.22f));
+    reg(Items::iceDagger, D::makeWeapon("Ice Dagger", 22, 18, 200, 2, 1, 0, 2, 0.20f));
+
+    // ── Weapons — thrown ─────────────────────────────────────────────────────
+
+    reg(Items::shuriken,
+        D::makeProjectile("Shuriken",
+            10,     // damage
+            10,     // critChance
+            175,    // critDamage
+            0,      // armorPen
+            1,      // knockback
+            4,      // pierceCount
+            8,      // range
+            14.0f,  // speed
+            3.0f,   // lifetime
+            true,   // affectedByGravity
+            false,  // shouldPassThroughWorld
+            0.25f   // useTime
+        ));
 
     // ── Consumables ───────────────────────────────────────────────────────────
     reg(Items::healthPotion, D::makeConsumable("Health Potion", 50, 0, 1.5f, 20));
     reg(Items::apple, D::makeConsumable("Apple", 10, 0, 1.0f, 20));
 
-    // ── Armor — copper ────────────────────────────────────────────────────────
-    reg(Items::copperHelmet, D::makeArmor("Copper Helmet", ArmorSlot::HELMET, 2));
-    reg(Items::copperChestPlate, D::makeArmor("Copper Chestplate", ArmorSlot::CHEST, 2));
-    reg(Items::copperBoots, D::makeArmor("Copper Boots", ArmorSlot::BOOTS, 2));
+    // ── Armor — copper ───────────────────────────────────────────────────────
 
-    // ── Armor — iron ──────────────────────────────────────────────────────────
-    reg(Items::ironHelmet, D::makeArmor("Iron Helmet", ArmorSlot::HELMET, 4));
-    reg(Items::ironChestPlate, D::makeArmor("Iron Chestplate", ArmorSlot::CHEST, 4));
-    reg(Items::ironBoots, D::makeArmor("Iron Boots", ArmorSlot::BOOTS, 4));
+    reg(Items::copperHelmet,
+        D::makeArmor("Copper Helmet",
+            ArmorSlot::HELMET,
+            2,      // armor
+            0,      // maxHealth
+            2       // knockbackResist
+        ));
 
-    // ── Armor — gold ──────────────────────────────────────────────────────────
-    reg(Items::goldHelmet, D::makeArmor("Gold Helmet", ArmorSlot::HELMET, 6));
-    reg(Items::goldChestPlate, D::makeArmor("Gold Chestplate", ArmorSlot::CHEST, 6));
-    reg(Items::goldBoots, D::makeArmor("Gold Boots", ArmorSlot::BOOTS, 6));
+    reg(Items::copperChestPlate, D::makeArmor("Copper Chestplate", ArmorSlot::CHEST, 3, 5, 4));
+    reg(Items::copperBoots, D::makeArmor("Copper Boots", ArmorSlot::BOOTS, 2, 0, 2));
 
-    // ── Armor — ice ───────────────────────────────────────────────────────────
-    reg(Items::iceHelmet, D::makeArmor("Ice Helmet", ArmorSlot::HELMET, 5));
-    reg(Items::iceChestPlate, D::makeArmor("Ice Chestplate", ArmorSlot::CHEST, 5));
-    reg(Items::iceBoots, D::makeArmor("Ice Boots", ArmorSlot::BOOTS, 5));
+
+    // ── Armor — iron ─────────────────────────────────────────────────────────
+
+    reg(Items::ironHelmet, D::makeArmor("Iron Helmet", ArmorSlot::HELMET, 3, 0, 3));
+    reg(Items::ironChestPlate, D::makeArmor("Iron Chestplate", ArmorSlot::CHEST, 5, 10, 6));
+    reg(Items::ironBoots, D::makeArmor("Iron Boots", ArmorSlot::BOOTS, 4, 0, 3));
+
+
+    // ── Armor — gold ─────────────────────────────────────────────────────────
+
+    reg(Items::goldHelmet, D::makeArmor("Gold Helmet", ArmorSlot::HELMET, 5, 0, 4));
+    reg(Items::goldChestPlate, D::makeArmor("Gold Chestplate", ArmorSlot::CHEST, 8, 15, 8));
+    reg(Items::goldBoots, D::makeArmor("Gold Boots", ArmorSlot::BOOTS, 5, 0, 4));
+
+
+    // ── Armor — ice ──────────────────────────────────────────────────────────
+
+    reg(Items::iceHelmet, D::makeArmor("Ice Helmet", ArmorSlot::HELMET, 4, 5, 4));
+    reg(Items::iceChestPlate, D::makeArmor("Ice Chestplate", ArmorSlot::CHEST, 6, 15, 6));
+    reg(Items::iceBoots, D::makeArmor("Ice Boots", ArmorSlot::BOOTS, 4, 5, 4));
 
     // ── Accessories ───────────────────────────────────────────────────────────
     reg(Items::partyHat, D::makeAccessory("Party Hat", .2f));

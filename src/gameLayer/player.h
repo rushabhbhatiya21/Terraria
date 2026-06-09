@@ -8,8 +8,9 @@ struct Player : public Entity
 {
 	Player()
 	{
-		stats = makePlayerStats();
-		life = (float)stats.maxHealth;
+		baseStats = makePlayerStats();
+		stats = baseStats;
+		life = (float)stats.defensive.maxHealth;
 
 		isAlive = true;
 		setColliderSize();
@@ -17,6 +18,8 @@ struct Player : public Entity
 	}
 
 	EntityAnimation animations;
+	ItemId heldItem = Items::air;
+	int selectedHotbarSlot = 0;
 
 	Vector2& getPosition()
 	{
@@ -54,11 +57,45 @@ struct Player : public Entity
 
 	virtual void onHit();
 
+	void recalculateStats()
+	{
+		stats = baseStats;
+
+		auto applyItem = [&](const ItemStack& stack)
+			{
+				if (stack.itemId == 0 || stack.count == 0)
+					return;
+
+				ItemDefinition* item = getItem(stack.itemId);
+
+				switch (item->category)
+				{
+				case ItemCategory::WEAPON:
+					stats.offensive += item->weapon.offensive;
+					break;
+				case ItemCategory::ARMOR:
+					stats.defensive += item->armor.defensive;
+					break;
+				case ItemCategory::ACCESSORY:
+					// todo
+					// later
+					break;
+				}
+			};
+
+		// todo: make held item - itemstack
+		applyItem(ItemStack{ heldItem, 1 });
+		applyItem(equipments.helmet);
+		applyItem(equipments.chest);
+		applyItem(equipments.boots);
+
+		for (const auto& accessory : equipments.accessories)
+			applyItem(accessory);
+
+		life = std::min(life, (float)stats.defensive.maxHealth);
+	}
+
 	bool isPlayingAttackAnimation = false;
-
-	ItemId heldItem = Items::air;
-	int selectedHotbarSlot = 0;
-
 	int numberOfParticlesOnLand = 1;
 
 	//static constexpr int TRAIL_SIZE = 8;

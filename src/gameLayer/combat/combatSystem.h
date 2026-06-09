@@ -7,8 +7,6 @@ struct ItemDefinition;
 struct DamageInfo
 {
 	Entity* attacker = nullptr;
-	ItemDefinition* item = nullptr;
-
 	Vector2 hitDirection = { 0,0 };
 };
 

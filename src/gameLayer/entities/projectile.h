@@ -11,8 +11,8 @@ struct Projectile : public Entity
 {
 	Projectile()
 	{
+		stats = baseStats;
 		isAlive = true;
-		//shouldApplyGravity = false;
 		setColliderSize();
 		life = 1.f;
 	}
@@ -33,8 +33,6 @@ struct Projectile : public Entity
 	float rotation = 0;
 	float rotationSpeed = 800;
 
-	int remainingPierceCount = 0;
-
 	bool isHit = false;
 	float hitCountTimer = 0.f;
 
@@ -44,7 +42,7 @@ struct Projectile : public Entity
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
-	static void spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction, int pierceCount);
+	static void spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction);
 
 	bool checkCollisionWithTile(GameMap& gameMap);
 

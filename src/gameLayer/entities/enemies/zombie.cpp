@@ -242,8 +242,7 @@ void Zombie::doAttack(Player* player)
 	// implement attack here
 	DamageInfo info;
 	info.attacker = this;
-	info.item = nullptr;
-	info.hitDirection = getPosition() - player->getPosition();
+	info.hitDirection = Vector2Normalize(physics.velocity);
 
 	DamageResult& result = CombatSystem::applyDamage(player, info);
 

@@ -8,10 +8,15 @@ note: recipes only visible when near crafting station
 6. King Slime boss
 
 1. implement factions in entity - diff in projectile so same faction will not hurt each other
-2. add all stats to weapons
 3. have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item
 4. have inventory for each entity - then change useProjectile
-5. bfs for tree
+6. calculate all lighting at the start for whole map, use loading for init, and add recalculate, whenever add/remove block is called
+7. make summons for eye of cthulhu
+8. update weapon animations based on if its sword or spear or dagger
+9. add bows, arrows, guns and bullets where arrows and bullets can be projectiles
+
+2. add all stats to weapons - done
+5. bfs for tree - done
 
 - bug with drag and drop - if left click instead of drag and drop causes weird bugs - done i think
 - have weapons and armor have actual stats that we implemented, so equipping them boost stats (2)
