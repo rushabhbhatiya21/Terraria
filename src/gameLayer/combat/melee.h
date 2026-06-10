@@ -47,5 +47,3 @@ MeleeHitResult updateMeleeAttacks(
 );
 
 bool checkForHits(Vector2 base, Vector2 tip, Enemy& enemy);
-
-void drawMeleeAttacks();

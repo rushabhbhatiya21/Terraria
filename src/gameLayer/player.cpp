@@ -45,137 +45,35 @@ void Player::drawSprite(AssetManager& assetManager)
 		textureUV = getTextureAtlas(animations.positionX, animations.positionY + 3, 32, 64, animations.movingLeft);
 
 	// --- BACK LAYER ---
-	DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId),  textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 	DrawTexturePro(assetManager.getHeadTexture(equipments.helmet.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 	// --- FRONT LAYER ---
 	DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 
-	// --- HELD ITEM ---
-	if (heldItem)
+	ItemDefinition* item = getItem(heldItem);
+
+	if (!item) return;
+
+	switch (item->attackStyle)
 	{
-		Texture2D  texture = getTextureForItemType(heldItem, assetManager);
-		Rectangle  textureUVItem = getTextureCoordinatesForItemType(heldItem);
-
-		ItemDefinition* item = getItem(heldItem);
-
-		if (!item) return;
-
-		switch (item->weapon.attackStyle)
-		{
-		case AttackStyle::SWING:
-			break;
-		case AttackStyle::THRUST:
-			break;
-		case AttackStyle::THROW:
-			break;
-		case AttackStyle::SHOOT:
-			break;
-		case AttackStyle::CAST:
-			break;
-		default:
-			break;
-		}
-
-		auto     pos = aabb;
-		float    rotation = 0.f;
-		Vector2  origin = { 0, 1 };
-
-		if (heldItem < Block::BLOCKS_COUNT)
-		{
-			pos.width = 0.4f;
-			pos.height = 0.4f;
-
-			if (animations.movingLeft) { pos.y += 0.5f; pos.x -= 0.2f; }
-			else { pos.y += 0.5f; pos.x += 0.6f; }
-		}
-		else
-		{
-			//renderTrail();
-
-			pos.width = 1.f;
-			pos.height = 1.f;
-
-			if (animations.movingLeft)
-			{
-				pos.y += 1.f;
-				pos.x += 0.2f;
-				textureUVItem = flipTextureAtlasX(textureUVItem);
-				origin = { 1.f, 1.f };
-			}
-			else
-			{
-				pos.y += 1.f;
-				pos.x += 0.8f;
-				origin = { 0.f, 1.f };
-			}
-		}
-
-		// rotation is now just a read — all math lives in updateSwing()
-		if (isPlayingAttackAnimation)
-		{
-			float t = 1.f - (swingTimer / attackDuration);
-			t = Clamp(t, 0.f, 1.f);
-			t = t * t * (3.f - 2.f * t);
-
-			if (!animations.movingLeft) rotation = Lerp(-90.f, 90.f, t);
-			else                        rotation = Lerp(90.f, -90.f, t);
-		}
-
-		DrawTexturePro(texture, textureUVItem, pos, origin, rotation, WHITE);
+	case AttackStyle::SWING:
+	{
+		swingAttack.owner = this;
+		swingAttack.render(assetManager);
+		break;
+	}
+	case AttackStyle::THRUST:
+		break;
+	case AttackStyle::THROW:
+		break;
+	case AttackStyle::SHOOT:
+		break;
+	case AttackStyle::CAST:
+		break;
+	default:
+		break;
 	}
 }
-
-//void Player::renderTrailPass(float expand, unsigned char maxAlpha)
-//{
-//	if (trailCount < 1) return;
-//
-//	for (int i = trailCount - 1; i > 0; i--)
-//	{
-//		int idxA = (trailHead - i + TRAIL_SIZE) % TRAIL_SIZE;
-//		int idxB = (trailHead - i - 1 + TRAIL_SIZE) % TRAIL_SIZE;
-//
-//		auto& a = trailPoints[idxA];
-//		auto& b = trailPoints[idxB];
-//
-//		auto expandPoint = [](Vector2 base, Vector2 tip, float amount) -> Vector2 {
-//			Vector2 dir = Vector2Normalize(Vector2Subtract(tip, base));
-//			return { tip.x + dir.x * amount, tip.y + dir.y * amount };
-//			};
-//
-//		Vector2 tipA = expandPoint(a.base, a.tip, expand);
-//		Vector2 tipB = expandPoint(b.base, b.tip, expand);
-//
-//		unsigned char alphaA = (unsigned char)(a.alpha * maxAlpha);
-//		unsigned char alphaB = (unsigned char)(b.alpha * maxAlpha);
-//
-//		Color colA = { 255, 220, 100, alphaA };
-//		Color colB = { 255, 220, 100, alphaB };
-//
-//		if (!animations.movingLeft)
-//		{
-//			DrawTriangle(a.base, tipA, tipB, colA);
-//			DrawTriangle(a.base, tipB, b.base, colB);
-//		}
-//		else // swap winding order for left-facing
-//		{
-//			DrawTriangle(a.base, tipB, tipA, colA);
-//			DrawTriangle(a.base, b.base, tipB, colB);
-//		}
-//	}
-//}
-//
-//void Player::renderTrail()
-//{
-//	if (!isPlayingAttackAnimation || trailCount < 2) return;
-//
-//	BeginBlendMode(BLEND_ADDITIVE); // KEY: additive blending makes it actually glow
-//
-//	renderTrailPass(0.3f, 30);  // outer glow  — wide,  faint
-//	renderTrailPass(0.15f, 80);  // inner glow  — medium
-//	renderTrailPass(0.f, 180);  // core        — sharp, bright
-//
-//	EndBlendMode();
-//}
 
 bool Player::update(float deltaTime, EntityUpdateData& data)
 {
@@ -202,17 +100,8 @@ void Player::updateTimers(float deltaTime)
 	if (useTimer > 0.f)
 		useTimer -= deltaTime;
 
-	if (swingTimer > 0.f)
-		swingTimer -= deltaTime;
-
 	if (flashTimer > 0)
 		flashTimer -= deltaTime;
-
-	if (swingTimer <= 0.f)
-	{
-		swingTimer = 0.f;
-		isPlayingAttackAnimation = false;
-	}
 }
 
 void Player::updateMovement(float deltaTime)
@@ -245,52 +134,31 @@ void Player::updateMovement(float deltaTime)
 
 void Player::updateSwing(float deltaTime)
 {
-	//if (resetTrailNextFrame)
-	//{
-	//	trailCount = 0;
-	//	trailHead = 0;
-	//	weaponTip = { 0.f, 0.f }; // add this
-	//	resetTrailNextFrame = false;
-	//}
+	ItemDefinition* item = getItem(heldItem);
 
-	if (swingTimer <= 0.f)
+	if (!item) return;
+
+	switch (item->attackStyle)
 	{
-		isPlayingAttackAnimation = false;
-		return;
+	case AttackStyle::SWING:
+	{
+		swingAttack.heldItem = heldItem;
+		swingAttack.swingTimer     = useTimer;
+		swingAttack.attackDuration = attackDuration;
+		swingAttack.update(deltaTime);
+		break;
 	}
-
-	//printf("swingTimer: %.3f  trailCount: %d  weaponTip: %.2f %.2f\n",
-	//	swingTimer, trailCount, weaponTip.x, weaponTip.y);
-
-	isPlayingAttackAnimation = true;
-	weaponBase = getPosition();
-
-	float t = 1.f - (swingTimer / attackDuration);
-	t = Clamp(t, 0.f, 1.f);
-	t = t * t * (3.f - 2.f * t);
-
-	float startAngle, endAngle;
-	if (!animations.movingLeft) { startAngle = -90.f; endAngle = 90.f; }
-	else { startAngle = 270.f; endAngle = 90.f; }
-
-	float currentAngle = Lerp(startAngle, endAngle, t);
-	float radians = DEG2RAD * currentAngle;
-	weaponTip.x = weaponBase.x + cosf(radians) * weaponLength;
-	weaponTip.y = weaponBase.y + sinf(radians) * weaponLength;
-
-	//// replace t > 0.01f guard with this
-	//if (weaponTip.x == 0.f && weaponTip.y == 0.f)
-	//	return;
-
-	//trailHead = (trailHead + 1) % TRAIL_SIZE;
-	//trailPoints[trailHead] = { weaponTip, weaponBase, 1.f };
-	//if (trailCount < TRAIL_SIZE) trailCount++;
-
-	//for (int i = 0; i < trailCount; i++)
-	//{
-	//	int idx = (trailHead - i + TRAIL_SIZE) % TRAIL_SIZE;
-	//	trailPoints[idx].alpha = 1.f - (float(i) / float(trailCount));
-	//}
+	case AttackStyle::THRUST:
+		break;
+	case AttackStyle::THROW:
+		break;
+	case AttackStyle::SHOOT:
+		break;
+	case AttackStyle::CAST:
+		break;
+	default:
+		break;
+	}
 }
 
 void Player::updateAnimation(float deltaTime)

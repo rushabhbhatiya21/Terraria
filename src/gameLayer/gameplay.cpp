@@ -1718,7 +1718,15 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		if (IsKeyPressed(hotbarKeys[i]))
 		{
-			player.selectedHotbarSlot = i;
+			// hotbar is selected while player using something, store it to pending and wait for usetimer to run out
+			if (player.useTimer > 0)
+			{
+				pendingHotbarSlot = i;
+			}
+			else
+			{
+				player.selectedHotbarSlot = i;
+			}
 			break;
 		}
 	}
@@ -1742,8 +1750,23 @@ bool Gameplay::update(AssetManager& assetManager)
 	{
 		if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
 		{
-			player.selectedHotbarSlot = hoveredSlot;
+			// hotbar is selected while player using something, store it to pending and wait for usetimer to run out
+			if (player.useTimer > 0)
+			{
+				pendingHotbarSlot = hoveredSlot;
+			}
+			else
+			{
+				player.selectedHotbarSlot = hoveredSlot;
+			}
 		}
+	}
+
+	// select pending hotbar
+	if (pendingHotbarSlot != -1 && player.useTimer <= 0)
+	{
+		player.selectedHotbarSlot = pendingHotbarSlot;
+		pendingHotbarSlot = -1;
 	}
 
 	 //equip item from hotbar

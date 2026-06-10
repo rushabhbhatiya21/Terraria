@@ -3,6 +3,7 @@
 #include <entityAnimation.h>
 #include <items/item.h>
 #include "combat/stats.h"
+#include "attackStyles/swingAttack.h"
 
 struct Player : public Entity
 {
@@ -18,6 +19,8 @@ struct Player : public Entity
 	}
 
 	ItemId heldItem = Items::air;
+	SwingAttack swingAttack;
+
 	int selectedHotbarSlot = 0;
 
 	Vector2& getPosition()

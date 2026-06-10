@@ -51,11 +51,11 @@ struct Entity
 	// not sure to keep or not
 	bool isFacingRight = true;
 
-	float attackDuration = 0.f;
-	float swingTimer = 0.f;
+	float attackDuration = 0;
+	float swingTimer = 0;
+	float useTimer = 0;
 
 	float flashTimer = 0.f;
-	float useTimer = 0.f;
 	float hitStopTimer = 0.f;
 	float damageTaken = 0.f;
 	float damageTakenHealthBarTimer = 0.f;

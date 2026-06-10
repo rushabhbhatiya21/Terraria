@@ -10,6 +10,8 @@
 #include "combat/stats.h"
 #include "player.h"
 
+constexpr float TICKS_PER_SECOND = 60.f;
+
 void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inventory& inventory, Vector2 mouseWorldPos)
 {
 	if (stack.count <= 0) return;
@@ -20,13 +22,12 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inven
 
 	if (entity->useTimer > 0.f) return;
 
-	entity->useTimer = item->useTime;
+	entity->useTimer       = item->useTime / TICKS_PER_SECOND;
+	entity->attackDuration = item->useTime / TICKS_PER_SECOND;
 
 	switch (item->category)
 	{
 	case ItemCategory::WEAPON:
-		entity->attackDuration = item->useTime * .35f;
-		entity->swingTimer = entity->attackDuration;
 		useWeapon(entity, *item);
 		break;
 
@@ -35,8 +36,6 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inven
 		break;
 
 	case ItemCategory::TOOL:
-		entity->attackDuration = item->useTime * .35f;
-		entity->swingTimer = entity->attackDuration;
 		useTool(entity, *item, mouseWorldPos);
 		break;
 

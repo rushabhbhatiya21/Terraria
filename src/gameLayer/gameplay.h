@@ -75,7 +75,7 @@ struct Gameplay
 	float lifetime = 0;
 
 	// inventory
-	int selectedHotbarSlot = 0;
+	int pendingHotbarSlot = -1;
 
 	int creativeSelectedBlock = Block::air;
 

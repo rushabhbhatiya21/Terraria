@@ -60,8 +60,8 @@ MeleeHitResult updateMeleeAttacks(
         if (attack.owner == nullptr) continue;
 
         // done: keep it entity, will need to add weaponBase and weaponTip to entity
-        // todo: need to add heldItem to entity
-        Player* player = dynamic_cast<Player*>(attack.owner);
+        // no need now: need to add heldItem to entity
+        //Player* player = dynamic_cast<Player*>(attack.owner);
 
         // collision against enemies
         for (Enemy* enemy : enemies)
@@ -69,9 +69,8 @@ MeleeHitResult updateMeleeAttacks(
             if (!enemy->isAlive)
                 continue;
 
-            if (checkForHits(player->weaponBase, player->weaponTip, *enemy))
+            if (checkForHits(attack.owner->weaponBase, attack.owner->weaponTip, *enemy))
             {
-                ItemDefinition* item = getItem(player->heldItem);
                 DamageInfo info;
                 info.attacker = attack.owner;
                 info.hitDirection = attack.direction;
@@ -109,21 +108,4 @@ bool checkForHits(Vector2 base, Vector2 tip, Enemy& enemy)
         }
     }
     return false;
-}
-
-void drawMeleeAttacks()
-{
-#ifdef _DEBUG
-
-    for (const MeleeAttack& attack : meleeAttacks)
-    {
-        DrawCircleLines(
-            (int)attack.position.x,
-            (int)attack.position.y,
-            attack.radius,
-            RED
-        );
-    }
-
-#endif
 }

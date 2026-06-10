@@ -8,17 +8,13 @@ struct EntityUpdateData;
 
 struct SwingAttack
 {
-	ItemId heldItem;
-	Entity* owner;
-
-	SwingAttack(ItemId heldItem, Entity* owner)
-	{
-		this->heldItem = heldItem;
-		this->owner = owner;
-	}
+	ItemId heldItem = Items::air;
+	Entity* owner = nullptr;
 
 	float swingTimer = 0.f;
 	float attackDuration = 0.f;
+
+	float currentSwingAngle = 0.f;
 
 	// for weapon swing animation
 	float weaponLength = 1.5f;
