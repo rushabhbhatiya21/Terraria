@@ -12,7 +12,7 @@
 
 constexpr float TICKS_PER_SECOND = 60.f;
 
-void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inventory& inventory, Vector2 mouseWorldPos)
+void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos)
 {
 	if (stack.count <= 0) return;
 
@@ -32,7 +32,7 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inven
 		break;
 
 	case ItemCategory::PROJECTILE:
-		useProjectile(entity, stack, entityHolder, inventory, mouseWorldPos);
+		useProjectile(entity, stack, entityHolder, mouseWorldPos);
 		break;
 
 	case ItemCategory::TOOL:
@@ -75,12 +75,13 @@ void useWeapon(Entity* entity, const ItemDefinition& item)
 	);
 }
 
-void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Inventory& inventory, Vector2 mouseWorldPos)
+void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos)
 {
-	if (!entity)
-		return;
+	if (!entity) return;
 
 	Player* player = dynamic_cast<Player*>(entity);
+
+	if (!player) return;
 
 	if (player)
 	{
@@ -110,7 +111,7 @@ void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 	spawnBlock(mouseWorldPos, entity->getPosition(), (int)block.type);
 }
 
-void useArmor(Entity* entity, const ItemDefinition& item, const ItemStack& stack, Inventory& inventory, int index)
+void useArmor(Entity* entity, const ItemDefinition& item, const ItemStack& stack, int index)
 {
 	ItemStack old = { 0,0 };
 
@@ -136,41 +137,16 @@ void useArmor(Entity* entity, const ItemDefinition& item, const ItemStack& stack
 			break;
 	}
 
-	inventory.removeItem(index);
+	Player* player = dynamic_cast<Player*>(entity);
+
+	if (!player) return;
+
+	player->inventory.removeItem(index);
 
 	if (old.itemId != 0)
-		inventory.storeItem(old);
+		player->inventory.storeItem(old);
 
 	entity->recalculateStats();
-
-	//// Remove old armor first
-	//if (old.itemId != 0 && old.count > 0)
-	//{
-	//	ItemDefinition* oldItem = getItem(old.itemId);
-	//	entity->stats.defensive -= oldItem->armor.defensive;
-	//}
-
-	//// Apply new armor
-	//entity->stats.defensive += item.armor.defensive;
-
-	//// Move items
-	//inventory.removeItem(index);
-
-	//if (old.itemId != 0 && old.count > 0)
-	//	inventory.storeItem(old);
-
-	//// todo: does armor only has defence or all stats? what about set stats?
-	//entity->stats.defensive += item.armor.defensive;
-
-	//// remove equipped armor from inventory
-	//inventory.removeItem(index);
-
-	//if (old.itemId == 0 || old.count == 0) return;
-
-	//// store old armor back into inventory
-	//inventory.storeItem(old);
-	//ItemDefinition* oldItem = getItem(old.itemId);
-	//entity->stats.defensive -= oldItem->armor.defensive;
 }
 
 void useConsumable(Entity* entity, ItemStack& stack, const ItemDefinition& item)

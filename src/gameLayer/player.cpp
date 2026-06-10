@@ -3,7 +3,6 @@
 #include <assetManager.h>
 #include <entityHolder.h>
 #include <items/blocks.h>
-#include <inventory.h>
 
 void Player::render(AssetManager& assetManager)
 {

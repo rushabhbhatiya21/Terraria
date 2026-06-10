@@ -4,6 +4,8 @@
 #include <items/item.h>
 #include "combat/stats.h"
 #include "attackStyles/swingAttack.h"
+#include "inventory.h"
+
 
 struct Player : public Entity
 {
@@ -17,6 +19,8 @@ struct Player : public Entity
 		setColliderSize();
 		shouldApplyGravity = false;
 	}
+
+	Inventory inventory;
 
 	ItemId heldItem = Items::air;
 	SwingAttack swingAttack;

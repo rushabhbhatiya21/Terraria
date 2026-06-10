@@ -660,13 +660,13 @@ bool Gameplay::init()
 	maxEnemyCount = 1;
 
 	// start item in inventory
-	inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
-	inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
-	inventory.storeItem(ItemStack{ Items::woodLog, 20 });
-	inventory.storeItem(ItemStack{ Items::shuriken, 100 });
-	//inventory.storeItem(ItemStack{ Items::furnace, 1 });
-	inventory.storeItem(ItemStack{ Items::workBench, 1 });
-	//inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
+	player.inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
+	player.inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
+	player.inventory.storeItem(ItemStack{ Items::woodLog, 20 });
+	player.inventory.storeItem(ItemStack{ Items::shuriken, 100 });
+	//player.inventory.storeItem(ItemStack{ Items::furnace, 1 });
+	player.inventory.storeItem(ItemStack{ Items::workBench, 1 });
+	//player.inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
 
 	// start day at random time
 	std::ranlux24_base rng(std::random_device{}());
@@ -845,7 +845,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			player,
 			rng,
 			entityHolder,
-			inventory,
+			player.inventory,
 			gameMap
 		}
 	);
@@ -910,7 +910,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			player,
 			rng,
 			entityHolder,
-			inventory,
+			player.inventory,
 			gameMap,
 			it->first
 		};
@@ -935,11 +935,11 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle inventory
 
-	for (int i = 0; i < inventory.slots.size(); i++)
+	for (int i = 0; i < player.inventory.slots.size(); i++)
 	{
-		if (inventory.slots[i].itemId != 0 && inventory.slots[i].count <= 0)
+		if (player.inventory.slots[i].itemId != 0 && player.inventory.slots[i].count <= 0)
 		{
-			inventory.removeItem(i);
+			player.inventory.removeItem(i);
 
 			// clear selection
 			creativeSelectedBlock = 0;
@@ -958,7 +958,7 @@ bool Gameplay::update(AssetManager& assetManager)
 	// inside hotbar meu
 	bool insideHotbarMenu = false;
 	Rectangle hotbarRectangle = inventoryRectangle;
-	hotbarRectangle.height /= inventory.rows;
+	hotbarRectangle.height /= player.inventory.rows;
 	insideHotbarMenu = CheckCollisionPointRec(GetMousePosition(), hotbarRectangle);
 
 	// inside inventory except hotbar
@@ -1028,9 +1028,8 @@ bool Gameplay::update(AssetManager& assetManager)
 
 				useItem(
 					&player,
-					inventory.slots[player.selectedHotbarSlot],
+					player.inventory.slots[player.selectedHotbarSlot],
 					entityHolder,
-					inventory,
 					worldPos
 				);
 			}
@@ -1064,7 +1063,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle blocks
 
-	updateBlock(gameMap, inventory);
+	updateBlock(gameMap, player.inventory);
 
 #pragma endregion
 
@@ -1692,21 +1691,21 @@ bool Gameplay::update(AssetManager& assetManager)
 	// draw inventory rect
 	drawInventoryBackground(
 		inventoryRectangle,
-		inventory,
+		player.inventory,
 		insideInventory
 	);
 
 	// draw hotbar + inventory
-	int slotsToDraw = insideInventory ? inventory.rows * inventory.columns : inventory.columns;
+	int slotsToDraw = insideInventory ? player.inventory.rows * player.inventory.columns : player.inventory.columns;
 	for (int i = 0; i < slotsToDraw; i++)
 	{
-		bool isDragged = (i == inventory.draggedSlot);
+		bool isDragged = (i == player.inventory.draggedSlot);
 
 		drawInventorySlotByIndex(
 			i,
 			isDragged,
 			inventoryRectangle,
-			inventory,
+			player.inventory,
 			player,
 			assetManager
 		);
@@ -1735,14 +1734,14 @@ bool Gameplay::update(AssetManager& assetManager)
 	int hoveredSlot = getHoveredInventorySlot(
 		GetMousePosition(),
 		inventoryRectangle,
-		inventory,
+		player.inventory,
 		insideInventory
 	);
 
 	// hovered slot out of inventory
 	if (hoveredSlot == -1)
 	{
-		inventory.draggedSlot = -1;
+		player.inventory.draggedSlot = -1;
 	}
 
 	// hotbar menu click to select
@@ -1771,24 +1770,24 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	 //equip item from hotbar
 	{
-		ItemStack& selectedStack = inventory.slots[player.selectedHotbarSlot];
+		ItemStack& selectedStack = player.inventory.slots[player.selectedHotbarSlot];
 
 		ItemDefinition* item = getItem(selectedStack.itemId);
 
 		if (item && item->category == ItemCategory::ARMOR)
 		{
-			useArmor(&player, *item, selectedStack, inventory, player.selectedHotbarSlot);
+			useArmor(&player, *item, selectedStack, player.inventory, player.selectedHotbarSlot);
 		}
 
-		player.heldItem = inventory.slots[player.selectedHotbarSlot].itemId;
+		player.heldItem = player.inventory.slots[player.selectedHotbarSlot].itemId;
 		player.recalculateStats();
 	}
 	
 	// draw display name of item
 	if (hoveredSlot != -1)
 	{
-		Rectangle slotRect = getInventorySlotRect(hoveredSlot, inventoryRectangle, inventory);
-		ItemId hoveredItem = inventory.slots[hoveredSlot].itemId;
+		Rectangle slotRect = getInventorySlotRect(hoveredSlot, inventoryRectangle, player.inventory);
+		ItemId hoveredItem = player.inventory.slots[hoveredSlot].itemId;
 		drawDisplauNameUI(hoveredItem, slotRect);
 	}
 
@@ -1798,7 +1797,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			if (hoveredSlot != -1)
 			{
-				inventory.draggedSlot = hoveredSlot;
+				player.inventory.draggedSlot = hoveredSlot;
 			}
 		}
 
@@ -1806,26 +1805,26 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			if (hoveredSlot == -1)
 			{
-				inventory.draggedSlot = -1;
+				player.inventory.draggedSlot = -1;
 			}
 
-			if (hoveredSlot == inventory.draggedSlot)
+			if (hoveredSlot == player.inventory.draggedSlot)
 			{
 				hoveredSlot = -1;
-				inventory.draggedSlot = -1;
+				player.inventory.draggedSlot = -1;
 			}
 
-			if (inventory.draggedSlot != -1 && hoveredSlot != -1)
+			if (player.inventory.draggedSlot != -1 && hoveredSlot != -1)
 			{
-				std::swap(inventory.slots[inventory.draggedSlot], inventory.slots[hoveredSlot]);
+				std::swap(player.inventory.slots[player.inventory.draggedSlot], player.inventory.slots[hoveredSlot]);
 				hoveredSlot = -1;
-				inventory.draggedSlot = -1;
+				player.inventory.draggedSlot = -1;
 			}
 		}
 
 		// draw dragged item at mouse
-		if (hoveredSlot != -1 && inventory.draggedSlot != -1)
-			drawDraggedItem(inventory.slots[inventory.draggedSlot], assetManager);
+		if (hoveredSlot != -1 && player.inventory.draggedSlot != -1)
+			drawDraggedItem(player.inventory.slots[player.inventory.draggedSlot], assetManager);
 	}
 
 #pragma endregion
@@ -1901,12 +1900,12 @@ bool Gameplay::update(AssetManager& assetManager)
 		{
 			ItemId selectedItemType = availableRecipes[selectedRecipeIndex];
 			auto nearbyStation = getNearbyStation(player.getPosition());
-			Crafting::CraftCheckResult craftingResult = Crafting::canCraft(inventory.slots, selectedItemType, nearbyStation);
+			Crafting::CraftCheckResult craftingResult = Crafting::canCraft(player.inventory.slots, selectedItemType, nearbyStation);
 			bool canCraft = craftingResult.canCraft;
 
 			if (canCraft)
 			{
-				Crafting::craft(inventory, selectedItemType);
+				Crafting::craft(player.inventory, selectedItemType);
 			}
 		}
 
@@ -1920,7 +1919,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			auto nearbyStation = getNearbyStation(player.getPosition());
 
 			ItemId itemType = availableRecipes[i];
-			Crafting::CraftCheckResult craftingResult = Crafting::canCraft(inventory.slots, itemType, nearbyStation);
+			Crafting::CraftCheckResult craftingResult = Crafting::canCraft(player.inventory.slots, itemType, nearbyStation);
 			bool canCraft = craftingResult.canCraft;
 
 			// item rectangle
@@ -1941,7 +1940,7 @@ bool Gameplay::update(AssetManager& assetManager)
 				// craft item if clicked
 				if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT) && canCraft)
 				{
-					Crafting::craft(inventory, selectedItemType);
+					Crafting::craft(player.inventory, selectedItemType);
 				}
 			}
 
@@ -1984,7 +1983,7 @@ bool Gameplay::update(AssetManager& assetManager)
 				ri = shrinkRectanglePercentage(ri, .3f, .3f);
 				std::vector<ItemStack> selectedItemIngredients = Recipes::all[itemType].ingredients;
 				int ingredient = selectedItemIngredients[j].itemId;
-				bool hasEnoughIngredients = Crafting::hasEnoughIngredients(inventory.slots, selectedItemIngredients[j]);
+				bool hasEnoughIngredients = Crafting::hasEnoughIngredients(player.inventory.slots, selectedItemIngredients[j]);
 
 				DrawRectangleRounded(ri, .3f, 1, { 48, 125, 255, 255 }); // blue color
 

@@ -70,7 +70,6 @@ struct Gameplay
 	GameMap backgroundMap = {};
 	Camera2D camera = {};
 	DrawBackground background;
-	Inventory inventory;
 
 	float lifetime = 0;
 
