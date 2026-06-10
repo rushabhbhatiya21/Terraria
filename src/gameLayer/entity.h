@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include "equipmentInventory.h"
 #include "combat/stats.h"
+#include "entityAnimation.h"
 
 struct Player;
 struct Inventory;
@@ -37,6 +38,7 @@ struct Entity
 	PhysicalEntity physics;
 
 	EquipmentInventory equipments;
+	EntityAnimation animations;
 
 	EntityStats baseStats;
 	EntityStats stats;

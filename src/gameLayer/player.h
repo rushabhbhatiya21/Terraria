@@ -17,7 +17,6 @@ struct Player : public Entity
 		shouldApplyGravity = false;
 	}
 
-	EntityAnimation animations;
 	ItemId heldItem = Items::air;
 	int selectedHotbarSlot = 0;
 

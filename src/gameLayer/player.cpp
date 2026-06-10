@@ -60,16 +60,18 @@ void Player::drawSprite(AssetManager& assetManager)
 
 		if (!item) return;
 
-		switch (item->weapon.type)
+		switch (item->weapon.attackStyle)
 		{
-		case WeaponType::BOW:
-			return;
-		case WeaponType::GUN:
-			return;
-		case WeaponType::STAFF:
-			return;
-		case WeaponType::WAND:
-			return;
+		case AttackStyle::SWING:
+			break;
+		case AttackStyle::THRUST:
+			break;
+		case AttackStyle::THROW:
+			break;
+		case AttackStyle::SHOOT:
+			break;
+		case AttackStyle::CAST:
+			break;
 		default:
 			break;
 		}

@@ -14,7 +14,7 @@ enum EnemyType
 
 struct Enemy : public Entity
 {
-	EntityAnimation animations;
+	//EntityAnimation animations;
 
 	float baseX = 0;
 	int shaderLoc = -1;
