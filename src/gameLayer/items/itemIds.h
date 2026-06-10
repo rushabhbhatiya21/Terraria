@@ -195,6 +195,9 @@ namespace Items
     constexpr ItemId iceChestPlate = sunGlasses + 1;
     constexpr ItemId iceHelmet = iceChestPlate + 1;
     constexpr ItemId iceBoots = iceHelmet + 1;
+    
+    constexpr ItemId woodenBow = iceBoots + 1;
+    constexpr ItemId woodenArrow = woodenBow + 1;
 
-    constexpr ItemId LAST_ITEM = iceBoots + 1;
+    constexpr ItemId LAST_ITEM = woodenArrow + 1;
 }

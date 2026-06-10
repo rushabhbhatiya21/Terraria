@@ -56,6 +56,24 @@ void Player::drawSprite(AssetManager& assetManager)
 		Texture2D  texture = getTextureForItemType(heldItem, assetManager);
 		Rectangle  textureUVItem = getTextureCoordinatesForItemType(heldItem);
 
+		ItemDefinition* item = getItem(heldItem);
+
+		if (!item) return;
+
+		switch (item->weapon.type)
+		{
+		case WeaponType::BOW:
+			return;
+		case WeaponType::GUN:
+			return;
+		case WeaponType::STAFF:
+			return;
+		case WeaponType::WAND:
+			return;
+		default:
+			break;
+		}
+
 		auto     pos = aabb;
 		float    rotation = 0.f;
 		Vector2  origin = { 0, 1 };

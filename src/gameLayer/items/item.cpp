@@ -235,26 +235,29 @@ void registerItems()
             2,      // knockback
             0,      // pierceCount
             3,      // range
-            0.50f   // useTime
+            0.50f,  // useTime
+            WeaponType::SWORD, // weaponType
+            DamageType::MELEE, // damageType
+            AttackStyle::SWING 
         ));
 
-    reg(Items::stoneSword, D::makeWeapon("Stone Sword", 12, 5, 150, 0, 3, 0, 3, 0.50f));
-    reg(Items::copperSword, D::makeWeapon("Copper Sword", 16, 6, 150, 1, 3, 0, 3, 0.45f));
-    reg(Items::ironSword, D::makeWeapon("Iron Sword", 22, 8, 175, 2, 4, 0, 3, 0.40f));
-    reg(Items::goldSword, D::makeWeapon("Gold Sword", 30, 10, 200, 3, 5, 0, 3, 0.35f));
+    reg(Items::stoneSword,  D::makeWeapon("Stone Sword", 12, 5, 150, 0, 3, 0, 3, 0.50f, WeaponType::SWORD, DamageType::MELEE, AttackStyle::SWING));
+    reg(Items::copperSword, D::makeWeapon("Copper Sword", 16, 6, 150, 1, 3, 0, 3, 0.45f, WeaponType::SWORD, DamageType::MELEE, AttackStyle::SWING));
+    reg(Items::ironSword,   D::makeWeapon("Iron Sword", 22, 8, 175, 2, 4, 0, 3, 0.40f, WeaponType::SWORD, DamageType::MELEE, AttackStyle::SWING));
+    reg(Items::goldSword,   D::makeWeapon("Gold Sword", 30, 10, 200, 3, 5, 0, 3, 0.35f, WeaponType::SWORD, DamageType::MELEE, AttackStyle::SWING));
 
     // ── Weapons — spears ─────────────────────────────────────────────────────
 
-    reg(Items::copperSpear, D::makeWeapon("Copper Spear", 18, 5, 150, 1, 3, 0, 5, 0.70f));
-    reg(Items::ironSpear, D::makeWeapon("Iron Spear", 25, 7, 175, 2, 4, 0, 5, 0.65f));
-    reg(Items::goldSpear, D::makeWeapon("Gold Spear", 34, 10, 200, 3, 5, 0, 5, 0.60f));
-    reg(Items::iceSpear, D::makeWeapon("Ice Spear", 28, 8, 200, 2, 4, 1, 5, 0.60f));
+    reg(Items::copperSpear, D::makeWeapon("Copper Spear", 18, 5, 150, 1, 3, 0, 5, 0.70f, WeaponType::SPEAR, DamageType::MELEE, AttackStyle::THRUST));
+    reg(Items::ironSpear,   D::makeWeapon("Iron Spear", 25, 7, 175, 2, 4, 0, 5, 0.65f, WeaponType::SPEAR, DamageType::MELEE, AttackStyle::THRUST));
+    reg(Items::goldSpear,   D::makeWeapon("Gold Spear", 34, 10, 200, 3, 5, 0, 5, 0.60f, WeaponType::SPEAR, DamageType::MELEE, AttackStyle::THRUST));
+    reg(Items::iceSpear,    D::makeWeapon("Ice Spear", 28, 8, 200, 2, 4, 1, 5, 0.60f, WeaponType::SPEAR, DamageType::MELEE, AttackStyle::THRUST));
 
     // ── Weapons — daggers ────────────────────────────────────────────────────
 
-    reg(Items::copperDagger, D::makeWeapon("Copper Dagger", 14, 12, 175, 1, 1, 0, 2, 0.25f));
-    reg(Items::ironDagger, D::makeWeapon("Iron Dagger", 20, 15, 175, 2, 1, 0, 2, 0.22f));
-    reg(Items::iceDagger, D::makeWeapon("Ice Dagger", 22, 18, 200, 2, 1, 0, 2, 0.20f));
+    reg(Items::copperDagger, D::makeWeapon("Copper Dagger", 14, 12, 175, 1, 1, 0, 2, 0.25f, WeaponType::DAGGER, DamageType::MELEE, AttackStyle::THRUST));
+    reg(Items::ironDagger,   D::makeWeapon("Iron Dagger", 20, 15, 175, 2, 1, 0, 2, 0.22f, WeaponType::DAGGER, DamageType::MELEE, AttackStyle::THRUST));
+    reg(Items::iceDagger,    D::makeWeapon("Ice Dagger", 22, 18, 200, 2, 1, 0, 2, 0.20f, WeaponType::DAGGER, DamageType::MELEE, AttackStyle::THRUST));
 
     // ── Weapons — thrown ─────────────────────────────────────────────────────
 
@@ -315,4 +318,8 @@ void registerItems()
     // ── Accessories ───────────────────────────────────────────────────────────
     reg(Items::partyHat, D::makeAccessory("Party Hat", .2f));
     reg(Items::sunGlasses, D::makeAccessory("Sunglasses", .2f));
+
+    // ── Range — wooden ──────────────────────────────────────────────────────────
+    reg(Items::woodenBow, D::makeWeapon("Wooden Bow", 4, 4, 100, 0, 0, 1, 0, 1.f, WeaponType::BOW, DamageType::RANGED, AttackStyle::SHOOT, ProjectileType::ARROW));
+    reg(Items::woodenArrow, D::makeProjectile("Wooden Arrow", 5, 0, 0, 0, 2, 0, 0, 3.f, 5.f, true, false, 0));
 }

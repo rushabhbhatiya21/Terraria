@@ -48,6 +48,13 @@ std::unordered_map<ItemId, Recipes::Recipe> Recipes::all =
     {Items::ironDagger,       {1, {{Items::ironIngot, 4}}, Recipes::CraftingStation::WORKBENCH}},
     {Items::iceDagger,        {1, {{Items::ice, 4}}, Recipes::CraftingStation::WORKBENCH}},
 
+    // ── Bows ───────────────────────────────────────────────────────────────
+    {Items::woodenBow,        {1, {{Items::woodLog, 10}}, Recipes::CraftingStation::WORKBENCH}},
+
+    // ── Arrows ───────────────────────────────────────────────────────────────
+    {Items::woodenArrow,      {1, {{Items::woodLog, 1}}, Recipes::CraftingStation::WORKBENCH}},
+
+
     // ── Thrown ───────────────────────────────────────────────────────────────
     {Items::shuriken,         {5, {{Items::ironIngot, 1}}, Recipes::CraftingStation::WORKBENCH}},
 

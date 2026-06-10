@@ -53,6 +53,24 @@ enum class DamageType
     SUMMON
 };
 
+enum class AttackStyle
+{
+    NONE,
+    SWING,
+    THRUST,
+    THROW,
+    SHOOT,
+    CAST
+};
+
+enum class ProjectileType
+{
+    NONE,
+    ARROW,
+    BULLET,
+    ORB
+};
+
 enum class ToolType
 {
     NONE,
@@ -152,8 +170,10 @@ enum class BlockType
 // need to add other stats like crit
 struct WeaponData
 {
-    WeaponType type = WeaponType::NONE;
-    DamageType damageType = DamageType::NONE;
+    WeaponType type           = WeaponType::NONE;
+    DamageType damageType     = DamageType::NONE;
+    AttackStyle attackStyle   = AttackStyle::NONE;
+    ProjectileType projectile = ProjectileType::NONE;
     OffensiveStats offensive;
 };
 
@@ -251,8 +271,8 @@ struct ItemDefinition
         return d;
     }
 
-    static ItemDefinition makeWeapon(const char* name, int damage, int critChance, int critDamage, int armorPen, int knockback, 
-        int pierceCount, int range, float useTime)
+    static ItemDefinition makeWeapon(const char* name, int damage, int critChance, int critDamage, int armorPen, int knockback, int pierceCount, 
+        int range, float useTime, WeaponType weaponType, DamageType damageType, AttackStyle attackStyle, ProjectileType projectile = ProjectileType::NONE)
     {
         ItemDefinition d;
         d.displayName = name;
@@ -266,6 +286,10 @@ struct ItemDefinition
         d.weapon.offensive.knockback = knockback;
         d.weapon.offensive.pierceCount = pierceCount;
         d.weapon.offensive.range = range;
+        d.weapon.type = weaponType;
+        d.weapon.damageType = damageType;
+        d.weapon.attackStyle = attackStyle;
+        d.weapon.projectile = projectile;
         return d;
     }
 
