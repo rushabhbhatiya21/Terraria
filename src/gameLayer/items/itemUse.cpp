@@ -9,6 +9,8 @@
 #include "inventory.h"
 #include "combat/stats.h"
 #include "player.h"
+#include "attackStyles/swingAttack.h"
+#include "attackStyles/throwAttack.h"
 
 constexpr float TICKS_PER_SECOND = 60.f;
 
@@ -22,22 +24,22 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vecto
 
 	if (entity->useTimer > 0.f) return;
 
-	entity->useTimer       = item->useTime / TICKS_PER_SECOND;
-	entity->attackDuration = item->useTime / TICKS_PER_SECOND;
+	entity->useTimer = item->useTime / TICKS_PER_SECOND;
 
 	switch (item->category)
 	{
 	case ItemCategory::WEAPON:
-		useWeapon(entity, *item);
-		break;
-
-	case ItemCategory::PROJECTILE:
-		useProjectile(entity, stack, entityHolder, mouseWorldPos);
-		break;
-
 	case ItemCategory::TOOL:
-		useTool(entity, *item, mouseWorldPos);
+		useWeapon(entity, stack, *item, entityHolder, mouseWorldPos);
 		break;
+
+	//case ItemCategory::AMMO:
+	//	useProjectile(entity, stack, entityHolder, mouseWorldPos);
+	//	break;
+
+	//case ItemCategory::TOOL:
+	//	useTool(entity, *item, mouseWorldPos);
+	//	break;
 
 	case ItemCategory::BLOCK:
 		useBlock(entity, *item, mouseWorldPos);
@@ -56,54 +58,64 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vecto
 	}
 }
 
-void useWeapon(Entity* entity, const ItemDefinition& item)
+void useWeapon(Entity* entity, ItemStack& stack, const ItemDefinition& item, EntityHolder& entityHolder, Vector2 mouseWorldPos)
 {
-	const WeaponData& weapon = item.weapon;
-
-	Vector2 direction =
+	switch (item.attackStyle)
 	{
-		entity->isFacingRight ? 1.f : -1.f,
-		0.f
-	};
-
-	spawnMeleeAttack(
-		entity,
-		direction,
-		weapon.offensive.damage,
-		weapon.offensive.range,
-		weapon.offensive.knockback
-	);
-}
-
-void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos)
-{
-	if (!entity) return;
-
-	Player* player = dynamic_cast<Player*>(entity);
-
-	if (!player) return;
-
-	if (player)
+	case AttackStyle::SWING:
 	{
-		if (stack.count <= 0) return;
-		stack.count--;
+		entity->swingStyle.startSwing(*entity, mouseWorldPos);
+		break;
 	}
 
-	Vector2 direction = Vector2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
-	Projectile::spawn(entity, stack, entityHolder, direction);
+	case AttackStyle::THRUST:
+		break;
+	case AttackStyle::THROW:
+	{
+		ThrowAttack attack;
+		attack.itemId = stack.itemId;
+		Vector2 direction = Vector2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
+		attack.use(entityHolder, stack, direction);
+		break;
+	}
+	case AttackStyle::SHOOT:
+		break;
+	case AttackStyle::CAST:
+		break;
+	default:
+		break;
+	}
 }
 
-void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
-{
-	const ToolData& tool = item.tool;
+//void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos)
+//{
+//	if (!entity) return;
+//
+//	Player* player = dynamic_cast<Player*>(entity);
+//
+//	if (!player) return;
+//
+//	if (player)
+//	{
+//		if (stack.count <= 0) return;
+//		stack.count--;
+//	}
+//
+//	Vector2 direction = Vector2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
+//	Projectile::spawn(entity, stack, entityHolder, direction);
+//}
 
-	spawnToolSwing(
-		entity,
-		mouseWorldPos,
-		tool.tool.range,
-		tool.tool.miningPower
-	);
-}
+//void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
+//{
+//	const ToolData& tool = item.tool;
+//
+//	spawnToolSwing(
+//		entity,
+//		mouseWorldPos,
+//		tool.tool.range,
+//		tool.tool.miningPower
+//	);
+//}
 
 void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 {
@@ -111,6 +123,7 @@ void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 	spawnBlock(mouseWorldPos, entity->getPosition(), (int)block.type);
 }
 
+// it is being used in gameplay.cpp (inventory)
 void useArmor(Entity* entity, const ItemDefinition& item, const ItemStack& stack, int index)
 {
 	ItemStack old = { 0,0 };

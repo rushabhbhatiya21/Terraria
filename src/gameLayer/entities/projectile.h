@@ -26,7 +26,6 @@ struct Projectile : public Entity
 	Entity* owner = nullptr;
 
 	int itemType = 0;
-	int itemCounter = 1;
 	float lifetime = 0;
 
 	Vector2 direction = { 0,0 };

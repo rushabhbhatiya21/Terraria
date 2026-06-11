@@ -22,9 +22,6 @@ struct Player : public Entity
 
 	Inventory inventory;
 
-	ItemId heldItem = Items::air;
-	SwingAttack swingAttack;
-
 	int selectedHotbarSlot = 0;
 
 	Vector2& getPosition()
@@ -47,7 +44,7 @@ struct Player : public Entity
 
 	void updateTimers(float deltaTime);
 	void updateMovement(float deltaTime);
-	void updateSwing(float deltaTime);
+	void updateSwing(float deltaTime, EntityUpdateData& data);
 	void updateAnimation(float deltaTime);
 
 	//void renderTrailPass(float expand, unsigned char maxAlpha);

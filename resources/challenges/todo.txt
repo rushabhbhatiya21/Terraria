@@ -20,8 +20,9 @@ note: recipes only visible when near crafting station
 5. bfs for tree - done
 8. update weapon animations based on if its sword or spear or dagger - done
 
-- bug with drag and drop - if left click instead of drag and drop causes weird bugs - done i think
-- have weapons and armor have actual stats that we implemented, so equipping them boost stats (2)
+- bug with drag and drop - if left click instead of drag and drop causes weird bugs - done
+- have weapons and armor have actual stats that we implemented, so equipping them boost stats (2) - done
+
 - add buffs/debuffs
 
 -- Craft UI

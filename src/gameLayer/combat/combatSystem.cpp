@@ -3,7 +3,7 @@
 #include "stats.h"
 #include "randomStuff.h"
 #include "ui/popupText.h"
-#include <iostream>
+#include "shake.h"
 
 static std::ranlux24_base rng(std::random_device{}());
 
@@ -70,6 +70,11 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 		ORANGE,
 		result.crit
 	);
+
+	float shakeDuration = result.crit ? .2f : .1f;
+	float shakeOffset = result.crit ? .3f : .15f;
+
+	camShake.triggerCameraShake(shakeDuration, shakeOffset);
 
 	return result;
 }

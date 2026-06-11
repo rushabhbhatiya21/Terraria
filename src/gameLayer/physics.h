@@ -191,8 +191,8 @@ struct PhysicalEntity
 	static constexpr float JUMP_BUFFER_TIME = 0.10f; // seconds before landing jump is pre-queued
 
 	// Horizontal movement
-	static constexpr float MOVE_SPEED = 12.f;
-	static constexpr float GROUND_ACCEL = 90.f;
+	static constexpr float MOVE_SPEED = 9.f;
+	static constexpr float GROUND_ACCEL = 70.f;
 	static constexpr float GROUND_FRICTION = 70.f;
 	static constexpr float AIR_ACCEL = 55.f;
 	static constexpr float AIR_FRICTION = 12.f;  // low = preserve momentum in air

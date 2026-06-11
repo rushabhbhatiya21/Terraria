@@ -193,25 +193,25 @@ void registerItems()
     reg(Items::boneBrickWall,   D::makeBlock("Bone Brick Wall", BlockType::boneBrickWall, 40, TOOL_HAMMER, 999, 40));
 
     // ── Tools ─────────────────────────────────────────────────────────────────
-    reg(Items::woodPickaxe, D::makeTool("Wood Pickaxe", ToolType::PICKAXE, 10, 0.7f, 60, AttackStyle::SWING));
-    reg(Items::woodAxe, D::makeTool("Wood Axe", ToolType::AXE, 10, 0.7f, 60, AttackStyle::SWING));
-    reg(Items::woodHammer, D::makeTool("Wood Hammer", ToolType::HAMMER, 10, 0.7f, 60, AttackStyle::SWING));
+    reg(Items::woodPickaxe, D::makeTool("Wood Pickaxe", ToolType::PICKAXE, 10, 3.f, 60, AttackStyle::SWING));
+    reg(Items::woodAxe, D::makeTool("Wood Axe", ToolType::AXE, 10, 3.f, 60, AttackStyle::SWING));
+    reg(Items::woodHammer, D::makeTool("Wood Hammer", ToolType::HAMMER, 10, 3.f, 60, AttackStyle::SWING));
 
-    reg(Items::stonePickaxe, D::makeTool("Stone Pickaxe", ToolType::PICKAXE, 14, 0.7f, 45, AttackStyle::SWING));
-    reg(Items::stoneAxe, D::makeTool("Stone Axe", ToolType::AXE, 14, 0.7f, 45, AttackStyle::SWING));
-    reg(Items::stoneHammer, D::makeTool("Stone Hammer", ToolType::HAMMER, 14, 0.7f, 45, AttackStyle::SWING));
+    reg(Items::stonePickaxe, D::makeTool("Stone Pickaxe", ToolType::PICKAXE, 14, 3.f, 45, AttackStyle::SWING));
+    reg(Items::stoneAxe, D::makeTool("Stone Axe", ToolType::AXE, 14, 3.f, 45, AttackStyle::SWING));
+    reg(Items::stoneHammer, D::makeTool("Stone Hammer", ToolType::HAMMER, 14, 3.f, 45, AttackStyle::SWING));
 
-    reg(Items::copperPickaxe, D::makeTool("Copper Pickaxe", ToolType::PICKAXE, 20, 0.7f, 30, AttackStyle::SWING));
-    reg(Items::copperAxe, D::makeTool("Copper Axe", ToolType::AXE, 20, 0.7f, 30, AttackStyle::SWING));
-    reg(Items::copperHammer, D::makeTool("Copper Hammer", ToolType::HAMMER, 20, 0.7f, 30, AttackStyle::SWING));
+    reg(Items::copperPickaxe, D::makeTool("Copper Pickaxe", ToolType::PICKAXE, 20, 3.f, 30, AttackStyle::SWING));
+    reg(Items::copperAxe, D::makeTool("Copper Axe", ToolType::AXE, 20, 3.f, 30, AttackStyle::SWING));
+    reg(Items::copperHammer, D::makeTool("Copper Hammer", ToolType::HAMMER, 20, 3.f, 30, AttackStyle::SWING));
 
-    reg(Items::ironPickaxe, D::makeTool("Iron Pickaxe", ToolType::PICKAXE, 28, 0.7f, 20, AttackStyle::SWING));
-    reg(Items::ironAxe, D::makeTool("Iron Axe", ToolType::AXE, 28, 0.7f, 20, AttackStyle::SWING));
-    reg(Items::ironHammer, D::makeTool("Iron Hammer", ToolType::HAMMER, 28, 0.7f, 20, AttackStyle::SWING));
+    reg(Items::ironPickaxe, D::makeTool("Iron Pickaxe", ToolType::PICKAXE, 28, 3.f, 15, AttackStyle::SWING));
+    reg(Items::ironAxe, D::makeTool("Iron Axe", ToolType::AXE, 28, 3.f, 15, AttackStyle::SWING));
+    reg(Items::ironHammer, D::makeTool("Iron Hammer", ToolType::HAMMER, 28, 3.f, 15, AttackStyle::SWING));
 
-    reg(Items::goldPickaxe, D::makeTool("Gold Pickaxe", ToolType::PICKAXE, 40, 0.7f, 10, AttackStyle::SWING));
-    reg(Items::goldAxe, D::makeTool("Gold Axe", ToolType::AXE, 40, 0.7f, 10, AttackStyle::SWING));
-    reg(Items::goldHammer, D::makeTool("Gold Hammer", ToolType::HAMMER, 40, 0.7f, 10, AttackStyle::SWING));
+    reg(Items::goldPickaxe, D::makeTool("Gold Pickaxe", ToolType::PICKAXE, 40, 3.f, 10, AttackStyle::SWING));
+    reg(Items::goldAxe, D::makeTool("Gold Axe", ToolType::AXE, 40, 3.f, 10, AttackStyle::SWING));
+    reg(Items::goldHammer, D::makeTool("Gold Hammer", ToolType::HAMMER, 40, 3.f, 10, AttackStyle::SWING));
 
     // ── Materials ─────────────────────────────────────────────────────────────
     reg(Items::slime, D::makeMaterial("Slime", 999, 20));
@@ -235,7 +235,7 @@ void registerItems()
             5,      // knockback
             0,      // pierceCount
             3,      // range
-            20,  // useTime
+            60,     // useTime
             WeaponType::SWORD, // weaponType
             DamageType::MELEE, // damageType
             AttackStyle::SWING 
@@ -262,7 +262,7 @@ void registerItems()
     // ── Weapons — thrown ─────────────────────────────────────────────────────
 
     reg(Items::shuriken,
-        D::makeProjectile("Shuriken",
+        D::makeAmmo("Shuriken",
             10,     // damage
             10,     // critChance
             175,    // critDamage
@@ -274,7 +274,10 @@ void registerItems()
             3.0f,   // lifetime
             true,   // affectedByGravity
             false,  // shouldPassThroughWorld
-            999     // maxStack
+            999,    // maxStack
+            DamageType::THROWING, // damageType
+            AmmoType::NONE,       // ammoType
+            AttackStyle::THROW    // attackStyle
         ));
 
     // ── Consumables ───────────────────────────────────────────────────────────
@@ -320,6 +323,6 @@ void registerItems()
     reg(Items::sunGlasses, D::makeAccessory("Sunglasses"));
 
     // ── Range — wooden ──────────────────────────────────────────────────────────
-    reg(Items::woodenBow,   D::makeWeapon("Wooden Bow", 4, 4, 100, 0, 0, 1, 0, 30, WeaponType::BOW, DamageType::RANGED, AttackStyle::SHOOT, ProjectileType::ARROW));
-    reg(Items::woodenArrow, D::makeProjectile("Wooden Arrow", 5, 0, 0, 0, 2, 0, 1, 20.f, 5.f, true, false, 999));
+    reg(Items::woodenBow,   D::makeWeapon("Wooden Bow", 4, 4, 100, 0, 0, 1, 0, 30, WeaponType::BOW, DamageType::RANGED, AttackStyle::SHOOT, AmmoType::ARROW));
+    reg(Items::woodenArrow, D::makeAmmo("Wooden Arrow", 5, 0, 0, 0, 2, 0, 1, 20.f, 5.f, true, false, 999, DamageType::RANGED, AmmoType::ARROW));
 }

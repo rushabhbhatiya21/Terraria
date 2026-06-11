@@ -62,7 +62,7 @@ struct Zombie : public Enemy
 
 	// Zombie.h — tweak these freely
 	bool isMoving = false;
-	bool movingLeft = false;
+	bool isMovingLeft = false;
 	static constexpr float SIGHT_RANGE = 10.f;
 	static constexpr float FORGET_RANGE = 15.f;
 	static constexpr float ATTACK_RANGE = 1.5f;

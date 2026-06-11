@@ -131,7 +131,7 @@ bool Zombie::update(float deltaTime, EntityUpdateData& data)
 	}
 	case Zombie_State::PATROL:
 	{
-		moveSpeed = WANDER_SPEED * (movingLeft ? -1.f : 1.f);
+		moveSpeed = WANDER_SPEED * (isMovingLeft ? -1.f : 1.f);
 		break;
 	}
 	case Zombie_State::CHASING:
@@ -212,7 +212,7 @@ void Zombie::enterState(Zombie_State newState)
 	case Zombie_State::PATROL:
 		// printf("entering state patrol.\n");
 		changeStateTimer = 3.f;
-		movingLeft = !movingLeft;
+		isMovingLeft = !isMovingLeft;
 		break;
 	case Zombie_State::CHASING:
 		// printf("entering state chasing.\n");

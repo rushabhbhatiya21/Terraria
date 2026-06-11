@@ -23,7 +23,8 @@ enum class ItemCategory
     BLOCK,
     TOOL,
     WEAPON,
-    PROJECTILE,
+    AMMO,
+    //PROJECTILE,
     ARMOR,
     ACCESSORY,
     CONSUMABLE
@@ -50,7 +51,8 @@ enum class DamageType
     MELEE,
     RANGED,
     MAGIC,
-    SUMMON
+    SUMMON,
+    THROWING
 };
 
 enum class AttackStyle
@@ -58,17 +60,16 @@ enum class AttackStyle
     NONE,
     SWING,
     THRUST,
-    THROW,
     SHOOT,
-    CAST
+    CAST,
+    THROW
 };
 
-enum class ProjectileType
+enum class AmmoType
 {
     NONE,
     ARROW,
-    BULLET,
-    ORB
+    BULLET
 };
 
 enum class ToolType
@@ -167,12 +168,11 @@ enum class BlockType
 
 // ─── Stat blocks ──────────────────────────────────────────────────────────────
 
-// need to add other stats like crit
 struct WeaponData
 {
     WeaponType type           = WeaponType::NONE;
     DamageType damageType     = DamageType::NONE;
-    ProjectileType projectile = ProjectileType::NONE;
+    AmmoType requiredAmmo     = AmmoType::NONE;
     OffensiveStats offensive;
 };
 
@@ -185,6 +185,12 @@ struct ProjectileData
 
     bool affectedByGravity = false;
     bool shouldPassThroughWorld = false;
+};
+
+struct AmmoData
+{
+    AmmoType ammoType;
+    ProjectileData projectile;
 };
 
 struct ToolData
@@ -226,7 +232,7 @@ struct ItemDefinition
     {
         ToolData       tool;
         WeaponData     weapon;
-        ProjectileData projectile;
+        AmmoData       ammo;
         ConsumableData consumable;
         ArmorData      armor;
         BlockData      block;
@@ -265,6 +271,8 @@ struct ItemDefinition
         d.maxStack = 1;
         d.useTime = useTime;
         d.tool.type = type;
+        d.tool.tool.axePower = power;
+        d.tool.tool.hammerPower = power;
         d.tool.tool.miningPower = power;
         d.tool.tool.range = range;
         d.attackStyle = attackStyle;
@@ -272,7 +280,7 @@ struct ItemDefinition
     }
 
     static ItemDefinition makeWeapon(const char* name, int damage, int critChance, int critDamage, int armorPen, int knockback, int pierceCount, 
-        int range, int useTime, WeaponType weaponType, DamageType damageType, AttackStyle attackStyle, ProjectileType projectile = ProjectileType::NONE)
+        int range, int useTime, WeaponType weaponType, DamageType damageType, AttackStyle attackStyle, AmmoType requiredAmmo = AmmoType::NONE)
     {
         ItemDefinition d;
         d.displayName = name;
@@ -288,29 +296,33 @@ struct ItemDefinition
         d.weapon.offensive.range = range;
         d.weapon.type = weaponType;
         d.weapon.damageType = damageType;
-        d.weapon.projectile = projectile;
+        d.weapon.requiredAmmo = requiredAmmo;
         d.attackStyle = attackStyle;
         return d;
     }
 
-    static ItemDefinition makeProjectile(const char* name, int damage, int critChance, int critDamage, int armorPen, int knockback, int pierceCount, int range,
-        float speed, float lifetime, bool affectedByGravity, bool shouldPassThroughWorld, int maxStack)
+    static ItemDefinition makeAmmo(const char* name, int damage, int critChance, int critDamage, int armorPen, int knockback, 
+        int pierceCount, int range, float speed, float lifetime, bool affectedByGravity, bool shouldPassThroughWorld, int maxStack, 
+        DamageType damageType, AmmoType ammoType = AmmoType::NONE, AttackStyle attackStyle = AttackStyle::NONE)
     {
         ItemDefinition d;
         d.displayName = name;
-        d.category = ItemCategory::PROJECTILE;
+        d.category = ItemCategory::AMMO;
+        d.attackStyle = attackStyle;
         d.maxStack = maxStack;
-        d.projectile.offensive.damage = damage;
-        d.projectile.offensive.critChance = critChance;
-        d.projectile.offensive.critDamage = critDamage;
-        d.projectile.offensive.armorPen = armorPen;
-        d.projectile.offensive.knockback = knockback;
-        d.projectile.offensive.pierceCount = pierceCount;
-        d.projectile.offensive.range = range;
-        d.projectile.speed = speed;
-        d.projectile.lifetime = lifetime;
-        d.projectile.affectedByGravity = affectedByGravity;
-        d.projectile.shouldPassThroughWorld = shouldPassThroughWorld;
+        d.ammo.ammoType = ammoType;
+        d.ammo.projectile.damageType = damageType;
+        d.ammo.projectile.offensive.damage = damage;
+        d.ammo.projectile.offensive.critChance = critChance;
+        d.ammo.projectile.offensive.critDamage = critDamage;
+        d.ammo.projectile.offensive.armorPen = armorPen;
+        d.ammo.projectile.offensive.knockback = knockback;
+        d.ammo.projectile.offensive.pierceCount = pierceCount;
+        d.ammo.projectile.offensive.range = range;
+        d.ammo.projectile.speed = speed;
+        d.ammo.projectile.lifetime = lifetime;
+        d.ammo.projectile.affectedByGravity = affectedByGravity;
+        d.ammo.projectile.shouldPassThroughWorld = shouldPassThroughWorld;
 
         return d;
     }

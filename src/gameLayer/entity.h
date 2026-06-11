@@ -5,6 +5,7 @@
 #include "equipmentInventory.h"
 #include "combat/stats.h"
 #include "entityAnimation.h"
+#include "attackStyles/swingAttack.h"
 
 struct Player;
 struct Inventory;
@@ -43,28 +44,20 @@ struct Entity
 	EntityStats baseStats;
 	EntityStats stats;
 
+	ItemId heldItem = Items::air;
+	SwingAttack swingStyle;
+
 	bool isAlive = false;
 	float life = 0.f;
 	bool shouldApplyGravity = true;
 	bool shouldResolveConstraints = true;
 
-	// not sure to keep or not
-	bool isFacingRight = true;
-
-	float attackDuration = 0;
-	float swingTimer = 0;
 	float useTimer = 0;
-
 	float flashTimer = 0.f;
 	float hitStopTimer = 0.f;
 	float damageTaken = 0.f;
 	float damageTakenHealthBarTimer = 0.f;
 	float hurtTimer = 0.f;
-
-	// for weapon swing animation
-	float weaponLength = 1.5f;
-	Vector2 weaponBase = {};
-	Vector2 weaponTip = {};
 
 	static constexpr float MAX_FORCE = 10.f;
 

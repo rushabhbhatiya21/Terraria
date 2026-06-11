@@ -3,6 +3,9 @@
 #include <assetManager.h>
 #include <entityHolder.h>
 #include <items/blocks.h>
+#include "particles.h"
+
+// todo: make AttackSTyle struct and add enum to it, and have item manage update and spawn and all
 
 void Player::render(AssetManager& assetManager)
 {
@@ -57,8 +60,7 @@ void Player::drawSprite(AssetManager& assetManager)
 	{
 	case AttackStyle::SWING:
 	{
-		swingAttack.owner = this;
-		swingAttack.render(assetManager);
+		swingStyle.render(assetManager);
 		break;
 	}
 	case AttackStyle::THRUST:
@@ -88,7 +90,7 @@ bool Player::update(float deltaTime, EntityUpdateData& data)
 
 	updateTimers(deltaTime);
 	updateMovement(deltaTime);
-	updateSwing(deltaTime);
+	updateSwing(deltaTime, data);
 	updateAnimation(deltaTime);
 
 	return true;
@@ -131,20 +133,19 @@ void Player::updateMovement(float deltaTime)
 	physics.applyHorizontalMovement(deltaTime, inputX);
 }
 
-void Player::updateSwing(float deltaTime)
+void Player::updateSwing(float deltaTime, EntityUpdateData& data)
 {
 	ItemDefinition* item = getItem(heldItem);
-
 	if (!item) return;
+
+	std::vector<Particle> dummyParticles;
 
 	switch (item->attackStyle)
 	{
 	case AttackStyle::SWING:
 	{
-		swingAttack.heldItem = heldItem;
-		swingAttack.swingTimer     = useTimer;
-		swingAttack.attackDuration = attackDuration;
-		swingAttack.update(deltaTime);
+		swingStyle.updateAnimation(deltaTime);
+		swingStyle.updateSwings(deltaTime, data.gameMap, data.entityHolder, dummyParticles, data.rng); // replace particles here
 		break;
 	}
 	case AttackStyle::THRUST:

@@ -8,11 +8,11 @@ struct ItemDefinition;
 
 void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos);
 
-void useWeapon(Entity* entity, const ItemDefinition& item);
+void useWeapon(Entity* entity, ItemStack& stack, const ItemDefinition& item, EntityHolder& entityHolder, Vector2 mouseWorldPos);
 
-void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos);
-
-void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos);
+//void useProjectile(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos);
+//
+//void useTool(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos);
 
 void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos);
 

@@ -51,17 +51,20 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 	else
 		isHit = false;
 
-	rotation += rotationSpeed * deltaTime;
-	rotation = fmod(rotation, 360.f);
+	ItemDefinition* item = getItem(itemType);
+
+	if (!item) return false;
+
+	if (Items::shuriken)
+	{
+		rotation += rotationSpeed * deltaTime;
+		rotation = fmod(rotation, 360.f);
+	}
 
 	physics.transform.pos += physics.velocity * deltaTime;
 
 	if (checkCollisionWithTile(data.gameMap))
 		return false;
-
-	ItemDefinition* item = getItem(itemType);
-
-	if (!item) return false;
 
 	// todo: have factions in entity
 	for (Enemy* e : data.entityHolder.enemies)
@@ -87,9 +90,9 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			float shakeOffset   = result.crit ? .3f   : .15f;
 			camShake.triggerCameraShake(shakeDuration, shakeOffset);
 
-			item->projectile.offensive.pierceCount--;
+			item->ammo.projectile.offensive.pierceCount--;
 
-			if (item->projectile.offensive.pierceCount <= 0)
+			if (item->ammo.projectile.offensive.pierceCount <= 0)
 				return false;
 
 			return true;
@@ -120,9 +123,9 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			float shakeOffset = result.crit ? .3f : .15f;
 			camShake.triggerCameraShake(shakeDuration, shakeOffset);
 
-			item->projectile.offensive.pierceCount--;
+			item->ammo.projectile.offensive.pierceCount--;
 
-			if (item->projectile.offensive.pierceCount <= 0)
+			if (item->ammo.projectile.offensive.pierceCount <= 0)
 				return false;
 
 			return true;
@@ -132,7 +135,7 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 	return true;
 }
 
-// todo: have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item
+// done: have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item
 void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction)
 {
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
@@ -146,13 +149,13 @@ void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHold
 
 	projectile->owner = owner;
 	projectile->itemType = stack.itemId;
-	projectile->stats.offensive = item->projectile.offensive;
+	projectile->stats.offensive = item->ammo.projectile.offensive;
 	projectile->stats.offensive += owner->stats.offensive;
 	projectile->teleport(position);
-	projectile->physics.velocity = Vector2Scale(Vector2Normalize(direction), item->projectile.speed);
-	projectile->lifetime = item->projectile.lifetime;
-	projectile->shouldApplyGravity = item->projectile.affectedByGravity;
-	projectile->shouldResolveConstraints = item->projectile.shouldPassThroughWorld;
+	projectile->physics.velocity = Vector2Scale(Vector2Normalize(direction), item->ammo.projectile.speed);
+	projectile->lifetime = item->ammo.projectile.lifetime;
+	projectile->shouldApplyGravity = item->ammo.projectile.affectedByGravity;
+	projectile->shouldResolveConstraints = item->ammo.projectile.shouldPassThroughWorld;
 
 	Projectile* projectilePtr = projectile.get();
 	entityHolder.entities[id] = std::move(projectile);

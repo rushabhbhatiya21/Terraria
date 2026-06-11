@@ -762,7 +762,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	static bool creative = false;
 
-	// ← snapshot HERE, before any physics or input runs
+	// snapshot HERE, before any physics or input runs
 	bool wasTouchingGround = player.physics.downTouch;
 	float landingVelocity = player.physics.velocity.y;
 
@@ -1041,22 +1041,22 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region handle melee attacks
 
-	MeleeHitResult meleeResult = updateMeleeAttacks(deltaTime, entityHolder.enemies);
+	//MeleeHitResult meleeResult = updateMeleeAttacks(deltaTime, entityHolder.enemies);
 
-	if (meleeResult.hit)
-	{
-		float shakeDuration = meleeResult.crit ? .2f : .1f;
-		float shakeOffset   = meleeResult.crit ? .3f : .15f;
+	//if (meleeResult.hit)
+	//{
+	//	float shakeDuration = meleeResult.crit ? .2f : .1f;
+	//	float shakeOffset   = meleeResult.crit ? .3f : .15f;
 
-		camShake.triggerCameraShake(shakeDuration, shakeOffset);
-	}
+	//	camShake.triggerCameraShake(shakeDuration, shakeOffset);
+	//}
 
 #pragma endregion
 
 
 #pragma region handle tools
 
-	updateToolSwing(deltaTime, gameMap, entityHolder, particles, rng);
+	//updateToolSwing(deltaTime, gameMap, entityHolder, particles, rng);
 
 #pragma endregion
 
@@ -1776,7 +1776,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		if (item && item->category == ItemCategory::ARMOR)
 		{
-			useArmor(&player, *item, selectedStack, player.inventory, player.selectedHotbarSlot);
+			useArmor(&player, *item, selectedStack, player.selectedHotbarSlot);
 		}
 
 		player.heldItem = player.inventory.slots[player.selectedHotbarSlot].itemId;
