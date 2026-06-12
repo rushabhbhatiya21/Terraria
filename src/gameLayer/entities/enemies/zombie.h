@@ -6,6 +6,9 @@ struct Zombie : public Enemy
 	Zombie()
 	{
 		setColliderSize();
+		baseStats = makeZombieStats();
+		stats = baseStats;
+		life = stats.defensive.maxHealth;
 	}
 
 	enum class Zombie_State

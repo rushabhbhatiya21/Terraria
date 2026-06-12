@@ -7,19 +7,24 @@ note: recipes only visible when near crafting station
 5. Eye of Cthulhu boss           - done
 6. King Slime boss
 
-1. implement factions in entity - diff in projectile so same faction will not hurt each other
-6. calculate all lighting at the start for whole map, use loading for init, and add recalculate, whenever add/remove block is called
-7. make summons for eye of cthulhu
+1.  implement factions in entity - diff in projectile so same faction will not hurt each other
+6.  calculate all lighting at the start for whole map, use loading for init, and add recalculate, whenever add/remove block is called
+7.  make summons for eye of cthulhu
 11. add chests
 12. add guns and bullets
+13. make enemy spawner better and actually spawn stuff around you
+14. fix full screen bug
 
-2. add all stats to weapons - done
-3. have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item - done
-4. have inventory for each entity (for now added to player only, other entities do not have use for it yet) - then change useProjectile - done
-5. bfs for tree - done
-8. update weapon animations based on if its sword or spear or dagger - done
-9. add bows, arrows where arrows are projectiles - done
+
+2.  add all stats to weapons - done
+3.  have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item - done
+4.  have inventory for each entity (for now added to player only, other entities do not have use for it yet) - then change useProjectile - done
+5.  bfs for tree - done
+8.  update weapon animations based on if its sword or spear or dagger - done
+9.  add bows, arrows where arrows are projectiles - done
 10. make throwables - add shuriken and maybe dagger to throwable - done
+15. make hp bar go from green, orange, red (done with tint) - done
+16. make slime & zombie hurt player with frame enter and exit, do same for projectile - done
 
 - bug with drag and drop - if left click instead of drag and drop causes weird bugs - done
 - have weapons and armor have actual stats that we implemented, so equipping them boost stats (2) - done

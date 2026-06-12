@@ -103,16 +103,38 @@ inline EntityStats makePlayerStats()
 	return playerStats;
 }
 
+inline EntityStats makeSlimeStats()
+{
+	EntityStats slimeStats;
+	slimeStats.offensive.damage = 5;
+
+	slimeStats.defensive.maxHealth = 100;
+	slimeStats.defensive.armor = 5;
+	slimeStats.defensive.knockbackResist = 5;
+	return slimeStats;
+}
+
+inline EntityStats makeZombieStats()
+{
+	EntityStats zombieStats;
+	zombieStats.offensive.damage = 10;
+
+	zombieStats.defensive.maxHealth = 150;
+	zombieStats.defensive.armor = 7;
+	zombieStats.defensive.knockbackResist = 5;
+	return zombieStats;
+}
+
 inline EntityStats makeEvilEyeStats()
 {
-	EntityStats EvilEyeStats;
-	EvilEyeStats.offensive.damage = 15;
+	EntityStats evilEyeStats;
+	evilEyeStats.offensive.damage = 15;
 
-	EvilEyeStats.defensive.armor = 12;
-	EvilEyeStats.defensive.maxHealth = 2800;
-	EvilEyeStats.defensive.knockbackResist = 100;
+	evilEyeStats.defensive.armor = 12;
+	evilEyeStats.defensive.maxHealth = 2800;
+	evilEyeStats.defensive.knockbackResist = 100;
 
-	return EvilEyeStats;
+	return evilEyeStats;
 }
 
 

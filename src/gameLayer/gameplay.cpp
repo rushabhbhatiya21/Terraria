@@ -649,8 +649,8 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnEnemyHelper<EvilEye>({ 35,55 });
-	//spawnEnemyHelper<Slime>({ 31,60 });
+	//spawnEnemyHelper<EvilEye>({ 35,55 });
+	spawnEnemyHelper<Slime>({ 31,60 });
 	//spawnEnemyHelper<Slime>({ 29,60 });
 	//spawnEnemyHelper<Slime>({ 32,60 });
 	//spawnEnemyHelper<Zombie>({ 25,60 });

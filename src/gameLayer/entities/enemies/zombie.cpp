@@ -244,22 +244,7 @@ void Zombie::doAttack(Player* player)
 	info.attacker = this;
 	info.hitDirection = Vector2Normalize(physics.velocity);
 
-	DamageResult& result = CombatSystem::applyDamage(player, info);
-
-	float shakeDuration = result.crit ? .2f : .1f;
-	float shakeStength = result.crit ? .3f : .2f;
-	camShake.triggerCameraShake(shakeDuration, shakeStength);
-
-	//spawnPopupText(
-	//	player->getPosition(),
-	//	Vector2{ .1f, .1f },
-	//	std::to_string(int(std::floor(result.finalDamage))),
-	//	1,
-	//	.4f,
-	//	-1.f,
-	//	WHITE,
-	//	result.crit
-	//);
+	CombatSystem::applyDamage(player, info);
 
 	return;
 }

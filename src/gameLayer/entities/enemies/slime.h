@@ -6,7 +6,13 @@ struct Slime : public Enemy
 	Slime()
 	{
 		setColliderSize();
+		baseStats = makeSlimeStats();
+		stats = baseStats;
+		life = stats.defensive.maxHealth;
 	}
+
+	bool isColliding = false;
+	bool wasColliding = false;
 
 	void drawSprite(AssetManager& assetManager) override;
 

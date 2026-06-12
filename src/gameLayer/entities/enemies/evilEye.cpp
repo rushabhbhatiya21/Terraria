@@ -57,6 +57,7 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 
 	Vector2 facingDirection = data.player.getPosition() - getPosition();
 
+	// todo: hurt player faction
 	isColliding = physics.transform.intersectTransform(data.player.physics.transform);
 
 	if (isColliding && !wasColliding)

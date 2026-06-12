@@ -38,6 +38,12 @@ struct Projectile : public Entity
 	bool isHit = false;
 	float hitCountTimer = 0.f;
 
+	bool isCollidingWithEnemy = false;
+	bool wasCollidingWithEnemy = false;
+
+	bool isCollidingWithPlayer = false;
+	bool wasCollidingWithPlayer = false;
+
 	static constexpr float HIT_COUNT_TIME = .2f;
 
 	void render(AssetManager& assetManager) override;

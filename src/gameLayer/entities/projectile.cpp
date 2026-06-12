@@ -47,10 +47,10 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 	if (lifetime <= 0)
 		return false;
 
-	if (hitCountTimer >= 0)
-		hitCountTimer -= deltaTime;
-	else
-		isHit = false;
+	//if (hitCountTimer >= 0)
+	//	hitCountTimer -= deltaTime;
+	//else
+	//	isHit = false;
 
 	ItemDefinition* item = getItem(itemType);
 
@@ -77,10 +77,12 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 	// todo: have factions in entity
 	for (Enemy* e : data.entityHolder.enemies)
 	{
-		if (physics.transform.intersectTransform(e->physics.transform))
+		isCollidingWithEnemy = physics.transform.intersectTransform(e->physics.transform);
+		if (isCollidingWithEnemy && !wasCollidingWithEnemy)
 		{
-			if (isHit)
-				continue;
+			//if (isHit)
+			//	continue;
+			wasCollidingWithEnemy = true;
 
 			// todo: if it hits 
 			DamageInfo info;
@@ -103,6 +105,8 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 
 			return true;
 		}
+
+		wasCollidingWithEnemy = isCollidingWithEnemy;
 	}
 
 	Player* player = dynamic_cast<Player*>(owner);
@@ -110,13 +114,15 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 	// once we implement factions, this will be arr and we can continue
 	if (!player)
 	{
-		if (physics.transform.intersectTransform(data.player.physics.transform))
-		{
-			if (isHit) return true;
-				//continue;
+		isCollidingWithPlayer = physics.transform.intersectTransform(data.player.physics.transform);
 
-			isHit = true;
-			hitCountTimer = HIT_COUNT_TIME;
+		if (isCollidingWithPlayer && !wasCollidingWithPlayer)
+		{
+			//if (isHit) return true;
+			wasCollidingWithPlayer = true;
+
+			//isHit = true;
+			//hitCountTimer = HIT_COUNT_TIME;
 			DamageInfo info;
 			info.attacker = this;
 			info.hitDirection = Vector2Normalize(physics.velocity);
@@ -136,6 +142,8 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 
 			return true;
 		}
+
+		wasCollidingWithPlayer = isCollidingWithPlayer;
 	}
 
 	return true;
@@ -147,7 +155,9 @@ void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHold
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
 	auto projectile = std::make_unique<Projectile>();
 
-	Vector2 position = { owner->getPosition().x + 0.2f, owner->getPosition().y };
+	float offset = owner->animations.movingLeft ? .2f : -.2f;
+
+	Vector2 position = { owner->getPosition().x + offset, owner->getPosition().y };
 	ItemDefinition* item = getItem(stack.itemId);
 
 	if (!owner) return;

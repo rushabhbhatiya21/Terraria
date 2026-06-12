@@ -48,6 +48,15 @@ bool Slime::update(float deltaTime, EntityUpdateData& data)
 	//	doAttack(&data.player);
 	//}
 
+	isColliding = physics.transform.intersectTransform(data.player.physics.transform);
+
+	if (isColliding && !wasColliding)
+	{
+		wasColliding = true;
+		doAttack(&data.player);
+	}
+	wasColliding = isColliding;
+
 	if (changeStateTimer < 0)
 	{
 		changeStateTimer = getRandomFloat(data.rng, 1, 7);
@@ -141,22 +150,8 @@ void Slime::doAttack(Player* player)
 	info.attacker = this;
 	info.hitDirection = getPosition() - player->getPosition();
 
-	DamageResult& result = CombatSystem::applyDamage(player, info);
+	CombatSystem::applyDamage(player, info);
 
-	float shakeDuration = result.crit ? .2f : .1f;
-	float shakeStength = result.crit ? .3f : .2f;
-	camShake.triggerCameraShake(shakeDuration, shakeStength);
-
-	//spawnPopupText(
-	//	player->getPosition(),
-	//	Vector2{ .1f, .1f },
-	//	std::to_string(int(std::floor(result.finalDamage))),
-	//	1,
-	//	.4f,
-	//	-1.f,
-	//	WHITE,
-	//	result.crit
-	//);
 
 	return;
 }

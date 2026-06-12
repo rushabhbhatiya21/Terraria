@@ -53,36 +53,51 @@ void Enemy::renderHealthBar(AssetManager& assetManager)
 
 	healthBarPos.width = life * healthWidth / stats.defensive.maxHealth;
 
+	Color color = WHITE;
+
+	if (life > stats.defensive.maxHealth * .7f)
+	{
+		color = LIME;
+	}
+	else if (life > stats.defensive.maxHealth * .3f && life <= stats.defensive.maxHealth * .7f)
+	{
+		color = { 255, 200, 120, 255 };;
+	}
+	else
+	{
+		color = RED;
+	}
+
 	DrawTexturePro(
 		assetManager.health,
 		{ 0,0,(float)assetManager.health.width, (float)assetManager.health.height },
 		healthBarPos,
 		{ 0,0 },
 		0,
-		WHITE
+		color
 	);
 
-	if (damageTakenHealthBarTimer >= 0)
-	{
-		float progress = 1.f - (damageTakenHealthBarTimer / 2);
-		float fade = 1.f - pow(progress, 3.f);
+	//if (damageTakenHealthBarTimer >= 0)
+	//{
+	//	float progress = 1.f - (damageTakenHealthBarTimer / 2);
+	//	float fade = 1.f - pow(progress, 3.f);
 
-		Rectangle r{
-			baseX + healthBarPos.width,
-			healthBarPos.y,
-			damageTaken * fade * healthWidth / stats.defensive.maxHealth,
-			healthHeight
-		};
+	//	Rectangle r{
+	//		baseX + healthBarPos.width,
+	//		healthBarPos.y,
+	//		damageTaken * fade * healthWidth / stats.defensive.maxHealth,
+	//		healthHeight
+	//	};
 
-		DrawTexturePro(
-			assetManager.health,
-			{ 0,0,(float)assetManager.health.width, (float)assetManager.health.height },
-			r,
-			{ 0,0 },
-			0,
-			Color{ 255,255,255,80 }
-		);
-	}
+	//	DrawTexturePro(
+	//		assetManager.health,
+	//		{ 0,0,(float)assetManager.health.width, (float)assetManager.health.height },
+	//		r,
+	//		{ 0,0 },
+	//		0,
+	//		Color{ 255,255,255,80 }
+	//	);
+	//}
 }
 
 bool Enemy::updateHealthBar(float deltaTime)
