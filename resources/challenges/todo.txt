@@ -14,6 +14,7 @@ note: recipes only visible when near crafting station
 12. add guns and bullets
 13. make enemy spawner better and actually spawn stuff around you
 14. fix full screen bug
+17. show pieces when eye of cthulhu dies
 
 
 2.  add all stats to weapons - done
