@@ -19,17 +19,20 @@ struct Projectile : public Entity
 
 	void setColliderSize()
 	{
-		physics.transform.w = 0.7f;
-		physics.transform.h = 0.7f;
+		physics.transform.w = .7f;
+		physics.transform.h = .7f;
 	}
 
+	// pass while spawn
 	Entity* owner = nullptr;
-
+	bool facingLeft = false;
 	int itemType = 0;
-	float lifetime = 0;
-
-	Vector2 direction = { 0,0 };
+	int cellSizeX = 0;
+	int cellSizeY = 0;
 	float rotation = 0;
+	float lifetime = 0;
+	Vector2 direction = { 0,0 };
+
 	float rotationSpeed = 800;
 
 	bool isHit = false;

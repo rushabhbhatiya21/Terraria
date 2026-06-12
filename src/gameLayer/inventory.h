@@ -1,9 +1,7 @@
 ﻿#pragma once
 #include <vector>
 #include <unordered_map>
-#include <entities/droppedItem.h>
 #include <items/item.h>
-#include <items/blocks.h>
 
 struct Inventory
 {

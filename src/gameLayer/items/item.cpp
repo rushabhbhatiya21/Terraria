@@ -55,11 +55,11 @@ Texture2D getTextureForItemType(int itemType, AssetManager& assetManager)
     return assetManager.items;         // item atlas
 }
 
-Rectangle getTextureCoordinatesForItemType(int itemType)
+Rectangle getTextureCoordinatesForItemType(int itemType, int cellSizeX, int cellSizeY, bool flipX)
 {
     if (!isItem(itemType))
-        return getTextureAtlas(itemType, 4, 32, 32);
-    return getTextureAtlas(itemType - Items::firstItem, 0, 32, 32);
+        return getTextureAtlas(itemType, 4, cellSizeX, cellSizeY, flipX);
+    return getTextureAtlas(itemType - Items::firstItem, 0, cellSizeX, cellSizeY, flipX);
 }
 
 // Tool type IDs
@@ -265,13 +265,14 @@ void registerItems()
         D::makeAmmo("Shuriken",
             10,     // damage
             10,     // critChance
-            175,    // critDamage
+            150,    // critDamage
             0,      // armorPen
             1,      // knockback
             4,      // pierceCount
             8,      // range
             18.0f,  // speed
             5.0f,   // lifetime
+            20,     // useTime
             true,   // affectedByGravity
             false,  // shouldPassThroughWorld
             999,    // maxStack
@@ -324,5 +325,5 @@ void registerItems()
 
     // ── Range — wooden ──────────────────────────────────────────────────────────
     reg(Items::woodenBow,   D::makeWeapon("Wooden Bow", 4, 4, 100, 0, 0, 1, 0, 30, WeaponType::BOW, DamageType::RANGED, AttackStyle::SHOOT, AmmoType::ARROW));
-    reg(Items::woodenArrow, D::makeAmmo("Wooden Arrow", 5, 0, 0, 0, 2, 0, 1, 20.f, 5.f, true, false, 999, DamageType::RANGED, AmmoType::ARROW));
+    reg(Items::woodenArrow, D::makeAmmo("Wooden Arrow", 5, 0, 0, 0, 2, 0, 1, 16.f, 5.f, 0, true, false, 999, DamageType::RANGED, AmmoType::ARROW));
 }

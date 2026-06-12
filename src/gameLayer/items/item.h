@@ -302,7 +302,7 @@ struct ItemDefinition
     }
 
     static ItemDefinition makeAmmo(const char* name, int damage, int critChance, int critDamage, int armorPen, int knockback, 
-        int pierceCount, int range, float speed, float lifetime, bool affectedByGravity, bool shouldPassThroughWorld, int maxStack, 
+        int pierceCount, int range, float speed, float lifetime, int useTime, bool affectedByGravity, bool shouldPassThroughWorld, int maxStack, 
         DamageType damageType, AmmoType ammoType = AmmoType::NONE, AttackStyle attackStyle = AttackStyle::NONE)
     {
         ItemDefinition d;
@@ -310,6 +310,7 @@ struct ItemDefinition
         d.category = ItemCategory::AMMO;
         d.attackStyle = attackStyle;
         d.maxStack = maxStack;
+        d.useTime = useTime;
         d.ammo.ammoType = ammoType;
         d.ammo.projectile.damageType = damageType;
         d.ammo.projectile.offensive.damage = damage;
@@ -388,4 +389,4 @@ bool            isItem(ItemId itemType);
 // ─── Texture helpers ──────────────────────────────────────────────────────────
 
 Texture2D getTextureForItemType(int itemType, AssetManager& assetManager);
-Rectangle getTextureCoordinatesForItemType(int itemType);
+Rectangle getTextureCoordinatesForItemType(int itemType, int cellSizeX = 32, int cellSizeY = 32, bool flipX = false);

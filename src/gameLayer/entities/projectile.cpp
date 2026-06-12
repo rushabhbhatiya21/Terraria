@@ -28,7 +28,7 @@ void Projectile::render(AssetManager& assetManager)
 
 	const Texture2D& texture = getTextureForItemType(itemType, assetManager);
 
-	Rectangle rectangle = getTextureCoordinatesForItemType(itemType);
+	Rectangle rectangle = getTextureCoordinatesForItemType(itemType, 32, 32, facingLeft);
 
 	DrawTexturePro(
 		texture,
@@ -55,10 +55,14 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 
 	if (!item) return false;
 
-	if (Items::shuriken)
+	if (itemType == Items::shuriken)
 	{
 		rotation += rotationSpeed * deltaTime;
 		rotation = fmod(rotation, 360.f);
+	}
+	else
+	{
+		rotation = atan2f(physics.velocity.y, physics.velocity.x) * RAD2DEG - 90.f;
 	}
 
 	physics.transform.pos += physics.velocity * deltaTime;
@@ -148,10 +152,12 @@ void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHold
 	if (!item) return;
 
 	projectile->owner = owner;
+	projectile->facingLeft = owner->animations.movingLeft;
 	projectile->itemType = stack.itemId;
 	projectile->stats.offensive = item->ammo.projectile.offensive;
 	projectile->stats.offensive += owner->stats.offensive;
 	projectile->teleport(position);
+	projectile->rotation = atan2f(direction.y, direction.x) * RAD2DEG - 90.f;
 	projectile->physics.velocity = Vector2Scale(Vector2Normalize(direction), item->ammo.projectile.speed);
 	projectile->lifetime = item->ammo.projectile.lifetime;
 	projectile->shouldApplyGravity = item->ammo.projectile.affectedByGravity;

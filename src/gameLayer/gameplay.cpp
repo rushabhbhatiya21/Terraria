@@ -649,7 +649,7 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	//spawnEnemyHelper<EvilEye>({ 35,55 });
+	spawnEnemyHelper<EvilEye>({ 35,55 });
 	//spawnEnemyHelper<Slime>({ 31,60 });
 	//spawnEnemyHelper<Slime>({ 29,60 });
 	//spawnEnemyHelper<Slime>({ 32,60 });
@@ -659,11 +659,13 @@ bool Gameplay::init()
 
 	// start item in inventory
 	player.inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
-	player.inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
-	player.inventory.storeItem(ItemStack{ Items::woodLog, 20 });
+	//player.inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
+	//player.inventory.storeItem(ItemStack{ Items::woodLog, 20 });
 	player.inventory.storeItem(ItemStack{ Items::shuriken, 100 });
+	player.inventory.storeItem(ItemStack{ Items::woodenBow, 1 });
+	player.inventory.storeItem(ItemStack{ Items::woodenArrow, 100 });
 	//player.inventory.storeItem(ItemStack{ Items::furnace, 1 });
-	player.inventory.storeItem(ItemStack{ Items::workBench, 1 });
+	//player.inventory.storeItem(ItemStack{ Items::workBench, 1 });
 	//player.inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
 
 	// start day at random time

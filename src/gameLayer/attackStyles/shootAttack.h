@@ -5,10 +5,10 @@
 struct Entity;
 struct EntityHolder;
 
-struct ThrowAttack
+struct ShootAttack
 {
 	ItemId itemId = Items::air;
 	Entity* owner = nullptr;
 
-	void use(EntityHolder& entityHolder, ItemStack& stack, Vector2 direction);
+	void use(EntityHolder& entityHolder, Vector2 direction);
 };

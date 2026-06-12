@@ -1,5 +1,6 @@
 #include "items/item.h"
 #include "items/itemUse.h"
+#include "asserts.h"
 #include "entity.h"
 #include "equipmentInventory.h"
 #include "inventory.h"
@@ -8,6 +9,7 @@
 #include "player.h"
 #include "attackStyles/swingAttack.h"
 #include "attackStyles/throwAttack.h"
+#include "attackStyles/shootAttack.h"
 
 constexpr float TICKS_PER_SECOND = 60.f;
 
@@ -21,6 +23,7 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vecto
 
 	if (entity->useTimer > 0.f) return;
 
+	// todo: make sure item useTimer does not go below 0, not important now, but in future when we start implementing attack speed, it will be important
 	entity->useTimer = item->useTime / TICKS_PER_SECOND;
 
 	switch (item->category)
@@ -30,10 +33,6 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vecto
 	case ItemCategory::AMMO:
 		useStyle(entity, stack, *item, entityHolder, mouseWorldPos);
 		break;
-
-	//case ItemCategory::TOOL:
-	//	useTool(entity, *item, mouseWorldPos);
-	//	break;
 
 	case ItemCategory::BLOCK:
 		useBlock(entity, *item, mouseWorldPos);
@@ -75,7 +74,14 @@ void useStyle(Entity* entity, ItemStack& stack, const ItemDefinition& item, Enti
 		break;
 	}
 	case AttackStyle::SHOOT:
+	{
+		ShootAttack attack;
+		attack.owner = entity;
+		attack.itemId = stack.itemId;
+		Vector2 direction = Vector2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
+		attack.use(entityHolder, direction);
 		break;
+	}
 	case AttackStyle::CAST:
 		break;
 	default:

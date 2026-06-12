@@ -2,13 +2,15 @@
 #include <physics.h>
 #include <random>
 #include <nlohmann/json.hpp>
+
+#include "inventory.h"
 #include "equipmentInventory.h"
 #include "combat/stats.h"
 #include "entityAnimation.h"
 #include "attackStyles/swingAttack.h"
 
 struct Player;
-struct Inventory;
+struct GameMap;
 struct EntityHolder;
 struct AssetManager;
 
@@ -43,6 +45,8 @@ struct Entity
 
 	EntityStats baseStats;
 	EntityStats stats;
+
+	Inventory inventory;
 
 	ItemId heldItem = Items::air;
 	SwingAttack swingStyle;
@@ -95,8 +99,6 @@ struct Entity
 	virtual void onHit() {}
 
 	virtual void recalculateStats() {};
-
-	//virtual void hit(float damage, Vector2 hitFromPosition) = 0;
 
 	virtual Json formatToJson() = 0;
 	virtual bool loadFromJson(Json& j) = 0;

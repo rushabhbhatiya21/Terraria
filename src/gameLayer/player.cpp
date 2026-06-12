@@ -43,9 +43,6 @@ void Player::drawSprite(AssetManager& assetManager)
 	auto aabb = playerSprite.getAABB();
 	Rectangle textureUV = getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft);
 
-	//if (swingStyle.isPlayingAnimation)
-	//	animations.setAnimation(3);
-
 	// --- BACK LAYER ---
 	DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 	DrawTexturePro(assetManager.getHeadTexture(equipments.helmet.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
@@ -69,7 +66,19 @@ void Player::drawSprite(AssetManager& assetManager)
 	case AttackStyle::THROW:
 		break;
 	case AttackStyle::SHOOT:
+	{
+		Texture2D textureItem   = getTextureForItemType(heldItem, assetManager);
+		Rectangle textureUVItem = getTextureCoordinatesForItemType(heldItem, 32, 32, animations.movingLeft);
+
+		Rectangle destRect{};
+		destRect.width  = 1.0;
+		destRect.height = 1.0;
+		destRect.x = playerSprite.getCenter().x + (animations.movingLeft ? -.6f : .6f);
+		destRect.y = playerSprite.getCenter().y;
+
+		DrawTexturePro(textureItem, textureUVItem, destRect, { 0.5f,0.5f }, 0.f, WHITE);
 		break;
+	}
 	case AttackStyle::CAST:
 		break;
 	default:

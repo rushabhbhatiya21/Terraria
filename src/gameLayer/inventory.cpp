@@ -1,6 +1,5 @@
 #include "inventory.h"
 #include <asserts.h>
-#include <items/blocks.h>
 #include <iostream>
 
 int Inventory::getEmptySlot()
