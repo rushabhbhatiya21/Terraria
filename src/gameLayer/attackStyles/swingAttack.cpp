@@ -243,8 +243,9 @@ bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, Block& block,
 {
 	// make particles global like popupText or camShake
 	triggerShake(blockPos.x, blockPos.y);
-	auto newParticles = spawnParticles({ (float)blockPos.x, (float)blockPos.y }, rng, block.type, 10);
-	particles.insert(particles.end(), newParticles.begin(), newParticles.end());
+	//auto newParticles = 
+	spawnParticles({ (float)blockPos.x, (float)blockPos.y }, rng, block.type, 10);
+	//particles.insert(particles.end(), newParticles.begin(), newParticles.end());
 
 	spawnPopupText(
 		blockPos.toVector2(),

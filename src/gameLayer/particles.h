@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <raylib.h>
 #include <randomStuff.h>
-#include <items/blocks.h>
+#include <items/item.h>
 
 extern std::unordered_map<int, Color> blockColors;
 
@@ -20,8 +20,10 @@ struct Particle
 
 Color getBlockColor(int type);
 
-std::vector<Particle> spawnParticles(Vector2 pos, std::ranlux24_base& rng, int blockType, int numberOfParticles, float maxOffset = 1, int angleOffset = 0);
+void spawnParticles(Vector2 pos, std::ranlux24_base& rng, int blockType, int numberOfParticles, float maxOffset = 1, int angleOffset = 0, bool fullCircle = false);
 
-void updateParticles(std::vector<Particle>& particles, float dt);
+void updateParticles(float dt);
 
-void renderParticles(std::vector<Particle>& particles);
+void renderParticles();
+
+extern std::vector<Particle> particles;

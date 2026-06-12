@@ -659,7 +659,7 @@ bool Gameplay::init()
 
 	// start item in inventory
 	player.inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
-	//player.inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
+	player.inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
 	//player.inventory.storeItem(ItemStack{ Items::woodLog, 20 });
 	player.inventory.storeItem(ItemStack{ Items::shuriken, 100 });
 	player.inventory.storeItem(ItemStack{ Items::woodenBow, 1 });
@@ -710,7 +710,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	updateShake(deltaTime);
 	camShake.updateCameraShake(deltaTime);
-	updateParticles(particles, deltaTime);
+	updateParticles(deltaTime);
 	updatePopupText(deltaTime);
 
 #pragma endregion
@@ -819,7 +819,8 @@ bool Gameplay::update(AssetManager& assetManager)
 		}
 
 		// spawn your particles here
-		auto rightParticles = spawnParticles(
+		//auto rightParticles = 
+		spawnParticles(
 			playerPos,
 			rng,
 			blockType,
@@ -828,7 +829,8 @@ bool Gameplay::update(AssetManager& assetManager)
 			45
 		);
 
-		auto leftParticles = spawnParticles(
+		//auto leftParticles = 
+		spawnParticles(
 			playerPos,
 			rng,
 			blockType,
@@ -836,8 +838,8 @@ bool Gameplay::update(AssetManager& assetManager)
 			player.physics.transform.w,
 			-45
 		);
-		particles.insert(particles.end(), leftParticles.begin(), leftParticles.end());
-		particles.insert(particles.end(), rightParticles.begin(), rightParticles.end());
+		//particles.insert(particles.end(), leftParticles.begin(), leftParticles.end());
+		//particles.insert(particles.end(), rightParticles.begin(), rightParticles.end());
 	}
 
 	player.isAlive = player.update(deltaTime, EntityUpdateData
@@ -1445,7 +1447,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region render particles
 
-	renderParticles(particles);
+	renderParticles();
 
 #pragma endregion
 

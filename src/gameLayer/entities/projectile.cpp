@@ -6,7 +6,8 @@
 #include "combat/combatSystem.h"
 #include "gameMap.h"
 #include "shake.h"
-#include "ui/popupText.h"
+//#include "ui/popupText.h"
+#include "particles.h"
 
 #include "player.h"
 #include "entities/enemies/enemy.h"
@@ -68,7 +69,10 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 	physics.transform.pos += physics.velocity * deltaTime;
 
 	if (checkCollisionWithTile(data.gameMap))
+	{
+		spawnParticles(getPosition(), data.rng, itemType, 20, 0, 0, true);
 		return false;
+	}
 
 	// todo: have factions in entity
 	for (Enemy* e : data.entityHolder.enemies)
@@ -78,10 +82,7 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			if (isHit)
 				continue;
 
-			// todo: if it hits diff enemy then reset counter
-			isHit = true;
-			hitCountTimer = HIT_COUNT_TIME;
-
+			// todo: if it hits 
 			DamageInfo info;
 			info.attacker = this;
 			info.hitDirection = Vector2Normalize(physics.velocity);
@@ -93,6 +94,7 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			float shakeDuration = result.crit ? .2f   : .1f;
 			float shakeOffset   = result.crit ? .3f   : .15f;
 			camShake.triggerCameraShake(shakeDuration, shakeOffset);
+			spawnParticles(e->getPosition(), data.rng, itemType, 20, 0, 0, true);
 
 			item->ammo.projectile.offensive.pierceCount--;
 

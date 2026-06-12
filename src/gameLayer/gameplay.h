@@ -94,7 +94,7 @@ struct Gameplay
 	SecondOrderDynamics camFollow;
 
 	// particles
-	std::vector<Particle> particles;
+	//std::vector<Particle> particles;
 
 	// recipe
 	int selectedRecipeIndex = 0;
