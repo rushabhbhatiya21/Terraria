@@ -81,15 +81,17 @@ void SwingAttack::updateAnimation(float deltaTime)
 {
 	swingTimer = std::max(0.f, swingTimer - deltaTime);
 
-	if (!owner) return;
-
 	if (swingTimer <= 0)
 	{
+		owner = nullptr;
 		swingTimer = 0;
 		animationDuration = 0;
 		currentSwingAngle = 0;
 		isPlayingAnimation = false;
+		return;
 	}
+
+	if (!owner) return;
 
 	isPlayingAnimation = true;
 

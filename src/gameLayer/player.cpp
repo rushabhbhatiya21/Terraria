@@ -41,14 +41,15 @@ void Player::drawSprite(AssetManager& assetManager)
 	playerSprite.pos.y -= (playerSprite.h - physics.transform.h) / 2;
 
 	auto aabb = playerSprite.getAABB();
-	auto textureUV = getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft);
+	Rectangle textureUV = getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft);
 
-	if (heldItem)
-		textureUV = getTextureAtlas(animations.positionX, animations.positionY + 3, 32, 64, animations.movingLeft);
+	//if (swingStyle.isPlayingAnimation)
+	//	animations.setAnimation(3);
 
 	// --- BACK LAYER ---
 	DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 	DrawTexturePro(assetManager.getHeadTexture(equipments.helmet.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	DrawTexturePro(assetManager.getBackTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 	// --- FRONT LAYER ---
 	DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 
@@ -173,6 +174,9 @@ void Player::updateAnimation(float deltaTime)
 		animations.setAnimation(1); // walk
 	else
 		animations.setAnimation(0); // idle
+
+	if (swingStyle.isPlayingAnimation)
+		animations.setAnimation(3); // assuming swing animation
 
 	animations.update(deltaTime, 0.08f, 7);
 }

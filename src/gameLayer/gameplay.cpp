@@ -21,8 +21,6 @@
 #include <items/item.h>
 #include <items/itemUse.h>
 
-#include <combat/melee.h>
-#include <combat/tool.h>
 #include <combat/blockSpawn.h>
 
 #include "ui/popupText.h"

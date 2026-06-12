@@ -270,8 +270,8 @@ void registerItems()
             1,      // knockback
             4,      // pierceCount
             8,      // range
-            14.0f,  // speed
-            3.0f,   // lifetime
+            18.0f,  // speed
+            5.0f,   // lifetime
             true,   // affectedByGravity
             false,  // shouldPassThroughWorld
             999,    // maxStack
