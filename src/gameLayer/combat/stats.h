@@ -137,6 +137,16 @@ inline EntityStats makeEvilEyeStats()
 	return evilEyeStats;
 }
 
+inline EntityStats makeServantEvilEyeStats()
+{
+	EntityStats servantEvilEyeStats;
+
+	servantEvilEyeStats.offensive.damage = 5;
+	servantEvilEyeStats.defensive.maxHealth = 10;
+
+	return servantEvilEyeStats;
+}
+
 
 //Armor	   Multiplier	  Damage Taken
 //0	       1.0	          100 %

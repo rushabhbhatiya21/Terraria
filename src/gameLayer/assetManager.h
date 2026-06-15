@@ -32,6 +32,7 @@ struct AssetManager
 	Texture2D evilEyePhase1 = {};
 	Texture2D evilEyePhase2 = {};
 	Texture2D evilEyePieces = {};
+	Texture2D evilEyeServant = {};
 	Texture2D zombie = {};
 	Texture2D health = {};
 	Texture2D healthBar = {};
@@ -45,11 +46,6 @@ struct AssetManager
 	Shader blurShader = {};
 	Shader bloomShader = {};
 	Shader flashShader = {};
-
-	//Texture2D playerBack = {};
-	//Texture2D playerFeet = {};
-	//Texture2D playerHead = {};
-	//Texture2D playerFront = {};
 
 	std::unordered_map<int, Texture2D> frontArmour;
 	std::unordered_map<int, Texture2D> backArmour;
@@ -70,6 +66,7 @@ struct AssetManager
 		{&evilEyePhase1, "eyeOfCthulhuPhase1.png"},
 		{&evilEyePhase2, "eyeOfCthulhuPhase2.png"},
 		{&evilEyePieces, "eyeOfCthulhuPieces.png"},
+		{&evilEyeServant, "servantOfCthulhu.png"},
 		{&zombie, "zombie.png"},
 		{&health, "health.png"},
 		{&healthBar, "healthBar.png"},
@@ -78,10 +75,6 @@ struct AssetManager
 		{&snowBG, "snowBG.png"},
 		{&caveBG, "caveBG.png"},
 		{&nightBG, "backgroundsLayred/sky/nightSky.png"}
-		//{&playerBack, "body/player_back.png"},
-		//{&playerFeet, "body/player_feet.png"},
-		//{&playerHead, "body/player_head.png"},
-		//{&playerFront, "body/player_front.png"}
 	};
 
 	std::vector<ShaderEntry> shaderList = {

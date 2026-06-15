@@ -17,6 +17,7 @@
 #include <entities/enemies/desetSlime.h>
 #include <entities/enemies/zombie.h>
 #include <entities/enemies/evilEye.h>
+#include <entities/enemies/evilEyeServant.h>
 
 #include <items/item.h>
 #include <items/itemUse.h>
@@ -649,8 +650,9 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	//spawnEnemyHelper<EvilEye>({ 35,55 });
-	spawnEnemyHelper<Slime>({ 31,60 });
+	spawnEnemyHelper<EvilEye>({ 35,55 });
+	//spawnEnemyHelper<EvilEyeServant>({ 35,55 });
+	//spawnEnemyHelper<Slime>({ 31,60 });
 	//spawnEnemyHelper<Slime>({ 29,60 });
 	//spawnEnemyHelper<Slime>({ 32,60 });
 	//spawnEnemyHelper<Zombie>({ 25,60 });
@@ -1041,28 +1043,6 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region handle melee attacks
-
-	//MeleeHitResult meleeResult = updateMeleeAttacks(deltaTime, entityHolder.enemies);
-
-	//if (meleeResult.hit)
-	//{
-	//	float shakeDuration = meleeResult.crit ? .2f : .1f;
-	//	float shakeOffset   = meleeResult.crit ? .3f : .15f;
-
-	//	camShake.triggerCameraShake(shakeDuration, shakeOffset);
-	//}
-
-#pragma endregion
-
-
-#pragma region handle tools
-
-	//updateToolSwing(deltaTime, gameMap, entityHolder, particles, rng);
-
-#pragma endregion
-
-
 #pragma region handle blocks
 
 	updateBlock(gameMap, player.inventory);
@@ -1414,11 +1394,11 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	for (auto& e : entityHolder.entities)
 	{
-		//DrawRectangleLinesEx(
-		//	e.second->physics.transform.getAABB(),
-		//	.1f,
-		//	PURPLE
-		//);
+		DrawRectangleLinesEx(
+			e.second->physics.transform.getAABB(),
+			.1f,
+			PURPLE
+		);
 
 		e.second->render(assetManager);
 	}

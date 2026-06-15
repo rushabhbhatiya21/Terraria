@@ -22,6 +22,7 @@ enum EntityType
 	EntityType_DroppedItem,
 	EntityType_Enemy,
 	EntityType_Boss,
+	//EntityType_Spawn,
 	EntityType_Projectile
 };
 
@@ -58,6 +59,7 @@ struct Entity
 
 	float useTimer = 0;
 	float flashTimer = 0.f;
+	float blinkTimer = 0.f;
 	float hitStopTimer = 0.f;
 	float damageTaken = 0.f;
 	float damageTakenHealthBarTimer = 0.f;

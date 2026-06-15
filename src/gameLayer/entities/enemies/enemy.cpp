@@ -19,6 +19,14 @@ void Enemy::render(AssetManager& assetManager)
 		);
 	}
 
+	bool blinking = blinkTimer > 0;
+
+	// flashing takes priority
+	if (!flashing && blinking)
+	{
+		return; // do not draw sprite
+	}
+
 	drawSprite(assetManager);
 
 	if (flashing)
@@ -104,10 +112,7 @@ bool Enemy::updateHealthBar(float deltaTime)
 {
 	if (flashTimer > 0) flashTimer -= deltaTime;
 
-	//if (life <= 0 && isAlive)
-	//{
-	//	isAlive = false;
-	//}
+	if (blinkTimer > 0) blinkTimer -= deltaTime;
 
 	if (damageTakenHealthBarTimer >= 0)
 	{

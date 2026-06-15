@@ -9,7 +9,8 @@ enum EnemyType
 	EnemyType_Slime = 101,
 	EnemyType_DesertSlime,
 	EnemyType_Zombie,
-	EnemyType_EvilEye
+	EnemyType_EvilEye,
+	EnemyType_EvilEyeSpawn
 };
 
 struct Enemy : public Entity
