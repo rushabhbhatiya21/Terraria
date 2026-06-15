@@ -204,13 +204,13 @@ bool Projectile::checkCollisionWithTile(GameMap& gameMap)
 			if (x < 0 || x >= gameMap.w)
 				return true;
 
-			Block* b = gameMap.getBlockSafe(x, y);
+			BlockData* b = gameMap.getBlockSafe(x, y);
 
 			if (!b)
 				continue;
 
-			if (!b->isCollidable())
-				continue;
+			//if (!b->isCollidable())
+			//	continue;
 
 			Rectangle blockRect =
 			{

@@ -302,10 +302,14 @@ bool Zombie::shouldStepUp(Vector2 playerPos, GameMap& gameMap)
 	auto bNext = gameMap.getBlockSafe(nextX, (int)getPosition().y);
 	auto bPrev = gameMap.getBlockSafe(prevX, (int)getPosition().y);
 
-	if (bNext && zTotPlayerDirection.x >= 0 && isCollidable(bNext->type))
+	if (bNext && zTotPlayerDirection.x >= 0 
+		//&& isCollidable(bNext->type)
+		)
 		return true;
 
-	if (bPrev && zTotPlayerDirection.x < 0 && isCollidable(bPrev->type))
+	if (bPrev && zTotPlayerDirection.x < 0
+		//&& isCollidable(bPrev->type)
+		)
 		return true;
 
 	return false;
@@ -322,13 +326,17 @@ bool Zombie::isOnLedge(GameMap& gameMap)
 	{
 		int nextX = int(getPosition().x) + 1;
 		auto bNext = gameMap.getBlockSafe(nextX, belowY);
-		return !bNext || !isCollidable(bNext->type);
+		return !bNext 
+			// || !isCollidable(bNext->type)
+			;
 	}
 	else if (moveSpeed < 0.f) // moving left, check left side
 	{
 		int prevX = int(getPosition().x) - 1;
 		auto bPrev = gameMap.getBlockSafe(prevX, belowY);
-		return !bPrev || !isCollidable(bPrev->type);
+		return !bPrev
+			//|| !isCollidable(bPrev->type)
+			;
 	}
 
 	return false; // not moving, not on edge

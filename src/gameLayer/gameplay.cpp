@@ -562,7 +562,9 @@ void Gameplay::addLight(int worldX, int worldY, float radius, float intensity, b
 					ly - 2
 				);
 
-				if (b && b->isCollidable())
+				if (b 
+					//&& b->isCollidable()
+				)
 				{
 					lightValue *= 0.3f;
 				}
@@ -650,7 +652,7 @@ bool Gameplay::init()
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnEnemyHelper<EvilEye>({ 35,55 });
+	//spawnEnemyHelper<EvilEye>({ 35,55 });
 	//spawnEnemyHelper<EvilEyeServant>({ 35,55 });
 	//spawnEnemyHelper<Slime>({ 31,60 });
 	//spawnEnemyHelper<Slime>({ 29,60 });
@@ -678,7 +680,6 @@ bool Gameplay::init()
 	double loadEnd = GetTime();
 	TraceLog(LOG_INFO, "Load time: %.3f seconds", loadEnd - loadStart);
 	TraceLog(LOG_INFO, "Raylib version: %s", RAYLIB_VERSION);
-	TraceLog(LOG_INFO, "map w=%d h=%d", gameMap.w, gameMap.h);
 
 	return true;
 }
@@ -809,7 +810,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		// get block below feet
 		// check collider left
 		auto b = gameMap.getBlockSafe((int)playerPosLeft.x, (int)playerPosLeft.y);
-		if (b && b->type != Block::air)
+		if (b && b->type != Items::air)
 		{
 			blockType = b->type;
 		}
@@ -818,7 +819,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			// check collider right
 			Vector2 playerPosRight = player.physics.transform.getBottomRight();
 			auto b = gameMap.getBlockSafe((int)playerPosRight.x, (int)playerPosRight.y);
-			if (b && b->type != Block::air) blockType = b->type;
+			if (b && b->type != Items::air) blockType = b->type;
 		}
 
 		// spawn your particles here
@@ -980,7 +981,7 @@ bool Gameplay::update(AssetManager& assetManager)
 	int blockY = (int)floor(worldPos.y);
 
 	if (creativeSelectedBlock < 0) { creativeSelectedBlock = 0; }
-	if (creativeSelectedBlock >= Block::BLOCKS_COUNT) { creativeSelectedBlock = Block::BLOCKS_COUNT - 1; }
+	if (creativeSelectedBlock >= Items::LAST_BLOCK) { creativeSelectedBlock = Items::LAST_BLOCK - 1; }
 
 	// selection
 	if (showImgui)
@@ -1038,6 +1039,11 @@ bool Gameplay::update(AssetManager& assetManager)
 					worldPos
 				);
 			}
+		}
+
+		if ((IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) && IsKeyPressed(KEY_SPACE))
+		{
+			printf("down jump pressed\n");
 		}
 	}
 
@@ -1322,7 +1328,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 			auto& bb = backgroundMap.getBlockUnsafe(x, y);
 
-			if (bb.type != Block::air)
+			if (bb.type != Items::air)
 			{
 				atlasX = bb.type;
 
@@ -1344,7 +1350,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			auto& b = gameMap.getBlockUnsafe(x, y);
 
 
-			if (b.type != Block::air)
+			if (b.type != Items::air)
 			{
 				atlasX = b.type;
 
@@ -2182,7 +2188,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		ImGui::Separator();
 
-		for (int i = 0; i < Block::BLOCKS_COUNT; i++)
+		for (int i = 0; i < Items::LAST_BLOCK; i++)
 		{
 			auto atlas = getTextureAtlas(i, 0, 32, 32);
 			atlas.x /= assetManager.textures.width;

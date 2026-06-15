@@ -3,6 +3,9 @@
 
 std::unordered_map<ItemId, Recipes::Recipe> Recipes::all =
 {
+    // platform
+    {Items::platform, {2, {{Items::woodLog, 1}}, Recipes::CraftingStation::NONE}},
+
     // workbench
     {Items::workBench, {1, {{Items::woodLog, 10}}, Recipes::CraftingStation::NONE}},
 

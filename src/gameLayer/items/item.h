@@ -1,5 +1,6 @@
 ﻿#pragma once
 #include <string>
+#include <cstdint>
 #include <unordered_map>
 #include <raylib.h>
 #include "itemIds.h"
@@ -88,6 +89,7 @@ enum class ArmorSlot
     BOOTS
 };
 
+// todo: maybe remove it
 enum class BlockType
 {
     air = 0,
@@ -213,9 +215,18 @@ struct ArmorData
 
 struct BlockData
 {
-    BlockType type = BlockType::air;
-    int       hp = 0;
-    int       bestTool = 0;
+    ItemId    type      = Items::air;
+    int       hp        = 0;
+    int       bestTool  = 0;
+    int       variation = -1;
+
+    void sanitize()
+    {
+        if (type >= Items::LAST_BLOCK)
+        {
+            type = 0;
+        }
+    }
 };
 
 // ─── ItemDefinition ───────────────────────────────────────────────────────────
@@ -354,7 +365,7 @@ struct ItemDefinition
         return d;
     }
 
-    static ItemDefinition makeBlock(const char* name, BlockType type, int hp, int bestTool, int maxStack, int useTime)
+    static ItemDefinition makeBlock(const char* name, ItemId type, int hp, int bestTool, int maxStack, int useTime)
     {
         ItemDefinition d;
         d.displayName = name;

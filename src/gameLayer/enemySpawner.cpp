@@ -59,9 +59,10 @@ void spawnEnemy
 
 			// standing position
 			if (ground &&
-				ground->isCollidable() &&
-				air &&
-				!air->isCollidable())
+				//ground->isCollidable() &&
+				air 
+				// && !air->isCollidable()
+			)
 			{
 				int leftCount = 0;
 				int rightCount = 0;
@@ -72,8 +73,11 @@ void spawnEnemy
 					auto* g = gameMap.getBlockSafe(x - i, y);
 					auto* a = gameMap.getBlockSafe(x - i, y - 1);
 
-					if (g && g->isCollidable() &&
-						a && !a->isCollidable())
+					if (g && 
+						//g->isCollidable() &&
+						a 
+						// && !a->isCollidable()
+					)
 					{
 						leftCount++;
 					}
@@ -89,8 +93,11 @@ void spawnEnemy
 					auto* g = gameMap.getBlockSafe(x + i, y);
 					auto* a = gameMap.getBlockSafe(x + i, y - 1);
 
-					if (g && g->isCollidable() &&
-						a && !a->isCollidable())
+					if (g &&
+						//g->isCollidable() &&
+						a 
+						// && !a->isCollidable()
+					)
 					{
 						rightCount++;
 					}

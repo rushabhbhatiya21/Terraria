@@ -13,7 +13,7 @@ void GameMap::create(const int w, const int h)
 	for (auto& e : mapData) { e = {}; }
 }
 
-Block& GameMap::getBlockUnsafe(int x, int y)
+BlockData& GameMap::getBlockUnsafe(int x, int y)
 {
 	permaAssertCommentDevelopement(mapData.size() == w * h, "MapData variable not initialized");
 
@@ -22,7 +22,7 @@ Block& GameMap::getBlockUnsafe(int x, int y)
 	return mapData[x + y * w];
 }
 
-Block* GameMap::getBlockSafe(int x, int y)
+BlockData* GameMap::getBlockSafe(int x, int y)
 {
 	permaAssertCommentDevelopement(mapData.size() == w * h, "MapData variable not initialized");
 
@@ -44,7 +44,7 @@ bool GameMap::isAdjacentBlock(int x, int y)
 
 			auto b = getBlockSafe(x + i, y + j);
 
-			if (b && b->type != Block::air)
+			if (b && b->type != Items::air)
 			{
 				return true;
 			}

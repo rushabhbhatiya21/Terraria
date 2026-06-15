@@ -16,7 +16,7 @@ bool isValidTree(Vector2i pos, GameMap& gameMap)
 	auto* b = gameMap.getBlockSafe(pos.x, pos.y);
 
 	if (!b) return false;
-	if (b->type != b->woodLog && b->type != b->leaves) return false;
+	if (b->type != Items::woodLog && b->type != Items::leaves) return false;
 
 	return true;
 }

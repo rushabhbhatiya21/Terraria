@@ -160,7 +160,9 @@ void SwingAttack::updateSwings(float deltaTime, GameMap& gameMap, EntityHolder& 
 
 	auto* b = gameMap.getBlockSafe(blockPos.x, blockPos.y);
 
-	if (!b || !b->isCollidable()) return;
+	if (!b 
+		//|| !b->isCollidable()
+		) return;
 
 	float dist = Vector2Distance(blockPos.toVector2(), owner->getPosition());
 	int toolRange = item->tool.tool.range;
@@ -170,7 +172,7 @@ void SwingAttack::updateSwings(float deltaTime, GameMap& gameMap, EntityHolder& 
 		// onHitBlock
 		onHitBlock(item->tool.tool.miningPower, blockPos, *b, gameMap, entityHolder, particles, rng);
 
-		if (b->hp <= 0 && b->type == b->woodLog)
+		if (b->hp <= 0 && b->type == Items::woodLog)
 		{
 			// onHitTree
 			onHitTree(blockPos, gameMap, entityHolder);
@@ -213,7 +215,7 @@ void SwingAttack::onHitEnemy(Enemy* enemy)
 	return;
 }
 
-void SwingAttack::onHitBlock(int power, Vector2i blockPos, Block& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng)
+void SwingAttack::onHitBlock(int power, Vector2i blockPos, BlockData& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
 	auto brokenType = b.type;
 	if (damageBlock(power, blockPos, b, particles, rng))
@@ -239,7 +241,7 @@ void SwingAttack::onHitTree(Vector2i blockPos, GameMap& gameMap, EntityHolder& e
 	}
 }
 
-bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, Block& block, std::vector<Particle>& particles, std::ranlux24_base& rng)
+bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, BlockData& block, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
 	// make particles global like popupText or camShake
 	triggerShake(blockPos.x, blockPos.y);
@@ -263,9 +265,9 @@ bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, Block& block,
 	return block.hp <= 0;
 }
 
-void SwingAttack::destroyBlock(const Vector2i& blockPos, Block& block, EntityHolder& entityHolder)
+void SwingAttack::destroyBlock(const Vector2i& blockPos, BlockData& block, EntityHolder& entityHolder)
 {
-	if (block.type == block.air)
+	if (block.type == Items::air)
 		return;
 
 	// drop item

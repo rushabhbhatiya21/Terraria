@@ -77,7 +77,7 @@ struct Gameplay
 	// inventory
 	int pendingHotbarSlot = -1;
 
-	int creativeSelectedBlock = Block::air;
+	int creativeSelectedBlock = Items::air;
 
 	// entities
 	Player player;
