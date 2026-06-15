@@ -22,7 +22,8 @@
 
 #include "recipe.h"
 
-#define CAMERA_ZOOM 30.0f
+#define DEBUG_MODE 0
+#define CAMERA_ZOOM 20.0f
 #define TILE_SIZE 1
 #define LIGHT_SCALE 4
 

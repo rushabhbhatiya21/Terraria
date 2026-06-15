@@ -9,7 +9,7 @@ struct GameMap
 
 	std::vector<Block> mapData = {};
 
-	void create(int w, int h);
+	void create(const int w, const int h);
 
 	Block& getBlockUnsafe(int x, int y);
 	Block* getBlockSafe(int x, int y);

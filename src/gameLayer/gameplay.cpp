@@ -616,9 +616,9 @@ bool Gameplay::init()
 {
 	double loadStart = GetTime();
 
-	int w = 900, h = 500;
+	const int w = 900, h = 500;
 	backgroundMap.create(w, h);
-	generateWorld(gameMap);
+	generateWorld(gameMap, w, h);
 	registerItems();
 
 	// cam init
@@ -678,6 +678,7 @@ bool Gameplay::init()
 	double loadEnd = GetTime();
 	TraceLog(LOG_INFO, "Load time: %.3f seconds", loadEnd - loadStart);
 	TraceLog(LOG_INFO, "Raylib version: %s", RAYLIB_VERSION);
+	TraceLog(LOG_INFO, "map w=%d h=%d", gameMap.w, gameMap.h);
 
 	return true;
 }
@@ -1052,12 +1053,22 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region get screen coords
 
-	// visible tile range
-	int startXView = (int)(camera.target.x / TILE_SIZE) - 30;
-	int endXView = startXView + 60;
+	// visible tile range dynamically based on screen resolution and zoom
+	float visibleWorldWidth = GetScreenWidth() / camera.zoom;
+	float visibleWorldHeight = GetScreenHeight() / camera.zoom;
 
-	int startYView = (int)(camera.target.y / TILE_SIZE) - 20;
-	int endYView = startYView + 40;
+	int visibleTilesX = (int)ceilf(visibleWorldWidth / TILE_SIZE);
+	int visibleTilesY = (int)ceilf(visibleWorldHeight / TILE_SIZE);
+
+	// padding
+	visibleTilesX += 4;
+	visibleTilesY += 4;
+
+	int startXView = (int)(camera.target.x / TILE_SIZE) - visibleTilesX / 2;
+	int endXView = startXView + visibleTilesX;
+
+	int startYView = (int)(camera.target.y / TILE_SIZE) - visibleTilesY / 2;
+	int endYView = startYView + visibleTilesY;
 
 	// clamp
 	startXView = std::max(0, startXView);
@@ -1394,11 +1405,14 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	for (auto& e : entityHolder.entities)
 	{
-		DrawRectangleLinesEx(
-			e.second->physics.transform.getAABB(),
-			.1f,
-			PURPLE
-		);
+		if (DEBUG_MODE == 1)
+		{
+			DrawRectangleLinesEx(
+				e.second->physics.transform.getAABB(),
+				.1f,
+				PURPLE
+			);
+		}
 
 		e.second->render(assetManager);
 	}

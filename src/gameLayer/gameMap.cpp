@@ -2,7 +2,7 @@
 #include <asserts.h>
 #include <gameMap.h>
 
-void GameMap::create(int w, int h)
+void GameMap::create(const int w, const int h)
 {
 	*this = {};
 	mapData.resize(w * h);

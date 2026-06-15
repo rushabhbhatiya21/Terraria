@@ -6,11 +6,8 @@
 #include <saveMap.h>
 #include "items/blockData.h" // initBlock, TOOL_* constants
 
-void generateWorld(GameMap& gameMap, int seed)
+void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
 {
-    const int w = 900;
-    const int h = 500;
-
     gameMap.create(w, h);
 
     std::ranlux24_base rng(seed++);

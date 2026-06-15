@@ -12,7 +12,6 @@ note: recipes only visible when near crafting station
 11. add chests
 12. add guns and bullets
 13. make enemy spawner better and actually spawn stuff around you
-14. fix full screen bug
 17. show pieces when eye of cthulhu dies
 19. add platform and its logic to go up and down
 
@@ -25,6 +24,7 @@ note: recipes only visible when near crafting station
 8.  update weapon animations based on if its sword or spear or dagger - done
 9.  add bows, arrows where arrows are projectiles - done
 10. make throwables - add shuriken and maybe dagger to throwable - done
+14. fix full screen bug - done
 15. make hp bar go from green, orange, red (done with tint) - done
 16. make slime & zombie hurt player with frame enter and exit, do same for projectile - done
 18. add phase transition - done
