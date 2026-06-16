@@ -11,6 +11,8 @@
 #include <crafting.h>
 
 #include <shake.h>
+#include <lighting.h>
+
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>
 #include <entities/enemies/slime.h>
@@ -522,62 +524,62 @@ Recipes::CraftingStation Gameplay::getNearbyStation(Vector2 playerPos)
 
 #pragma region light helpers
 
-void Gameplay::addLight(int worldX, int worldY, float radius, float intensity, bool isTorch)
-{
-	// visible lightmap range
-	int lightW = (int)lightMap.size();
-	int lightH = (int)lightMap[0].size();
-
-	for (int dy = -(int)radius; dy <= (int)radius; dy++)
-	{
-		for (int dx = -(int)radius; dx <= (int)radius; dx++)
-		{
-			float distSq = (float)(dx * dx + dy * dy);
-			float radiusSq = radius * radius;
-
-			if (distSq > radiusSq)
-				continue;
-
-			// convert world -> local lightmap coords
-			int lx = worldX + dx;
-			int ly = worldY + dy;
-
-			if (lx < 0 || ly < 0 || lx >= lightW || ly >= lightH)
-				continue;
-
-			// smooth falloff
-			float t = 1.0f - (sqrtf(distSq) / (float)radius);
-
-			// gamma curve (VERY IMPORTANT)
-			t = powf(t, 2.f);
-
-			// convert to light value
-			float lightValue = t * intensity;
-
-			// optional wall attenuation
-			if (!isTorch)
-			{
-				auto* b = gameMap.getBlockSafe(
-					lx,
-					ly - 2
-				);
-
-				auto* bDef = getItem(b->type);
-
-				if (b && bDef && bDef->block.isCollidable()
-				)
-				{
-					lightValue *= 0.3f;
-				}
-			}
-
-			lightValue = Clamp(lightValue, 0.0f, 1.0f);
-
-			// keep brightest light
-			lightMap[lx][ly] = std::max(lightMap[lx][ly], lightValue);
-		}
-	}
-}
+//void Gameplay::addLight(int worldX, int worldY, float radius, float intensity, bool isTorch)
+//{
+//	// visible lightmap range
+//	int lightW = (int)lightMap.size();
+//	int lightH = (int)lightMap[0].size();
+//
+//	for (int dy = -(int)radius; dy <= (int)radius; dy++)
+//	{
+//		for (int dx = -(int)radius; dx <= (int)radius; dx++)
+//		{
+//			float distSq = (float)(dx * dx + dy * dy);
+//			float radiusSq = radius * radius;
+//
+//			if (distSq > radiusSq)
+//				continue;
+//
+//			// convert world -> local lightmap coords
+//			int lx = worldX + dx;
+//			int ly = worldY + dy;
+//
+//			if (lx < 0 || ly < 0 || lx >= lightW || ly >= lightH)
+//				continue;
+//
+//			// smooth falloff
+//			float t = 1.0f - (sqrtf(distSq) / (float)radius);
+//
+//			// gamma curve (VERY IMPORTANT)
+//			t = powf(t, 2.f);
+//
+//			// convert to light value
+//			float lightValue = t * intensity;
+//
+//			// optional wall attenuation
+//			if (!isTorch)
+//			{
+//				auto* b = gameMap.getBlockSafe(
+//					lx,
+//					ly - 2
+//				);
+//
+//				auto* bDef = getItem(b->type);
+//
+//				if (b && bDef && bDef->block.isCollidable()
+//				)
+//				{
+//					lightValue *= 0.3f;
+//				}
+//			}
+//
+//			lightValue = Clamp(lightValue, 0.0f, 1.0f);
+//
+//			// keep brightest light
+//			lightMap[lx][ly] = std::max(lightMap[lx][ly], lightValue);
+//		}
+//	}
+//}
 
 //void Gameplay::floodFillLight(int x, int y, int offsetX, int offsetY, int value, bool isTorch)
 //{
@@ -619,11 +621,16 @@ bool Gameplay::init()
 {
 	double loadStart = GetTime();
 
+	// items init
 	registerItems();
 
+	// map init
 	const int w = 900, h = 500;
 	backgroundMap.create(w, h);
 	generateWorld(gameMap, w, h);
+
+	// lighting init
+	initLight(gameMap);
 
 	// cam init
 	camera.target = { 20, 120 };
@@ -635,9 +642,6 @@ bool Gameplay::init()
 
 	// player spawn
 	player.teleport({ 20, 60 });
-
-	//player.physics.transform.w = 0.9f;
-	//player.physics.transform.h = 1.8f;
 
 	// Use a RenderTexture to capture the scene
 	sceneTexture =        LoadRenderTexture(screenW, screenH);
@@ -1203,109 +1207,110 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
+	// below 3 commented out for now
 #pragma region add light sources
 
 	// player light
-	{
-		int localX = (int)player.getPosition().x - startXView;
-		int localY = (int)player.getPosition().y - startYView;
+	//{
+	//	int localX = (int)player.getPosition().x - startXView;
+	//	int localY = (int)player.getPosition().y - startYView;
 
-		addLight(
-			localX,
-			localY,
-			10.f,
-			1.f
-		);
-	}
+	//	addLight(
+	//		localX,
+	//		localY,
+	//		10.f,
+	//		1.f
+	//	);
+	//}
 
 
 	// torch light example
-	{
-		int torchX = 29;
-		int torchY = 59;
+	//{
+	//	int torchX = 29;
+	//	int torchY = 59;
 
-		float intensity = 0.92f + sinf(::GetTime() * 23.0f) * 0.10f + sinf(::GetTime() * 37.0f) * 0.05f;
+	//	float intensity = 0.92f + sinf(::GetTime() * 23.0f) * 0.10f + sinf(::GetTime() * 37.0f) * 0.05f;
 
-		addLight(
-			torchX - startXView,
-			torchY - startYView,
-			8.f,
-			intensity,
-			true
-		);
-	}
+	//	addLight(
+	//		torchX - startXView,
+	//		torchY - startYView,
+	//		8.f,
+	//		intensity,
+	//		true
+	//	);
+	//}
 
 #pragma endregion
 
 
 #pragma region build lightmask texture
 
-	BeginTextureMode(lightMask);
-	
-	unsigned char ambientByte = (unsigned char)(0.08f * 255.f);
+	//BeginTextureMode(lightMask);
+	//
+	//unsigned char ambientByte = (unsigned char)(0.08f * 255.f);
 
-	ClearBackground(Color{
-		ambientByte,
-		ambientByte,
-		ambientByte,
-		255
-	});
+	//ClearBackground(Color{
+	//	ambientByte,
+	//	ambientByte,
+	//	ambientByte,
+	//	255
+	//});
 
-	BeginMode2D(camera);
+	//BeginMode2D(camera);
 
-	for (int x = startXView; x <= endXView; x++)
-	{
-		for (int y = startYView; y <= endYView; y++)
-		{
-			float light = lightMap[x - startXView][y - startYView];
+	//for (int x = startXView; x <= endXView; x++)
+	//{
+	//	for (int y = startYView; y <= endYView; y++)
+	//	{
+	//		float light = lightMap[x - startXView][y - startYView];
 
-			float ambient = 0.08f;
+	//		float ambient = 0.08f;
 
-			float t = ambient + light * (1.0f - ambient);
+	//		float t = ambient + light * (1.0f - ambient);
 
-			t = Clamp(t, 0.0f, 1.0f);
+	//		t = Clamp(t, 0.0f, 1.0f);
 
-			unsigned char c = (unsigned char)(t * 255.0f);
+	//		unsigned char c = (unsigned char)(t * 255.0f);
 
-			DrawRectangle(
-				x,
-				y,
-				1,
-				1,
-				Color{ c, c, c, 255 }
-			);
-		}
-	}
+	//		DrawRectangle(
+	//			x,
+	//			y,
+	//			1,
+	//			1,
+	//			Color{ c, c, c, 255 }
+	//		);
+	//	}
+	//}
 
-	EndMode2D();
-	EndTextureMode();
+	//EndMode2D();
+	//EndTextureMode();
 
 #pragma endregion
 
 
 #pragma region add blur pass
 
-	BeginTextureMode(blurredLightTexture);
+	//BeginTextureMode(blurredLightTexture);
 
-	BeginShaderMode(assetManager.blurShader);
+	//BeginShaderMode(assetManager.blurShader);
 
-	ClearBackground(BLACK);
+	//ClearBackground(BLACK);
 
-	DrawTextureRec(
-		lightMask.texture,
-		{
-			0,
-			0,
-			(float)lightMask.texture.width,
-			-(float)lightMask.texture.height
-		},
-		{ 0,0 },
-		WHITE
-	);
+	//DrawTextureRec(
+	//	lightMask.texture,
+	//	{
+	//		0,
+	//		0,
+	//		(float)lightMask.texture.width,
+	//		-(float)lightMask.texture.height
+	//	},
+	//	{ 0,0 },
+	//	WHITE
+	//);
 
-	EndShaderMode();
+	//EndShaderMode();
 
-	EndTextureMode();
+	//EndTextureMode();
 
 #pragma endregion
 	
@@ -1350,7 +1355,6 @@ bool Gameplay::update(AssetManager& assetManager)
 
 			auto& b = gameMap.getBlockUnsafe(x, y);
 
-
 			if (b.type != Items::air)
 			{
 				atlasX = b.type;
@@ -1365,13 +1369,22 @@ bool Gameplay::update(AssetManager& assetManager)
 				float drawX = posX + shake.x;
 				float drawY = posY + shake.y;
 
+				float l = b.light / 255.0f;
+
+				Color tint = {
+					(uint8_t)(255 * l),
+					(uint8_t)(255 * l),
+					(uint8_t)(255 * l),
+					255
+				};
+
 				DrawTexturePro(
 					assetManager.textures,
 					getTextureAtlas(atlasX, b.variation, 32, 32), //source (in sprite)
 					{ drawX,drawY,size,size }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
-					Color{ 255,255,255,255 }
+					tint
 				);
 			}
 		}

@@ -93,6 +93,7 @@ void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
 {
 	const BlockData& block = item.block;
 	spawnBlock(mouseWorldPos, entity->getPosition(), (int)block.type);
+	// recalculate light here
 }
 
 // it is being used in gameplay.cpp (inventory)

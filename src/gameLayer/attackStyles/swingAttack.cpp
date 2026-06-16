@@ -12,6 +12,7 @@
 #include "../entities/droppedItem.h"
 #include "../combat/combatSystem.h"
 #include "../entities/enemies/enemy.h"
+#include <lighting.h>
 
 void SwingAttack::render(AssetManager& assetManager)
 {
@@ -216,14 +217,12 @@ void SwingAttack::onHitEnemy(Enemy* enemy)
 
 void SwingAttack::onHitBlock(int power, Vector2i blockPos, Block& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
-	printf("before hp: %d\n", b.hp);
 	auto brokenType = b.type;
 	if (damageBlock(power, blockPos, b, particles, rng))
 	{
-		destroyBlock(blockPos, b, entityHolder);
+		destroyBlock(blockPos, b, gameMap, entityHolder);
 	}
 	lifetime = 0;
-	printf("after hp: %d\n", b.hp);
 	return;
 }
 
@@ -237,7 +236,7 @@ void SwingAttack::onHitTree(Vector2i blockPos, GameMap& gameMap, EntityHolder& e
 		{
 			auto* tb = gameMap.getBlockSafe(block.x, block.y);
 			if (!tb) continue;
-			destroyBlock(block, *tb, entityHolder);
+			destroyBlock(block, *tb, gameMap, entityHolder);
 		}
 	}
 }
@@ -259,15 +258,22 @@ bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, Block& block,
 		false
 	);
 
-	block.hp -= power;
+	int newHp = (int)block.hp - power;
 
-	return block.hp <= 0;
+	if (newHp <= 0)
+		return true;
+
+	block.hp = uint16_t(newHp);
+	return false;
 }
 
-void SwingAttack::destroyBlock(const Vector2i& blockPos, Block& block, EntityHolder& entityHolder)
+void SwingAttack::destroyBlock(const Vector2i& blockPos, Block& block, GameMap& gameMap, EntityHolder& entityHolder)
 {
 	if (block.type == Items::air)
 		return;
+
+	// store light BEFORE modifying block
+	uint8_t oldLight = block.light;
 
 	// drop item
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
@@ -281,4 +287,5 @@ void SwingAttack::destroyBlock(const Vector2i& blockPos, Block& block, EntityHol
 	entityHolder.droppedItems.push_back(itemPtr);
 
 	block = {};
+	recalculateLight(gameMap, blockPos.x, blockPos.y, oldLight);
 }
