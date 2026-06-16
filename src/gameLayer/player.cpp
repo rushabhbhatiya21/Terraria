@@ -119,6 +119,7 @@ void Player::updateMovement(float deltaTime)
 {
 	float inputX = 0.f;
 	bool moving = false;
+	bool droppedThrough = false;
 
 	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
 	{
@@ -132,12 +133,21 @@ void Player::updateMovement(float deltaTime)
 		moving = true;
 		animations.movingLeft = false;
 	}
+	if ((IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) && IsKeyPressed(KEY_SPACE) && physics.standingOnPlatform)
+	{
+		printf("down jump pressed\n");
+		physics.dropThroughTimer = 0.2f;
+		droppedThrough = true;
+	}
 
-	physics.updateJump(
-		deltaTime,
-		IsKeyDown(KEY_SPACE),
-		IsKeyPressed(KEY_SPACE)
-	);
+	if (!droppedThrough)
+	{
+		physics.updateJump(
+			deltaTime,
+			IsKeyDown(KEY_SPACE),
+			IsKeyPressed(KEY_SPACE)
+		);
+	}
 
 	physics.applyGravity();
 	physics.applyHorizontalMovement(deltaTime, inputX);

@@ -26,7 +26,6 @@ struct Player : public Entity
 		return physics.getPosition();
 	}
 
-
 	void render(AssetManager& assetManager) override;
 
 	void drawSprite(AssetManager& assetManager);

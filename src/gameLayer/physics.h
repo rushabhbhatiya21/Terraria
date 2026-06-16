@@ -166,6 +166,9 @@ struct PhysicalEntity
 	bool downTouch = 0;
 	bool leftTouch = 0;
 	bool rightTouch = 0;
+	bool standingOnPlatform = 0;
+
+	float dropThroughTimer = 0.f;
 
 	// ── Jump state ───────────────────────────────────────────────────────────
 	// All tunable constants are here at the top — tweak to taste.
@@ -205,6 +208,11 @@ struct PhysicalEntity
 	float jumpBufferTimer = 0.f;   // counts down after pressing jump in air
 
 	// ── Core physics ─────────────────────────────────────────────────────────
+	bool isIgnoringPlatforms() const
+	{
+		return dropThroughTimer > 0.f;
+	}
+
 	void teleport(Vector2 pos)
 	{
 		transform.pos = pos;
@@ -389,6 +397,8 @@ struct PhysicalEntity
 	}
 
 	// functions to resolve collisions
+	void updatePhysicsTimers(float deltaTime);
+
 	void resolveConstrains(GameMap& mapData);
 
 	void checkCollisionOnce(GameMap& mapData, Vector2& pos);

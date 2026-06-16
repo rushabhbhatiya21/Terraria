@@ -3,12 +3,22 @@
 #include <gameMap.h>
 #include "items/item.h"
 
+void PhysicalEntity::updatePhysicsTimers(float deltaTime)
+{
+	dropThroughTimer -= deltaTime;
+
+	if (dropThroughTimer < 0.f)
+		dropThroughTimer = 0.f;
+}
+
+
 void PhysicalEntity::resolveConstrains(GameMap& mapData) 
 {
 	upTouch = false;
 	downTouch = false;
 	leftTouch = false;
 	rightTouch = false;
+	standingOnPlatform = false;
 
 	Vector2& pos = transform.pos;
 
@@ -95,10 +105,44 @@ Vector2 PhysicalEntity::performCollisionsOnOneAxis(GameMap& mapData, Vector2 pos
 	{
 		for (int x = minX; x < maxX; x++)
 		{
-			auto& block = mapData.getBlockUnsafe(x, y);
-			auto* item = getItem(block.type);
-			if (!item) continue;
-			if (item->block.isCollidable())
+			bool isPlatform = mapData.getBlockUnsafe(x, y).isPlatform();
+			bool isCollidable = mapData.getBlockUnsafe(x, y).isCollidable();
+
+			if (isPlatform)
+			{
+				if (isIgnoringPlatforms())
+					continue;
+
+				if (delta.x != 0)
+					continue;
+
+				if (delta.y > 0) // moving downward
+				{
+					float oldBottom = lastPosition.y + transform.h / 2.f;
+					float newBottom = pos.y + transform.h / 2.f;
+
+					float platformTop = (float)y;
+
+					float entityLeft = pos.x - transform.w / 2.f;
+					float entityRight = pos.x + transform.w / 2.f;
+
+					float blockLeft = (float)x;
+					float blockRight = (float)x + 1.f;
+
+					bool overlapsX = entityRight > blockLeft && entityLeft < blockRight;
+
+					if (overlapsX && oldBottom <= platformTop && newBottom >= platformTop) // platform crossed
+					{
+						standingOnPlatform = true;
+						downTouch = true;
+						pos.y = platformTop - transform.h / 2.f;
+						return pos;
+					}
+				}
+				continue;
+			}
+
+			else if (isCollidable)
 			{
 				Transform2D entity;
 				entity.pos = pos;

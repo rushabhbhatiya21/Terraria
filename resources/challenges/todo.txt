@@ -13,7 +13,7 @@ note: recipes only visible when near crafting station
 12. add guns and bullets
 13. make enemy spawner better and actually spawn stuff around you
 17. show pieces when eye of cthulhu dies
-19. add platform and its logic to go up and down
+20. add hammer logic to make slopes for stairs
 
 
 2.  add all stats to weapons - done
@@ -28,6 +28,7 @@ note: recipes only visible when near crafting station
 15. make hp bar go from green, orange, red (done with tint) - done
 16. make slime & zombie hurt player with frame enter and exit, do same for projectile - done
 18. add phase transition - done
+19. add platform and its logic to go up and down - done
 
 - bug with drag and drop - if left click instead of drag and drop causes weird bugs - done
 - have weapons and armor have actual stats that we implemented, so equipping them boost stats (2) - done

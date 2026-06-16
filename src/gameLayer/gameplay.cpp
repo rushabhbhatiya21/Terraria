@@ -669,6 +669,7 @@ bool Gameplay::init()
 	player.inventory.storeItem(ItemStack{ Items::shuriken, 100 });
 	player.inventory.storeItem(ItemStack{ Items::woodenBow, 1 });
 	player.inventory.storeItem(ItemStack{ Items::woodenArrow, 100 });
+	player.inventory.storeItem(ItemStack{ Items::platform, 100 });
 	//player.inventory.storeItem(ItemStack{ Items::furnace, 1 });
 	//player.inventory.storeItem(ItemStack{ Items::workBench, 1 });
 	//player.inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
@@ -794,6 +795,7 @@ bool Gameplay::update(AssetManager& assetManager)
 			entity.physics.updateForces(deltaTime);
 			if (shouldResolveConstraints) { entity.physics.resolveConstrains(gameMap); }
 			entity.physics.updateFinal();
+			entity.physics.updatePhysicsTimers(deltaTime);
 		};
 
 	updateEntityPhysics(player, player.shouldApplyGravity); // gravity = false for player
@@ -1040,18 +1042,6 @@ bool Gameplay::update(AssetManager& assetManager)
 					worldPos
 				);
 			}
-		}
-
-		//auto& block = gameMap.getBlockUnsafe((int)worldPos.x, (int)worldPos.y);
-
-		//if (block.type == Items::dirt)
-		//{
-		//	std::cout << (int)block.collision << "\n";
-		//}
-
-		if ((IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) && IsKeyPressed(KEY_SPACE))
-		{
-			printf("down jump pressed\n");
 		}
 	}
 
