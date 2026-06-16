@@ -44,7 +44,8 @@ void updateBlock(GameMap& gameMap, Inventory& inventory)
 			// check inventory to see if we have same type of item and have more than 0
 			if (block.type == i.itemId && i.count > 0)
 			{
-				b->type = i.itemId;
+				//b->type = i.itemId;
+				*b = initBlock(i.itemId);
 				i.count -= 1;
 
 				block.used = true;

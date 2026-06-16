@@ -16,22 +16,32 @@
 
 struct BlockRepresentation1
 {
-	std::uint16_t type = 0;
+	std::uint16_t type = Items::air;
+	std::uint8_t light = 0;
+
+	std::uint16_t hp = 0;
+	std::uint8_t variation = NO_VARIATION;
 
 	Block toBlock() const
 	{
 		Block b;
 		b.type = type;
+		b.hp = hp;
+		b.light = light;
+		b.variation = variation;
 		return b;
 	}
 };
 
-const int VERSION = 1;
+const int VERSION = 2;
 
 BlockRepresentation1 toBlockRepresentation(Block b)
 {
 	BlockRepresentation1 rez;
 	rez.type = b.type;
+	rez.hp = b.hp;
+	rez.light = b.light;
+	rez.variation = b.variation;
 	return rez;
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <asserts.h>
 #include <items/item.h>
 
 static constexpr std::uint8_t NO_VARIATION = 255;
@@ -40,4 +41,29 @@ struct Block
         auto* def = getItemDefinition();
         return def && def->block.collision == CollisionType::PLATFORM;
     }
+
+    void clear()
+    {
+        type = Items::air;
+        hp = 0;
+        light = 0;
+    }
 };
+
+inline Block initBlock(ItemId type)
+{
+    Block b;
+    b.type = type;
+
+    auto* def = getItem(type);
+
+    permaAssertComment(
+        def,
+        "Missing item definition in initBlock()"
+    );
+
+    b.hp = def->block.hp;
+    b.light = 0;
+
+    return b;
+}

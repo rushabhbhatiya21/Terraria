@@ -216,12 +216,14 @@ void SwingAttack::onHitEnemy(Enemy* enemy)
 
 void SwingAttack::onHitBlock(int power, Vector2i blockPos, Block& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
+	printf("before hp: %d\n", b.hp);
 	auto brokenType = b.type;
 	if (damageBlock(power, blockPos, b, particles, rng))
 	{
 		destroyBlock(blockPos, b, entityHolder);
 	}
 	lifetime = 0;
+	printf("after hp: %d\n", b.hp);
 	return;
 }
 

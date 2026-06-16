@@ -619,10 +619,11 @@ bool Gameplay::init()
 {
 	double loadStart = GetTime();
 
+	registerItems();
+
 	const int w = 900, h = 500;
 	backgroundMap.create(w, h);
 	generateWorld(gameMap, w, h);
-	registerItems();
 
 	// cam init
 	camera.target = { 20, 120 };
@@ -670,6 +671,8 @@ bool Gameplay::init()
 	player.inventory.storeItem(ItemStack{ Items::woodenBow, 1 });
 	player.inventory.storeItem(ItemStack{ Items::woodenArrow, 100 });
 	player.inventory.storeItem(ItemStack{ Items::platform, 100 });
+	player.inventory.storeItem(ItemStack{ Items::woodLog, 100 });
+	player.inventory.storeItem(ItemStack{ Items::leaves, 100 });
 	//player.inventory.storeItem(ItemStack{ Items::furnace, 1 });
 	//player.inventory.storeItem(ItemStack{ Items::workBench, 1 });
 	//player.inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
@@ -1715,7 +1718,7 @@ bool Gameplay::update(AssetManager& assetManager)
 	for (int i = 0; i < sizeof(hotbarKeys) / sizeof(hotbarKeys[0]); i++)
 	{
 
-		if (IsKeyPressed(hotbarKeys[i]))
+		if (!showImgui && IsKeyPressed(hotbarKeys[i]))
 		{
 			// hotbar is selected while player using something, store it to pending and wait for usetimer to run out
 			if (player.useTimer > 0)

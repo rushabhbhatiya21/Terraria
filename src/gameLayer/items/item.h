@@ -154,8 +154,9 @@ struct BlockData
 {
     ItemId             type = Items::air;
     int                  hp = 0;
-    int            bestTool = 0;
+    int       lightEmission = 0;
     int           variation = -1;
+    ItemId         bestTool = 0;
     CollisionType collision = CollisionType::NONE;
     ProjectileCollisionType projectileCollision = ProjectileCollisionType::NONE;
 
@@ -308,7 +309,7 @@ struct ItemDefinition
     }
 
     static ItemDefinition makeBlock(const char* name, ItemId type, CollisionType collision, ProjectileCollisionType projectileCollision,
-        int hp, int bestTool, int maxStack, int useTime)
+        int hp, ItemId bestTool, int maxStack, int useTime)
     {
         ItemDefinition d;
         d.displayName = name;

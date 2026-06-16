@@ -1,6 +1,7 @@
 #pragma once
+#include <cstdint>
 
-using ItemId = int;
+using ItemId = uint16_t;
 
 namespace Items
 {
