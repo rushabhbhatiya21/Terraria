@@ -1,9 +1,10 @@
 #pragma once
 #include <vector>
+#include <raylib.h>
+
 #include <items/blocks.h>
 
-#include <gameMap.h>
-#include <raylib.h>
+struct GameMap;
 
 struct Structure
 {

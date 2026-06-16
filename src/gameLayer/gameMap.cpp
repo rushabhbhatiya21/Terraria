@@ -1,6 +1,8 @@
 #pragma once
 #include <asserts.h>
 #include <gameMap.h>
+#include <items/item.h>
+
 
 void GameMap::create(const int w, const int h)
 {
@@ -13,7 +15,7 @@ void GameMap::create(const int w, const int h)
 	for (auto& e : mapData) { e = {}; }
 }
 
-BlockData& GameMap::getBlockUnsafe(int x, int y)
+Block& GameMap::getBlockUnsafe(int x, int y)
 {
 	permaAssertCommentDevelopement(mapData.size() == w * h, "MapData variable not initialized");
 
@@ -22,7 +24,7 @@ BlockData& GameMap::getBlockUnsafe(int x, int y)
 	return mapData[x + y * w];
 }
 
-BlockData* GameMap::getBlockSafe(int x, int y)
+Block* GameMap::getBlockSafe(int x, int y)
 {
 	permaAssertCommentDevelopement(mapData.size() == w * h, "MapData variable not initialized");
 

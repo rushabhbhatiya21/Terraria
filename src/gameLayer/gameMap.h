@@ -1,18 +1,18 @@
 #pragma once
 #include <vector>
-#include <items/item.h>
+#include <items/blocks.h>
 
 struct GameMap
 {
 	int w = 0;
 	int h = 0;
 
-	std::vector<BlockData> mapData = {};
+	std::vector<Block> mapData = {};
 
 	void create(const int w, const int h);
 
-	BlockData& getBlockUnsafe(int x, int y);
-	BlockData* getBlockSafe(int x, int y);
+	Block& getBlockUnsafe(int x, int y);
+	Block* getBlockSafe(int x, int y);
 	bool isAdjacentBlock(int x, int y);
 
 	int desertStart = 0;

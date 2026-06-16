@@ -57,11 +57,11 @@ void spawnEnemy
 			auto* ground = gameMap.getBlockSafe(x, y);
 			auto* air = gameMap.getBlockSafe(x, y - 1);
 
+			auto* groundDef = getItem(ground->type);
+			auto* airDef = getItem(air->type);
+
 			// standing position
-			if (ground &&
-				//ground->isCollidable() &&
-				air 
-				// && !air->isCollidable()
+			if (ground && groundDef && groundDef->block.isCollidable() && air  && airDef && !airDef->block.isCollidable()
 			)
 			{
 				int leftCount = 0;
@@ -73,10 +73,10 @@ void spawnEnemy
 					auto* g = gameMap.getBlockSafe(x - i, y);
 					auto* a = gameMap.getBlockSafe(x - i, y - 1);
 
-					if (g && 
-						//g->isCollidable() &&
-						a 
-						// && !a->isCollidable()
+					auto* gDef = getItem(ground->type);
+					auto* aDef = getItem(air->type);
+
+					if (g && gDef && gDef->block.isCollidable() && a && aDef && !aDef->block.isCollidable()
 					)
 					{
 						leftCount++;
@@ -93,10 +93,10 @@ void spawnEnemy
 					auto* g = gameMap.getBlockSafe(x + i, y);
 					auto* a = gameMap.getBlockSafe(x + i, y - 1);
 
-					if (g &&
-						//g->isCollidable() &&
-						a 
-						// && !a->isCollidable()
+					auto* gDef = getItem(ground->type);
+					auto* aDef = getItem(air->type);
+
+					if (g && gDef && gDef->block.isCollidable() && a && aDef && !aDef->block.isCollidable()
 					)
 					{
 						rightCount++;
@@ -111,7 +111,7 @@ void spawnEnemy
 
 				if (totalSpace >= requiredTiles)
 				{
-					printf("enemy spawn at {x, y}: {%d, %d}\n", x, y - 1);
+					//printf("enemy spawn at {x, y}: {%d, %d}\n", x, y - 1);
 
 					auto id = entityHolder.idHolder.getEntityIdAndIncreament();
 					auto slime = std::make_unique<Slime>();

@@ -62,10 +62,10 @@ struct SwingAttack
 	bool checkForHits(Enemy& enemy) const;
 
 	void onHitEnemy(Enemy* enemy);
-	void onHitBlock(int power, Vector2i blockPos, BlockData& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng);
+	void onHitBlock(int power, Vector2i blockPos, Block& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng);
 	void onHitTree(Vector2i blockPos, GameMap& gameMap, EntityHolder& entityHolder);
-	bool damageBlock(int power, const Vector2i& blockPos, BlockData& block, std::vector<Particle>& particles, std::ranlux24_base& rng);
-	void destroyBlock(const Vector2i& blockPos, BlockData& block, EntityHolder& entityHolder);
+	bool damageBlock(int power, const Vector2i& blockPos, Block& block, std::vector<Particle>& particles, std::ranlux24_base& rng);
+	void destroyBlock(const Vector2i& blockPos, Block& block, EntityHolder& entityHolder);
 };
 
 //extern std::vector<Swing> swings;

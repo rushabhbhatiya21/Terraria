@@ -2,9 +2,9 @@
 
 #include "worldGenerator.h"
 #include "randomStuff.h"
+#include "items/blocks.h"
 #include <structure.h>
 #include <saveMap.h>
-#include "items/blockData.h" // initBlock, TOOL_* constants
 
 void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
 {
@@ -164,14 +164,14 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
         int surfaceRow = dirtHeight; // grassBlock / sand row
         surfaceY[x] = surfaceRow;
 
-        int dirtType = inDesert ? Block::sand : Block::dirt;
-        int grassType = inDesert ? Block::sand : Block::grassBlock;
-        int stoneType = inDesert ? Block::sandStone : Block::stone;
+        int dirtType = inDesert ? Items::sand : Items::dirt;
+        int grassType = inDesert ? Items::sand : Items::grassBlock;
+        int stoneType = inDesert ? Items::sandStone : Items::stone;
 
         for (int y = 0; y < h; y++)
         {
             Block b;
-            b.type = Block::air;
+            b.type = Items::air;
 
             // ── Base terrain ─────────────────────────────────────────────────
             if (y > surfaceRow)    b.type = dirtType;
@@ -186,15 +186,15 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
                 int   distFromMid = std::abs(x - desertMid);
                 float desertDist = 1.f - distFromMid / float(desertHalfWidth);
                 int   triStoneY = (10 + stoneHeight) + int(desertDist * (20 + stoneHeight));
-                if (y > triStoneY) b.type = Block::stone;
+                if (y > triStoneY) b.type = Items::stone;
             }
 
             // ── Caves (noise threshold) ──────────────────────────────────────
             if (getCaveNoise(x, y) < 0.30f)
-                b.type = Block::air;
+                b.type = Items::air;
 
             // ── Ore veins (only in solid stone or sandStone) ─────────────────
-            if (b.type == Block::stone || b.type == Block::sandStone)
+            if (b.type == Items::stone || b.type == Items::sandStone)
             {
                 int depth = y - stoneHeight; // 0 at stone surface, grows down
 
@@ -203,7 +203,7 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
                 {
                     float thresh = 0.72f - depth * 0.0008f; // slightly rarer deeper
                     if (getOreNoise(x, y) > thresh)
-                        b.type = Block::copper;
+                        b.type = Items::copper;
                 }
 
                 // Iron — mid depth (depth 40–160), ore2Noise blob
@@ -211,7 +211,7 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
                 {
                     float thresh = 0.74f;
                     if (getOre2Noise(x, y) > thresh)
-                        b.type = Block::iron;
+                        b.type = Items::iron;
                 }
 
                 // Gold — deep (depth 100–250), oreNoise (different range)
@@ -219,7 +219,7 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
                 {
                     float thresh = 0.77f;
                     if (getOreNoise(x, y) > thresh)
-                        b.type = Block::gold;
+                        b.type = Items::gold;
                 }
 
                 // Ruby — very deep (depth 190+), ore2Noise
@@ -227,7 +227,7 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
                 {
                     float thresh = 0.79f;
                     if (getOre2Noise(x, y) > thresh)
-                        b.type = inDesert ? Block::sandRuby : Block::rubyBlock;
+                        b.type = inDesert ? Items::sandRuby : Items::rubyBlock;
                 }
 
                 // BlueRuby — deepest (depth 230+), oreNoise
@@ -235,24 +235,23 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
                 {
                     float thresh = 0.81f;
                     if (getOreNoise(x, y) > thresh)
-                        b.type = inDesert ? Block::snowBlueRuby : Block::blueRubyBlock;
+                        b.type = inDesert ? Items::snowBlueRuby : Items::blueRubyBlock;
                 }
             }
 
             // ── Clay pockets — near dirt/stone boundary ──────────────────────
             // Appears in the dirt layer within ~15 blocks above stone
-            if (b.type == Block::dirt)
+            if (b.type == Items::dirt)
             {
                 int distToStone = stoneHeight - y;
                 if (distToStone >= 0 && distToStone < 15)
                 {
                     float thresh = 0.68f + distToStone * 0.01f; // rarer further from stone
                     if (getDetailNoise(x, y) > thresh)
-                        b.type = Block::clay;
+                        b.type = Items::clay;
                 }
             }
 
-            initBlock(b);
             gameMap.getBlockUnsafe(x, y) = b;
         }
     }
@@ -288,7 +287,7 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
                     if (float(ox * ox + oy * oy) <= radius * radius)
                     {
                         auto b = gameMap.getBlockSafe(int(x) + ox, int(y) + oy);
-                        if (b) b->type = Block::air;
+                        if (b) b->type = Items::air;
                     }
                 }
             }
@@ -322,21 +321,21 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
         for (int y = 1; y < h - 1; y++)
         {
             auto& b = gameMap.getBlockUnsafe(x, y);
-            if (b.type != Block::air) continue;
+            if (b.type != Items::air) continue;
             if (y < surfaceY[x] - 1)  continue; // above ground — no wall
 
             // Check if any neighbour is solid (cave interior check)
             bool hasSolidNeighbour =
-                gameMap.getBlockUnsafe(x - 1, y).type != Block::air ||
-                gameMap.getBlockUnsafe(x + 1, y).type != Block::air ||
-                gameMap.getBlockUnsafe(x, y - 1).type != Block::air ||
-                gameMap.getBlockUnsafe(x, y + 1).type != Block::air;
+                gameMap.getBlockUnsafe(x - 1, y).type != Items::air ||
+                gameMap.getBlockUnsafe(x + 1, y).type != Items::air ||
+                gameMap.getBlockUnsafe(x, y - 1).type != Items::air ||
+                gameMap.getBlockUnsafe(x, y + 1).type != Items::air;
 
             if (!hasSolidNeighbour) continue;
 
             // Decide wall type by depth
             int depthBelowSurface = y - surfaceY[x];
-            int wallType = (depthBelowSurface < 30) ? Block::dirtWall : Block::stoneWall;
+            int wallType = (depthBelowSurface < 30) ? Items::dirtWall : Items::stoneWall;
 
             // Place into wall layer — adjust to your GameMap API:
             // gameMap.getWallUnsafe(x, y).type = wallType;
@@ -356,9 +355,9 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
         for (int y = 0; y < h; y++)
         {
             auto type = gameMap.getBlockUnsafe(x, y).type;
-            if (type == Block::air) continue;
+            if (type == Items::air) continue;
 
-            if (type == Block::grassBlock)
+            if (type == Items::grassBlock)
             {
                 Vector2 spawnPos{ float(x) - treeStructure.w / 2.f, float(y) - treeStructure.h };
                 treeStructure.pasteIntoMap(gameMap, spawnPos);
@@ -382,30 +381,27 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
         auto& surface = gameMap.getBlockUnsafe(x, sy);
         auto& above = gameMap.getBlockUnsafe(x, sy - 1);
 
-        if (surface.type != Block::grassBlock) continue;
-        if (above.type != Block::air)        continue;
+        if (surface.type != Items::grassBlock) continue;
+        if (above.type != Items::air)        continue;
 
         float roll = getRandomFloat(rng, 0.f, 1.f);
 
         if (roll < 0.18f)
         {
             // ── Grass plant ───────────────────────────────────────────────────
-            above.type = Block::grass;
-            initBlock(above);
+            above.type = Items::grass;
         }
         else if (roll < 0.18f + 0.04f)
         {
             // ── Sapling ───────────────────────────────────────────────────────
-            above.type = Block::sappling;
-            initBlock(above);
+            above.type = Items::sappling;
         }
         else if (roll < 0.18f + 0.04f + 0.03f)
         {
             // ── Mushroom (jar block repurposed as mushroom cap, 1 tall) ───────
-            // Using Block::jar as a small mushroom — swap to a dedicated block
+            // Using Items::jar as a small mushroom — swap to a dedicated block
             // once you have one.  Two variants: stone = brown, glass = red cap.
-            above.type = getRandomChance(rng, 0.6f) ? Block::jar : Block::glass;
-            initBlock(above);
+            above.type = getRandomChance(rng, 0.6f) ? Items::jar : Items::glass;
         }
         else if (roll < 0.18f + 0.04f + 0.03f + 0.025f)
         {
@@ -413,7 +409,7 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
             // Rocks = small stone or stoneBricks lumps on the surface.
             int rockWidth = getRandomInt(rng, 1, 3);
             int rockHeight = getRandomInt(rng, 1, 2);
-            int rockType = getRandomChance(rng, 0.7f) ? Block::stone : Block::stoneBricks;
+            int rockType = getRandomChance(rng, 0.7f) ? Items::stone : Items::stoneBricks;
 
             int startX = x - rockWidth / 2;
             for (int rx = 0; rx < rockWidth; rx++)
@@ -421,10 +417,9 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
                 for (int ry = 0; ry < rockHeight; ry++)
                 {
                     auto b = gameMap.getBlockSafe(startX + rx, sy - 1 - ry);
-                    if (b && b->type == Block::air)
+                    if (b && b->type == Items::air)
                     {
                         b->type = rockType;
-                        initBlock(*b);
                     }
                 }
             }

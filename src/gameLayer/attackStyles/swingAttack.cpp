@@ -159,10 +159,9 @@ void SwingAttack::updateSwings(float deltaTime, GameMap& gameMap, EntityHolder& 
 	};
 
 	auto* b = gameMap.getBlockSafe(blockPos.x, blockPos.y);
+	auto* bDef = getItem(b->type);
 
-	if (!b 
-		//|| !b->isCollidable()
-		) return;
+	if (!b || !bDef || !bDef->block.isCollidable()) return;
 
 	float dist = Vector2Distance(blockPos.toVector2(), owner->getPosition());
 	int toolRange = item->tool.tool.range;
@@ -215,7 +214,7 @@ void SwingAttack::onHitEnemy(Enemy* enemy)
 	return;
 }
 
-void SwingAttack::onHitBlock(int power, Vector2i blockPos, BlockData& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng)
+void SwingAttack::onHitBlock(int power, Vector2i blockPos, Block& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
 	auto brokenType = b.type;
 	if (damageBlock(power, blockPos, b, particles, rng))
@@ -241,13 +240,11 @@ void SwingAttack::onHitTree(Vector2i blockPos, GameMap& gameMap, EntityHolder& e
 	}
 }
 
-bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, BlockData& block, std::vector<Particle>& particles, std::ranlux24_base& rng)
+bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, Block& block, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
 	// make particles global like popupText or camShake
 	triggerShake(blockPos.x, blockPos.y);
-	//auto newParticles = 
 	spawnParticles({ (float)blockPos.x, (float)blockPos.y }, rng, block.type, 10);
-	//particles.insert(particles.end(), newParticles.begin(), newParticles.end());
 
 	spawnPopupText(
 		blockPos.toVector2(),
@@ -265,7 +262,7 @@ bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, BlockData& bl
 	return block.hp <= 0;
 }
 
-void SwingAttack::destroyBlock(const Vector2i& blockPos, BlockData& block, EntityHolder& entityHolder)
+void SwingAttack::destroyBlock(const Vector2i& blockPos, Block& block, EntityHolder& entityHolder)
 {
 	if (block.type == Items::air)
 		return;

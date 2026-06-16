@@ -1,6 +1,7 @@
 #pragma once
+#include "structure.h"
 #include <asserts.h>
-#include <structure.h>
+#include <gameMap.h>
 
 void Structure::create(int w, int h)
 {

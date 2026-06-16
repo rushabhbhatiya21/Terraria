@@ -1,6 +1,7 @@
 #pragma once
 #include <physics.h>
 #include <gameMap.h>
+#include "items/item.h"
 
 void PhysicalEntity::resolveConstrains(GameMap& mapData) 
 {
@@ -94,7 +95,10 @@ Vector2 PhysicalEntity::performCollisionsOnOneAxis(GameMap& mapData, Vector2 pos
 	{
 		for (int x = minX; x < maxX; x++)
 		{
-			if (mapData.getBlockUnsafe(x, y).isCollidable())
+			auto& block = mapData.getBlockUnsafe(x, y);
+			auto* item = getItem(block.type);
+			if (!item) continue;
+			if (item->block.isCollidable())
 			{
 				Transform2D entity;
 				entity.pos = pos;

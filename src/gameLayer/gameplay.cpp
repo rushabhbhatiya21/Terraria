@@ -562,8 +562,9 @@ void Gameplay::addLight(int worldX, int worldY, float radius, float intensity, b
 					ly - 2
 				);
 
-				if (b 
-					//&& b->isCollidable()
+				auto* bDef = getItem(b->type);
+
+				if (b && bDef && bDef->block.isCollidable()
 				)
 				{
 					lightValue *= 0.3f;
@@ -1040,6 +1041,13 @@ bool Gameplay::update(AssetManager& assetManager)
 				);
 			}
 		}
+
+		//auto& block = gameMap.getBlockUnsafe((int)worldPos.x, (int)worldPos.y);
+
+		//if (block.type == Items::dirt)
+		//{
+		//	std::cout << (int)block.collision << "\n";
+		//}
 
 		if ((IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) && IsKeyPressed(KEY_SPACE))
 		{

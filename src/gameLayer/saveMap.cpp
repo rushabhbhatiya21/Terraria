@@ -3,6 +3,7 @@
 #include <asserts.h>
 
 #include <nlohmann/json.hpp>
+#include "items/blocks.h"
 #include <gameMap.h>
 #include <entityHolder.h>
 #include <player.h>
@@ -10,12 +11,14 @@
 #include <entities/enemies/slime.h>
 #include <entities/enemies/desetSlime.h>
 #include <entities/enemies/zombie.h>
+#include <entities/enemies/evilEye.h>
+#include <entities/enemies/evilEyeServant.h>
 
 struct BlockRepresentation1
 {
 	std::uint16_t type = 0;
 
-	Block toBlock()
+	Block toBlock() const
 	{
 		Block b;
 		b.type = type;
@@ -312,6 +315,7 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 
 			entityType = entityJson["entityType"];
 
+			// todo: also need to add them in enemies list
 			switch (entityType)
 			{
 				case EnemyType_Slime:
@@ -353,6 +357,28 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 					if (item.loadFromJson(entityJson))
 					{
 						entities.entities[id] = std::make_unique<DroppedItem>(item);
+					}
+
+					break;
+				}
+
+				case EnemyType::EnemyType_EvilEye:
+				{
+					EvilEye evilEye;
+					if (evilEye.loadFromJson(entityJson))
+					{
+						entities.entities[id] = std::make_unique<EvilEye>(evilEye);
+					}
+
+					break;
+				}
+
+				case EnemyType::EnemyType_EvilEyeSpawn:
+				{
+					EvilEyeServant evilEyeSerpant;
+					if (evilEyeSerpant.loadFromJson(entityJson))
+					{
+						entities.entities[id] = std::make_unique<EvilEyeServant>(evilEyeSerpant);
 					}
 
 					break;

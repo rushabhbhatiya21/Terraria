@@ -10,6 +10,7 @@ struct AssetManager;
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
+// todo: not using it right now
 enum class ItemUseContext
 {
     NONE,
@@ -25,7 +26,6 @@ enum class ItemCategory
     TOOL,
     WEAPON,
     AMMO,
-    //PROJECTILE,
     ARMOR,
     ACCESSORY,
     CONSUMABLE
@@ -89,83 +89,20 @@ enum class ArmorSlot
     BOOTS
 };
 
-// todo: maybe remove it
-enum class BlockType
+enum class CollisionType
 {
-    air = 0,
-    dirt,
-    grassBlock,
-    stone,
-    grass,
-    sand,
-    sandRuby,
-    sandStone,
-    woodPlank,
-    stoneBricks,
-    clay,
-    woodLog,
-    leaves,
-    copper,
-    iron,
-    gold,
-    copperBlock,
-    ironBlock,
-    goldBlock,
-    bricks,
-    snow,
-    ice,
-    rubyBlock,
-    platform,
-    workBench,
-    glass,
-    furnace,
-    painting,
-    sappling,
-    snowBlueRuby,
-    blueRubyBlock,
-    door,
-    jar,
-    table,
-    wordrobe,
-    bookShelf,
-    snowBricks,
-    iceTable,
-    iceWordrobe,
-    iceBookShelf,
-    icePlatform,
-    sandTable,
-    sandWordrobe,
-    sandBookShelf,
-    sandPlatform,
-    woodenChest,
-    iceChest,
-    sandChest,
-    boneChest,
-    boneBricks,
-    boneBench,
-    boneWordrobe,
-    boneBookShelf,
-    bonePlatform,
-    dirtWall,
-    stoneWall,
-    woodWall,
-    sandStoneWall,
-    brickWall,
-    glassWall,
-    copperBlockWall,
-    silverBlockWall,
-    goldBlockWall,
-    snowWall,
-    sandWall,
-    stoneBricksWall,
-    rubyBlockWall,
-    heroglyphWall,
-    blueRubyWall,
-    plankedWall,
-    snowBrickWall,
-    boneBrickWall,
+    NONE,
+    SOLID,
+    PLATFORM
+};
 
-    BLOCKS_COUNT,
+enum class ProjectileCollisionType
+{
+    NONE,
+    DESTROY,
+    //SLOW,
+    //BOOST,
+    //RICOCHET
 };
 
 // ─── Stat blocks ──────────────────────────────────────────────────────────────
@@ -215,17 +152,22 @@ struct ArmorData
 
 struct BlockData
 {
-    ItemId    type      = Items::air;
-    int       hp        = 0;
-    int       bestTool  = 0;
-    int       variation = -1;
+    ItemId             type = Items::air;
+    int                  hp = 0;
+    int            bestTool = 0;
+    int           variation = -1;
+    CollisionType collision = CollisionType::NONE;
+    ProjectileCollisionType projectileCollision = ProjectileCollisionType::NONE;
 
-    void sanitize()
+
+    bool isCollidable() const
     {
-        if (type >= Items::LAST_BLOCK)
-        {
-            type = 0;
-        }
+        return collision != CollisionType::NONE;
+    }
+
+    bool isProjectileCollidable() const
+    {
+        return projectileCollision != ProjectileCollisionType::NONE;
     }
 };
 
@@ -365,7 +307,8 @@ struct ItemDefinition
         return d;
     }
 
-    static ItemDefinition makeBlock(const char* name, ItemId type, int hp, int bestTool, int maxStack, int useTime)
+    static ItemDefinition makeBlock(const char* name, ItemId type, CollisionType collision, ProjectileCollisionType projectileCollision,
+        int hp, int bestTool, int maxStack, int useTime)
     {
         ItemDefinition d;
         d.displayName = name;
@@ -373,6 +316,8 @@ struct ItemDefinition
         d.maxStack = maxStack;
         d.useTime = useTime;
         d.block.type = type;
+        d.block.collision = collision;
+        d.block.projectileCollision = projectileCollision;
         d.block.hp = hp;
         d.block.bestTool = bestTool;
         return d;

@@ -1,6 +1,7 @@
 #include "bfs.h"
 #include <queue>
 #include "gameMap.h"
+#include "items/item.h"
 
 
 Vector2i directions[3] =

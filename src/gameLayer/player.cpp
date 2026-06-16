@@ -5,7 +5,7 @@
 #include <items/blocks.h>
 #include "particles.h"
 
-// todo: make AttackSTyle struct and add enum to it, and have item manage update and spawn and all
+// todo: make AttackStyle struct and add enum to it, and have item manage update and spawn and all
 
 void Player::render(AssetManager& assetManager)
 {
