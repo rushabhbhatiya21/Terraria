@@ -5,6 +5,7 @@
 #include <settings.h>
 #include <ui.h>
 #include <drawBackground.h>
+#include <iostream>
 
 #pragma region global variables
 
@@ -20,7 +21,7 @@ bool gameplayRunning = true;
 
 bool initGame()
 {
-	Audio::init();
+	//Audio::init();
 	assetManager.loadAll();
 	assetManager.loadTexturePack("hdtextures");
 	loadSettings();
@@ -32,7 +33,7 @@ bool initGame()
 
 bool updateGame()
 {
-	Audio::update();
+	//Audio::update();
 	updateSettings();
 
 	ClearBackground({ 0,0,0,255 });
@@ -50,7 +51,8 @@ bool updateGame()
 		if (mainMenuButtons.addButton("Start Game"))
 		{
 			gameplayRunning = true;
-			gameplay = {};
+			//gameplay = {};
+			// todo: implement gameplay.reset() and call here
 			gameplay.init();
 		}
 
@@ -69,7 +71,6 @@ bool updateGame()
 		return gameplay.update(assetManager);
 	}
 
-	//return gameplay.update(assetManager);
 	return true;
 }
 

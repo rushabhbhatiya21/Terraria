@@ -624,6 +624,9 @@ bool Gameplay::init()
 	// items init
 	registerItems();
 
+	// chunk grid testing
+	chunkGrid.initChunks();
+
 	// map init
 	const int w = 900, h = 500;
 	backgroundMap.create(w, h);
@@ -685,6 +688,17 @@ bool Gameplay::init()
 	std::ranlux24_base rng(std::random_device{}());
 	float randStartTime = getRandomFloat(rng, 0.4f, 0.6f);
 	worldTime = randStartTime * FULL_DAY_LENGTH;
+
+	// chunk grid testing
+	std::cout << sizeof(Block) << "\n";
+	std::cout << sizeof(Chunk) << "\n";
+	std::cout << sizeof(ChunkGrid) << "\n";
+	std::cout << sizeof(Gameplay) << "\n";
+
+	chunkGrid.setBlock(15, 15, Items::dirt);
+	chunkGrid.setBlock(16, 15, Items::stone);
+	chunkGrid.setBlock(15, 16, Items::woodLog);
+	chunkGrid.setBlock(16, 16, Items::sand);
 
 	double loadEnd = GetTime();
 	TraceLog(LOG_INFO, "Load time: %.3f seconds", loadEnd - loadStart);
@@ -843,7 +857,6 @@ bool Gameplay::update(AssetManager& assetManager)
 			45
 		);
 
-		//auto leftParticles = 
 		spawnParticles(
 			playerPos,
 			rng,
@@ -852,8 +865,6 @@ bool Gameplay::update(AssetManager& assetManager)
 			player.physics.transform.w,
 			-45
 		);
-		//particles.insert(particles.end(), leftParticles.begin(), leftParticles.end());
-		//particles.insert(particles.end(), rightParticles.begin(), rightParticles.end());
 	}
 
 	player.isAlive = player.update(deltaTime, EntityUpdateData
@@ -1046,6 +1057,7 @@ bool Gameplay::update(AssetManager& assetManager)
 					&player,
 					player.inventory.slots[player.selectedHotbarSlot],
 					entityHolder,
+					gameMap,
 					worldPos
 				);
 			}

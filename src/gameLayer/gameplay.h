@@ -4,6 +4,8 @@
 #include <string>
 #include <raylib.h>
 
+#include <world/chunk.h>
+
 #include <gameMap.h>
 #include <assetManager.h>
 #include <drawBackground.h>
@@ -64,6 +66,9 @@ struct SkyData
 
 struct Gameplay
 {
+	// core testing
+	ChunkGrid chunkGrid = {};
+
 	// core
 	GameMap gameMap = {};
 	GameMap backgroundMap = {};
@@ -162,7 +167,7 @@ struct Gameplay
 
 	//void floodFillLight(int x, int y, int offsetX, int offsetY, float value, bool isTorch = false);
 
-	void addLight(int worldX, int worldY, float radius, float intensity, bool isTorch = false);
+	//void addLight(int worldX, int worldY, float radius, float intensity, bool isTorch = false);
 
 	template<typename T>
 	void spawnEnemyHelper(Vector2 position)

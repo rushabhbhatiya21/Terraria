@@ -1,5 +1,6 @@
 #include "lighting.h"
 #include "gameMap.h"
+#include <iostream>
 
 constexpr int dirs[4][2] =
 {
@@ -16,7 +17,7 @@ int getAttenuation(Block& b)
 
 void initLight(GameMap& gameMap)
 {
-	std::queue<LightNode> lightQ;
+	std::queue<LightNode> q;
 
 	auto width = gameMap.w;
 
@@ -28,13 +29,13 @@ void initLight(GameMap& gameMap)
 
 		b->light = 255;
 
-		lightQ.push({ x,40,255 });
+		q.push({ x,40,255 });
 	}
 
-	while (!lightQ.empty())
+	while (!q.empty())
 	{
-		LightNode node = lightQ.front();
-		lightQ.pop();
+		LightNode node = q.front();
+		q.pop();
 
 		for (auto dir : dirs)
 		{
@@ -52,30 +53,30 @@ void initLight(GameMap& gameMap)
 			if (newLight > neighbour->light)
 			{
 				neighbour->light = (uint8_t)newLight;
-				lightQ.push(
-					LightNode{
-						nx,
-						ny,
-						(uint8_t)newLight
-					}
-				);
+				q.push({ nx,ny,(uint8_t)newLight });
 			}
 		}
 	}
 }
 
-void recalculateLight(GameMap& gameMap, int x, int y, uint8_t light)
+void recalculateLight(GameMap& gameMap, int x, int y, uint8_t emittedLight)
 {
-	std::queue<LightNode> lightQ;
+	printf("recalculateLight called...\n");
+	std::cout << "emittedLight = " << (int)emittedLight << "\n";
+	std::queue<LightNode> q;
 
-	if (light == 0) return;
+	auto* start = gameMap.getBlockSafe(x, y);
+	if (!start) return;
 
-	lightQ.push({ x, y, light });
+	start->light = emittedLight;
+	q.push({ x, y, emittedLight });
 
-	while (!lightQ.empty())
+	int count = 0;
+	// update neighbours
+	while (!q.empty())
 	{
-		LightNode node = lightQ.front();
-		lightQ.pop();
+		LightNode node = q.front();
+		q.pop();
 
 		for (auto dir : dirs)
 		{
@@ -83,24 +84,29 @@ void recalculateLight(GameMap& gameMap, int x, int y, uint8_t light)
 			int ny = node.y + dir[1];
 
 			auto* neighbour = gameMap.getBlockSafe(nx, ny);
-
+			if (neighbour) std::cout << "meighbour exists\n";
 			if (!neighbour) continue;
 
 			int newLight = (int)node.light - getAttenuation(*neighbour);
+
+			std::cout << "from (" << node.x << "," << node.y << ") -> ("
+				<< nx << "," << ny << ") "
+				<< "light=" << (int)node.light
+				<< " atten=" << getAttenuation(*neighbour)
+				<< " new=" << newLight
+				<< " current=" << (int)neighbour->light
+				<< "\n";
 
 			if (newLight <= 0) continue;
 
 			if (newLight > neighbour->light)
 			{
 				neighbour->light = (uint8_t)newLight;
-				lightQ.push(
-					LightNode{
-						nx,
-						ny,
-						(uint8_t)newLight
-					}
-				);
+				q.push({ nx, ny, (uint8_t)newLight });
 			}
 		}
+		count++;
 	}
+
+	printf("recalculateLight ended with neightbours count: %d\n", count);
 }

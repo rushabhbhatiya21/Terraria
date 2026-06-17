@@ -7,13 +7,14 @@
 #include "combat/stats.h"
 #include "combat/blockSpawn.h"
 #include "player.h"
+#include "lighting.h"
 #include "attackStyles/swingAttack.h"
 #include "attackStyles/throwAttack.h"
 #include "attackStyles/shootAttack.h"
 
 constexpr float TICKS_PER_SECOND = 60.f;
 
-void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vector2 mouseWorldPos)
+void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, GameMap& gameMap, Vector2 mouseWorldPos)
 {
 	if (stack.count <= 0) return;
 
@@ -35,7 +36,7 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, Vecto
 		break;
 
 	case ItemCategory::BLOCK:
-		useBlock(entity, *item, mouseWorldPos);
+		useBlock(entity, *item, gameMap, mouseWorldPos);
 		break;
 
 	//case ItemCategory::ARMOR:
@@ -89,11 +90,11 @@ void useStyle(Entity* entity, ItemStack& stack, const ItemDefinition& item, Enti
 	}
 }
 
-void useBlock(Entity* entity, const ItemDefinition& item, Vector2 mouseWorldPos)
+void useBlock(Entity* entity, const ItemDefinition& item, GameMap& gameMap, Vector2 mouseWorldPos)
 {
 	const BlockData& block = item.block;
 	spawnBlock(mouseWorldPos, entity->getPosition(), (int)block.type);
-	// recalculate light here
+	recalculateLight(gameMap, (int)mouseWorldPos.x, (int)mouseWorldPos.y, block.lightEmission);
 }
 
 // it is being used in gameplay.cpp (inventory)
