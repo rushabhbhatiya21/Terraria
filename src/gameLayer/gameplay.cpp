@@ -624,16 +624,13 @@ bool Gameplay::init()
 	// items init
 	registerItems();
 
-	// chunk grid testing
-	chunkGrid.initChunks();
-
 	// map init
-	const int w = 900, h = 500;
+	const int w = 912, h = 512;
 	backgroundMap.create(w, h);
 	generateWorld(gameMap, w, h);
 
-	// lighting init
-	initLight(gameMap);
+	//// lighting init
+	//initLight(gameMap);
 
 	// cam init
 	camera.target = { 20, 120 };
@@ -695,10 +692,10 @@ bool Gameplay::init()
 	std::cout << sizeof(ChunkGrid) << "\n";
 	std::cout << sizeof(Gameplay) << "\n";
 
-	chunkGrid.setBlock(15, 15, Items::dirt);
-	chunkGrid.setBlock(16, 15, Items::stone);
-	chunkGrid.setBlock(15, 16, Items::woodLog);
-	chunkGrid.setBlock(16, 16, Items::sand);
+	//chunkGrid.setBlock(15, 15, Items::dirt);
+	//chunkGrid.setBlock(16, 15, Items::stone);
+	//chunkGrid.setBlock(15, 16, Items::woodLog);
+	//chunkGrid.setBlock(16, 16, Items::sand);
 
 	double loadEnd = GetTime();
 	TraceLog(LOG_INFO, "Load time: %.3f seconds", loadEnd - loadStart);

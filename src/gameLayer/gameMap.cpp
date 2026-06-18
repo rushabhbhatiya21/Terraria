@@ -7,35 +7,35 @@
 void GameMap::create(const int w, const int h)
 {
 	*this = {};
-	mapData.resize(w * h);
+	//mapData.resize(w * h);
+	chunkGrid.initChunks(w, h);
 
 	this->w = w;
 	this->h = h;
 
-	for (auto& e : mapData) { e = {}; }
+	//for (auto& e : mapData) { e = {}; }
 }
 
 Block& GameMap::getBlockUnsafe(int x, int y)
 {
-	permaAssertCommentDevelopement(mapData.size() == w * h, "MapData variable not initialized");
+	permaAssertCommentDevelopement(chunkGrid.chunks.size() == chunkGrid.CW * chunkGrid.CH, "MapData variable not initialized");
 
-	permaAssertCommentDevelopement(x >= 0 && y >= 0 && x < w && y < h, "getBlockUnsafe out of bound error");
+	//permaAssertCommentDevelopement(x >= 0 && y >= 0 && x < w && y < h, "getBlockUnsafe out of bound error");
+	//return mapData[x + y * w];
 
-	return mapData[x + y * w];
+	return chunkGrid.getBlockUnsafe(x, y);
 }
 
 Block* GameMap::getBlockSafe(int x, int y)
 {
-	permaAssertCommentDevelopement(mapData.size() == w * h, "MapData variable not initialized");
-
 	if (x < 0 || y < 0 || x >= w || y >= h) return nullptr;
 
-	return &mapData[x + y * w];
+	return chunkGrid.getBlock(x, y);
 }
 
 bool GameMap::isAdjacentBlock(int x, int y)
 {
-	permaAssertCommentDevelopement(mapData.size() == w * h, "MapData variable not initialized");
+	permaAssertCommentDevelopement(chunkGrid.chunks.size() == chunkGrid.CW * chunkGrid.CH, "chunkGrid variable not initialized");
 
 	for (int i = -1; i <= 1; i++)
 	{

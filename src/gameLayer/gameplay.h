@@ -66,9 +66,6 @@ struct SkyData
 
 struct Gameplay
 {
-	// core testing
-	ChunkGrid chunkGrid = {};
-
 	// core
 	GameMap gameMap = {};
 	GameMap backgroundMap = {};

@@ -2,13 +2,9 @@
 #include <vector>
 #include <unordered_map>
 #include <items/blocks.h>
-#include <lighting.h>
 #include <asserts.h>
 #include <iostream>
 
-
-constexpr int w = 912;
-constexpr int h = 512;
 constexpr int CHUNK_SIZE = 16;
 constexpr int CHUNK_SHIFT = 4;
 
@@ -40,18 +36,25 @@ struct Chunk
 
 struct ChunkGrid
 {
-	static constexpr int CW = w / CHUNK_SIZE;
-	static constexpr int CH = h / CHUNK_SIZE;
+	int CW = 0;
+	int CH = 0;
 
-	Chunk chunks[CH][CW];
+	std::vector<Chunk> chunks;
 
-	void initChunks()
+	void initChunks(const int w, const int h)
 	{
+		permaAssertCommentDevelopement(isPowerOfTwo(CHUNK_SIZE), "Chunk size needs to be power of 2.");
+
+		CW = w / CHUNK_SIZE;
+		CH = h / CHUNK_SIZE;
+
+		chunks.resize(CW * CH);
+
 		for (int cy = 0; cy < CH; cy++)
 		{
 			for (int cx = 0; cx < CW; cx++)
 			{
-				Chunk& chunk = chunks[cy][cx];
+				Chunk& chunk = chunks[cy * CW + cx];
 
 				chunk.renderDirty = false;
 				chunk.lightingDirty = false;
@@ -87,7 +90,16 @@ struct ChunkGrid
 			<< cx << ", "
 			<< cy << ")\n";
 
-		return &chunks[cy][cx];
+		permaAssertCommentDevelopement(CW == 0 || CH == 0, "CW or CH is 0, make sure to call chunkGrid.init(w, h) before using getChunk(cx, cy).");
+
+		return &chunks[cy * CW + cx];
+	}
+
+	Chunk& getChunkUnsafe(int cx, int cy)
+	{
+		permaAssertCommentDevelopement(CW == 0 || CH == 0, "CW or CH is 0, make sure to call chunkGrid.init(w, h) before using getChunk(cx, cy).");
+		permaAssertCommentDevelopement(cx >= 0 && cy >= 0 && cx < CW && cy < CH, "getChunkUnsafe out of bound error");
+		return chunks[cy * CW + cx];
 	}
 
 	Chunk* getChunkFromWorldPos(int x, int y)
@@ -98,13 +110,16 @@ struct ChunkGrid
 		return getChunk(cx, cy);
 	}
 
+	Chunk& getChunkUnsafeFromWorldPos(int x, int y)
+	{
+		int cx = x >> CHUNK_SHIFT;
+		int cy = y >> CHUNK_SHIFT;
+
+		return getChunkUnsafe(cx, cy);
+	}
+
 	Block* getBlock(int x, int y)
 	{
-		if (x < 0 || y < 0 || x >= w || y >= h) return nullptr;
-
-		// do not need to do this every getcall
-		//permaAssertCommentDevelopement(isPowerOfTwo(CHUNK_SIZE), "Chunk size needs to be power of 2.");
-
 		// for print only
 		int cx = x >> CHUNK_SHIFT;
 		int cy = y >> CHUNK_SHIFT;
@@ -121,6 +136,16 @@ struct ChunkGrid
 			<< "-> Local(" << lx << "," << ly << ")\n";
 
 		return &chunk->blocks[ly][lx];
+	}
+
+	Block& getBlockUnsafe(int x, int y)
+	{
+		auto& chunk = getChunkUnsafeFromWorldPos(x, y);
+
+		int lx = x & (CHUNK_SIZE - 1);
+		int ly = y & (CHUNK_SIZE - 1);
+
+		return chunk.blocks[ly][lx];
 	}
 
 	bool setBlock(int x, int y, ItemId blockType)

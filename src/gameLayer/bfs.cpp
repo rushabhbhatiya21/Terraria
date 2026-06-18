@@ -24,6 +24,7 @@ bool isValidTree(Vector2i pos, GameMap& gameMap)
 
 std::vector<Vector2i> bfs(Vector2i startPosition, GameMap& gameMap)
 {
+	printf("bfs called...\n");
 	std::queue<Vector2i> q;
 	std::vector<Vector2i> component;
 	std::unordered_set<Vector2i, Vector2iHash> visited;

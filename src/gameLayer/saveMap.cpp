@@ -225,7 +225,7 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 	std::error_code errorCode;
 	std::filesystem::create_directory(RESOURCES_PATH "../saves/", errorCode);
 
-	saveBlockDataToFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin.tmp");
+	//saveBlockDataToFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin.tmp");
 
 	// id holder
 	{
@@ -268,10 +268,10 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 	player = {};
 	entities.idHolder = {};
 
-	if (!loadBlockDataFromFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin"))
-	{
-		return false;
-	}
+	//if (!loadBlockDataFromFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin"))
+	//{
+	//	return false;
+	//}
 
 	// id holder
 	{

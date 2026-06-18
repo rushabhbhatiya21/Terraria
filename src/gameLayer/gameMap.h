@@ -1,13 +1,15 @@
 #pragma once
 #include <vector>
 #include <items/blocks.h>
+#include "world/chunk.h"
 
 struct GameMap
 {
 	int w = 0;
 	int h = 0;
 
-	std::vector<Block> mapData = {};
+	//std::vector<Block> mapData = {};
+	ChunkGrid chunkGrid = {};
 
 	void create(const int w, const int h);
 
