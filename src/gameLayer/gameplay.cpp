@@ -675,9 +675,9 @@ bool Gameplay::init()
 	player.inventory.storeItem(ItemStack{ Items::woodenBow, 1 });
 	player.inventory.storeItem(ItemStack{ Items::woodenArrow, 100 });
 	player.inventory.storeItem(ItemStack{ Items::platform, 100 });
-	player.inventory.storeItem(ItemStack{ Items::woodLog, 100 });
-	player.inventory.storeItem(ItemStack{ Items::leaves, 100 });
-	//player.inventory.storeItem(ItemStack{ Items::furnace, 1 });
+	//player.inventory.storeItem(ItemStack{ Items::woodLog, 100 });
+	//player.inventory.storeItem(ItemStack{ Items::leaves, 100 });
+	player.inventory.storeItem(ItemStack{ Items::furnace, 10 });
 	//player.inventory.storeItem(ItemStack{ Items::workBench, 1 });
 	//player.inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
 
@@ -1205,18 +1205,18 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
+	// below 4 commented out for now
 #pragma region build tile lightmap
 
-	// reset light map
-	lightMap.assign(
-		endXView - startXView + 1,
-		std::vector<float>(endYView - startYView + 1, 0.0f)
-	);
+	//// reset light map
+	//lightMap.assign(
+	//	endXView - startXView + 1,
+	//	std::vector<float>(endYView - startYView + 1, 0.0f)
+	//);
 
 #pragma endregion
 
 
-	// below 3 commented out for now
 #pragma region add light sources
 
 	// player light
@@ -1368,22 +1368,28 @@ bool Gameplay::update(AssetManager& assetManager)
 			{
 				atlasX = b.type;
 
-				if (b.variation == -1)
+				if (b.variation == 255)
 				{
 					b.variation = rand() % 4;
 				}
+
+				if (b.type > Items::LAST_BLOCK)
+					b.variation = 0;
 
 				Vector2 shake = getShakeOffset(x, y);
 
 				float drawX = posX + shake.x;
 				float drawY = posY + shake.y;
 
-				float l = b.light / 255.0f;
+				//float l = b.light / 255.0f;
 
 				Color tint = {
-					(uint8_t)(255 * l),
-					(uint8_t)(255 * l),
-					(uint8_t)(255 * l),
+					//(uint8_t)(255 * l),
+					//(uint8_t)(255 * l),
+					//(uint8_t)(255 * l),
+					b.light,
+					b.light,
+					b.light,
 					255
 				};
 
@@ -1395,6 +1401,23 @@ bool Gameplay::update(AssetManager& assetManager)
 					0.f,     //rotation
 					tint
 				);
+
+				//if (x == 31 && y == 62 && b.type != 0)
+				//{
+				//	printf("type: %d light: %d\n", b.type, (int)b.light);
+				//}
+
+				if ((int)b.light != 0)
+					DrawTextPro(
+						GetFontDefault(),
+						std::to_string((int)b.light).c_str(),
+						{ drawX, drawY + .5f },
+						{ 0,0 },
+						0.f,
+						.5f,
+						.09f,
+						WHITE
+					);
 			}
 		}
 	}
@@ -2096,6 +2119,10 @@ bool Gameplay::update(AssetManager& assetManager)
 	if (showImgui)
 	{
 		ImGui::Begin("Game Control");
+
+		ImGui::Text("Debug Tile Cords: ");
+		Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), camera);
+		ImGui::Text("%.2f, %.2f", mousePos.x, mousePos.y);
 
 		std::string s = "Projectiles: ";
 		s += std::to_string(entityHolder.projectiles.size());

@@ -46,7 +46,7 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
     dirtNoisegen->SetFractalType(FastNoiseSIMD::FractalType::FBM);
     dirtNoisegen->SetFractalOctaves(6);
     dirtNoisegen->SetFractalGain(0.4f);
-    dirtNoisegen->SetFrequency(0.01f);
+    dirtNoisegen->SetFrequency(0.004f);
 
     // Caves
     cavesNoisegen->SetFractalType(FastNoiseSIMD::FractalType::FBM);

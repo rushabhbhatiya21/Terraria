@@ -309,7 +309,7 @@ struct ItemDefinition
     }
 
     static ItemDefinition makeBlock(const char* name, ItemId type, CollisionType collision, ProjectileCollisionType projectileCollision,
-        int hp, ItemId bestTool, int maxStack, int useTime)
+        int hp, ItemId bestTool, int emittedLight, int maxStack, int useTime)
     {
         ItemDefinition d;
         d.displayName = name;
@@ -320,6 +320,7 @@ struct ItemDefinition
         d.block.collision = collision;
         d.block.projectileCollision = projectileCollision;
         d.block.hp = hp;
+        d.block.lightEmission = emittedLight;
         d.block.bestTool = bestTool;
         return d;
     }

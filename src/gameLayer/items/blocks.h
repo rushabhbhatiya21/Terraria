@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <algorithm>
 #include <asserts.h>
 #include <items/item.h>
 
@@ -42,18 +43,41 @@ struct Block
         return def && def->block.collision == CollisionType::PLATFORM;
     }
 
+    void setType(ItemId blockType)
+    {
+        if (blockType < 0 || blockType >= Items::LAST_ITEM)
+            blockType = Items::air;
+
+        type = blockType;
+    }
+
+    void setLight(int newLight)
+    {
+        newLight = (int)std::clamp((float)newLight, 0.f, 255.f);
+        light = (uint8_t)newLight;
+    }
+
+    void setHp(int newHp)
+    {
+        if (newHp < 0)
+            newHp = 0;
+        hp = newHp;
+    }
+
     void clear()
     {
         type = Items::air;
         hp = 0;
         light = 0;
+        variation = NO_VARIATION;
     }
 };
 
 inline Block initBlock(ItemId type)
 {
     Block b;
-    b.type = type;
+
+    b.clear();
 
     auto* def = getItem(type);
 
@@ -62,8 +86,9 @@ inline Block initBlock(ItemId type)
         "Missing item definition in initBlock()"
     );
 
-    b.hp = def->block.hp;
-    b.light = 0;
+    b.setType(type);
+    b.setHp(def->block.hp);
+    b.setLight(def->block.lightEmission);
 
     return b;
 }

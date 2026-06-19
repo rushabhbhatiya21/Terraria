@@ -17,59 +17,58 @@ int getAttenuation(Block& b)
 
 void initLight(GameMap& gameMap)
 {
-	std::queue<LightNode> q;
+	//std::queue<LightNode> q;
 
-	auto width = gameMap.w;
+	//auto width = gameMap.w;
 
-	for (int x = 0; x < width; x++)
-	{
-		auto* b = gameMap.getBlockSafe(x, 0);
+	//for (int x = 0; x < width; x++)
+	//{
+	//	auto* b = gameMap.getBlockSafe(x, 0);
 
-		if (!b) continue;
+	//	if (!b) continue;
 
-		b->light = 255;
+	//	b->light = 255;
 
-		q.push({ x,40,255 });
-	}
+	//	q.push({ x,40,255 });
+	//}
 
-	while (!q.empty())
-	{
-		LightNode node = q.front();
-		q.pop();
+	//while (!q.empty())
+	//{
+	//	LightNode node = q.front();
+	//	q.pop();
 
-		for (auto dir : dirs)
-		{
-			int nx = node.x + dir[0];
-			int ny = node.y + dir[1];
+	//	for (auto dir : dirs)
+	//	{
+	//		int nx = node.x + dir[0];
+	//		int ny = node.y + dir[1];
 
-			auto* neighbour = gameMap.getBlockSafe(nx, ny);
+	//		auto* neighbour = gameMap.getBlockSafe(nx, ny);
 
-			if (!neighbour) continue;
+	//		if (!neighbour) continue;
 
-			int newLight = (int)node.light - getAttenuation(*neighbour);
+	//		int newLight = (int)node.light - getAttenuation(*neighbour);
 
-			if (newLight <= 0) continue;
+	//		if (newLight <= 0) continue;
 
-			if (newLight > neighbour->light)
-			{
-				neighbour->light = (uint8_t)newLight;
-				q.push({ nx,ny,(uint8_t)newLight });
-			}
-		}
-	}
+	//		if (newLight > neighbour->light)
+	//		{
+	//			neighbour->light = (uint8_t)newLight;
+	//			q.push({ nx,ny,(uint8_t)newLight });
+	//		}
+	//	}
+	//}
 }
 
 void recalculateLight(GameMap& gameMap, int x, int y, uint8_t emittedLight)
 {
 	printf("recalculateLight called...\n");
-	std::cout << "emittedLight = " << (int)emittedLight << "\n";
 	std::queue<LightNode> q;
 
 	auto* start = gameMap.getBlockSafe(x, y);
 	if (!start) return;
 
-	start->light = emittedLight;
-	q.push({ x, y, emittedLight });
+	start->setLight(255);
+	q.push({ x, y, start->light });
 
 	int count = 0;
 	// update neighbours
@@ -84,27 +83,19 @@ void recalculateLight(GameMap& gameMap, int x, int y, uint8_t emittedLight)
 			int ny = node.y + dir[1];
 
 			auto* neighbour = gameMap.getBlockSafe(nx, ny);
-			if (neighbour) std::cout << "meighbour exists\n";
 			if (!neighbour) continue;
 
-			int newLight = (int)node.light - getAttenuation(*neighbour);
+			// attenuation = 17
+			int newLight = (int)node.light - (255 / emittedLight);
+			if (newLight == 0) continue;
 
-			std::cout << "from (" << node.x << "," << node.y << ") -> ("
-				<< nx << "," << ny << ") "
-				<< "light=" << (int)node.light
-				<< " atten=" << getAttenuation(*neighbour)
-				<< " new=" << newLight
-				<< " current=" << (int)neighbour->light
-				<< "\n";
+			// neighbour has brighter light from other source
+			if (newLight <= (int)neighbour->light) continue;
 
-			if (newLight <= 0) continue;
-
-			if (newLight > neighbour->light)
-			{
-				neighbour->light = (uint8_t)newLight;
-				q.push({ nx, ny, (uint8_t)newLight });
-			}
+			neighbour->setLight(newLight);
+			q.push({ nx, ny, neighbour->light });
 		}
+
 		count++;
 	}
 

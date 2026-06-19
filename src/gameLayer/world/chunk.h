@@ -41,6 +41,7 @@ struct ChunkGrid
 
 	std::vector<Chunk> chunks;
 
+	// 912 x 512
 	void initChunks(const int w, const int h)
 	{
 		permaAssertCommentDevelopement(isPowerOfTwo(CHUNK_SIZE), "Chunk size needs to be power of 2.");

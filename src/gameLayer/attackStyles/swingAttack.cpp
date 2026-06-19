@@ -286,6 +286,7 @@ void SwingAttack::destroyBlock(const Vector2i& blockPos, Block& block, GameMap& 
 	entityHolder.entities[id] = std::move(item);
 	entityHolder.droppedItems.push_back(itemPtr);
 
-	block = {};
+	gameMap.setBlock(blockPos.x, blockPos.y, Items::air);
+	//block = {};
 	//recalculateLight(gameMap, blockPos.x, blockPos.y, oldLight);
 }

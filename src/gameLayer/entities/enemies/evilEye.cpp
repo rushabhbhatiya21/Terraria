@@ -24,6 +24,7 @@ void EvilEye::drawSprite(AssetManager& assetManager)
 		tex = assetManager.evilEyePhase2;
 		break;
 	case EvilEyePhase::DEAD:
+		// todo
 		tex = assetManager.evilEyePieces;
 		break;
 	default:
