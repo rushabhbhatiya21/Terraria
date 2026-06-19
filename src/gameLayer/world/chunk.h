@@ -86,10 +86,6 @@ struct ChunkGrid
 	{
 		if (cx < 0 || cy < 0 || cx >= CW || cy >= CH) return nullptr;
 
-		std::cout << "getChunk("
-			<< cx << ", "
-			<< cy << ")\n";
-
 		permaAssertCommentDevelopement(CW == 0 || CH == 0, "CW or CH is 0, make sure to call chunkGrid.init(w, h) before using getChunk(cx, cy).");
 
 		return &chunks[cy * CW + cx];
@@ -120,20 +116,11 @@ struct ChunkGrid
 
 	Block* getBlock(int x, int y)
 	{
-		// for print only
-		int cx = x >> CHUNK_SHIFT;
-		int cy = y >> CHUNK_SHIFT;
-
 		auto* chunk = getChunkFromWorldPos(x, y);
 		if (!chunk) return nullptr;
 
 		int lx = x & (CHUNK_SIZE - 1);
 		int ly = y & (CHUNK_SIZE - 1);
-
-		std::cout
-			<< "World(" << x << "," << y << ") "
-			<< "-> Chunk(" << cx << "," << cy << ") "
-			<< "-> Local(" << lx << "," << ly << ")\n";
 
 		return &chunk->blocks[ly][lx];
 	}
@@ -150,29 +137,11 @@ struct ChunkGrid
 
 	bool setBlock(int x, int y, ItemId blockType)
 	{
-		// for print only
-		int cx = x >> CHUNK_SHIFT;
-		int cy = y >> CHUNK_SHIFT;
-
 		auto* chunk = getChunkFromWorldPos(x, y);
 		if (!chunk) return false;
 
 		int lx = x & (CHUNK_SIZE - 1);
 		int ly = y & (CHUNK_SIZE - 1);
-
-		std::cout
-			<< "setBlock: world("
-			<< x << ","
-			<< y << ") "
-			<< "chunk("
-			<< cx << ","
-			<< cy << ") "
-			<< "local("
-			<< lx << ","
-			<< ly << ") "
-			<< "type="
-			<< (int)blockType
-			<< "\n";
 
 		// only if we want to return old
 		//Block old = *b;

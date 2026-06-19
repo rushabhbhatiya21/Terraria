@@ -629,8 +629,8 @@ bool Gameplay::init()
 	backgroundMap.create(w, h);
 	generateWorld(gameMap, w, h);
 
-	//// lighting init
-	//initLight(gameMap);
+	// lighting init
+	initLight(gameMap);
 
 	// cam init
 	camera.target = { 20, 120 };

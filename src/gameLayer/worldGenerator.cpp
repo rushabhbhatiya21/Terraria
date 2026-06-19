@@ -26,6 +26,8 @@
 
 void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
 {
+    std::cout << "PASS 1\n";
+
     gameMap.create(w, h);
 
     std::ranlux24_base rng(seed++);
@@ -280,6 +282,9 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
     FastNoiseSIMD::FreeNoiseSet(ore2Noise);
     FastNoiseSIMD::FreeNoiseSet(detailNoise);
 
+    std::cout << "PASS 1 DONE\n";
+    std::cout << "PASS 2\n";
+
     // ═══════════════════════════════════════════════════════════════════════════
     //  PASS 2 — Perlin worms (large caves)
     // ═══════════════════════════════════════════════════════════════════════════
@@ -326,6 +331,9 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
         }
     }
 
+    std::cout << "PASS 2 DONE\n";
+    std::cout << "PASS 3\n";
+
     // ═══════════════════════════════════════════════════════════════════════════
     //  PASS 3 — Background walls (dirtWall + stoneWall inside caves)
     // ═══════════════════════════════════════════════════════════════════════════
@@ -363,6 +371,9 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
         }
     }
 
+    std::cout << "PASS 3 DONE\n";
+    std::cout << "PASS 4\n";
+
     // ═══════════════════════════════════════════════════════════════════════════
     //  PASS 4 — Trees
     // ═══════════════════════════════════════════════════════════════════════════
@@ -384,6 +395,9 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
             break;
         }
     }
+
+    std::cout << "PASS 4 DONE\n";
+    std::cout << "PASS 5\n";
 
     // ═══════════════════════════════════════════════════════════════════════════
     //  PASS 5 — Surface scatter
@@ -446,4 +460,6 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
             x += rockWidth; // skip ahead so next scatter doesn't overlap the rock
         }
     }
+
+    std::cout << "PASS 5 DONE\n";
 }
