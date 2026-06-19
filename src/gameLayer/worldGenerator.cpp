@@ -6,28 +6,8 @@
 #include <structure.h>
 #include <saveMap.h>
 
-//Block initBlock(ItemId type)
-//{
-//    Block b;
-//    b.type = type;
-//
-//    auto* def = getItem(type);
-//
-//    permaAssertComment(
-//        def,
-//        "Missing item definition in initBlock()"
-//    );
-//
-//    b.hp = def->block.hp;
-//    b.light = 0;
-//
-//    return b;
-//}
-
 void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
 {
-    std::cout << "PASS 1\n";
-
     gameMap.create(w, h);
 
     std::ranlux24_base rng(seed++);
@@ -272,7 +252,7 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
                 }
             }
 
-            gameMap.getBlockUnsafe(x, y) = initBlock(blockType);
+            gameMap.setBlock(x, y, blockType);
         }
     }
 
@@ -281,9 +261,6 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
     FastNoiseSIMD::FreeNoiseSet(oreNoise);
     FastNoiseSIMD::FreeNoiseSet(ore2Noise);
     FastNoiseSIMD::FreeNoiseSet(detailNoise);
-
-    std::cout << "PASS 1 DONE\n";
-    std::cout << "PASS 2\n";
 
     // ═══════════════════════════════════════════════════════════════════════════
     //  PASS 2 — Perlin worms (large caves)
@@ -331,9 +308,6 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
         }
     }
 
-    std::cout << "PASS 2 DONE\n";
-    std::cout << "PASS 3\n";
-
     // ═══════════════════════════════════════════════════════════════════════════
     //  PASS 3 — Background walls (dirtWall + stoneWall inside caves)
     // ═══════════════════════════════════════════════════════════════════════════
@@ -371,9 +345,6 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
         }
     }
 
-    std::cout << "PASS 3 DONE\n";
-    std::cout << "PASS 4\n";
-
     // ═══════════════════════════════════════════════════════════════════════════
     //  PASS 4 — Trees
     // ═══════════════════════════════════════════════════════════════════════════
@@ -395,9 +366,6 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
             break;
         }
     }
-
-    std::cout << "PASS 4 DONE\n";
-    std::cout << "PASS 5\n";
 
     // ═══════════════════════════════════════════════════════════════════════════
     //  PASS 5 — Surface scatter
@@ -421,21 +389,22 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
         if (roll < 0.18f)
         {
             // ── Grass plant ───────────────────────────────────────────────────
-            above = initBlock(Items::grass);
+            gameMap.setBlock(x, sy - 1, Items::grass);
+
         }
         else if (roll < 0.18f + 0.04f)
         {
             // ── Sapling ───────────────────────────────────────────────────────
-            above = initBlock(Items::sappling);
+            gameMap.setBlock(x, sy - 1, Items::sappling);
+
         }
         else if (roll < 0.18f + 0.04f + 0.03f)
         {
             // ── Mushroom (jar block repurposed as mushroom cap, 1 tall) ───────
             // Using Items::jar as a small mushroom — swap to a dedicated block
             // once you have one.  Two variants: stone = brown, glass = red cap.
-            above = initBlock(
-                getRandomChance(rng, 0.6f) ? Items::jar : Items::glass
-            );
+            gameMap.setBlock(x, sy - 1, getRandomChance(rng, 0.6f) ? Items::jar : Items::glass);
+
         }
         else if (roll < 0.18f + 0.04f + 0.03f + 0.025f)
         {
@@ -450,16 +419,10 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
             {
                 for (int ry = 0; ry < rockHeight; ry++)
                 {
-                    auto b = gameMap.getBlockSafe(startX + rx, sy - 1 - ry);
-                    if (b && b->type == Items::air)
-                    {
-                        *b = initBlock(rockType);
-                    }
+                    gameMap.setBlock(startX + rx, sy - 1 - ry, getRandomChance(rng, 0.6f) ? Items::jar : Items::glass);
                 }
             }
             x += rockWidth; // skip ahead so next scatter doesn't overlap the rock
         }
     }
-
-    std::cout << "PASS 5 DONE\n";
 }

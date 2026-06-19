@@ -55,3 +55,8 @@ bool GameMap::isAdjacentBlock(int x, int y)
 
 	return false;
 }
+
+bool GameMap::setBlock(int x, int y, ItemId blockType)
+{
+	return chunkGrid.setBlock(x, y, blockType);
+}
