@@ -1,7 +1,7 @@
 #include "lighting.h"
 #include "gameMap.h"
-//#include <iostream>
-//#include <chrono>
+#include <iostream>
+#include <chrono>
 
 std::queue<LightNode> q;
 
@@ -12,30 +12,6 @@ constexpr int dirs[4][2] =
 	{ 0,-1},
 	{ 0, 1}
 };
-
-//int getAttenuation(Block& b)
-//{
-//	return b.isCollidable() ? 20 : 3;
-//}
-
-//void buildHeightMap(GameMap& gameMap)
-//{
-//	for (int x = 0; x < gameMap.w; x++)
-//	{
-//		for (int y = 0; y < gameMap.h; y++)
-//		{
-//			auto* b = gameMap.getBlockSafe(node.x, node.y);
-//			if (!b) continue;
-//
-//			if (b->type == Items::air) continue;
-//
-//			auto* chunk = gameMap.chunkGrid.getChunkFromWorldPos(x, y);
-//			if (!chunk) continue;
-//
-//			chunk->heightMap[x] = y;
-//		}
-//	}
-//}
 
 void initLight(GameMap& gameMap)
 {
@@ -99,41 +75,19 @@ void calculateSunlight(GameMap& gameMap)
 {
 	for (int x = 0; x < gameMap.w; x++)
 	{
-		bool blockEncountered = false;
+		int sunLight = 15;
+		uint16_t surfaceY = gameMap.worldHeightMap[x];
 
-		for (int y = 0; y < gameMap.h; y++)
+		for (int y = (int)surfaceY; y < gameMap.h; y++)
 		{
 			auto* b = gameMap.getBlockSafe(x, y);
 
-			if (!b)
-				continue;
+			sunLight -= (int)b->getLightAttenuation();
 
-			if (!blockEncountered)
-			{
-				b->setSunLight(15);
+			if (sunLight <= 0)
+				break;
 
-				// ignore few types of blocks
-				if (b->type != Items::air && b->type != Items::grass && b->type != Items::jar && b->type != Items::sappling)
-				{
-					blockEncountered = true;
-				}
-			}
-			else
-			{
-				auto* prev = gameMap.getBlockSafe(x, y-1);
-				if (!prev)
-					continue;
-
-				if (prev->sunLight <= 0)
-					break;
-
-				int newSunLight = (int)prev->sunLight - (int)b->getLightAttenuation();
-
-				if (newSunLight <= 0)
-					break;
-
-				b->setSunLight(newSunLight);
-			}
+			b->setSunLight(sunLight);
 		}
 	}
 }
@@ -175,21 +129,21 @@ void calculateBlockLight(GameMap& gameMap)
 
 void recalculateLight(GameMap& gameMap)
 {
-	//auto s1 = std::chrono::high_resolution_clock::now();
+	auto s1 = std::chrono::high_resolution_clock::now();
 	initLight(gameMap);
-	//auto e1 = std::chrono::high_resolution_clock::now();
-	//auto d1 = std::chrono::duration_cast<std::chrono::microseconds>(e1 - s1);
-	//std::cout << "Init Light time: " << d1.count() / 1000 << " ms" << std::endl;
+	auto e1 = std::chrono::high_resolution_clock::now();
+	auto d1 = std::chrono::duration_cast<std::chrono::microseconds>(e1 - s1);
+	std::cout << "Init Light time: " << d1.count() / 1000 << " ms" << std::endl;
 
-	//auto s2 = std::chrono::high_resolution_clock::now();
+	auto s2 = std::chrono::high_resolution_clock::now();
 	calculateSunlight(gameMap);
-	//auto e2 = std::chrono::high_resolution_clock::now();
-	//auto d2 = std::chrono::duration_cast<std::chrono::microseconds>(e2 - s2);
-	//std::cout << "Calculate Sun Light time: " << d2.count() / 1000 << " ms" << std::endl;
+	auto e2 = std::chrono::high_resolution_clock::now();
+	auto d2 = std::chrono::duration_cast<std::chrono::microseconds>(e2 - s2);
+	std::cout << "Calculate Sun Light time: " << d2.count() / 1000 << " ms" << std::endl;
 
-	//auto s3 = std::chrono::high_resolution_clock::now();
+	auto s3 = std::chrono::high_resolution_clock::now();
 	calculateBlockLight(gameMap);
-	//auto e3 = std::chrono::high_resolution_clock::now();
-	//auto d3 = std::chrono::duration_cast<std::chrono::microseconds>(e3 - s3);
-	//std::cout << "Calculate Block Light time: " << d3.count() / 1000 << " ms" << std::endl;
+	auto e3 = std::chrono::high_resolution_clock::now();
+	auto d3 = std::chrono::duration_cast<std::chrono::microseconds>(e3 - s3);
+	std::cout << "Calculate Block Light time: " << d3.count() / 1000 << " ms" << std::endl;
 }

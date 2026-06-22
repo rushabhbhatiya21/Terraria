@@ -12,13 +12,18 @@ struct GameMap
 
 	//std::vector<Block> mapData = {};
 	ChunkGrid chunkGrid = {};
+	std::vector<uint16_t> worldHeightMap;
 
 	void create(const int w, const int h);
 
 	Block& getBlockUnsafe(int x, int y);
 	Block* getBlockSafe(int x, int y);
-	bool isAdjacentBlock(int x, int y);
 	bool setBlock(int x, int y, ItemId blockType);
+
+	// todo: updateHeightMap on setBlock
+	void buildHeightMap();
+
+	bool isAdjacentBlock(int x, int y);
 
 	int desertStart = 0;
 	int desertEnd = 0;

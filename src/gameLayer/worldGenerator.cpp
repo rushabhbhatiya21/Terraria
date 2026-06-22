@@ -425,4 +425,6 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
             x += rockWidth; // skip ahead so next scatter doesn't overlap the rock
         }
     }
+
+    gameMap.buildHeightMap();
 }

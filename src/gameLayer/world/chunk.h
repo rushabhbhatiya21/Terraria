@@ -29,9 +29,6 @@ struct Chunk
 	bool isActive = false;
 
 	//std::vector<LightSource> lightSources;
-
-	// height map for cache
-	uint8_t heightMap[CHUNK_SIZE] = {};
 };
 
 struct ChunkGrid
@@ -39,6 +36,7 @@ struct ChunkGrid
 	int CW = 0;
 	int CH = 0;
 
+	// first solid block found when scanning downward
 	std::vector<Chunk> chunks;
 
 	// 912 x 512
@@ -68,11 +66,6 @@ struct ChunkGrid
 					{
 						chunk.blocks[y][x] = initBlock(Items::air);
 					}
-				}
-
-				for (int x = 0; x < CHUNK_SIZE; x++)
-				{
-					chunk.heightMap[x] = 0;
 				}
 
 				// placeholder to init lightSources
