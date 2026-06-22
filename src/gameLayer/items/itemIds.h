@@ -120,7 +120,7 @@ namespace Items
 
     constexpr ItemId LAST_BLOCK = boneBrickWall + 1;
 
-    constexpr ItemId firstItem = 6001;
+    constexpr ItemId firstItem = 500;
 
     constexpr ItemId woodPickaxe = firstItem;
     constexpr ItemId woodAxe = woodPickaxe + 1;

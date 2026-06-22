@@ -1,7 +1,7 @@
 ﻿#pragma once
 #include <string>
 #include <cstdint>
-#include <unordered_map>
+#include <vector>
 #include <raylib.h>
 #include "itemIds.h"
 #include "../combat/stats.h"
@@ -339,7 +339,7 @@ struct ItemStack
 // ─── Database ─────────────────────────────────────────────────────────────────
 
 void registerItems();
-extern std::unordered_map<ItemId, ItemDefinition> itemDatabase;
+extern std::vector<ItemDefinition> itemDatabase;
 
 ItemDefinition* getItem(ItemId itemType);
 int             getMaxStackSize(ItemId itemId);

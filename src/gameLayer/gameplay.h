@@ -103,7 +103,9 @@ struct Gameplay
 	// lighting
 	int lastScreenWidth = 0;
 	int lastScreenHeight = 0;
-	std::vector<std::vector<float>> lightMap;
+	//std::vector<std::vector<float>> lightMap;
+
+	bool lightingNeedsRebuild = false;
 
 	RenderTexture2D lightMask = { 0 };
 	RenderTexture2D sceneTexture = { 0 };

@@ -1,4 +1,5 @@
 #include "gameplay.h"
+#include <chrono>
 #include <iostream>
 #include <imgui.h>
 
@@ -691,11 +692,6 @@ bool Gameplay::init()
 	std::cout << sizeof(Chunk) << "\n";
 	std::cout << sizeof(ChunkGrid) << "\n";
 	std::cout << sizeof(Gameplay) << "\n";
-
-	//chunkGrid.setBlock(15, 15, Items::dirt);
-	//chunkGrid.setBlock(16, 15, Items::stone);
-	//chunkGrid.setBlock(15, 16, Items::woodLog);
-	//chunkGrid.setBlock(16, 16, Items::sand);
 
 	double loadEnd = GetTime();
 	TraceLog(LOG_INFO, "Load time: %.3f seconds", loadEnd - loadStart);
@@ -1680,6 +1676,23 @@ bool Gameplay::update(AssetManager& assetManager)
 		);
 
 		EndBlendMode();
+	}
+
+#pragma endregion
+
+
+#pragma region lighting update
+
+	if (gameMap.lightingNeedsRebuild)
+	{
+		gameMap.lightingNeedsRebuild = false;
+
+		auto start = std::chrono::high_resolution_clock::now();
+		recalculateLight(gameMap);
+		auto end = std::chrono::high_resolution_clock::now();
+
+		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+		std::cout << "Total Lighting time: " << duration.count() / 1000 << " ms\n" << std::endl;
 	}
 
 #pragma endregion

@@ -46,7 +46,7 @@ void updateBlock(GameMap& gameMap, Inventory& inventory)
 			{
 				//b->type = i.itemId;
 				//*b = initBlock(i.itemId);
-				if (!gameMap.setBlock((int)block.position.x, (int)block.position.y, i.itemId, true)) continue;
+				if (!gameMap.setBlock((int)block.position.x, (int)block.position.y, i.itemId)) continue;
 
 				i.count -= 1;
 				block.used = true;

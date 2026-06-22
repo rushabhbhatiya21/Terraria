@@ -4,7 +4,6 @@
 #include <items/item.h>
 #include <lighting.h>
 
-
 void GameMap::create(const int w, const int h)
 {
 	*this = {};
@@ -57,15 +56,13 @@ bool GameMap::isAdjacentBlock(int x, int y)
 	return false;
 }
 
-bool GameMap::setBlock(int x, int y, ItemId blockType, bool shouldCalcLight)
+bool GameMap::setBlock(int x, int y, ItemId blockType)
 {
 	auto* i = getItem(blockType);
 	if (!i) return false;
 
 	auto res = chunkGrid.setBlock(x, y, blockType);
-
-	if (shouldCalcLight)
-		recalculateLight(*this);
+	lightingNeedsRebuild = true;
 
 	return res;
 }

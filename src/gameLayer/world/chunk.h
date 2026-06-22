@@ -3,7 +3,7 @@
 #include <unordered_map>
 #include <items/blocks.h>
 #include <asserts.h>
-#include <iostream>
+//#include <iostream>
 
 constexpr int CHUNK_SIZE = 16;
 constexpr int CHUNK_SHIFT = 4;
@@ -78,9 +78,6 @@ struct ChunkGrid
 				// placeholder to init lightSources
 			}
 		}
-		std::cout << "Initialized "
-			<< CW << "x" << CH
-			<< " chunks\n";
 	}
 
 	Chunk* getChunk(int cx, int cy)
@@ -144,17 +141,10 @@ struct ChunkGrid
 		int lx = x & (CHUNK_SIZE - 1);
 		int ly = y & (CHUNK_SIZE - 1);
 
-		// only if we want to return old
-		//Block old = *b;
-
 		chunk->blocks[ly][lx] = initBlock(blockType);
 		chunk->renderDirty = true;
 		chunk->lightingDirty = true;
 		chunk->simulationDirty = true;
-
-		//// set skylight
-		//if (y == 0)
-		//	chunk->blocks[ly][lx].setLight(0, 15);
 
 		// placeholder to update height map
 		// placeholder to notify light system

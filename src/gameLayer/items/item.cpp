@@ -3,29 +3,18 @@
 #include <helper.h>
 #include <assetManager.h>
 
-std::unordered_map<ItemId, ItemDefinition> itemDatabase;
+std::vector<ItemDefinition> itemDatabase;
 
 // ─── Internal helpers ─────────────────────────────────────────────────────────
 
 ItemDefinition* getItem(ItemId itemId)
 {
-    auto it = itemDatabase.find(itemId);
-
-    if (it != itemDatabase.end())
-    {
-        return&it->second;
-    }
-
-    return nullptr;
+    return &itemDatabase[(int)itemId];
 }
 
 int getMaxStackSize(ItemId itemId)
 {
-    ItemDefinition* item = getItem(itemId);
-    
-    if (!item) return -1;
-
-    return item->maxStack;
+    return itemDatabase[(int)itemId].maxStack;
 }
 
 bool isStackable(ItemId itemId)
@@ -45,7 +34,7 @@ bool isItem(ItemId itemType)
 
 static void reg(ItemId id, ItemDefinition def)
 {
-    itemDatabase[id] = def;
+    itemDatabase.insert(itemDatabase.begin() + (int)id, def);
 }
 
 Texture2D getTextureForItemType(int itemType, AssetManager& assetManager)
@@ -79,6 +68,7 @@ constexpr ItemId TOOL_HAMMER = Items::firstItem + 2;
 
 void registerItems()
 {
+    itemDatabase.resize(Items::LAST_ITEM);
     using D = ItemDefinition;
 
     // ── Air ──────────────────────────────────────────────────────
