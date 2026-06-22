@@ -152,6 +152,10 @@ struct ChunkGrid
 		chunk->lightingDirty = true;
 		chunk->simulationDirty = true;
 
+		//// set skylight
+		//if (y == 0)
+		//	chunk->blocks[ly][lx].setLight(0, 15);
+
 		// placeholder to update height map
 		// placeholder to notify light system
 

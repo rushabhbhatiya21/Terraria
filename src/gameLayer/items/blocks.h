@@ -10,6 +10,7 @@ struct Block
 {
     std::uint16_t type = Items::air;
     std::uint8_t light = 0;
+    std::uint8_t sunLight = 0;
 
     std::uint16_t hp = 0;
     std::uint8_t variation = NO_VARIATION;
@@ -43,6 +44,20 @@ struct Block
         return def && def->block.collision == CollisionType::PLATFORM;
     }
 
+    const uint8_t getLightEmission() const
+    {
+        auto* def = getItemDefinition();
+        if (!def) return 0;
+        return def->block.lightEmission;
+    }
+
+    const uint8_t getLightAttenuation() const
+    {
+        auto* def = getItemDefinition();
+        if (!def) return 0;
+        return def->block.lightAttenuation;
+    }
+
     void setType(ItemId blockType)
     {
         if (blockType < 0 || blockType >= Items::LAST_ITEM)
@@ -51,10 +66,22 @@ struct Block
         type = blockType;
     }
 
-    void setLight(int newLight)
+    void setBlockLight(int newLight)
     {
-        newLight = (int)std::clamp((float)newLight, 0.f, 255.f);
+        newLight = (int)std::clamp((float)newLight, 0.f, 15.f);
         light = (uint8_t)newLight;
+    }
+
+    void setSunLight(int newSunLight)
+    {
+        newSunLight = (int)std::clamp((float)newSunLight, 0.f, 15.f);
+        sunLight = (uint8_t)newSunLight;
+    }
+
+    void clearLight()
+    {
+        light = 0;
+        sunLight = 0;
     }
 
     void setHp(int newHp)
@@ -69,6 +96,7 @@ struct Block
         type = Items::air;
         hp = 0;
         light = 0;
+        sunLight = 0;
         variation = NO_VARIATION;
     }
 };
@@ -88,7 +116,7 @@ inline Block initBlock(ItemId type)
 
     b.setType(type);
     b.setHp(def->block.hp);
-    b.setLight(def->block.lightEmission);
+    b.clearLight();
 
     return b;
 }

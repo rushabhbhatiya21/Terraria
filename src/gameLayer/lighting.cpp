@@ -2,6 +2,8 @@
 #include "gameMap.h"
 #include <iostream>
 
+std::queue<LightNode> q;
+
 constexpr int dirs[4][2] =
 {
 	{-1, 0},
@@ -15,67 +17,103 @@ int getAttenuation(Block& b)
 	return b.isCollidable() ? 20 : 3;
 }
 
+//void buildHeightMap(GameMap& gameMap)
+//{
+//	for (int x = 0; x < gameMap.w; x++)
+//	{
+//		for (int y = 0; y < gameMap.h; y++)
+//		{
+//			auto* b = gameMap.getBlockSafe(node.x, node.y);
+//			if (!b) continue;
+//
+//			if (b->type == Items::air) continue;
+//
+//			auto* chunk = gameMap.chunkGrid.getChunkFromWorldPos(x, y);
+//			if (!chunk) continue;
+//
+//			chunk->heightMap[x] = y;
+//		}
+//	}
+//}
+
 void initLight(GameMap& gameMap)
 {
-	//std::queue<LightNode> q;
+	while (!q.empty())
+		q.pop();
 
-	//auto width = gameMap.w;
+	for (int y = 0; y < gameMap.h; y++)
+	{
+		for (int x = 0; x < gameMap.w; x++)
+		{
+			auto* b = gameMap.getBlockSafe(x, y);
+			if (!b)
+				continue;
 
-	//for (int x = 0; x < width; x++)
-	//{
-	//	auto* b = gameMap.getBlockSafe(x, 0);
+			b->clearLight();
 
-	//	if (!b) continue;
+			uint8_t emittedLight = b->getLightEmission();
 
-	//	b->light = 255;
-
-	//	q.push({ x,40,255 });
-	//}
-
-	//while (!q.empty())
-	//{
-	//	LightNode node = q.front();
-	//	q.pop();
-
-	//	for (auto dir : dirs)
-	//	{
-	//		int nx = node.x + dir[0];
-	//		int ny = node.y + dir[1];
-
-	//		auto* neighbour = gameMap.getBlockSafe(nx, ny);
-
-	//		if (!neighbour) continue;
-
-	//		int newLight = (int)node.light - getAttenuation(*neighbour);
-
-	//		if (newLight <= 0) continue;
-
-	//		if (newLight > neighbour->light)
-	//		{
-	//			neighbour->light = (uint8_t)newLight;
-	//			q.push({ nx,ny,(uint8_t)newLight });
-	//		}
-	//	}
-	//}
+			// emitters
+			if (emittedLight > 0)
+			{
+				b->setBlockLight(emittedLight);
+				q.push({ x, y });
+			}
+		}
+	}
 }
 
-void recalculateLight(GameMap& gameMap, int x, int y, uint8_t emittedLight)
+void calculateSunlight(GameMap& gameMap)
 {
-	printf("recalculateLight called...\n");
-	std::queue<LightNode> q;
+	for (int x = 0; x < gameMap.w; x++)
+	{
+		bool blockEncountered = false;
 
-	auto* start = gameMap.getBlockSafe(x, y);
-	if (!start) return;
+		for (int y = 0; y < gameMap.h; y++)
+		{
+			auto* b = gameMap.getBlockSafe(x, y);
+			if (!b)
+				continue;
 
-	start->setLight(255);
-	q.push({ x, y, start->light });
+			if (!blockEncountered)
+			{
+				b->setSunLight(15);
 
-	int count = 0;
-	// update neighbours
+				if (b->type != Items::air && b->type != Items::grass && b->type != Items::jar && b->type != Items::sappling)
+				{
+					blockEncountered = true;
+				}
+			}
+			else
+			{
+				auto* prev = gameMap.getBlockSafe(x, y-1);
+				if (!prev)
+					continue;
+
+				if (prev->sunLight <= 0)
+					break;
+
+				int newSunLight = (int)prev->sunLight - (int)b->getLightAttenuation();
+
+				if (newSunLight <= 0)
+					break;
+
+				b->setSunLight(newSunLight);
+			}
+		}
+	}
+}
+
+void calculateBlockLight(GameMap& gameMap)
+{
 	while (!q.empty())
 	{
 		LightNode node = q.front();
 		q.pop();
+
+		auto* b = gameMap.getBlockSafe(node.x, node.y);
+		if (!b)
+			continue;
 
 		for (auto dir : dirs)
 		{
@@ -83,21 +121,27 @@ void recalculateLight(GameMap& gameMap, int x, int y, uint8_t emittedLight)
 			int ny = node.y + dir[1];
 
 			auto* neighbour = gameMap.getBlockSafe(nx, ny);
-			if (!neighbour) continue;
+			if (!neighbour)
+				continue;
 
-			// attenuation = 17
-			int newLight = (int)node.light - (255 / emittedLight);
-			if (newLight == 0) continue;
+			int newLight = (int)b->light - (int)neighbour->getLightAttenuation();
 
-			// neighbour has brighter light from other source
-			if (newLight <= (int)neighbour->light) continue;
+			if (newLight <= 0)
+				continue;
 
-			neighbour->setLight(newLight);
-			q.push({ nx, ny, neighbour->light });
+			if (newLight <= (int)neighbour->light)
+				continue;
+
+			neighbour->setBlockLight(newLight);
+
+			q.push({ nx, ny });
 		}
-
-		count++;
 	}
+}
 
-	printf("recalculateLight ended with neightbours count: %d\n", count);
+void recalculateLight(GameMap& gameMap)
+{
+	initLight(gameMap);
+	calculateSunlight(gameMap);
+	calculateBlockLight(gameMap);
 }

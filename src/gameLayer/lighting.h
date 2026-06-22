@@ -9,9 +9,14 @@ struct LightNode
 {
 	int x;
 	int y;
-	uint8_t light;
+	//uint8_t light;
 };
 
 int getAttenuation(Block& b);
+//void buildHeightMap(GameMap& gameMap);
 void initLight(GameMap& gameMap);
-void recalculateLight(GameMap& gameMap, int x, int y, uint8_t light);
+void calculateSunlight(GameMap& gameMap);
+void calculateBlockLight(GameMap& gameMap);
+void recalculateLight(GameMap& gameMap);
+
+extern std::queue<LightNode> q;

@@ -630,7 +630,7 @@ bool Gameplay::init()
 	generateWorld(gameMap, w, h);
 
 	// lighting init
-	initLight(gameMap);
+	recalculateLight(gameMap);
 
 	// cam init
 	camera.target = { 20, 120 };
@@ -1381,15 +1381,16 @@ bool Gameplay::update(AssetManager& assetManager)
 				float drawX = posX + shake.x;
 				float drawY = posY + shake.y;
 
-				//float l = b.light / 255.0f;
+				float l = (std::max((float)b.light, (float)b.sunLight)) * 17.0f;
+				//float l = (float)b.light * 17.0f;
 
 				Color tint = {
-					//(uint8_t)(255 * l),
-					//(uint8_t)(255 * l),
-					//(uint8_t)(255 * l),
-					b.light,
-					b.light,
-					b.light,
+					(uint8_t)l,
+					(uint8_t)l,
+					(uint8_t)l,
+					//b.light,
+					//b.light,
+					//b.light,
 					255
 				};
 
@@ -1401,24 +1402,20 @@ bool Gameplay::update(AssetManager& assetManager)
 					0.f,     //rotation
 					tint
 				);
-
-				//if (x == 31 && y == 62 && b.type != 0)
-				//{
-				//	printf("type: %d light: %d\n", b.type, (int)b.light);
-				//}
-
-				if ((int)b.light != 0)
-					DrawTextPro(
-						GetFontDefault(),
-						std::to_string((int)b.light).c_str(),
-						{ drawX, drawY + .5f },
-						{ 0,0 },
-						0.f,
-						.5f,
-						.09f,
-						WHITE
-					);
 			}
+
+			//float l = (float)b.light * 17.0f;
+
+			//DrawTextPro(
+			//	GetFontDefault(),
+			//	std::to_string((int)l).c_str(),
+			//	{ posX, posY },
+			//	{ 0,0 },
+			//	.0f,
+			//	.5f,
+			//	.05f,
+			//	WHITE
+			//);
 		}
 	}
 
@@ -1818,6 +1815,7 @@ bool Gameplay::update(AssetManager& assetManager)
 
 	 //equip item from hotbar
 	{
+		player.selectedHotbarSlot = Clamp(player.selectedHotbarSlot, 0, 8);
 		ItemStack& selectedStack = player.inventory.slots[player.selectedHotbarSlot];
 
 		ItemDefinition* item = getItem(selectedStack.itemId);

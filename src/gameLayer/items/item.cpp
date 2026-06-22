@@ -82,98 +82,98 @@ void registerItems()
     using D = ItemDefinition;
 
     // ── Air ──────────────────────────────────────────────────────
-    reg(Items::air, D::makeBlock("Air", Items::air, CollisionType::NONE, ProjectileCollisionType::NONE, 0, 0, 0, 0, 0));
+    reg(Items::air, D::makeBlock("Air", Items::air, CollisionType::NONE, ProjectileCollisionType::NONE, 0, 0, 0, 1, 0, 0));
 
     // ── Soil & terrain ──────────────────────────────────────────────────────
-    reg(Items::dirt, D::makeBlock("Dirt", Items::dirt, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 20, TOOL_PICKAXE, 0,  999, 10));
-    reg(Items::grassBlock, D::makeBlock("Grass Block", Items::grassBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 20, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::stone, D::makeBlock("Stone", Items::stone, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 60, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::grass, D::makeBlock("Grass", Items::grass, CollisionType::NONE, ProjectileCollisionType::NONE, 5, TOOL_AXE, 0, 999, 10));
-    reg(Items::sand, D::makeBlock("Sand", Items::sand, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 15, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::sandRuby, D::makeBlock("Ruby Sand", Items::sandRuby, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 80, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::sandStone, D::makeBlock("Sandstone", Items::sandStone, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 55, TOOL_PICKAXE, 0, 999, 10));
+    reg(Items::dirt, D::makeBlock("Dirt", Items::dirt, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 20, TOOL_PICKAXE, 0, 4, 999, 10));
+    reg(Items::grassBlock, D::makeBlock("Grass Block", Items::grassBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 20, TOOL_PICKAXE, 0, 4, 999, 10));
+    reg(Items::stone, D::makeBlock("Stone", Items::stone, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 60, TOOL_PICKAXE, 0, 5, 999, 10));
+    reg(Items::grass, D::makeBlock("Grass", Items::grass, CollisionType::NONE, ProjectileCollisionType::NONE, 5, TOOL_AXE, 0, 1, 999, 10));
+    reg(Items::sand, D::makeBlock("Sand", Items::sand, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 15, TOOL_PICKAXE, 0, 4, 999, 10));
+    reg(Items::sandRuby, D::makeBlock("Ruby Sand", Items::sandRuby, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 80, TOOL_PICKAXE, 0, 6, 999, 10));
+    reg(Items::sandStone, D::makeBlock("Sandstone", Items::sandStone, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 55, TOOL_PICKAXE, 0, 5, 999, 10));
 
     // ── Wood & planks ───────────────────────────────────────────────────────
-    reg(Items::woodPlank, D::makeBlock("Wood Plank", Items::woodPlank, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 999, 10));
+    reg(Items::woodPlank, D::makeBlock("Wood Plank", Items::woodPlank, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 1, 999, 10));
 
     // ── Stone & brick ───────────────────────────────────────────────────────
-    reg(Items::stoneBricks, D::makeBlock("Stone Bricks", Items::stoneBricks, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 70, TOOL_HAMMER, 0, 999, 10));
+    reg(Items::stoneBricks, D::makeBlock("Stone Bricks", Items::stoneBricks, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 70, TOOL_HAMMER, 0, 5, 999, 10));
 
     // ── Soil (cont.) ────────────────────────────────────────────────────────
-    reg(Items::clay, D::makeBlock("Clay", Items::clay, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 25, TOOL_PICKAXE, 0, 999, 10));
+    reg(Items::clay, D::makeBlock("Clay", Items::clay, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 25, TOOL_PICKAXE, 0, 4, 999, 10));
 
     // ── Wood (cont.) ────────────────────────────────────────────────────────
-    reg(Items::woodLog, D::makeBlock("Wood Log", Items::woodLog, CollisionType::SOLID, ProjectileCollisionType::NONE, 40, TOOL_AXE, 0, 999, 10));
-    reg(Items::leaves, D::makeBlock("Leaves", Items::leaves, CollisionType::NONE, ProjectileCollisionType::NONE, 5, TOOL_AXE, 0, 999, 10));
+    reg(Items::woodLog, D::makeBlock("Wood Log", Items::woodLog, CollisionType::SOLID, ProjectileCollisionType::NONE, 40, TOOL_AXE, 0, 1, 999, 10));
+    reg(Items::leaves, D::makeBlock("Leaves", Items::leaves, CollisionType::NONE, ProjectileCollisionType::NONE, 5, TOOL_AXE, 0, 1, 999, 10));
 
     // ── Ores ────────────────────────────────────────────────────────────────
-    reg(Items::copper, D::makeBlock("Copper Ore", Items::copper, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 60, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::iron, D::makeBlock("Iron Ore", Items::iron, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 80, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::gold, D::makeBlock("Gold Ore", Items::gold, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 100, TOOL_PICKAXE, 0, 999, 10));
+    reg(Items::copper, D::makeBlock("Copper Ore", Items::copper, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 60, TOOL_PICKAXE, 0, 6, 999, 10));
+    reg(Items::iron, D::makeBlock("Iron Ore", Items::iron, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 80, TOOL_PICKAXE, 0, 6, 999, 10));
+    reg(Items::gold, D::makeBlock("Gold Ore", Items::gold, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 100, TOOL_PICKAXE, 0, 6, 999, 10));
 
     // ── Ore blocks ──────────────────────────────────────────────────────────
-    reg(Items::copperBlock, D::makeBlock("Copper Block", Items::copperBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 70, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::ironBlock, D::makeBlock("Iron Block", Items::ironBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 90, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::goldBlock, D::makeBlock("Gold Block", Items::goldBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 110, TOOL_PICKAXE, 0, 999, 10));
+    reg(Items::copperBlock, D::makeBlock("Copper Block", Items::copperBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 70, TOOL_PICKAXE, 0, 7,  999, 10));
+    reg(Items::ironBlock, D::makeBlock("Iron Block", Items::ironBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 90, TOOL_PICKAXE, 0, 7,  999, 10));
+    reg(Items::goldBlock, D::makeBlock("Gold Block", Items::goldBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 110, TOOL_PICKAXE, 0, 7,  999, 10));
 
     // ── Brick ───────────────────────────────────────────────────────────────
-    reg(Items::bricks, D::makeBlock("Bricks", Items::bricks, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 65, TOOL_HAMMER, 0, 999, 10));
+    reg(Items::bricks, D::makeBlock("Bricks", Items::bricks, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 65, TOOL_HAMMER, 0, 5,  999, 10));
 
     // ── Snow & ice ──────────────────────────────────────────────────────────
-    reg(Items::snow, D::makeBlock("Snow", Items::snow, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 15, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::ice, D::makeBlock("Ice", Items::ice, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 20, TOOL_PICKAXE, 0, 999, 10));
+    reg(Items::snow, D::makeBlock("Snow", Items::snow, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 15, TOOL_PICKAXE, 0, 4, 999, 10));
+    reg(Items::ice, D::makeBlock("Ice", Items::ice, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 20, TOOL_PICKAXE, 0, 2, 999, 10));
 
     // ── Ore blocks (cont.) ──────────────────────────────────────────────────
-    reg(Items::rubyBlock, D::makeBlock("Ruby Block", Items::rubyBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 120, TOOL_PICKAXE, 0, 999, 10));
+    reg(Items::rubyBlock, D::makeBlock("Ruby Block", Items::rubyBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 120, TOOL_PICKAXE, 0, 7, 999, 10));
 
     // ── Furniture / platforms ───────────────────────────────────────────────
-    reg(Items::platform, D::makeBlock("Platform", Items::platform, CollisionType::PLATFORM, ProjectileCollisionType::NONE, 20, TOOL_AXE, 0, 999, 10));
-    reg(Items::workBench, D::makeBlock("Workbench", Items::workBench, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
+    reg(Items::platform, D::makeBlock("Platform", Items::platform, CollisionType::PLATFORM, ProjectileCollisionType::NONE, 20, TOOL_AXE, 0, 1, 999, 10));
+    reg(Items::workBench, D::makeBlock("Workbench", Items::workBench, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
 
     // ── Special ─────────────────────────────────────────────────────────────
-    reg(Items::glass, D::makeBlock("Glass", Items::glass, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_HAMMER, 0, 999, 10));
-    reg(Items::furnace, D::makeBlock("Furnace", Items::furnace, CollisionType::SOLID, ProjectileCollisionType::NONE, 50, TOOL_PICKAXE, 10, 1, 10));
-    reg(Items::painting, D::makeBlock("Painting", Items::painting, CollisionType::NONE, ProjectileCollisionType::NONE, 10, TOOL_HAMMER, 0, 999, 10));
+    reg(Items::glass, D::makeBlock("Glass", Items::glass, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_HAMMER, 0, 1, 999, 10));
+    reg(Items::furnace, D::makeBlock("Furnace", Items::furnace, CollisionType::SOLID, ProjectileCollisionType::NONE, 50, TOOL_PICKAXE, 10, 1, 1, 10));
+    reg(Items::painting, D::makeBlock("Painting", Items::painting, CollisionType::NONE, ProjectileCollisionType::NONE, 10, TOOL_HAMMER, 0, 1, 999, 10));
 
     // ── Plants ──────────────────────────────────────────────────────────────
-    reg(Items::sappling, D::makeBlock("Sapling", Items::sappling, CollisionType::NONE, ProjectileCollisionType::NONE, 5, TOOL_AXE, 0, 999, 10));
+    reg(Items::sappling, D::makeBlock("Sapling", Items::sappling, CollisionType::NONE, ProjectileCollisionType::NONE, 5, TOOL_AXE, 0, 1, 999, 10));
 
     // ── Ore blocks (cont.) ──────────────────────────────────────────────────
-    reg(Items::snowBlueRuby, D::makeBlock("Blue Ruby Snow", Items::snowBlueRuby, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 80, TOOL_PICKAXE, 0, 999, 10));
-    reg(Items::blueRubyBlock, D::makeBlock("Blue Ruby Block", Items::blueRubyBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 130, TOOL_PICKAXE, 0, 999, 10));
+    reg(Items::snowBlueRuby, D::makeBlock("Blue Ruby Snow", Items::snowBlueRuby, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 80, TOOL_PICKAXE, 0, 6, 999, 10));
+    reg(Items::blueRubyBlock, D::makeBlock("Blue Ruby Block", Items::blueRubyBlock, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 130, TOOL_PICKAXE, 0, 7, 999, 10));
 
     // ── Furniture ───────────────────────────────────────────────────────────
-    reg(Items::door, D::makeBlock("Door", Items::door, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
-    reg(Items::jar, D::makeBlock("Jar", Items::jar, CollisionType::NONE, ProjectileCollisionType::NONE, 10, TOOL_HAMMER, 0, 999, 10));
-    reg(Items::table, D::makeBlock("Table", Items::table, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
-    reg(Items::wordrobe, D::makeBlock("Wardrobe", Items::wordrobe, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 1, 10));
-    reg(Items::bookShelf, D::makeBlock("Bookshelf", Items::bookShelf, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
+    reg(Items::door, D::makeBlock("Door", Items::door, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::jar, D::makeBlock("Jar", Items::jar, CollisionType::NONE, ProjectileCollisionType::NONE, 10, TOOL_HAMMER, 0, 1, 999, 10));
+    reg(Items::table, D::makeBlock("Table", Items::table, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::wordrobe, D::makeBlock("Wardrobe", Items::wordrobe, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::bookShelf, D::makeBlock("Bookshelf", Items::bookShelf, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
 
     // ── Snow brick & furniture ──────────────────────────────────────────────
-    reg(Items::snowBricks, D::makeBlock("Snow Bricks", Items::snowBricks, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 70, TOOL_HAMMER, 0, 999, 10));
-    reg(Items::iceTable, D::makeBlock("Ice Table", Items::iceTable, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
-    reg(Items::iceWordrobe, D::makeBlock("Ice Wardrobe", Items::iceWordrobe, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 1, 10));
-    reg(Items::iceBookShelf, D::makeBlock("Ice Bookshelf", Items::iceBookShelf, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
-    reg(Items::icePlatform, D::makeBlock("Ice Platform", Items::icePlatform, CollisionType::PLATFORM, ProjectileCollisionType::NONE, 20, TOOL_AXE, 0, 999, 10));
+    reg(Items::snowBricks, D::makeBlock("Snow Bricks", Items::snowBricks, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 70, TOOL_HAMMER, 0, 5, 999, 10));
+    reg(Items::iceTable, D::makeBlock("Ice Table", Items::iceTable, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::iceWordrobe, D::makeBlock("Ice Wardrobe", Items::iceWordrobe, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::iceBookShelf, D::makeBlock("Ice Bookshelf", Items::iceBookShelf, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::icePlatform, D::makeBlock("Ice Platform", Items::icePlatform, CollisionType::PLATFORM, ProjectileCollisionType::NONE, 20, TOOL_AXE, 0, 1, 999, 10));
 
     // ── Sand furniture ──────────────────────────────────────────────────────
-    reg(Items::sandTable, D::makeBlock("Sand Table", Items::sandTable, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
-    reg(Items::sandWordrobe, D::makeBlock("Sand Wardrobe", Items::sandWordrobe, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 1, 10));
-    reg(Items::sandBookShelf, D::makeBlock("Sand Bookshelf", Items::sandBookShelf, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
-    reg(Items::sandPlatform, D::makeBlock("Sand Platform", Items::sandPlatform, CollisionType::PLATFORM, ProjectileCollisionType::NONE, 20, TOOL_AXE, 0, 999, 10));
+    reg(Items::sandTable, D::makeBlock("Sand Table", Items::sandTable, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::sandWordrobe, D::makeBlock("Sand Wardrobe", Items::sandWordrobe, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::sandBookShelf, D::makeBlock("Sand Bookshelf", Items::sandBookShelf, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::sandPlatform, D::makeBlock("Sand Platform", Items::sandPlatform, CollisionType::PLATFORM, ProjectileCollisionType::NONE, 20, TOOL_AXE, 0, 1, 999, 10));
 
     // ── Chests ──────────────────────────────────────────────────────────────
-    reg(Items::woodenChest, D::makeBlock("Wooden Chest", Items::woodenChest, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_AXE, 0, 1, 10));
-    reg(Items::iceChest, D::makeBlock("Ice Chest", Items::iceChest, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_AXE, 0, 1, 10));
-    reg(Items::sandChest, D::makeBlock("Sand Chest", Items::sandChest, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_AXE, 0, 1, 10));
-    reg(Items::boneChest, D::makeBlock("Bone Chest", Items::boneChest, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_AXE, 0, 1, 10));
+    reg(Items::woodenChest, D::makeBlock("Wooden Chest", Items::woodenChest, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_AXE, 0, 3, 1, 10));
+    reg(Items::iceChest, D::makeBlock("Ice Chest", Items::iceChest, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_AXE, 0, 3, 1, 10));
+    reg(Items::sandChest, D::makeBlock("Sand Chest", Items::sandChest, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_AXE, 0, 3, 1, 10));
+    reg(Items::boneChest, D::makeBlock("Bone Chest", Items::boneChest, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 10, TOOL_AXE, 0, 3, 1, 10));
 
     // ── Bone set ────────────────────────────────────────────────────────────
-    reg(Items::boneBricks, D::makeBlock("Bone Bricks", Items::boneBricks, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 75, TOOL_HAMMER, 0, 999, 10));
-    reg(Items::boneBench, D::makeBlock("Bone Bench", Items::boneBench, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
-    reg(Items::boneWordrobe, D::makeBlock("Bone Wardrobe", Items::boneWordrobe, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 1, 10));
-    reg(Items::boneBookShelf, D::makeBlock("Bone Bookshelf", Items::boneBookShelf, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 1, 10));
-    reg(Items::bonePlatform, D::makeBlock("Bone Platform", Items::bonePlatform, CollisionType::PLATFORM, ProjectileCollisionType::NONE, 20, TOOL_AXE, 0, 999, 10));
+    reg(Items::boneBricks, D::makeBlock("Bone Bricks", Items::boneBricks, CollisionType::SOLID, ProjectileCollisionType::DESTROY, 75, TOOL_HAMMER, 0, 5, 999, 10));
+    reg(Items::boneBench, D::makeBlock("Bone Bench", Items::boneBench, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::boneWordrobe, D::makeBlock("Bone Wardrobe", Items::boneWordrobe, CollisionType::SOLID, ProjectileCollisionType::NONE, 35, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::boneBookShelf, D::makeBlock("Bone Bookshelf", Items::boneBookShelf, CollisionType::SOLID, ProjectileCollisionType::NONE, 30, TOOL_AXE, 0, 2, 1, 10));
+    reg(Items::bonePlatform, D::makeBlock("Bone Platform", Items::bonePlatform, CollisionType::PLATFORM, ProjectileCollisionType::NONE, 20, TOOL_AXE, 0, 1, 999, 10));
 
     // ── Tools ─────────────────────────────────────────────────────────────────
     reg(Items::woodPickaxe, D::makeTool("Wood Pickaxe", ToolType::PICKAXE, 10, 3.f, 60, AttackStyle::SWING));

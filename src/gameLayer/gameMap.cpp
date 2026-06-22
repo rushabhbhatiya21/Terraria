@@ -65,7 +65,7 @@ bool GameMap::setBlock(int x, int y, ItemId blockType, bool shouldCalcLight)
 	auto res = chunkGrid.setBlock(x, y, blockType);
 
 	if (shouldCalcLight)
-		recalculateLight(*this, x, y, i->block.lightEmission);
+		recalculateLight(*this);
 
 	return res;
 }
