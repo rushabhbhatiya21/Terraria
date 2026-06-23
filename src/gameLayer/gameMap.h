@@ -13,6 +13,7 @@ struct GameMap
 	//std::vector<Block> mapData = {};
 	ChunkGrid chunkGrid = {};
 	std::vector<uint16_t> worldHeightMap;
+	std::vector<bool> dirtyColumns;
 
 	void create(const int w, const int h);
 

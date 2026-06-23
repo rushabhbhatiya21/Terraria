@@ -1,5 +1,6 @@
 #include "lighting.h"
 #include "gameMap.h"
+#include <set>
 #include <iostream>
 #include <chrono>
 
@@ -23,7 +24,9 @@ void initLight(GameMap& gameMap)
 	{
 		for (int cx = 0; cx < gameMap.chunkGrid.CW; cx++)
 		{
-			Chunk& chunk = gameMap.chunkGrid.getChunkUnsafe(cx, cy);
+			Chunk& chunk = gameMap.chunkGrid.chunks[cy * gameMap.chunkGrid.CW + cx];
+
+			if (!chunk.lightingDirty) continue;
 
 			for (int ly = 0; ly < 16; ly++)
 			{
@@ -73,8 +76,28 @@ void initLight(GameMap& gameMap)
 
 void calculateSunlight(GameMap& gameMap)
 {
+	for (int cy = 0; cy < gameMap.chunkGrid.CH; cy++)
+	{
+		for (int cx = 0; cx < gameMap.chunkGrid.CW; cx++)
+		{
+			Chunk& chunk = gameMap.chunkGrid.chunks[cy * gameMap.chunkGrid.CW + cx];
+
+			if (!chunk.lightingDirty) continue;
+
+			int startX = cx << CHUNK_SHIFT;
+			
+			for (int x = startX; x < startX + CHUNK_SIZE; x++)
+			{
+				if (!gameMap.dirtyColumns[x])
+					gameMap.dirtyColumns[x] = true;
+			}
+		}
+	}
+
 	for (int x = 0; x < gameMap.w; x++)
 	{
+		if (!gameMap.dirtyColumns[x]) continue;
+
 		int sunLight = 15;
 		uint16_t surfaceY = gameMap.worldHeightMap[x];
 
@@ -127,23 +150,44 @@ void calculateBlockLight(GameMap& gameMap)
 	}
 }
 
+void clearDirtyRegions(GameMap& gameMap)
+{
+	for (int cy = 0; cy < gameMap.chunkGrid.CH; cy++)
+	{
+		for (int cx = 0; cx < gameMap.chunkGrid.CW; cx++)
+		{
+			Chunk& chunk = gameMap.chunkGrid.chunks[cy * gameMap.chunkGrid.CW + cx];
+
+			if (!chunk.lightingDirty) continue;
+			chunk.lightingDirty = false;
+		}
+	}
+
+	for (int x = 0; x < gameMap.w; x++)
+	{
+		gameMap.dirtyColumns[x] = false;
+	}
+}
+
 void recalculateLight(GameMap& gameMap)
 {
 	auto s1 = std::chrono::high_resolution_clock::now();
 	initLight(gameMap);
 	auto e1 = std::chrono::high_resolution_clock::now();
 	auto d1 = std::chrono::duration_cast<std::chrono::microseconds>(e1 - s1);
-	std::cout << "Init Light time: " << d1.count() / 1000 << " ms" << std::endl;
+	std::cout << "Init Light time: " << d1.count() << " us" << std::endl;
 
 	auto s2 = std::chrono::high_resolution_clock::now();
 	calculateSunlight(gameMap);
 	auto e2 = std::chrono::high_resolution_clock::now();
 	auto d2 = std::chrono::duration_cast<std::chrono::microseconds>(e2 - s2);
-	std::cout << "Calculate Sun Light time: " << d2.count() / 1000 << " ms" << std::endl;
+	std::cout << "Calculate Sun Light time: " << d2.count() << " us" << std::endl;
 
 	auto s3 = std::chrono::high_resolution_clock::now();
 	calculateBlockLight(gameMap);
 	auto e3 = std::chrono::high_resolution_clock::now();
 	auto d3 = std::chrono::duration_cast<std::chrono::microseconds>(e3 - s3);
-	std::cout << "Calculate Block Light time: " << d3.count() / 1000 << " ms" << std::endl;
+	std::cout << "Calculate Block Light time: " << d3.count() << " us" << std::endl;
+
+	clearDirtyRegions(gameMap);
 }

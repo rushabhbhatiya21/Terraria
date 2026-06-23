@@ -131,13 +131,32 @@ struct ChunkGrid
 		auto* chunk = getChunkFromWorldPos(x, y);
 		if (!chunk) return false;
 
+		auto* def = getItem(blockType);
+		if (!def) return false;
+		int emission = (int)def->block.lightEmission;
+
 		int lx = x & (CHUNK_SIZE - 1);
 		int ly = y & (CHUNK_SIZE - 1);
 
+		int chunkX = x >> CHUNK_SHIFT;
+		int chunkY = y >> CHUNK_SHIFT;
+
+		for (int cy = -1; cy <= 1; cy++)
+		{
+			for (int cx = -1; cx <= 1; cx++)
+			{
+				if (cx == 0 && cy == 0) continue;
+
+				auto* chunkNeighbor = getChunk(chunkX + cx, chunkY + cy);
+				if (chunkNeighbor)
+					chunkNeighbor->lightingDirty = true;
+			}
+		}
+
 		chunk->blocks[ly][lx] = initBlock(blockType);
-		chunk->renderDirty = true;
 		chunk->lightingDirty = true;
-		chunk->simulationDirty = true;
+		//chunk->renderDirty = true;
+		//chunk->simulationDirty = true;
 
 		return true;
 	}

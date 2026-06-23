@@ -15,5 +15,6 @@ void initLight(GameMap& gameMap);
 void calculateSunlight(GameMap& gameMap);
 void calculateBlockLight(GameMap& gameMap);
 void recalculateLight(GameMap& gameMap);
+void clearDirtyRegions(GameMap& gameMap);
 
 extern std::queue<LightNode> q;

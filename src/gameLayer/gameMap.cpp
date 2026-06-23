@@ -16,6 +16,7 @@ void GameMap::create(const int w, const int h)
 	// make sure h is less than uint16_t
 	permaAssertCommentDevelopement(w < 32768, "world height exceeds height map data store(uint16_t) variable.");
 	worldHeightMap.resize(w);
+	dirtyColumns.resize(w, false);
 }
 
 Block& GameMap::getBlockUnsafe(int x, int y)

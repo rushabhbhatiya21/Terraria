@@ -1692,7 +1692,7 @@ bool Gameplay::update(AssetManager& assetManager)
 		auto end = std::chrono::high_resolution_clock::now();
 
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-		std::cout << "Total Lighting time: " << duration.count() / 1000 << " ms\n" << std::endl;
+		std::cout << "Total Lighting time: " << duration.count() << " us\n" << std::endl;
 	}
 
 #pragma endregion
