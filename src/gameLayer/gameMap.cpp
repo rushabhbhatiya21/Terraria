@@ -40,10 +40,27 @@ bool GameMap::setBlock(int x, int y, ItemId blockType)
 	auto* i = getItem(blockType);
 	if (!i) return false;
 
-	auto res = chunkGrid.setBlock(x, y, blockType);
-	lightingNeedsRebuild = true;
+	bool success = chunkGrid.setBlock(x, y, blockType);
 
-	return res;
+	if (success)
+	{
+		updateHeightMapAfterPlacement(x, y);
+		lightingNeedsRebuild = true;
+	}
+
+	return success;
+}
+
+bool GameMap::removeBlock(int x, int y)
+{
+	bool success = chunkGrid.removeBlock(x, y);
+
+	if (success)
+	{
+		updateHeightMapAfterRemoval(x, y);
+		lightingNeedsRebuild = true;
+	}
+	return success;
 }
 
 void GameMap::buildHeightMap()
@@ -65,13 +82,44 @@ void GameMap::buildHeightMap()
 			Block& b = chunk.blocks[ly][lx];
 
 			// for now ignore, we will give 0 value to their attenuation later
-			if (b.type != Items::air && b.type != Items::grass && b.type != Items::jar && b.type != Items::sappling)
+			if (b.type != Items::air)
 			{
 				worldHeightMap[x] = y;
 				break;
 			}
 		}
 	}
+}
+
+void GameMap::updateHeightMapAfterPlacement(int x, int y)
+{
+	// less y = higher in map
+	
+	// if blocks is placed below, no effect
+	if (y >= worldHeightMap[x])
+		return;
+
+	// new block is above
+	worldHeightMap[x] = y;
+}
+
+void GameMap::updateHeightMapAfterRemoval(int x, int y)
+{
+	if (y != worldHeightMap[x])
+		return;
+
+	for (int wy = worldHeightMap[x]; wy < h; wy++)
+	{
+		Block* b = getBlockSafe(x, wy);
+
+		if (b && b->type != Items::air)
+		{
+			worldHeightMap[x] = wy;
+			return;
+		}
+	}
+
+	worldHeightMap[x] = h;
 }
 
 bool GameMap::isAdjacentBlock(int x, int y)

@@ -19,9 +19,12 @@ struct GameMap
 	Block& getBlockUnsafe(int x, int y);
 	Block* getBlockSafe(int x, int y);
 	bool setBlock(int x, int y, ItemId blockType);
+	bool removeBlock(int x, int y);
 
 	// todo: updateHeightMap on setBlock
 	void buildHeightMap();
+	void updateHeightMapAfterPlacement(int x, int y);
+	void updateHeightMapAfterRemoval(int x, int y);
 
 	bool isAdjacentBlock(int x, int y);
 

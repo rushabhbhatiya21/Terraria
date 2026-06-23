@@ -77,7 +77,7 @@ struct ChunkGrid
 	{
 		if (cx < 0 || cy < 0 || cx >= CW || cy >= CH) return nullptr;
 
-		permaAssertCommentDevelopement(CW == 0 || CH == 0, "CW or CH is 0, make sure to call chunkGrid.init(w, h) before using getChunk(cx, cy).");
+		//permaAssertCommentDevelopement(CW == 0 || CH == 0, "CW or CH is 0, make sure to call chunkGrid.init(w, h) before using getChunk(cx, cy).");
 
 		return &chunks[cy * CW + cx];
 	}
@@ -138,9 +138,6 @@ struct ChunkGrid
 		chunk->renderDirty = true;
 		chunk->lightingDirty = true;
 		chunk->simulationDirty = true;
-
-		// placeholder to update height map
-		// placeholder to notify light system
 
 		return true;
 	}
