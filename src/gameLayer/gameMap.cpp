@@ -47,6 +47,7 @@ bool GameMap::setBlock(int x, int y, ItemId blockType)
 	{
 		updateHeightMapAfterPlacement(x, y);
 		lightingNeedsRebuild = true;
+		textureNeedsRebuild  = true;
 	}
 
 	return success;
@@ -60,6 +61,7 @@ bool GameMap::removeBlock(int x, int y)
 	{
 		updateHeightMapAfterRemoval(x, y);
 		lightingNeedsRebuild = true;
+		textureNeedsRebuild  = true;
 	}
 	return success;
 }

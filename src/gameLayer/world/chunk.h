@@ -27,8 +27,11 @@ struct Chunk
 	bool lightingDirty = false;
 	bool simulationDirty = false;
 	bool isActive = false;
-
 	//std::vector<LightSource> lightSources;
+
+	// cache
+	RenderTexture2D renderTexture = {};
+	bool renderTextureInitialized = false;
 };
 
 struct ChunkGrid
@@ -128,16 +131,7 @@ struct ChunkGrid
 
 	bool setBlock(int x, int y, ItemId blockType)
 	{
-		auto* chunk = getChunkFromWorldPos(x, y);
-		if (!chunk) return false;
-
-		auto* def = getItem(blockType);
-		if (!def) return false;
-		int emission = (int)def->block.lightEmission;
-
-		int lx = x & (CHUNK_SIZE - 1);
-		int ly = y & (CHUNK_SIZE - 1);
-
+		bool isBlockSet = false;
 		int chunkX = x >> CHUNK_SHIFT;
 		int chunkY = y >> CHUNK_SHIFT;
 
@@ -145,20 +139,26 @@ struct ChunkGrid
 		{
 			for (int cx = -1; cx <= 1; cx++)
 			{
-				if (cx == 0 && cy == 0) continue;
+				auto* chunk = getChunk(chunkX + cx, chunkY + cy);
 
-				auto* chunkNeighbor = getChunk(chunkX + cx, chunkY + cy);
-				if (chunkNeighbor)
-					chunkNeighbor->lightingDirty = true;
+				if (!chunk) continue;
+
+				if (cx == 0 && cy == 0)
+				{
+					int lx = x & (CHUNK_SIZE - 1);
+					int ly = y & (CHUNK_SIZE - 1);
+
+					chunk->blocks[ly][lx] = initBlock(blockType);
+					isBlockSet = true;
+				}
+
+				chunk->lightingDirty = true;
+				chunk->renderDirty   = true;
+				//chunk->simulationDirty = true;
 			}
 		}
 
-		chunk->blocks[ly][lx] = initBlock(blockType);
-		chunk->lightingDirty = true;
-		//chunk->renderDirty = true;
-		//chunk->simulationDirty = true;
-
-		return true;
+		return isBlockSet;
 	}
 
 	bool removeBlock(int x, int y)

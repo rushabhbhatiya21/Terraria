@@ -3,6 +3,8 @@
 #include <set>
 #include <iostream>
 #include <chrono>
+#include "helper.h"
+#include "assetManager.h"
 
 std::queue<LightNode> q;
 

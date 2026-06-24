@@ -13,6 +13,7 @@
 
 #include <shake.h>
 #include <lighting.h>
+#include <rendering/chunkRenderer.h>
 
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>
@@ -632,6 +633,9 @@ bool Gameplay::init()
 
 	// lighting init
 	recalculateLight(gameMap);
+
+	// chunk texture init
+	ChunkRenderer::initializeChunkRenderTextures(gameMap);
 
 	// cam init
 	camera.target = { 20, 120 };
@@ -1327,93 +1331,22 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region render world
 
-	for (int y = startYView; y <= endYView; y++)
-	{
-		for (int x = startXView; x <= endXView; x++)
-		{
-			float size = 1;
-			float posX = x * size;
-			float posY = y * size;
+	bool debugChunkRendering = true;
+	int visibleBlocks = 0;
 
-			int atlasX = 0;
+	auto start = std::chrono::high_resolution_clock::now();
 
-			auto& bb = backgroundMap.getBlockUnsafe(x, y);
+	if (debugChunkRendering)
+		visibleBlocks = ChunkRenderer::drawChunks(gameMap, startYView, endYView, startXView, endXView);
+	else
+		visibleBlocks = ChunkRenderer::legacyDrawBlocks(assetManager, backgroundMap, gameMap, startYView, endYView, startXView, endXView);
 
-			if (bb.type != Items::air)
-			{
-				atlasX = bb.type;
+	auto end = std::chrono::high_resolution_clock::now();
 
-				if (bb.variation == -1)
-				{
-					bb.variation = rand() % 4;
-				}
+	float worldRenderMs = std::chrono::duration<float, std::milli>(end - start).count();
 
-				DrawTexturePro(
-					assetManager.textures,
-					getTextureAtlas(atlasX, bb.variation, 32, 32),
-					{ posX,posY,size,size }, //dest
-					{ 0,0 }, //origin (top-left)
-					0.f,     //rotation
-					WHITE    //tint
-				);
-			}
-
-			auto& b = gameMap.getBlockUnsafe(x, y);
-
-			if (b.type != Items::air)
-			{
-				atlasX = b.type;
-
-				if (b.variation == 255)
-				{
-					b.variation = rand() % 4;
-				}
-
-				if (b.type > Items::LAST_BLOCK)
-					b.variation = 0;
-
-				Vector2 shake = getShakeOffset(x, y);
-
-				float drawX = posX + shake.x;
-				float drawY = posY + shake.y;
-
-				float l = (std::max((float)b.light, (float)b.sunLight)) * 17.0f;
-				//float l = (float)b.light * 17.0f;
-
-				Color tint = {
-					(uint8_t)l,
-					(uint8_t)l,
-					(uint8_t)l,
-					//b.light,
-					//b.light,
-					//b.light,
-					255
-				};
-
-				DrawTexturePro(
-					assetManager.textures,
-					getTextureAtlas(atlasX, b.variation, 32, 32), //source (in sprite)
-					{ drawX,drawY,size,size }, //dest
-					{ 0,0 }, //origin (top-left)
-					0.f,     //rotation
-					tint
-				);
-			}
-
-			//float l = (float)b.light * 17.0f;
-
-			//DrawTextPro(
-			//	GetFontDefault(),
-			//	std::to_string((int)l).c_str(),
-			//	{ posX, posY },
-			//	{ 0,0 },
-			//	.0f,
-			//	.5f,
-			//	.05f,
-			//	WHITE
-			//);
-		}
-	}
+	std::cout << "Visible Blocks/Chunks: " << visibleBlocks << "\n";
+	std::cout << "World Render Time: " << worldRenderMs << " ms" << "\n";
 
 #pragma endregion
 
@@ -1681,7 +1614,18 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region lighting update
+#pragma region rebuild texture
+
+	if (gameMap.textureNeedsRebuild)
+	{
+		gameMap.textureNeedsRebuild = false;
+		ChunkRenderer::rebuildChunk(assetManager, gameMap);
+	}
+
+#pragma endregion
+
+
+#pragma region rebuild lighting
 
 	if (gameMap.lightingNeedsRebuild)
 	{

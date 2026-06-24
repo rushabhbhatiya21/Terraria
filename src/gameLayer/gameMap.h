@@ -9,6 +9,7 @@ struct GameMap
 	int h = 0;
 
 	bool lightingNeedsRebuild = false;
+	bool textureNeedsRebuild  = false;
 
 	//std::vector<Block> mapData = {};
 	ChunkGrid chunkGrid = {};
