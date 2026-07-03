@@ -19,6 +19,36 @@ static bool isPowerOfTwo(int n)
 //	uint8_t y;
 //};
 
+struct CachedTile
+{
+	Vector2 position = {};
+	Rectangle srcRect = {};
+	Block* block;
+};
+
+struct ChunkRenderData
+{
+	std::vector<CachedTile> tiles;
+
+	void addTile(int worldX, int worldY, Rectangle srcRect, Block* b)
+	{
+		tiles.emplace_back
+		(
+			CachedTile
+			{ 
+				Vector2{ (float)worldX, (float)worldY },
+				srcRect, 
+				b 
+			}
+		);
+	}
+
+	void clearCache()
+	{
+		tiles.clear();
+	}
+};
+
 struct Chunk
 {
 	Block blocks[CHUNK_SIZE][CHUNK_SIZE];
@@ -29,9 +59,12 @@ struct Chunk
 	bool isActive = false;
 	//std::vector<LightSource> lightSources;
 
-	// cache
+	// old cache
 	RenderTexture2D renderTexture = {};
 	bool renderTextureInitialized = false;
+
+	// cache
+	ChunkRenderData renderData = {};
 };
 
 struct ChunkGrid

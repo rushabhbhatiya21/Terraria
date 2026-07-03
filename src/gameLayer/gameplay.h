@@ -9,6 +9,7 @@
 #include <gameMap.h>
 #include <assetManager.h>
 #include <drawBackground.h>
+#include <rendering/chunkRenderer.h>
 
 #include <entityHolder.h>
 #include <structure.h>
@@ -24,7 +25,6 @@
 
 #define DEBUG_MODE 0
 #define CAMERA_ZOOM 20.0f
-#define TILE_SIZE 1
 #define LIGHT_SCALE 4
 
 enum class DayPhase
@@ -71,6 +71,7 @@ struct Gameplay
 	GameMap backgroundMap = {};
 	Camera2D camera = {};
 	DrawBackground background;
+	WorldRenderer renderer = {};
 
 	float lifetime = 0;
 
@@ -179,7 +180,7 @@ struct Gameplay
 		entityHolder.enemies.push_back(enemyPtr);
 	}
 
-	bool init();
+	bool init(AssetManager& assetManager);
 
 	bool update(AssetManager& assetManager);
 

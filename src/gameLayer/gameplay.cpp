@@ -619,7 +619,7 @@ static float tileNoise(int x, int y)
 #pragma endregion
 
 
-bool Gameplay::init()
+bool Gameplay::init(AssetManager& assetManager)
 {
 	double loadStart = GetTime();
 
@@ -631,11 +631,14 @@ bool Gameplay::init()
 	backgroundMap.create(w, h);
 	generateWorld(gameMap, w, h);
 
+	// renderer
+	renderer.init(gameMap, assetManager);
+
 	// lighting init
 	recalculateLight(gameMap);
 
 	// chunk texture init
-	ChunkRenderer::initializeChunkRenderTextures(gameMap);
+	ChunkRendererTexture::initializeChunkRenderTextures(gameMap);
 
 	// cam init
 	camera.target = { 20, 120 };
@@ -1331,15 +1334,29 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region render world
 
-	bool debugChunkRendering = true;
+	int debugRendering = 2;
 	int visibleBlocks = 0;
 
 	auto start = std::chrono::high_resolution_clock::now();
 
-	if (debugChunkRendering)
-		visibleBlocks = ChunkRenderer::drawChunks(gameMap, startYView, endYView, startXView, endXView);
-	else
-		visibleBlocks = ChunkRenderer::legacyDrawBlocks(assetManager, backgroundMap, gameMap, startYView, endYView, startXView, endXView);
+	switch (debugRendering)
+	{
+	case 1:
+	{
+		visibleBlocks = ChunkRendererTexture::drawChunks(gameMap, startYView, endYView, startXView, endXView);
+		break;
+	}
+	case 2:
+	{
+		std::cout << "Using Cached Render Data.\n";
+		visibleBlocks = renderer.drawBlocks(startYView, endYView, startXView, endXView);
+	}
+	default:
+	{
+		visibleBlocks = WorldRendererLegacy::drawBlocks(assetManager, backgroundMap, gameMap, startYView, endYView, startXView, endXView);
+		break;
+	}
+	}
 
 	auto end = std::chrono::high_resolution_clock::now();
 
@@ -1619,7 +1636,7 @@ bool Gameplay::update(AssetManager& assetManager)
 	if (gameMap.textureNeedsRebuild)
 	{
 		gameMap.textureNeedsRebuild = false;
-		ChunkRenderer::rebuildChunk(assetManager, gameMap);
+		ChunkRendererTexture::rebuildChunk(assetManager, gameMap);
 	}
 
 #pragma endregion

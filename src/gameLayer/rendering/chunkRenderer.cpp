@@ -1,4 +1,6 @@
 ﻿#include "chunkRenderer.h"
+#include "chunkRenderer.h"
+#include "chunkRenderer.h"
 #include <raylib.h>
 #include <world/chunk.h>
 #include <helper.h>
@@ -6,7 +8,7 @@
 #include <gameMap.h>
 #include <assetManager.h>
 
-void ChunkRenderer::initializeChunkRenderTextures(GameMap& gameMap)
+void ChunkRendererTexture::initializeChunkRenderTextures(GameMap& gameMap)
 {
 	for (int cy = 0; cy < gameMap.chunkGrid.CH; cy++)
 	{
@@ -25,7 +27,7 @@ void ChunkRenderer::initializeChunkRenderTextures(GameMap& gameMap)
 	}
 }
 
-int ChunkRenderer::drawChunks(GameMap& gameMap, int startYView, int endYView, int startXView, int endXView)
+int ChunkRendererTexture::drawChunks(GameMap& gameMap, int startYView, int endYView, int startXView, int endXView)
 {
 	int visibleChunks = 0;
 	startYView >>= CHUNK_SHIFT;
@@ -65,7 +67,7 @@ int ChunkRenderer::drawChunks(GameMap& gameMap, int startYView, int endYView, in
 	return visibleChunks;
 }
 
-void ChunkRenderer::rebuildChunk(AssetManager& assetManager, GameMap& gameMap)
+void ChunkRendererTexture::rebuildChunk(AssetManager& assetManager, GameMap& gameMap)
 {
 	for (int cy = 0; cy < gameMap.chunkGrid.CH; cy++)
 	{
@@ -86,7 +88,7 @@ void ChunkRenderer::rebuildChunk(AssetManager& assetManager, GameMap& gameMap)
 	}
 }
 
-void ChunkRenderer::rebuildChunkTexture(AssetManager& assetManager, GameMap& gameMap, Chunk& chunk)
+void ChunkRendererTexture::rebuildChunkTexture(AssetManager& assetManager, GameMap& gameMap, Chunk& chunk)
 {
 	for (int ly = 0; ly < CHUNK_SIZE; ly++)
 	{
@@ -112,7 +114,7 @@ void ChunkRenderer::rebuildChunkTexture(AssetManager& assetManager, GameMap& gam
 	}
 }
 
-int ChunkRenderer::legacyDrawBlocks(AssetManager& assetManager, GameMap& backgroundMap, GameMap& gameMap, int startYView, int endYView, int startXView, int endXView)
+int WorldRendererLegacy::drawBlocks(AssetManager& assetManager, GameMap& backgroundMap, GameMap& gameMap, int startYView, int endYView, int startXView, int endXView)
 {
 	int visibleBlocks = 0;
 
@@ -120,9 +122,8 @@ int ChunkRenderer::legacyDrawBlocks(AssetManager& assetManager, GameMap& backgro
 	{
 		for (int x = startXView; x <= endXView; x++)
 		{
-			float size = 1;
-			float posX = x * size;
-			float posY = y * size;
+			float posX = x * TILE_SIZE;
+			float posY = y * TILE_SIZE;
 
 			int atlasX = 0;
 
@@ -140,7 +141,7 @@ int ChunkRenderer::legacyDrawBlocks(AssetManager& assetManager, GameMap& backgro
 				DrawTexturePro(
 					assetManager.textures,
 					getTextureAtlas(atlasX, bb.variation, 32, 32),
-					{ posX,posY,size,size }, //dest
+					{ posX,posY,TILE_SIZE,TILE_SIZE }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
 					WHITE    //tint
@@ -178,13 +179,14 @@ int ChunkRenderer::legacyDrawBlocks(AssetManager& assetManager, GameMap& backgro
 				DrawTexturePro(
 					assetManager.textures,
 					getTextureAtlas(atlasX, b.variation, 32, 32), //source (in sprite)
-					{ drawX,drawY,size,size }, //dest
+					{ drawX,drawY,TILE_SIZE,TILE_SIZE }, //dest
 					{ 0,0 }, //origin (top-left)
 					0.f,     //rotation
 					tint
 				);
 			}
 
+			// comment helper start
 			//float l = (float)b.light * 17.0f;
 
 			//DrawTextPro(
@@ -197,8 +199,116 @@ int ChunkRenderer::legacyDrawBlocks(AssetManager& assetManager, GameMap& backgro
 			//	.05f,
 			//	WHITE
 			//);
+			// comment helper end
+
 			visibleBlocks++;
 		}
 	}
 	return visibleBlocks;
+}
+
+void WorldRenderer::init(GameMap& map, AssetManager& assets)
+{
+	this->map = &map;
+	this->assets = &assets;
+}
+
+void WorldRenderer::rebuildDirtyChunkRenderData()
+{
+	for (int cy = 0; cy < map->chunkGrid.CH; cy++)
+	{
+		for (int cx = 0; cx < map->chunkGrid.CW; cx++)
+		{
+			auto* chunk = map->chunkGrid.getChunk(cx, cy);
+			if (!chunk) continue;
+
+			if (!chunk->renderDirty) continue;
+
+			rebuildChunkRenderData(cx, cy);
+
+			chunk->renderDirty = false;
+		}
+	}
+}
+
+void WorldRenderer::rebuildChunkRenderData(const int cx, const int cy)
+{
+	Chunk& chunk = map->chunkGrid.getChunkUnsafe(cx, cy);
+	chunk.renderData.clearCache();
+
+	for (int ly = 0; ly < CHUNK_SIZE; ly++)
+	{
+		for (int lx = 0; lx < CHUNK_SIZE; lx++)
+		{
+			Block& b = chunk.blocks[ly][lx];
+
+			if (b.type == Items::air)
+				continue;
+
+			int worldX = cx * CHUNK_SIZE + lx;
+			int worldY = cy * CHUNK_SIZE + ly;
+			Rectangle srcRect = getTextureAtlas(b.type, b.variation, 32, 32);
+
+			chunk.renderData.addTile(worldX, worldY, srcRect, &b);
+		}
+	}
+}
+
+int WorldRenderer::drawBlocks(int startYView, int endYView, int startXView, int endXView)
+{
+	int visibleBlocks = 0;
+	startYView >>= CHUNK_SHIFT;
+	endYView >>= CHUNK_SHIFT;
+	startXView >>= CHUNK_SHIFT;
+	endXView >>= CHUNK_SHIFT;
+
+	// for edge cases - display 1 extra chunk eachside
+	startYView--;
+	endYView++;
+	startXView--;
+	endXView++;
+
+	for (int cy = startYView; cy < endYView; cy++)
+	{
+		for (int cx = startXView; cx < endXView; cx++)
+		{
+			auto* chunk = map->chunkGrid.getChunk(cx, cy);
+			if (!chunk) continue;
+
+			for (auto& cache : chunk->renderData.tiles)
+			{
+				permaAssertComment(cache.block, "Invalid cached block, please contact developer.");
+				drawTile(cache);
+				visibleBlocks++;
+			}
+		}
+	}
+
+	return visibleBlocks;
+}
+
+void WorldRenderer::drawTile(const CachedTile& tile)
+{
+	Vector2 shake = getShakeOffset((int)tile.position.x, (int)tile.position.y);
+
+	float drawX = (tile.position.x * TILE_SIZE) + shake.x;
+	float drawY = (tile.position.y * TILE_SIZE) + shake.y;
+
+	float l = (std::max((float)tile.block->light, (float)tile.block->sunLight)) * 17.0f;
+
+	Color tint = {
+		(uint8_t)l,
+		(uint8_t)l,
+		(uint8_t)l,
+		255
+	};
+
+	DrawTexturePro(
+		assets->textures,
+		tile.srcRect, //source (cached)
+		{ drawX,drawY,TILE_SIZE,TILE_SIZE }, //dest
+		{ 0,0 }, //origin (top-left)
+		0.f,     //rotation
+		tint
+	);
 }

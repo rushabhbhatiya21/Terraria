@@ -26,7 +26,7 @@ bool initGame()
 	assetManager.loadTexturePack("hdtextures");
 	loadSettings();
 
-	gameplay.init();
+	gameplay.init(assetManager);
 
 	return true;
 }
@@ -53,7 +53,7 @@ bool updateGame()
 			gameplayRunning = true;
 			//gameplay = {};
 			// todo: implement gameplay.reset() and call here
-			gameplay.init();
+			gameplay.init(assetManager);
 		}
 
 		mainMenuButtons.addButton("Settings");
