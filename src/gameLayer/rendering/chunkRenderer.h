@@ -7,18 +7,18 @@ struct AssetManager;
 
 constexpr int TILE_SIZE = 1;
 
-namespace WorldRendererLegacy
-{
-	int  drawBlocks(AssetManager& assetManager, GameMap& backgroundMap, GameMap& gameMap, int startYView, int endYView, int startXView, int endXView);
-}
-
-namespace ChunkRendererTexture
-{
-	void initializeChunkRenderTextures(GameMap& gameMap);
-	int  drawChunks(GameMap& gameMap, int startYView, int endYView, int startXView, int endXView);
-	void rebuildChunk(AssetManager& assetManager, GameMap& gameMap);
-	void rebuildChunkTexture(AssetManager& assetManager, GameMap& gameMap, Chunk& chunk);
-}
+//namespace WorldRendererLegacy
+//{
+//	int  drawBlocks(AssetManager& assetManager, GameMap& backgroundMap, GameMap& gameMap, int startYView, int endYView, int startXView, int endXView);
+//}
+//
+//namespace ChunkRendererTexture
+//{
+//	void initializeChunkRenderTextures(GameMap& gameMap);
+//	int  drawChunks(GameMap& gameMap, int startYView, int endYView, int startXView, int endXView);
+//	void rebuildChunk(AssetManager& assetManager, GameMap& gameMap);
+//	void rebuildChunkTexture(AssetManager& assetManager, GameMap& gameMap, Chunk& chunk);
+//}
 
 class WorldRenderer
 {

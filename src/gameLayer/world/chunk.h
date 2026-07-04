@@ -60,8 +60,8 @@ struct Chunk
 	//std::vector<LightSource> lightSources;
 
 	// old cache
-	RenderTexture2D renderTexture = {};
-	bool renderTextureInitialized = false;
+	//RenderTexture2D renderTexture = {};
+	//bool renderTextureInitialized = false;
 
 	// cache
 	ChunkRenderData renderData = {};

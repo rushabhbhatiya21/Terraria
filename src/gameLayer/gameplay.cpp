@@ -637,8 +637,8 @@ bool Gameplay::init(AssetManager& assetManager)
 	// lighting init
 	recalculateLight(gameMap);
 
-	// chunk texture init
-	ChunkRendererTexture::initializeChunkRenderTextures(gameMap);
+	// chunk texture init - no longer using it (too much memory consumption)
+	//ChunkRendererTexture::initializeChunkRenderTextures(gameMap);
 
 	// cam init
 	camera.target = { 20, 120 };
@@ -1334,36 +1334,37 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma region render world
 
-	int debugRendering = 2;
+	//int debugRendering = 2;
 	int visibleBlocks = 0;
 
-	auto start = std::chrono::high_resolution_clock::now();
+	visibleBlocks = renderer.drawBlocks(startYView, endYView, startXView, endXView);
 
-	switch (debugRendering)
-	{
-	case 1:
-	{
-		visibleBlocks = ChunkRendererTexture::drawChunks(gameMap, startYView, endYView, startXView, endXView);
-		break;
-	}
-	case 2:
-	{
-		std::cout << "Using Cached Render Data.\n";
-		visibleBlocks = renderer.drawBlocks(startYView, endYView, startXView, endXView);
-	}
-	default:
-	{
-		visibleBlocks = WorldRendererLegacy::drawBlocks(assetManager, backgroundMap, gameMap, startYView, endYView, startXView, endXView);
-		break;
-	}
-	}
+	//auto start = std::chrono::high_resolution_clock::now();
 
-	auto end = std::chrono::high_resolution_clock::now();
+	//switch (debugRendering)
+	//{
+	//case 1:
+	//{
+	//	visibleBlocks = ChunkRendererTexture::drawChunks(gameMap, startYView, endYView, startXView, endXView);
+	//	break;
+	//}
+	//case 2:
+	//{
+	//	visibleBlocks = renderer.drawBlocks(startYView, endYView, startXView, endXView);
+	//}
+	//default:
+	//{
+	//	visibleBlocks = WorldRendererLegacy::drawBlocks(assetManager, backgroundMap, gameMap, startYView, endYView, startXView, endXView);
+	//	break;
+	//}
+	//}
 
-	float worldRenderMs = std::chrono::duration<float, std::milli>(end - start).count();
+	//auto end = std::chrono::high_resolution_clock::now();
 
-	std::cout << "Visible Blocks/Chunks: " << visibleBlocks << "\n";
-	std::cout << "World Render Time: " << worldRenderMs << " ms" << "\n";
+	//float worldRenderMs = std::chrono::duration<float, std::milli>(end - start).count();
+
+	//std::cout << "Visible Blocks/Chunks: " << visibleBlocks << "\n";
+	//std::cout << "World Render Time: " << worldRenderMs << " ms" << "\n";
 
 #pragma endregion
 
@@ -1636,7 +1637,8 @@ bool Gameplay::update(AssetManager& assetManager)
 	if (gameMap.textureNeedsRebuild)
 	{
 		gameMap.textureNeedsRebuild = false;
-		ChunkRendererTexture::rebuildChunk(assetManager, gameMap);
+		//ChunkRendererTexture::rebuildChunk(assetManager, gameMap);
+		renderer.rebuildDirtyChunkRenderData();
 	}
 
 #pragma endregion
