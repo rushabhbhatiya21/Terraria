@@ -1,6 +1,4 @@
-﻿#include "chunkRenderer.h"
-#include "chunkRenderer.h"
-#include "chunkRenderer.h"
+﻿#include "worldRenderer.h"
 #include <raylib.h>
 #include <world/chunk.h>
 #include <helper.h>
