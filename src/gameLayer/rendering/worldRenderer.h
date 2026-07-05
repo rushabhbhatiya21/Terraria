@@ -3,6 +3,7 @@
 struct Chunk;
 struct GameMap;
 struct CachedTile;
+struct SpriteBatch;
 struct AssetManager;
 
 constexpr int TILE_SIZE = 1;
@@ -24,9 +25,9 @@ class WorldRenderer
 {
 public:
 
-	void init(GameMap& map, AssetManager& assets);
+	void init(GameMap& map, AssetManager& assets, SpriteBatch& spriteBatch);
 	void rebuildDirtyChunkRenderData();
-	int  drawBlocks(int startYView, int endYView, int startXView, int endXView);
+	void drawBlocks(int startYView, int endYView, int startXView, int endXView);
 
 private:
 	void drawTile(const CachedTile& tile);
@@ -35,4 +36,5 @@ private:
 private:
 	GameMap* map = nullptr;
 	AssetManager* assets = nullptr;
+	SpriteBatch* spriteBatch = nullptr;
 };

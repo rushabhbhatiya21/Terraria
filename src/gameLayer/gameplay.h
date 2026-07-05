@@ -9,7 +9,8 @@
 #include <gameMap.h>
 #include <assetManager.h>
 #include <drawBackground.h>
-#include <rendering/chunkRenderer.h>
+#include <rendering/worldRenderer.h>
+#include <rendering/spriteBatch.h>
 
 #include <entityHolder.h>
 #include <structure.h>
@@ -71,6 +72,9 @@ struct Gameplay
 	GameMap backgroundMap = {};
 	Camera2D camera = {};
 	DrawBackground background;
+
+	// render
+	SpriteBatch spriteBatch = {};
 	WorldRenderer renderer = {};
 
 	float lifetime = 0;

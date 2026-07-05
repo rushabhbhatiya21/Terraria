@@ -632,7 +632,7 @@ bool Gameplay::init(AssetManager& assetManager)
 	generateWorld(gameMap, w, h);
 
 	// renderer
-	renderer.init(gameMap, assetManager);
+	renderer.init(gameMap, assetManager, spriteBatch);
 
 	// lighting init
 	recalculateLight(gameMap);
@@ -1335,9 +1335,8 @@ bool Gameplay::update(AssetManager& assetManager)
 #pragma region render world
 
 	//int debugRendering = 2;
-	int visibleBlocks = 0;
 
-	visibleBlocks = renderer.drawBlocks(startYView, endYView, startXView, endXView);
+	renderer.drawBlocks(startYView, endYView, startXView, endXView);
 
 	//auto start = std::chrono::high_resolution_clock::now();
 
@@ -1509,6 +1508,8 @@ bool Gameplay::update(AssetManager& assetManager)
 
 #pragma endregion
 
+
+	spriteBatch.end();
 
 	EndMode2D();
 	EndTextureMode();

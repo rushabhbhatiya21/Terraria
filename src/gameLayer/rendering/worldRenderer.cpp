@@ -5,11 +5,14 @@
 #include <shake.h>
 #include <gameMap.h>
 #include <assetManager.h>
+#include "sprite.h"
+#include "spriteBatch.h"
 
-void WorldRenderer::init(GameMap& map, AssetManager& assets)
+void WorldRenderer::init(GameMap& map, AssetManager& assets, SpriteBatch& spriteBatch)
 {
 	this->map = &map;
 	this->assets = &assets;
+	this->spriteBatch = &spriteBatch;
 }
 
 void WorldRenderer::rebuildDirtyChunkRenderData()
@@ -53,9 +56,9 @@ void WorldRenderer::rebuildChunkRenderData(const int cx, const int cy)
 	}
 }
 
-int WorldRenderer::drawBlocks(int startYView, int endYView, int startXView, int endXView)
+void WorldRenderer::drawBlocks(int startYView, int endYView, int startXView, int endXView)
 {
-	int visibleBlocks = 0;
+	//int visibleBlocks = 0;
 	startYView >>= CHUNK_SHIFT;
 	endYView >>= CHUNK_SHIFT;
 	startXView >>= CHUNK_SHIFT;
@@ -78,12 +81,11 @@ int WorldRenderer::drawBlocks(int startYView, int endYView, int startXView, int 
 			{
 				permaAssertComment(cache.block, "Invalid cached block, please contact developer.");
 				drawTile(cache);
-				visibleBlocks++;
+				//visibleBlocks++;
 			}
 		}
 	}
-
-	return visibleBlocks;
+	//return visibleBlocks;
 }
 
 void WorldRenderer::drawTile(const CachedTile& tile)
@@ -102,14 +104,17 @@ void WorldRenderer::drawTile(const CachedTile& tile)
 		255
 	};
 
-	DrawTexturePro(
+	Sprite sprite
+	{
 		assets->textures,
-		tile.srcRect, //source (cached)
-		{ drawX,drawY,TILE_SIZE,TILE_SIZE }, //dest
-		{ 0,0 }, //origin (top-left)
-		0.f,     //rotation
+		tile.srcRect,
+		{ drawX,drawY,TILE_SIZE,TILE_SIZE },
+		{ 0,0 },
+		0.f,
 		tint
-	);
+	};
+
+	spriteBatch->submit(sprite);
 }
 
 //void ChunkRendererTexture::initializeChunkRenderTextures(GameMap& gameMap)
