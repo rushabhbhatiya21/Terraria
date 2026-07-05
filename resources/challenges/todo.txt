@@ -15,6 +15,7 @@ note: recipes only visible when near crafting station
 17. show pieces when eye of cthulhu dies
 20. add hammer logic to make slopes for stairs
 21. add buffs/debuffs
+22. throwing star not working check
 
 
 2.  add all stats to weapons - done

@@ -10,6 +10,7 @@
 #include <assetManager.h>
 #include <drawBackground.h>
 #include <rendering/worldRenderer.h>
+#include <rendering/spriteGeometryBuilder.h>
 #include <rendering/spriteBatch.h>
 
 #include <entityHolder.h>
@@ -74,7 +75,8 @@ struct Gameplay
 	DrawBackground background;
 
 	// render
-	SpriteBatch spriteBatch = {};
+	SpriteGeometryBuilder builder;
+	SpriteBatch spriteBatch{ builder };
 	WorldRenderer renderer = {};
 
 	float lifetime = 0;

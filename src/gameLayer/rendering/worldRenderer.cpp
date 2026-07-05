@@ -114,7 +114,7 @@ void WorldRenderer::drawTile(const CachedTile& tile)
 		tint
 	};
 
-	spriteBatch->submit(sprite);
+	spriteBatch->submitSprite(sprite);
 }
 
 //void ChunkRendererTexture::initializeChunkRenderTextures(GameMap& gameMap)
