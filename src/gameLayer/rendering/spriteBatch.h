@@ -40,7 +40,7 @@ public:
 
 private:
 	//std::vector<DrawCommand> buildDrawCommands();
-	void executeDrawCommands(const std::vector<DrawCommand>& commands);
+	//void executeDrawCommands(const std::vector<DrawCommand>& commands);
 	void flush();
 
 	void beginEmission(const RenderState& renderState) override;

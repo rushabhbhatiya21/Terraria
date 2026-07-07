@@ -1331,6 +1331,8 @@ bool Gameplay::update(AssetManager& assetManager)
 	ClearBackground(BLANK);
 	BeginMode2D(camera);
 
+	spriteBatch.begin();
+
 
 #pragma region render world
 

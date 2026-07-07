@@ -37,8 +37,8 @@ void SpriteBatch::end()
 //
 //}
 
-void SpriteBatch::executeDrawCommands(const std::vector<DrawCommand>& commands)
-{
+//void SpriteBatch::executeDrawCommands(const std::vector<DrawCommand>& commands)
+//{
 	//for (const auto& command : commands)
 	//{
 	//	const Sprite& sprite = command.sprite;
@@ -51,12 +51,12 @@ void SpriteBatch::executeDrawCommands(const std::vector<DrawCommand>& commands)
 	//		sprite.tint
 	//	);
 	//}
-}
+//}
 
 void SpriteBatch::flush()
 {
 	//std::vector<DrawCommand> commands = buildDrawCommands();
-	executeDrawCommands(drawCommands);
+	//executeDrawCommands(drawCommands);
 }
 
 void SpriteBatch::beginEmission(const RenderState& renderState)
