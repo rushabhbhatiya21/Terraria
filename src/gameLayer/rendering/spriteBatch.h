@@ -14,6 +14,13 @@ class SpriteBatch : public IGeometrySink
 		uint32_t firstVertex = 0;
 		uint32_t firstIndex = 0;
 		RenderState renderState = {};
+
+		void clear()
+		{
+			uint32_t firstVertex = 0;
+			uint32_t firstIndex = 0;
+			RenderState renderState = {};
+		}
 	};
 
 private:

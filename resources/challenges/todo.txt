@@ -34,6 +34,7 @@ note: recipes only visible when near crafting station
 
 Engine Recommendations
 Geometry-oriented API for GeometrySink
+RenderBatch to separate SpriteBatch builder and its data
 
 
 - copy/paste tree into structures, old tree.bin removed 

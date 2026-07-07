@@ -61,6 +61,7 @@ void SpriteBatch::flush()
 
 void SpriteBatch::beginEmission(const RenderState& renderState)
 {
+	currentEmission.clear();
 	currentEmission.firstVertex = (uint32_t)vertexBuffer.size();
 	currentEmission.firstIndex  = (uint32_t)indexBuffer.size();
 	currentEmission.renderState = renderState;
