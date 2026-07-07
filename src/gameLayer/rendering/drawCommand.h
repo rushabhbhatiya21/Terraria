@@ -1,11 +1,12 @@
 #pragma once
-#include <array>
+#include <vector>
 #include "vertex.h"
 
 struct DrawCommand
 {
 	// geometry
-	std::array<Vertex, 4> vertices;
+	std::vector<Vertex> vertices;
+	std::vector<uint32_t> indices;
 
 	// render state
 	Texture2D* texture;
