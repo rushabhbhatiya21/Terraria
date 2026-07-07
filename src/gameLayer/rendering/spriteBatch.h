@@ -11,8 +11,8 @@ class SpriteBatch : public IGeometrySink
 {
 	struct EmissionState
 	{
-		int offsetVertex = 0;
-		int offsetIndex = 0;
+		uint32_t firstVertex = 0;
+		uint32_t firstIndex = 0;
 		RenderState renderState = {};
 	};
 
@@ -38,6 +38,6 @@ private:
 
 	void beginEmission(const RenderState& renderState) override;
 	void emitVertex(const Vertex& vertex) override;
-	void emitIndex(const uint32_t index) override;
+	void emitIndex(uint32_t index) override;
 	void endEmission() override;
 };

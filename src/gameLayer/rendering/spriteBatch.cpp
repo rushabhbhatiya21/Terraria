@@ -56,5 +56,36 @@ void SpriteBatch::executeDrawCommands(const std::vector<DrawCommand>& commands)
 void SpriteBatch::flush()
 {
 	//std::vector<DrawCommand> commands = buildDrawCommands();
-	executeDrawCommands(commands);
+	executeDrawCommands(drawCommands);
+}
+
+void SpriteBatch::beginEmission(const RenderState& renderState)
+{
+	currentEmission.firstVertex = (uint32_t)vertexBuffer.size();
+	currentEmission.firstIndex  = (uint32_t)indexBuffer.size();
+	currentEmission.renderState = renderState;
+}
+
+void SpriteBatch::emitVertex(const Vertex& vertex)
+{
+	vertexBuffer.emplace_back(vertex);
+}
+
+void SpriteBatch::emitIndex(uint32_t index)
+{
+	indexBuffer.emplace_back(currentEmission.firstVertex + index);
+}
+
+void SpriteBatch::endEmission()
+{
+	DrawCommand drawCommand
+	{
+		currentEmission.firstVertex,
+		(uint32_t)vertexBuffer.size() - currentEmission.firstVertex,
+		currentEmission.firstIndex,
+		(uint32_t)indexBuffer.size() - currentEmission.firstIndex,
+		currentEmission.renderState
+	};
+
+	drawCommands.emplace_back(drawCommand);
 }

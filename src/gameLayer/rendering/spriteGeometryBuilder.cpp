@@ -33,21 +33,29 @@ void SpriteGeometryBuilder::build(const Sprite& sprite, IGeometrySink& sink)
 	const float c = cosf(theta);
 	const float s = sinf(theta);
 
-	sink.beginEmission(RenderState{ &sprite.texture }));
+	sink.beginEmission(RenderState{ &sprite.texture });
 
 	for (int i = 0; i < 4; i++)
 	{
 		Vector2 corner = corners[i];
 		Vector2 uv = uvs[i];
 		
-		Vertex v = generateVertex(sprite, corner, uv, textureSize);
+		Vertex v = generateVertex(sprite, corner, uv, textureSize, c, s);
 		sink.emitVertex(v);
 	}
+
+	sink.emitIndex(0);
+	sink.emitIndex(1);
+	sink.emitIndex(2);
+
+	sink.emitIndex(2);
+	sink.emitIndex(3);
+	sink.emitIndex(0);
 
 	sink.endEmission();
 }
 
-Vertex SpriteGeometryBuilder::generateVertex(const Sprite& sprite, Vector2 corner, Vector2 uv, Vector2 textureSize)
+Vertex SpriteGeometryBuilder::generateVertex(const Sprite& sprite, Vector2& corner, Vector2& uv, const Vector2& textureSize, const float c, const float s)
 {
 	corner -= sprite.origin;
 	corner = rotateAroundOrigin(corner, c, s);
