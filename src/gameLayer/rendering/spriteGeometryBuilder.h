@@ -5,8 +5,8 @@
 class SpriteGeometryBuilder
 {
 public:
-	DrawCommand build(const Sprite& sprite);
+	void build(const Sprite& sprite, IGeometrySink& sink);
 
 private:
-	std::array<Vertex, 4> generateVertices(const Sprite& sprite);
+	Vertex generateVertex(const Sprite& sprite, Vector2 corner, Vector2 uv, Vector2 textureSize);
 };

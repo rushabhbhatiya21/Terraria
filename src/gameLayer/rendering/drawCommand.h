@@ -1,13 +1,18 @@
 #pragma once
 #include <vector>
 #include "vertex.h"
+#include "renderState.h"
 
 struct DrawCommand
 {
 	// geometry
-	std::vector<Vertex> vertices;
-	std::vector<uint32_t> indices;
+	int firstVertex = 0;
+	int vertexCount = 0;
+	uint32_t firstIndex = 0;
+	int indexCount = 0;
+	//std::vector<Vertex> vertices;
+	//std::vector<uint32_t> indices;
 
 	// render state
-	Texture2D* texture;
+	RenderState renderState = {};
 };

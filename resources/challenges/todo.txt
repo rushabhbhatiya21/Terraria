@@ -32,6 +32,9 @@ note: recipes only visible when near crafting station
 18. add phase transition - done
 19. add platform and its logic to go up and down - done
 
+Engine Recommendations
+Geometry-oriented API for GeometrySink
+
 
 - copy/paste tree into structures, old tree.bin removed 
 

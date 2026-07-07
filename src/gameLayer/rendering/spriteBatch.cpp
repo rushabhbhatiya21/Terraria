@@ -8,32 +8,34 @@ SpriteBatch::SpriteBatch(SpriteGeometryBuilder& builder)
 
 void SpriteBatch::begin()
 {
+	vertexBuffer.clear();
+	indexBuffer.clear();
+	drawCommands.clear();
 }
 
 void SpriteBatch::submitSprite(const Sprite& sprite)
 {
-	sprites.push_back(sprite);
+	builder.build(sprite, *this);
 }
 
 void SpriteBatch::end()
 {
 	flush();
-	sprites.clear();
 }
 
-std::vector<DrawCommand> SpriteBatch::buildDrawCommands()
-{
-	std::vector<DrawCommand> commands;
-	commands.reserve(sprites.size());
-
-	for (const auto& sprite : sprites)
-	{
-		const DrawCommand command = builder.build(sprite);
-		commands.push_back(command);
-	}
-	return commands;
-
-}
+//std::vector<DrawCommand> SpriteBatch::buildDrawCommands()
+//{
+//	std::vector<DrawCommand> commands;
+//	commands.reserve(sprites.size());
+//
+//	for (const auto& sprite : sprites)
+//	{
+//		const DrawCommand command = builder.build(sprite);
+//		commands.push_back(command);
+//	}
+//	return commands;
+//
+//}
 
 void SpriteBatch::executeDrawCommands(const std::vector<DrawCommand>& commands)
 {
@@ -53,6 +55,6 @@ void SpriteBatch::executeDrawCommands(const std::vector<DrawCommand>& commands)
 
 void SpriteBatch::flush()
 {
-	std::vector<DrawCommand> commands = buildDrawCommands();
+	//std::vector<DrawCommand> commands = buildDrawCommands();
 	executeDrawCommands(commands);
 }

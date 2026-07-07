@@ -3,24 +3,10 @@
 #include <array>
 #include <math/utils.h>
 #include <math/vector2overloads.h>
+#include "geometrySink.h"
 
-DrawCommand SpriteGeometryBuilder::build(const Sprite& sprite)
+void SpriteGeometryBuilder::build(const Sprite& sprite, IGeometrySink& sink)
 {
-
-	auto vertices = generateVertices(sprite);
-
-	DrawCommand command
-	{
-		vertices,
-		&sprite.texture
-	};
-
-	return command;
-}
-
-std::array<Vertex, 4> SpriteGeometryBuilder::generateVertices(const Sprite& sprite)
-{
-	std::array<Vertex, 4> vertices;
 	std::array<Vector2, 4> corners =
 	{
 		Vector2{0, 0},
@@ -47,26 +33,36 @@ std::array<Vertex, 4> SpriteGeometryBuilder::generateVertices(const Sprite& spri
 	const float c = cosf(theta);
 	const float s = sinf(theta);
 
+	sink.beginEmission(RenderState{ &sprite.texture }));
+
 	for (int i = 0; i < 4; i++)
 	{
 		Vector2 corner = corners[i];
-		corner -= sprite.origin;
-		corner = rotateAroundOrigin(corner, c, s);
-		corner += Vector2{
-			sprite.destRect.x,
-			sprite.destRect.y
-		};
-
-		// normalize uvs
 		Vector2 uv = uvs[i];
-		uv /= textureSize;
-
-		Vertex v;
-		v.position = corner;
-		v.uv = uv;
-		v.tint = sprite.tint;
-		vertices[i] = v;
+		
+		Vertex v = generateVertex(sprite, corner, uv, textureSize);
+		sink.emitVertex(v);
 	}
 
-	return vertices;
+	sink.endEmission();
+}
+
+Vertex SpriteGeometryBuilder::generateVertex(const Sprite& sprite, Vector2 corner, Vector2 uv, Vector2 textureSize)
+{
+	corner -= sprite.origin;
+	corner = rotateAroundOrigin(corner, c, s);
+	corner += Vector2{
+		sprite.destRect.x,
+		sprite.destRect.y
+	};
+
+	// normalize uvs
+	uv /= textureSize;
+
+	Vertex v;
+	v.position = corner;
+	v.uv = uv;
+	v.tint = sprite.tint;
+	
+	return v;
 }
