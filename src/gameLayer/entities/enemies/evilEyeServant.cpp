@@ -1,5 +1,5 @@
 #include "evilEyeServant.h"
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include <helper.h>
 #include <player.h>
 #include <combat/combatSystem.h>

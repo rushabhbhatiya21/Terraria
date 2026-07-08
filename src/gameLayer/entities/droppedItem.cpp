@@ -1,7 +1,7 @@
 #include "droppedItem.h"
 #include "asserts.h"
 #include "helper.h"
-#include "assetManager.h"
+#include "assets/assetManager.h"
 #include "entityHolder.h"
 #include <items/item.h>
 #include <inventory.h>

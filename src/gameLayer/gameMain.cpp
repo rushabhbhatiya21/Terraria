@@ -1,6 +1,6 @@
 #include "gameMain.h"
 #include <gameplay.h>
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include <audio.h>
 #include <settings.h>
 #include <ui.h>

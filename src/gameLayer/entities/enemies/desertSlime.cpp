@@ -1,6 +1,6 @@
 #pragma once
 #include "desetSlime.h"
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include <helper.h>
 #include <randomStuff.h>
 #include <entityHolder.h>

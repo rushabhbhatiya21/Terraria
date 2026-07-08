@@ -1,6 +1,6 @@
 #include "evilEye.h"
 #include <helper.h>
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include <player.h>
 #include "evilEyeServant.h"
 #include "../../combat/combatSystem.h"

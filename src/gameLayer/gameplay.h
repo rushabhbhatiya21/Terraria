@@ -7,7 +7,7 @@
 #include <world/chunk.h>
 
 #include <gameMap.h>
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include <drawBackground.h>
 #include <rendering/worldRenderer.h>
 #include <rendering/spriteGeometryBuilder.h>

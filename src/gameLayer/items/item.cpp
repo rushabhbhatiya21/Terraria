@@ -1,7 +1,7 @@
 ﻿#include "item.h"
 #include "items/itemIds.h"
 #include <helper.h>
-#include <assetManager.h>
+#include <assets/assetManager.h>
 
 std::vector<ItemDefinition> itemDatabase;
 

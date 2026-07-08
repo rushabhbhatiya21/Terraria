@@ -1,6 +1,6 @@
 ﻿#include "player.h"
 #include <helper.h>
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include <entityHolder.h>
 #include <items/blocks.h>
 #include "particles.h"

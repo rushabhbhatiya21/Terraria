@@ -4,7 +4,7 @@
 #include <helper.h>
 #include <shake.h>
 #include <gameMap.h>
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include "sprite.h"
 #include "spriteBatch.h"
 

@@ -3,7 +3,7 @@
 #include "../droppedItem.h"
 #include <items/blocks.h>
 #include <gameMap.h>
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include <helper.h>
 #include <entityHolder.h>
 #include <player.h>

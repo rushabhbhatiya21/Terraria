@@ -4,7 +4,7 @@
 #include "../helper.h"
 #include "../entity.h"
 #include "../gameMap.h"
-#include "../assetManager.h"
+#include "../assets/assetManager.h"
 #include "../entityHolder.h"
 #include "../items/item.h"
 #include "../items/blocks.h"

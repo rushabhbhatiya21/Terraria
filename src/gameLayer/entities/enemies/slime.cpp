@@ -2,7 +2,7 @@
 #include "slime.h"
 #include "../droppedItem.h"
 #include <helper.h>
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include <entityHolder.h>
 #include <items/blocks.h>
 #include <player.h>

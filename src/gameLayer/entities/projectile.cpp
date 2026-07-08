@@ -1,7 +1,7 @@
 #include "projectile.h"
 #include "asserts.h"
 #include "helper.h"
-#include "assetManager.h"
+#include "assets/assetManager.h"
 #include "entityHolder.h"
 #include "combat/combatSystem.h"
 #include "gameMap.h"

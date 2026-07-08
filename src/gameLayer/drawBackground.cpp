@@ -1,5 +1,5 @@
 #include "drawBackground.h"
-#include <assetManager.h>
+#include <assets/assetManager.h>
 #include <raymath.h>
 
 void DrawBackground::draw(float deltaTime, AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor)
