@@ -1,10 +1,14 @@
 #pragma once
 
+namespace Engine
+{
+	struct AssetManager;
+}
+
 struct Chunk;
 struct GameMap;
 struct CachedTile;
-struct SpriteBatch;
-struct AssetManager;
+class SpriteBatch;
 
 constexpr int TILE_SIZE = 1;
 
@@ -25,7 +29,7 @@ class WorldRenderer
 {
 public:
 
-	void init(GameMap& map, AssetManager& assets, SpriteBatch& spriteBatch);
+	void init(GameMap& map, Engine::AssetManager& assets, SpriteBatch& spriteBatch);
 	void rebuildDirtyChunkRenderData();
 	void drawBlocks(int startYView, int endYView, int startXView, int endXView);
 
@@ -35,6 +39,6 @@ private:
 
 private:
 	GameMap* map = nullptr;
-	AssetManager* assets = nullptr;
+	Engine::AssetManager* assets = nullptr;
 	SpriteBatch* spriteBatch = nullptr;
 };

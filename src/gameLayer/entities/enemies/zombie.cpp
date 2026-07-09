@@ -11,7 +11,9 @@
 #include "../../ui/popupText.h"
 #include "../../shake.h"
 
-void Zombie::drawSprite(AssetManager& assetManager)
+//using Engine::AssetManager;
+
+void Zombie::drawSprite(Engine::AssetManager& assetManager)
 {
 	Transform2D zombieSprite = physics.transform;
 	zombieSprite.w = 1;
@@ -21,14 +23,14 @@ void Zombie::drawSprite(AssetManager& assetManager)
 
 	auto aabb = getRectangleForEntity(zombieSprite, 1, 2);
 
-	DrawTexturePro(
-		assetManager.zombie,
-		getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft),
-		aabb, // dest
-		{ 0, 0 }, // origin top-left corner
-		0.f, // rotation
-		WHITE // tint
-	);
+	//DrawTexturePro(
+	//	assetManager.zombie,
+	//	getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft),
+	//	aabb, // dest
+	//	{ 0, 0 }, // origin top-left corner
+	//	0.f, // rotation
+	//	WHITE // tint
+	//);
 }
 
 bool Zombie::update(float deltaTime, EntityUpdateData& data)

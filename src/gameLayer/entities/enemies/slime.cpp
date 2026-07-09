@@ -10,21 +10,23 @@
 #include "shake.h"
 #include "ui/popupText.h"
 
-void Slime::drawSprite(AssetManager& assetManager)
+//using Engine::AssetManager;
+
+void Slime::drawSprite(Engine::AssetManager& assetManager)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
 	Color color = WHITE;
 
 	if (flashTimer > 0) { color = { 255,0,0,255 }; }
 
-	DrawTexturePro(
-		assetManager.slime,
-		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
-		aabb, // dest
-		{ 0, 0 }, // origin top-left corner
-		0.f, // rotation
-		color // tint
-	);
+	//DrawTexturePro(
+	//	assetManager.slime,
+	//	getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
+	//	aabb, // dest
+	//	{ 0, 0 }, // origin top-left corner
+	//	0.f, // rotation
+	//	color // tint
+	//);
 }
 
 bool Slime::update(float deltaTime, EntityUpdateData& data)

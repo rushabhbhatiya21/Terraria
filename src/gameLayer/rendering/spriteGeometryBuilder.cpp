@@ -25,8 +25,8 @@ void SpriteGeometryBuilder::build(const Sprite& sprite, IGeometrySink& sink)
 
 	const Vector2 textureSize
 	{
-		(float)sprite.texture.width,
-		(float)sprite.texture.height
+		(float)sprite.texture.getWidth(),
+		(float)sprite.texture.getHeight()
 	};
 
 	const float theta = DEG2RAD * sprite.rotation;

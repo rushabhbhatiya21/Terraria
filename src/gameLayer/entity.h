@@ -9,10 +9,14 @@
 #include "entityAnimation.h"
 #include "attackStyles/swingAttack.h"
 
+namespace Engine
+{
+	struct AssetManager;
+}
+
 struct Player;
 struct GameMap;
 struct EntityHolder;
-struct AssetManager;
 
 using Json = nlohmann::json;
 
@@ -88,7 +92,7 @@ struct Entity
 		physics.velocity += hitDirection * force;
 	}
 
-	virtual void render(AssetManager& assetManager) = 0;
+	virtual void render(Engine::AssetManager& assetManager) = 0;
 
 	virtual bool update(float deltaTime, EntityUpdateData& entityUpdateData) = 0;
 

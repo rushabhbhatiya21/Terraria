@@ -1,7 +1,9 @@
 #include "enemy.h"
 #include <assets/assetManager.h>
 
-void Enemy::render(AssetManager& assetManager)
+//using Engine::AssetManager;
+
+void Enemy::render(Engine::AssetManager& assetManager)
 {
 	bool flashing = flashTimer > 0;
 
@@ -35,7 +37,7 @@ void Enemy::render(AssetManager& assetManager)
 	}
 }
 
-void Enemy::renderHealthBar(AssetManager& assetManager)
+void Enemy::renderHealthBar(Engine::AssetManager& assetManager)
 {
 	float healthWidth = 1.6f;
 	float healthHeight = .4f;
@@ -50,14 +52,14 @@ void Enemy::renderHealthBar(AssetManager& assetManager)
 		healthHeight
 	};
 
-	DrawTexturePro(
-		assetManager.healthBar,
-		{ 0,0,(float)assetManager.healthBar.width, (float)assetManager.healthBar.height },
-		healthBarPos,
-		{ 0,0 },
-		0,
-		WHITE
-	);
+	//DrawTexturePro(
+	//	assetManager.healthBar,
+	//	{ 0,0,(float)assetManager.healthBar.getWidth(), (float)assetManager.healthBar.getHeight()},
+	//	healthBarPos,
+	//	{ 0,0 },
+	//	0,
+	//	WHITE
+	//);
 
 	healthBarPos.width = life * healthWidth / stats.defensive.maxHealth;
 
@@ -76,14 +78,14 @@ void Enemy::renderHealthBar(AssetManager& assetManager)
 		color = RED;
 	}
 
-	DrawTexturePro(
-		assetManager.health,
-		{ 0,0,(float)assetManager.health.width, (float)assetManager.health.height },
-		healthBarPos,
-		{ 0,0 },
-		0,
-		color
-	);
+	//DrawTexturePro(
+	//	assetManager.health,
+	//	{ 0,0,(float)assetManager.health.getWidth(), (float)assetManager.health.getHeight()},
+	//	healthBarPos,
+	//	{ 0,0 },
+	//	0,
+	//	color
+	//);
 
 	//if (damageTakenHealthBarTimer >= 0)
 	//{

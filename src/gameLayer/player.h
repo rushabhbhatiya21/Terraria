@@ -5,7 +5,6 @@
 #include "combat/stats.h"
 #include "attackStyles/swingAttack.h"
 
-
 struct Player : public Entity
 {
 	Player()
@@ -26,9 +25,9 @@ struct Player : public Entity
 		return physics.getPosition();
 	}
 
-	void render(AssetManager& assetManager) override;
+	void render(Engine::AssetManager& assetManager) override;
 
-	void drawSprite(AssetManager& assetManager);
+	void drawSprite(Engine::AssetManager& assetManager);
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 

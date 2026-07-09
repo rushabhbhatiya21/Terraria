@@ -7,9 +7,10 @@
 #include <drawBackground.h>
 #include <iostream>
 
+
 #pragma region global variables
 
-AssetManager assetManager;
+Engine::AssetManager assetManager;
 Gameplay gameplay;
 UIEngine mainMenuButtons;
 DrawBackground backgroundForMenu;

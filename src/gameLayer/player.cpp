@@ -6,8 +6,9 @@
 #include "particles.h"
 
 // todo: make AttackStyle struct and add enum to it, and have item manage update and spawn and all
+//using Engine::AssetManager;
 
-void Player::render(AssetManager& assetManager)
+void Player::render(Engine::AssetManager& assetManager)
 {
 	bool flashing = flashTimer > 0;
 
@@ -33,7 +34,7 @@ void Player::render(AssetManager& assetManager)
 	}
 }
 
-void Player::drawSprite(AssetManager& assetManager)
+void Player::drawSprite(Engine::AssetManager& assetManager)
 {
 	Transform2D playerSprite = physics.transform;
 	playerSprite.w = 1;
@@ -44,11 +45,11 @@ void Player::drawSprite(AssetManager& assetManager)
 	Rectangle textureUV = getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft);
 
 	// --- BACK LAYER ---
-	DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
-	DrawTexturePro(assetManager.getHeadTexture(equipments.helmet.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
-	DrawTexturePro(assetManager.getBackTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	//DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	//DrawTexturePro(assetManager.getHeadTexture(equipments.helmet.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	//DrawTexturePro(assetManager.getBackTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 	// --- FRONT LAYER ---
-	DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	//DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 
 	ItemDefinition* item = getItem(heldItem);
 
@@ -67,7 +68,7 @@ void Player::drawSprite(AssetManager& assetManager)
 		break;
 	case AttackStyle::SHOOT:
 	{
-		Texture2D textureItem   = getTextureForItemType(heldItem, assetManager);
+		auto& textureItem   = getTextureForItemType(heldItem, assetManager);
 		Rectangle textureUVItem = getTextureCoordinatesForItemType(heldItem, 32, 32, animations.movingLeft);
 
 		Rectangle destRect{};
@@ -76,7 +77,7 @@ void Player::drawSprite(AssetManager& assetManager)
 		destRect.x = playerSprite.getCenter().x + (animations.movingLeft ? -.6f : .6f);
 		destRect.y = playerSprite.getCenter().y;
 
-		DrawTexturePro(textureItem, textureUVItem, destRect, { 0.5f,0.5f }, 0.f, WHITE);
+		//DrawTexturePro(textureItem, textureUVItem, destRect, { 0.5f,0.5f }, 0.f, WHITE);
 		break;
 	}
 	case AttackStyle::CAST:

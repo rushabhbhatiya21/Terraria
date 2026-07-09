@@ -5,7 +5,9 @@
 #include "evilEyeServant.h"
 #include "../../combat/combatSystem.h"
 
-void EvilEye::drawSprite(AssetManager& assetManager)
+//using Engine::AssetManager;
+
+void EvilEye::drawSprite(Engine::AssetManager& assetManager)
 {
 	Transform2D evilEyeSprite = physics.transform;
 
@@ -13,35 +15,36 @@ void EvilEye::drawSprite(AssetManager& assetManager)
 	evilEyeSprite.pos.x += 1.25f;
 	evilEyeSprite.pos.y += 2.7f;
 
-	Texture2D tex = {};
+	const Engine::Texture* tex = nullptr;
 
 	switch (currentPhase)
 	{
-	case EvilEye::EvilEyePhase::ONE:
-		tex = assetManager.evilEyePhase1;
+	case EvilEyePhase::ONE:
+		tex = &assetManager.evilEyePhase1;
 		break;
-	case EvilEye::EvilEyePhase::TWO:
-		tex = assetManager.evilEyePhase2;
+
+	case EvilEyePhase::TWO:
+		tex = &assetManager.evilEyePhase2;
 		break;
+
 	case EvilEyePhase::DEAD:
-		// todo
-		tex = assetManager.evilEyePieces;
-		break;
-	default:
+		tex = &assetManager.evilEyePieces;
 		break;
 	}
+
+	assert(tex);
 
 	// draw size in scene
 	auto aabb = getRectangleForEntity(evilEyeSprite, 2.72f, 4.f);
 
-	DrawTexturePro(
-		tex,
-		getTextureAtlas(animations.positionX, animations.positionY, currentPhaseData->cellSizeX, currentPhaseData->cellSizeY),
-		aabb, // dest
-		{ 1.2f, 2.5f }, // origin
-		rotation, // rotation
-		WHITE // tint
-	);
+	//DrawTexturePro(
+	//	tex,
+	//	getTextureAtlas(animations.positionX, animations.positionY, currentPhaseData->cellSizeX, currentPhaseData->cellSizeY),
+	//	aabb, // dest
+	//	{ 1.2f, 2.5f }, // origin
+	//	rotation, // rotation
+	//	WHITE // tint
+	//);
 }
 
 // done - keeps on dashing if in range, have 3 dashes and hover for some time

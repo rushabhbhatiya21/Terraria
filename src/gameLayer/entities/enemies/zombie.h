@@ -8,7 +8,7 @@ struct Zombie : public Enemy
 		setColliderSize();
 		baseStats = makeZombieStats();
 		stats = baseStats;
-		life = stats.defensive.maxHealth;
+		life = (float)stats.defensive.maxHealth;
 	}
 
 	enum class Zombie_State
@@ -25,7 +25,7 @@ struct Zombie : public Enemy
 	Zombie_State currentState = Zombie_State::IDLE;
 	Zombie_State previouseState = Zombie_State::IDLE;
 
-	void drawSprite(AssetManager& assetManager) override;
+	void drawSprite(Engine::AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 

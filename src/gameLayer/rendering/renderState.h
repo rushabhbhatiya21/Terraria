@@ -1,7 +1,7 @@
 #pragma once
-#include <raylib.h>
+#include <assets/texture.h>
 
 struct RenderState
 {
-	Texture2D* texture = nullptr;
+	const Engine::Texture* texture = nullptr;
 };

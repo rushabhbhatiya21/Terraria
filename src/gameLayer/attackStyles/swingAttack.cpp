@@ -14,13 +14,13 @@
 #include "../entities/enemies/enemy.h"
 #include <lighting.h>
 
-void SwingAttack::render(AssetManager& assetManager)
+void SwingAttack::render(Engine::AssetManager& assetManager)
 {
 	if (!owner) return;
 	
 	if (!isPlayingAnimation) return;
 
-	Texture2D  texture = getTextureForItemType(itemId, assetManager);
+	auto&      tex           = getTextureForItemType(itemId, assetManager);
 	Rectangle  textureUVItem = getTextureCoordinatesForItemType(itemId);
 
 	// player position
@@ -53,7 +53,7 @@ void SwingAttack::render(AssetManager& assetManager)
 	destRect.x = handPos.x - origin.x;
 	destRect.y = handPos.y - origin.y;
 
-	DrawTexturePro(texture, textureUVItem, destRect, origin, currentSwingAngle, WHITE);
+	//DrawTexturePro(tex, textureUVItem, destRect, origin, currentSwingAngle, WHITE);
 }
 
 void SwingAttack::startSwing(Entity& owner, Vector2 mousePosition)

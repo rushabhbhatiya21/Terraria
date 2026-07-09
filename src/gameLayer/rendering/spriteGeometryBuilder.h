@@ -2,7 +2,7 @@
 #include "sprite.h"
 #include "drawCommand.h"
 
-struct IGeometrySink;
+class IGeometrySink;
 
 class SpriteGeometryBuilder
 {

@@ -1,7 +1,10 @@
 ﻿#include "item.h"
 #include "items/itemIds.h"
 #include <helper.h>
+#include <assets/texture.h>
 #include <assets/assetManager.h>
+
+//using Engine::AssetManager;
 
 std::vector<ItemDefinition> itemDatabase;
 
@@ -37,7 +40,7 @@ static void reg(ItemId id, ItemDefinition def)
     itemDatabase.insert(itemDatabase.begin() + (int)id, def);
 }
 
-Texture2D getTextureForItemType(int itemType, AssetManager& assetManager)
+const Engine::Texture& getTextureForItemType(int itemType, const Engine::AssetManager& assetManager)
 {
     if (!isItem(itemType))
         return assetManager.textures;  // block atlas

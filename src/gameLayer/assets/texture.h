@@ -1,21 +1,36 @@
 #pragma once
+#include <string>
+#include <memory>
 
-struct TextureImpl;
-struct AssetManager;
-
-class Texture
+namespace Engine
 {
-public:
-	int getWidth() const;
-	int getHeight() const;
+    class Texture
+    {
+    public:
+        Texture();
 
-private:
-	friend class AssetManager;
+        Texture(Texture&&) noexcept;
+        Texture& operator=(Texture&&) noexcept;
 
-	Texture() = default;
+        Texture(const Texture&) = delete;
+        Texture& operator=(const Texture&) = delete;
 
-	int width = 0;
-	int height = 0;
+        ~Texture();
 
-	// Backend-specific implementation comes later.
-};
+        int getWidth() const;
+        int getHeight() const;
+
+    private:
+        class TextureImpl;
+
+        friend struct AssetManager;
+
+        std::unique_ptr<TextureImpl> impl;
+
+        int width = 0;
+        int height = 0;
+
+    private:
+        void loadFromFile(const std::string& path);
+    };
+}

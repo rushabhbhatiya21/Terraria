@@ -55,7 +55,7 @@ struct SwingAttack
 	Vector2 weaponTip{};
 	float   weaponLength = 1.5f; // add this in weaponData
 
-	void render(AssetManager& assetManager);
+	void render(Engine::AssetManager& assetManager);
 	void updateAnimation(float deltaTime);
 	void startSwing(Entity& entity, Vector2 mousePosition);
 	void updateSwings(float deltaTime, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng);

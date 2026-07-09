@@ -51,7 +51,7 @@ struct EvilEyeServant : public Enemy
 
 	int getEnemyType() override { return EnemyType_EvilEyeSpawn; }
 
-	void drawSprite(AssetManager& assetManager) override;
+	void drawSprite(Engine::AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData& data) override;
 

@@ -1,9 +1,10 @@
 #pragma once
 #include <raylib.h>
+#include <assets/texture.h>
 
 struct Sprite
 {
-	Texture2D& texture;
+	const Engine::Texture& texture;
 	Rectangle srcRect = {};
 	Rectangle destRect = {};
 	Vector2 origin = {};

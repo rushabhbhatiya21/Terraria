@@ -1,28 +1,33 @@
 #include "drawBackground.h"
 #include <assets/assetManager.h>
 #include <raymath.h>
+#include <assert.h>
 
-void DrawBackground::draw(float deltaTime, AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor)
+//using Engine::AssetManager;
+
+void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor)
 {
 	auto drawBackground = [&](int type, float parallax, float opacity, Color skyColor)
 		{
-			Texture bg = assetManager.forestBG;
+			const Engine::Texture* bg = &assetManager.forestBG;
 
 			switch (type)
 			{
-				case forest: bg = assetManager.forestBG; break;
-				case desert: bg = assetManager.desertBG; break;
-				case snow: bg = assetManager.snowBG; break;
-				case cave: bg = assetManager.caveBG; break;
+				case forest: bg = &assetManager.forestBG; break;
+				case desert: bg = &assetManager.desertBG; break;
+				case snow:   bg = &assetManager.snowBG; break;
+				case cave:   bg = &assetManager.caveBG; break;
 					
 				default:
 					break;
 			}
 
+			assert(bg);
+
 			int screenW = GetScreenWidth();
 			int screenH = GetScreenHeight();
 
-			float aspectRatio = (float)bg.width / (float)bg.height;
+			float aspectRatio = (float)bg->getWidth()/ (float)bg->getHeight();
 			float bgScaleScreen = 2.f;
 
 			float base = std::max(screenW, screenH) * bgScaleScreen;
@@ -66,19 +71,19 @@ void DrawBackground::draw(float deltaTime, AssetManager& assetManager, Camera2D 
 			const float offX = -maxOffX * normX * parallax;
 			const float offY = -maxOffY * normY * parallax;
 
-			Rectangle src = { 0,0,(float)bg.width,(float)bg.height };
+			Rectangle src = { 0,0,(float)bg->getWidth(),(float)bg->getHeight()};
 			Rectangle dest = { offX, offY, bgW, bhH };
 
 			skyColor.a = opacity * 255;
 
-			DrawTexturePro(
-				bg, 
-				src, 
-				dest, 
-				{ 0,0 }, 
-				0.f, 
-				skyColor
-			);
+			//DrawTexturePro(
+			//	bg, 
+			//	src, 
+			//	dest, 
+			//	{ 0,0 }, 
+			//	0.f, 
+			//	skyColor
+			//);
 		};
 
 	drawBackground(currentBackgroundType, 0.3f, 1.f, skyColor);

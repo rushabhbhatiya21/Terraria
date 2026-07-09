@@ -12,7 +12,7 @@
 #include "player.h"
 #include "entities/enemies/enemy.h"
 
-void Projectile::render(AssetManager& assetManager)
+void Projectile::render(Engine::AssetManager& assetManager)
 {
 	float size = .5f;
 
@@ -27,18 +27,18 @@ void Projectile::render(AssetManager& assetManager)
 		size
 	};
 
-	const Texture2D& texture = getTextureForItemType(itemType, assetManager);
+	auto& tex = getTextureForItemType(itemType, assetManager);
 
 	Rectangle rectangle = getTextureCoordinatesForItemType(itemType, 32, 32, facingLeft);
 
-	DrawTexturePro(
-		texture,
-		rectangle,
-		renderRect,
-		{ size * 0.5f, size * 0.5f }, // want to rotate shuriken from middle
-		rotation,
-		WHITE
-	);
+	//DrawTexturePro(
+	//	tex,
+	//	rectangle,
+	//	renderRect,
+	//	{ size * 0.5f, size * 0.5f }, // want to rotate shuriken from middle
+	//	rotation,
+	//	WHITE
+	//);
 }
 
 bool Projectile::update(float deltaTime, EntityUpdateData& data)

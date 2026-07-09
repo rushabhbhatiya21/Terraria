@@ -6,6 +6,8 @@
 #include <ui.h>
 #include <audio.h>
 #include <settings.h>
+
+#include <assets/assetManager.h>
 #include <helper.h>
 #include <saveMap.h>
 #include <worldGenerator.h>
@@ -29,6 +31,8 @@
 #include <combat/blockSpawn.h>
 
 #include "ui/popupText.h"
+
+//using Engine::AssetManager;
 
 #pragma region sky colors
 
@@ -285,7 +289,7 @@ void Gameplay::drawInventoryBackground(const Rectangle& inventoryRectangle, cons
 	}
 }
 
-void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const ItemStack& stack, bool selected, AssetManager& assetManager)
+void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const ItemStack& stack, bool selected, Engine::AssetManager& assetManager)
 {
 	Color c = { 180,180,200,240 };
 
@@ -295,30 +299,53 @@ void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const It
 	if (selected)
 		c = { 255,230,80,255 };
 
-	DrawTexturePro(
+	//DrawTexturePro(
+	//	assetManager.frame,
+	//	getTextureAtlas(0, 0,
+	//		assetManager.frame.getWidth(),
+	//		assetManager.frame.getHeight()),
+	//	rect,
+	//	{ 0,0 },
+	//	0.f,
+	//	c
+	//);
+
+	Sprite selectedSlot
+	{
 		assetManager.frame,
-		getTextureAtlas(0, 0,
-			assetManager.frame.width,
-			assetManager.frame.height),
+		getTextureAtlas(0, 0, assetManager.frame.getWidth(), assetManager.frame.getHeight()),
 		rect,
 		{ 0,0 },
 		0.f,
 		c
-	);
+	};
+
+	spriteBatch.submitSprite(selectedSlot);
 
 	auto atlas = getTextureCoordinatesForItemType(stack.itemId);
-	Texture2D tex = getTextureForItemType(stack.itemId, assetManager);
+	auto& tex = getTextureForItemType(stack.itemId, assetManager);
 
 	if (!isDragged)
 	{
-		DrawTexturePro(
+		//DrawTexturePro(
+		//	tex,
+		//	atlas,
+		//	shrinkRectanglePercentage(rect, .3f, .3f),
+		//	{ 0,0 },
+		//	0.f,
+		//	c
+		//);
+
+		Sprite selectedItem
+		{
 			tex,
 			atlas,
 			shrinkRectanglePercentage(rect, .3f, .3f),
 			{ 0,0 },
 			0.f,
 			c
-		);
+		};
+		spriteBatch.submitSprite(selectedItem);
 
 		if (stack.count != 0 && isStackable(stack.itemId))
 		{
@@ -375,7 +402,7 @@ Rectangle Gameplay::getInventorySlotRect(int index, const Rectangle& inventoryRe
 	return newRect;
 }
 
-void Gameplay::drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, AssetManager& assetManager)
+void Gameplay::drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, Engine::AssetManager& assetManager)
 {
 	Rectangle slotRect = getInventorySlotRect(index, inventoryRectangle, inventory);
 
@@ -418,7 +445,7 @@ int Gameplay::getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRecta
 	return row * inventory.columns + col;
 }
 
-void Gameplay::drawDraggedItem(const ItemStack& stack, AssetManager& assetManager)
+void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& assetManager)
 {
 	Vector2 mouse = GetMousePosition();
 
@@ -430,16 +457,27 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, AssetManager& assetManage
 
 	auto atlas = getTextureCoordinatesForItemType(stack.itemId);
 
-	Texture2D tex = getTextureForItemType(stack.itemId, assetManager);
+	auto& tex = getTextureForItemType(stack.itemId, assetManager);
 
-	DrawTexturePro(
+	//DrawTexturePro(
+	//	tex,
+	//	atlas,
+	//	r,
+	//	{ 0,0 },
+	//	0.f,
+	//	Color{ 255,255,255,180 }
+	//);
+
+	Sprite draggeItemSprite
+	{
 		tex,
 		atlas,
 		r,
 		{ 0,0 },
 		0.f,
 		Color{ 255,255,255,180 }
-	);
+	};
+	spriteBatch.submitSprite(draggeItemSprite);
 }
 
 void Gameplay::drawDisplauNameUI(ItemId itemId, Rectangle parentRect, float fontSize, float spacing, float paddingX, float paddingY, Color rectColor, Color textColor)
@@ -619,7 +657,7 @@ static float tileNoise(int x, int y)
 #pragma endregion
 
 
-bool Gameplay::init(AssetManager& assetManager)
+bool Gameplay::init(Engine::AssetManager& assetManager)
 {
 	double loadStart = GetTime();
 
@@ -707,7 +745,7 @@ bool Gameplay::init(AssetManager& assetManager)
 	return true;
 }
 
-bool Gameplay::update(AssetManager& assetManager)
+bool Gameplay::update(Engine::AssetManager& assetManager)
 {
 
 #pragma region delta time
@@ -1375,25 +1413,36 @@ bool Gameplay::update(AssetManager& assetManager)
 	//draw selected block
 	if (!insideInventoryGrid && !insideCraftingMenu && !insideHotbarMenu)
 	{
-		DrawTexturePro(
+		//DrawTexturePro(
+		//	assetManager.frame,
+		//	{ 0,0,(float)assetManager.frame.width,(float)assetManager.frame.height },
+		//	{ (float)blockX, (float)blockY, 1, 1 },
+		//	{},
+		//	0.f,
+		//	WHITE
+		//);
+
+		Sprite frame
+		{
 			assetManager.frame,
-			{ 0,0,(float)assetManager.frame.width,(float)assetManager.frame.height },
+			{ 0,0,(float)assetManager.frame.getWidth(),(float)assetManager.frame.getHeight()},
 			{ (float)blockX, (float)blockY, 1, 1 },
-			{},
+			{ 0,0 },
 			0.f,
 			WHITE
-		);
+		};
+		spriteBatch.submitSprite(frame);
 	}
 
 	// todo: show this inside inventury menu or not
-	DrawTexturePro(
-		assetManager.textures,
-		getTextureAtlas(creativeSelectedBlock, 0, 32, 32),
-		{ (float)blockX, (float)blockY, 1, 1 },
-		{},
-		0.f,
-		{ 255,255,255,127 }
-	);
+	//DrawTexturePro(
+	//	assetManager.textures,
+	//	getTextureAtlas(creativeSelectedBlock, 0, 32, 32),
+	//	{ (float)blockX, (float)blockY, 1, 1 },
+	//	{},
+	//	0.f,
+	//	{ 255,255,255,127 }
+	//);
 
 #pragma endregion
 
@@ -1692,18 +1741,29 @@ bool Gameplay::update(AssetManager& assetManager)
 		int x = 0;
 
 		if(damagedLife >= 10)
-			x = assetManager.hearts.width / 3;
+			x = assetManager.hearts.getWidth() / 3;
 		else if (damagedLife >= 5)
-			x = assetManager.hearts.width * 2 / 3;
+			x = assetManager.hearts.getWidth() * 2 / 3;
 
-		DrawTexturePro(
+		//DrawTexturePro(
+		//	assetManager.hearts,
+		//	getTextureAtlas(x, 0, assetManager.hearts.getWidth() / 3, assetManager.hearts.getHeight()),
+		//	oneHeartRectangle,
+		//	{ 0,0 },
+		//	0.f,
+		//	WHITE
+		//);
+
+		Sprite heart
+		{
 			assetManager.hearts,
-			getTextureAtlas(x, 0, assetManager.hearts.width / 3, assetManager.hearts.height),
+			getTextureAtlas(x, 0, assetManager.hearts.getWidth() / 3, assetManager.hearts.getHeight()),
 			oneHeartRectangle,
 			{ 0,0 },
 			0.f,
 			WHITE
-		);
+		};
+		spriteBatch.submitSprite(heart);
 	}
 
 #pragma endregion
@@ -1988,15 +2048,27 @@ bool Gameplay::update(AssetManager& assetManager)
 			rr = shrinkRectanglePercentage(rr, .4f, .4f);
 
 			auto atlas = getTextureCoordinatesForItemType(itemType);
-			Texture2D tex = getTextureForItemType(itemType, assetManager);
-			DrawTexturePro(
+			auto& tex = getTextureForItemType(itemType, assetManager);
+
+			//DrawTexturePro(
+			//	tex,
+			//	atlas,
+			//	rr,
+			//	{ 0,0 },
+			//	0.f,
+			//	itemColor
+			//);
+
+			Sprite craftingRecipe
+			{
 				tex,
 				atlas,
 				rr,
 				{ 0,0 },
 				0.f,
 				itemColor
-			);
+			};
+			spriteBatch.submitSprite(craftingRecipe);
 
 			if (itemType != selectedItemType) continue;
 
@@ -2015,15 +2087,27 @@ bool Gameplay::update(AssetManager& assetManager)
 				ri = shrinkRectanglePercentage(ri, .25f, .25f);
 
 				auto atlas = getTextureCoordinatesForItemType(ingredient);
-				Texture2D tex = getTextureForItemType(ingredient, assetManager);
-				DrawTexturePro(
+				auto& tex = getTextureForItemType(ingredient, assetManager);
+
+				//DrawTexturePro(
+				//	tex,
+				//	atlas,
+				//	ri,
+				//	{ 0,0 },
+				//	0.f,
+				//	itemColor
+				//);
+
+				Sprite craftingIngredient
+				{
 					tex,
 					atlas,
 					ri,
 					{ 0,0 },
 					0.f,
 					itemColor
-				);
+				};
+				spriteBatch.submitSprite(craftingIngredient);
 
 				std::string str = std::to_string(selectedItemIngredients[j].count);
 				Vector2 textPos =
@@ -2215,34 +2299,34 @@ bool Gameplay::update(AssetManager& assetManager)
 
 		ImGui::Separator();
 
-		for (int i = 0; i < Items::LAST_BLOCK; i++)
-		{
-			auto atlas = getTextureAtlas(i, 0, 32, 32);
-			atlas.x /= assetManager.textures.width;
-			atlas.width /= assetManager.textures.width;
-			atlas.y /= assetManager.textures.height;
-			atlas.height /= assetManager.textures.height;
+		//for (int i = 0; i < Items::LAST_BLOCK; i++)
+		//{
+		//	auto atlas = getTextureAtlas(i, 0, 32, 32);
+		//	atlas.x /= assetManager.textures.getWidth();
+		//	atlas.width /= assetManager.textures.getWidth();
+		//	atlas.y /= assetManager.textures.getHeight();
+		//	atlas.height /= assetManager.textures.getHeight();
 
-			ImGui::PushID(i);
+		//	ImGui::PushID(i);
 
-			ImTextureID tex = (ImTextureID)(intptr_t)assetManager.textures.id;
-			if (ImGui::ImageButton(
-				tex,
-				{ 35,35 },
-				{ atlas.x,atlas.y },
-				{ atlas.x + atlas.width,atlas.y + atlas.height }
-			))
-			{
-				creativeSelectedBlock = i;
-			}
+		//	ImTextureID tex = (ImTextureID)(intptr_t)assetManager.textures.id;
+		//	if (ImGui::ImageButton(
+		//		tex,
+		//		{ 35,35 },
+		//		{ atlas.x,atlas.y },
+		//		{ atlas.x + atlas.width,atlas.y + atlas.height }
+		//	))
+		//	{
+		//		creativeSelectedBlock = i;
+		//	}
 
-			ImGui::PopID();
+		//	ImGui::PopID();
 
-			if (i % 10 != 0)
-			{
-				ImGui::SameLine();
-			}
-		}
+		//	if (i % 10 != 0)
+		//	{
+		//		ImGui::SameLine();
+		//	}
+		//}
 
 		ImGui::End();
 	}
@@ -2259,7 +2343,7 @@ bool Gameplay::update(AssetManager& assetManager)
 	return true;
 }
 
-void Gameplay::closeGame(AssetManager& assetManager) const
+void Gameplay::closeGame(Engine::AssetManager& assetManager) const
 {
 	UnloadRenderTexture(lightMask);
 	UnloadRenderTexture(sceneTexture);

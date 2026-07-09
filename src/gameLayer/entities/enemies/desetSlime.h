@@ -8,7 +8,7 @@ struct DesertSlime: public Enemy
 		setColliderSize();
 	}
 
-	void drawSprite(AssetManager& assetManager) override;
+	void drawSprite(Engine::AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 

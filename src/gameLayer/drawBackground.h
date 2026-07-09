@@ -1,7 +1,10 @@
 #pragma once
 #include <raylib.h>
 
-struct AssetManager;
+namespace Engine
+{
+	struct AssetManager;
+}
 
 struct DrawBackground
 {
@@ -20,7 +23,7 @@ struct DrawBackground
 	int currentTransitionType = 0;
 	float transitionTime = 0.f;
 
-	void draw(float deltaTime, AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor);
+	void draw(float deltaTime, Engine::AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor);
 
 	void setBackground(int background);
 };

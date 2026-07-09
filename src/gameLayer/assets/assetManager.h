@@ -1,95 +1,101 @@
 #pragma once
+#include "texture.h"
 #include <raylib.h>
 #include <string>
 #include <vector>
 #include <unordered_map>
 
-struct TexEntry
+namespace Engine
 {
-	Texture2D* tex;
-	const char* path;
-};
-
-struct ShaderEntry
-{
-	Shader* shader;
-	const char* path;
-};
-
-struct AssetManager
-{
-	int flashShaderLocation = 0;
-
-	Texture2D dirt = {};
-	Texture2D textures = {};
-	Texture2D items = {};
-	Texture2D treeTextures = {};
-	Texture2D frame = {};
-	Texture2D player = {};
-	Texture2D hearts = {};
-	Texture2D slime = {};
-	Texture2D desertSlime = {};
-	Texture2D evilEyePhase1 = {};
-	Texture2D evilEyePhase2 = {};
-	Texture2D evilEyePieces = {};
-	Texture2D evilEyeServant = {};
-	Texture2D zombie = {};
-	Texture2D health = {};
-	Texture2D healthBar = {};
-
-	Texture2D forestBG = {};
-	Texture2D desertBG = {};
-	Texture2D snowBG = {};
-	Texture2D caveBG = {};
-	Texture2D nightBG = {};
-
-	Shader blurShader = {};
-	Shader bloomShader = {};
-	Shader flashShader = {};
-
-	std::unordered_map<int, Texture2D> frontArmour;
-	std::unordered_map<int, Texture2D> backArmour;
-	std::unordered_map<int, Texture2D> feetArmour;
-	std::unordered_map<int, Texture2D> headArmour;
-
-	std::vector<TexEntry> texList =
+	struct TexEntry
 	{
-		{&dirt, "dirt.png"},
-		{&textures, "texturesWithBackgroundVersion.png"},
-		{&items, "items.png"},
-		{&treeTextures, "treetextures.png"},
-		{&frame, "frame.png"},
-		{&player, "player.png"},
-		{&hearts, "hearts.png"},
-		{&slime, "slime.png"},
-		{&desertSlime, "desertSlime.png"},
-		{&evilEyePhase1, "eyeOfCthulhuPhase1.png"},
-		{&evilEyePhase2, "eyeOfCthulhuPhase2.png"},
-		{&evilEyePieces, "eyeOfCthulhuPieces.png"},
-		{&evilEyeServant, "servantOfCthulhu.png"},
-		{&zombie, "zombie.png"},
-		{&health, "health.png"},
-		{&healthBar, "healthBar.png"},
-		{&forestBG, "forestBG.png"},
-		{&desertBG, "desertBG.png"},
-		{&snowBG, "snowBG.png"},
-		{&caveBG, "caveBG.png"},
-		{&nightBG, "backgroundsLayred/sky/nightSky.png"}
+		Texture* tex;
+		const char* path;
 	};
 
-	std::vector<ShaderEntry> shaderList = {
-		{&blurShader,  "shaders/blur.fs"},
-		{&bloomShader, "shaders/bloom.fs"},
-		{&flashShader, "shaders/flash.fs"}
+	struct ShaderEntry
+	{
+		Shader* shader;
+		const char* path;
 	};
 
-	void loadAll();
+	struct AssetManager
+	{
+		int flashShaderLocation = 0;
 
-	Texture2D getHeadTexture(int item);
-	Texture2D getBackTexture(int item);
-	Texture2D getFeetTexture(int item);
-	Texture2D getFrontTexture(int item);
+		Texture dirt = {};
+		Texture textures = {};
+		Texture items = {};
+		Texture treeTextures = {};
+		Texture frame = {};
+		Texture player = {};
+		Texture hearts = {};
+		Texture slime = {};
+		Texture desertSlime = {};
+		Texture evilEyePhase1 = {};
+		Texture evilEyePhase2 = {};
+		Texture evilEyePieces = {};
+		Texture evilEyeServant = {};
+		Texture zombie = {};
+		Texture health = {};
+		Texture healthBar = {};
 
-	void loadTexturePack(const std::string& pack);
-	void unloadTexturePack();
-};
+		Texture forestBG = {};
+		Texture desertBG = {};
+		Texture snowBG = {};
+		Texture caveBG = {};
+		Texture nightBG = {};
+
+		Shader blurShader = {};
+		Shader bloomShader = {};
+		Shader flashShader = {};
+
+		std::unordered_map<int, Texture> frontArmour;
+		std::unordered_map<int, Texture> backArmour;
+		std::unordered_map<int, Texture> feetArmour;
+		std::unordered_map<int, Texture> headArmour;
+
+		std::vector<TexEntry> texList =
+		{
+			{&dirt, "dirt.png"},
+			{&textures, "texturesWithBackgroundVersion.png"},
+			{&items, "items.png"},
+			{&treeTextures, "treetextures.png"},
+			{&frame, "frame.png"},
+			{&player, "player.png"},
+			{&hearts, "hearts.png"},
+			{&slime, "slime.png"},
+			{&desertSlime, "desertSlime.png"},
+			{&evilEyePhase1, "eyeOfCthulhuPhase1.png"},
+			{&evilEyePhase2, "eyeOfCthulhuPhase2.png"},
+			{&evilEyePieces, "eyeOfCthulhuPieces.png"},
+			{&evilEyeServant, "servantOfCthulhu.png"},
+			{&zombie, "zombie.png"},
+			{&health, "health.png"},
+			{&healthBar, "healthBar.png"},
+			{&forestBG, "forestBG.png"},
+			{&desertBG, "desertBG.png"},
+			{&snowBG, "snowBG.png"},
+			{&caveBG, "caveBG.png"},
+			{&nightBG, "backgroundsLayred/sky/nightSky.png"}
+		};
+
+		std::vector<ShaderEntry> shaderList = {
+			{&blurShader,  "shaders/blur.fs"},
+			{&bloomShader, "shaders/bloom.fs"},
+			{&flashShader, "shaders/flash.fs"}
+		};
+
+		void loadAll();
+
+		const Texture& getHeadTexture(int item);
+		const Texture& getBackTexture(int item);
+		const Texture& getFeetTexture(int item);
+		const Texture& getFrontTexture(int item);
+
+		Texture loadTextureFromFile(const std::string& path);
+
+		void loadTexturePack(const std::string& pack);
+		void unloadTexturePack();
+	};
+}

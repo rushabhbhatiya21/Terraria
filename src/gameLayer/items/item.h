@@ -6,7 +6,11 @@
 #include "itemIds.h"
 #include "../combat/stats.h"
 
-struct AssetManager;
+namespace Engine
+{
+    struct Texture;
+    struct AssetManager;
+}
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
 
@@ -229,7 +233,7 @@ struct ItemDefinition
         d.tool.tool.axePower = power;
         d.tool.tool.hammerPower = power;
         d.tool.tool.miningPower = power;
-        d.tool.tool.range = range;
+        d.tool.tool.range = (int)range;
         d.attackStyle = attackStyle;
         return d;
     }
@@ -348,5 +352,5 @@ bool            isItem(ItemId itemType);
 
 // ─── Texture helpers ──────────────────────────────────────────────────────────
 
-Texture2D getTextureForItemType(int itemType, AssetManager& assetManager);
+const Engine::Texture& getTextureForItemType(int itemType, const Engine::AssetManager& assetManager);
 Rectangle getTextureCoordinatesForItemType(int itemType, int cellSizeX = 32, int cellSizeY = 32, bool flipX = false);

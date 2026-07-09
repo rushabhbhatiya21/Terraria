@@ -4,19 +4,21 @@
 #include <player.h>
 #include <combat/combatSystem.h>
 
-void EvilEyeServant::drawSprite(AssetManager& assetManager)
+//using Engine::AssetManager;
+
+void EvilEyeServant::drawSprite(Engine::AssetManager& assetManager)
 {
-	Texture2D tex = assetManager.evilEyeServant;
+	auto& tex = assetManager.evilEyeServant;
 	Rectangle aabb = getRectangleForEntity(physics.transform, spriteScale, spriteScale); // bottom-mid
 
-	DrawTexturePro(
-		tex,
-		getTextureAtlas(animations.positionX, animations.positionY, 16, 16, animations.movingLeft),
-		aabb, // dest
-		{ 0.f, spriteScale / 2 }, // origin (aabb - already mid so no need to touch x)
-		rotation, // rotation
-		WHITE // tint
-	);
+	//DrawTexturePro(
+	//	tex,
+	//	getTextureAtlas(animations.positionX, animations.positionY, 16, 16, animations.movingLeft),
+	//	aabb, // dest
+	//	{ 0.f, spriteScale / 2 }, // origin (aabb - already mid so no need to touch x)
+	//	rotation, // rotation
+	//	WHITE // tint
+	//);
 
 	if (currentState == ServantState::DEAD_ANIM)
 	{

@@ -7,7 +7,7 @@
 #include <inventory.h>
 #include <player.h>
 
-void DroppedItem::render(AssetManager& assetManager)
+void DroppedItem::render(Engine::AssetManager& assetManager)
 {
 	float size = 1.f;
 
@@ -24,17 +24,17 @@ void DroppedItem::render(AssetManager& assetManager)
 
 	auto aabb = getRectangleForEntity(physics.transform, size, size);
 
-	Texture2D texture = getTextureForItemType(itemType, assetManager);
+	auto& tex = getTextureForItemType(itemType, assetManager);
 	Rectangle rectangle = getTextureCoordinatesForItemType(itemType);
 
-	DrawTexturePro(
-		texture,
-		rectangle,
-		aabb,
-		{ 0,0 },
-		0.f,
-		WHITE
-	);
+	//DrawTexturePro(
+	//	tex,
+	//	rectangle,
+	//	aabb,
+	//	{ 0,0 },
+	//	0.f,
+	//	WHITE
+	//);
 }
 
 

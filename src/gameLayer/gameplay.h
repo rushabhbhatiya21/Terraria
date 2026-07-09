@@ -7,7 +7,6 @@
 #include <world/chunk.h>
 
 #include <gameMap.h>
-#include <assets/assetManager.h>
 #include <drawBackground.h>
 #include <rendering/worldRenderer.h>
 #include <rendering/spriteGeometryBuilder.h>
@@ -28,6 +27,11 @@
 #define DEBUG_MODE 0
 #define CAMERA_ZOOM 20.0f
 #define LIGHT_SCALE 4
+
+namespace Engine
+{
+	struct AssetManager;
+}
 
 enum class DayPhase
 {
@@ -153,11 +157,11 @@ struct Gameplay
 	Rectangle getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle);
 
 	void drawInventoryBackground(const Rectangle& inventoryRectangle, const Inventory& inventory, bool insideInventory);
-	void drawInventorySlot(bool isDragged, const Rectangle& rect, const ItemStack& stack, bool selected, AssetManager& assetManager);
+	void drawInventorySlot(bool isDragged, const Rectangle& rect, const ItemStack& stack, bool selected, Engine::AssetManager& assetManager);
 	Rectangle getInventorySlotRect(int index, const Rectangle& inventoryRectangle, const Inventory& inventory);
-	void drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, AssetManager& assetManager);
+	void drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, Engine::AssetManager& assetManager);
 	int getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRectangle, const Inventory& inventory, bool insideInventory);
-	void drawDraggedItem(const ItemStack& stack, AssetManager& assetManager);
+	void drawDraggedItem(const ItemStack& stack, Engine::AssetManager& assetManager);
 	void drawDisplauNameUI(
 		ItemId itemId, 
 		Rectangle parentRect, 
@@ -186,9 +190,9 @@ struct Gameplay
 		entityHolder.enemies.push_back(enemyPtr);
 	}
 
-	bool init(AssetManager& assetManager);
+	bool init(Engine::AssetManager& assetManager);
 
-	bool update(AssetManager& assetManager);
+	bool update(Engine::AssetManager& assetManager);
 
-	void closeGame(AssetManager& assetManager) const;
+	void closeGame(Engine::AssetManager& assetManager) const;
 };

@@ -8,7 +8,7 @@
 #include "sprite.h"
 #include "spriteBatch.h"
 
-void WorldRenderer::init(GameMap& map, AssetManager& assets, SpriteBatch& spriteBatch)
+void WorldRenderer::init(GameMap& map, Engine::AssetManager& assets, SpriteBatch& spriteBatch)
 {
 	this->map = &map;
 	this->assets = &assets;

@@ -7,18 +7,20 @@
 #include <player.h>
 #include "entities/droppedItem.h"
 
-void DesertSlime::drawSprite(AssetManager& assetManager)
+//using Engine::AssetManager;
+
+void DesertSlime::drawSprite(Engine::AssetManager& assetManager)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
 
-	DrawTexturePro(
-		assetManager.desertSlime,
-		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
-		aabb,
-		{ 0,0 },
-		0.f,
-		WHITE
-	);
+	//DrawTexturePro(
+	//	assetManager.desertSlime,
+	//	getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
+	//	aabb,
+	//	{ 0,0 },
+	//	0.f,
+	//	WHITE
+	//);
 }
 
 bool DesertSlime::update(float deltaTime, EntityUpdateData& data)

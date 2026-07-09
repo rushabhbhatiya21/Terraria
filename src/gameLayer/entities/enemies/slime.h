@@ -8,13 +8,13 @@ struct Slime : public Enemy
 		setColliderSize();
 		baseStats = makeSlimeStats();
 		stats = baseStats;
-		life = stats.defensive.maxHealth;
+		life = (float)stats.defensive.maxHealth;
 	}
 
 	bool isColliding = false;
 	bool wasColliding = false;
 
-	void drawSprite(AssetManager& assetManager) override;
+	void drawSprite(Engine::AssetManager& assetManager) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
