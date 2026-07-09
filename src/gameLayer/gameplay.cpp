@@ -1560,7 +1560,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 #pragma endregion
 
 
-	spriteBatch.end();
+	spriteBatch.end(backend);
 
 	EndMode2D();
 	EndTextureMode();

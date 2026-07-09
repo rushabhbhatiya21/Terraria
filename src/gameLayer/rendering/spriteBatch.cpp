@@ -1,5 +1,6 @@
 #include "spriteBatch.h"
 #include "drawCommand.h"
+#include "IRenderBackend.h"
 
 SpriteBatch::SpriteBatch(SpriteGeometryBuilder& builder)
 	: builder(builder)
@@ -18,9 +19,9 @@ void SpriteBatch::submitSprite(const Sprite& sprite)
 	builder.build(sprite, *this);
 }
 
-void SpriteBatch::end()
+void SpriteBatch::end(IRenderBackend& backend)
 {
-	flush();
+	flush(backend);
 }
 
 //std::vector<DrawCommand> SpriteBatch::buildDrawCommands()
@@ -53,10 +54,11 @@ void SpriteBatch::end()
 	//}
 //}
 
-void SpriteBatch::flush()
+void SpriteBatch::flush(IRenderBackend& backend) const
 {
 	//std::vector<DrawCommand> commands = buildDrawCommands();
 	//executeDrawCommands(drawCommands);
+	backend.render(vertexBuffer, indexBuffer, drawCommands);
 }
 
 void SpriteBatch::beginEmission(const RenderState& renderState)

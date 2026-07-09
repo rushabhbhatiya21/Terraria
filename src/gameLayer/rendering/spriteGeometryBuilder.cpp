@@ -3,7 +3,7 @@
 #include <array>
 #include <math/utils.h>
 #include <math/vector2overloads.h>
-#include "geometrySink.h"
+#include "IGeometrySink.h"
 
 void SpriteGeometryBuilder::build(const Sprite& sprite, IGeometrySink& sink)
 {

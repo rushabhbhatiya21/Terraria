@@ -11,6 +11,7 @@
 #include <rendering/worldRenderer.h>
 #include <rendering/spriteGeometryBuilder.h>
 #include <rendering/spriteBatch.h>
+#include <rendering/raylibRenderBackend.h>
 
 #include <entityHolder.h>
 #include <structure.h>
@@ -82,6 +83,7 @@ struct Gameplay
 	SpriteGeometryBuilder builder;
 	SpriteBatch spriteBatch{ builder };
 	WorldRenderer renderer = {};
+	RaylibRenderBackend backend = {};
 
 	float lifetime = 0;
 

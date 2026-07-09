@@ -1,11 +1,12 @@
 #pragma once
 #include <vector>
-#include "geometrySink.h"
+#include "IGeometrySink.h"
 #include "renderState.h"
 #include "sprite.h"
 #include "spriteGeometryBuilder.h"
 
 struct DrawCommand;
+class IRenderBackend;
 
 class SpriteBatch : public IGeometrySink
 {
@@ -36,12 +37,12 @@ public:
 	SpriteBatch(SpriteGeometryBuilder& builder);
 	void begin();
 	void submitSprite(const Sprite& sprite);
-	void end();
+	void end(IRenderBackend& backend);
 
 private:
 	//std::vector<DrawCommand> buildDrawCommands();
 	//void executeDrawCommands(const std::vector<DrawCommand>& commands);
-	void flush();
+	void flush(IRenderBackend& backend) const;
 
 	void beginEmission(const RenderState& renderState) override;
 	void emitVertex(const Vertex& vertex) override;
