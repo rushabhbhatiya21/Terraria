@@ -1,24 +1,47 @@
 #include "raylibRenderBackend.h"
-#include "raylibRenderBackend.h"
-#include "raylibRenderBackend.h"
 #include "vertex.h"
 #include <rlgl.h>
+#include <iostream>
 
 RaylibRenderBackend::RaylibRenderBackend()
 {
 }
 
-void RaylibRenderBackend::render(const std::vector<Vertex>& vertexBuffer, const std::vector<uint32_t>& indexBuffer, const std::vector<DrawCommand>& drawCommands)
+void RaylibRenderBackend::render(
+	const std::vector<Vertex>& vertexBuffer, 
+	const std::vector<Index>& indexBuffer, 
+	const std::vector<DrawCommand>& drawCommands
+)
 {
+	std::cout << "Render called\n";
 	ensureBufferCapacity(vertexBuffer.size(), indexBuffer.size());
 
 	if (!vertexBuffer.empty())
 		rlUpdateVertexBuffer(m_vertexBufferHandle, vertexBuffer.data(), vertexBuffer.size() * sizeof(Vertex), 0);
 
 	if (!indexBuffer.empty())
-		rlUpdateVertexBufferElements(m_indexBufferHandle, indexBuffer.data(), indexBuffer.size() * sizeof(uint32_t), 0);
+		rlUpdateVertexBufferElements(m_indexBufferHandle, indexBuffer.data(), indexBuffer.size() * sizeof(Index), 0);
 
-	rlDrawVertexArrayElements()
+	rlEnableVertexBuffer(m_vertexBufferHandle);
+	rlEnableVertexBufferElement(m_indexBufferHandle);
+
+	for (auto& cmd : drawCommands)
+	{
+		// Bind cmd.renderState.texture
+		rlEnableTexture(static_cast<unsigned int>(cmd.renderState.texture->getNativeHandle()));
+
+		// Draw cmd.firstIndex, cmd.indexCount
+		rlDrawVertexArrayElements(
+			0, 
+			static_cast<int>(cmd.indexCount),
+			reinterpret_cast<void*>(cmd.firstIndex * sizeof(Index))
+		);
+
+		rlDisableTexture();
+	}
+
+	rlDisableVertexBuffer();
+	rlDisableVertexBufferElement();
 }
 
 size_t RaylibRenderBackend::growCapacity(size_t current, size_t required) const
@@ -58,7 +81,7 @@ void RaylibRenderBackend::ensureBufferCapacity(size_t vertexCount, size_t indexC
 	{
 		auto newCapacity = growCapacity(m_indexCapacity, indexCount);
 
-		unsigned int newIndexBuffer = rlLoadVertexBufferElement(nullptr, newCapacity * sizeof(uint32_t), true);
+		unsigned int newIndexBuffer = rlLoadVertexBufferElement(nullptr, newCapacity * sizeof(Index), true);
 
 		// Index buffer growth
 		if (newIndexBuffer != 0)
@@ -80,9 +103,6 @@ void RaylibRenderBackend::ensureBufferCapacity(size_t vertexCount, size_t indexC
 
 void RaylibRenderBackend::configureVertexAttributes()
 {
-	rlEnableVertexBuffer(m_vertexBufferHandle);
-	rlEnableVertexBufferElement(m_indexBufferHandle);
-
 	rlSetVertexAttribute(0, 2, RL_FLOAT, false, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, position)));
 	rlEnableVertexAttribute(0);
 
@@ -91,7 +111,4 @@ void RaylibRenderBackend::configureVertexAttributes()
 
 	rlSetVertexAttribute(2, 4, RL_UNSIGNED_BYTE, true, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tint)));
 	rlEnableVertexAttribute(2);
-
-	rlDisableVertexBuffer();
-	rlDisableVertexBufferElement();
 }

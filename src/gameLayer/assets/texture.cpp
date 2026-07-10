@@ -1,4 +1,5 @@
 #include "texture.h"
+#include "texture.h"
 #include <raylib.h>
 
 
@@ -38,6 +39,11 @@ namespace Engine
 	int Texture::getHeight() const
 	{
 		return height;
+	}
+
+	uint32_t Texture::getNativeHandle() const
+	{
+		return impl->texture.id;
 	}
 
 	Texture::~Texture() = default;

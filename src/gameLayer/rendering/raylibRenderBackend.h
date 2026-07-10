@@ -5,11 +5,11 @@ class RaylibRenderBackend : public IRenderBackend
 {
 public:
 	RaylibRenderBackend();
-	~RaylibRenderBackend();
+	~RaylibRenderBackend() = default;
 
 	void render(
 		const std::vector<Vertex>& vertexBuffer,
-		const std::vector<uint32_t>& indexBuffer,
+		const std::vector<Index>& indexBuffer,
 		const std::vector<DrawCommand>& drawCommands
 	) override;
 

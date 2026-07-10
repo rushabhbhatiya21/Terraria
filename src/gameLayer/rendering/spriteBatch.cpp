@@ -1,6 +1,7 @@
 #include "spriteBatch.h"
 #include "drawCommand.h"
 #include "IRenderBackend.h"
+#include <asserts.h>
 
 SpriteBatch::SpriteBatch(SpriteGeometryBuilder& builder)
 	: builder(builder)
@@ -74,9 +75,11 @@ void SpriteBatch::emitVertex(const Vertex& vertex)
 	vertexBuffer.emplace_back(vertex);
 }
 
-void SpriteBatch::emitIndex(uint32_t index)
+void SpriteBatch::emitIndex(const Index index)
 {
-	indexBuffer.emplace_back(currentEmission.firstVertex + index);
+	uint32_t finalIndex = currentEmission.firstVertex + static_cast<uint32_t>(index);
+	permaAssertCommentDevelopement(finalIndex <= 65535, "SpriteBatch index overflow! Exceeded 65535 vertices.");
+	indexBuffer.push_back(static_cast<Index>(finalIndex));
 }
 
 void SpriteBatch::endEmission()

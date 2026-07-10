@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "index.h"
 #include "IGeometrySink.h"
 #include "renderState.h"
 #include "sprite.h"
@@ -25,8 +26,8 @@ class SpriteBatch : public IGeometrySink
 	};
 
 private:
-	std::vector<Vertex>   vertexBuffer;
-	std::vector<uint32_t> indexBuffer;
+	std::vector<Vertex>      vertexBuffer;
+	std::vector<Index>       indexBuffer;
 	std::vector<DrawCommand> drawCommands;
 
 	EmissionState currentEmission;
@@ -46,6 +47,6 @@ private:
 
 	void beginEmission(const RenderState& renderState) override;
 	void emitVertex(const Vertex& vertex) override;
-	void emitIndex(uint32_t index) override;
+	void emitIndex(const Index index) override;
 	void endEmission() override;
 };

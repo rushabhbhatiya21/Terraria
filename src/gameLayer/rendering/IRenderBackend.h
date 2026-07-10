@@ -1,5 +1,6 @@
 #pragma	once
 #include <vector>
+#include "index.h"
 #include"vertex.h"
 #include "drawCommand.h"
 
@@ -10,7 +11,7 @@ public:
 
 	virtual void render(
 		const std::vector<Vertex>& vertexBuffer,
-		const std::vector<uint32_t>& indexBuffer,
+		const std::vector<Index>& indexBuffer,
 		const std::vector<DrawCommand>& drawCommands
 	) = 0;
 };
