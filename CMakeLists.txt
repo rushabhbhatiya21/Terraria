@@ -29,6 +29,8 @@ add_subdirectory(thirdParty/imgui-docking)
 add_subdirectory(thirdParty/rlImGui)
 add_subdirectory(thirdParty/fastNoiseSIMD)
 add_subdirectory(thirdParty/json-3.12.0)
+add_library(glad thirdParty/glad/src/gl.c)
+
 
 # MY_SOURCES is defined to be a list of all the source files for my game 
 # DON'T ADD THE SOURCES BY HAND, they are already added with this macro
@@ -84,6 +86,18 @@ endif()
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/gameLayer")
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/src/platform")
 
+target_include_directories(glad
+    PUBLIC
+        thirdParty/glad/include
+)
 
 # Link raylib library statically
-target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE raylib_static imgui rlImGui fastNoiseSIMD nlohmann_json)
+target_link_libraries("${CMAKE_PROJECT_NAME}"
+    PRIVATE
+        raylib_static
+        imgui
+        rlImGui
+        fastNoiseSIMD
+        nlohmann_json
+        glad
+)
