@@ -1,10 +1,10 @@
 #include "raylibRenderBackend.h"
 #include "vertex.h"
 #include <rlgl.h>
-#include <iostream>
 
 RaylibRenderBackend::RaylibRenderBackend()
 {
+	m_vertexArrayHandle = rlLoadVertexArray();
 }
 
 void RaylibRenderBackend::render(
@@ -13,7 +13,6 @@ void RaylibRenderBackend::render(
 	const std::vector<DrawCommand>& drawCommands
 )
 {
-	std::cout << "Render called\n";
 	ensureBufferCapacity(vertexBuffer.size(), indexBuffer.size());
 
 	if (!vertexBuffer.empty())
@@ -22,8 +21,11 @@ void RaylibRenderBackend::render(
 	if (!indexBuffer.empty())
 		rlUpdateVertexBufferElements(m_indexBufferHandle, indexBuffer.data(), indexBuffer.size() * sizeof(Index), 0);
 
+	bool isVertexArraySet = rlEnableVertexArray(m_vertexArrayHandle);
 	rlEnableVertexBuffer(m_vertexBufferHandle);
 	rlEnableVertexBufferElement(m_indexBufferHandle);
+
+	configureVertexAttributes();
 
 	for (auto& cmd : drawCommands)
 	{
@@ -34,12 +36,13 @@ void RaylibRenderBackend::render(
 		rlDrawVertexArrayElements(
 			0, 
 			static_cast<int>(cmd.indexCount),
-			reinterpret_cast<void*>(cmd.firstIndex * sizeof(Index))
+			reinterpret_cast<void*>(static_cast<uintptr_t>(cmd.firstIndex * sizeof(Index)))
 		);
 
 		rlDisableTexture();
 	}
 
+	rlDisableVertexArray();
 	rlDisableVertexBuffer();
 	rlDisableVertexBufferElement();
 }
@@ -95,10 +98,10 @@ void RaylibRenderBackend::ensureBufferCapacity(size_t vertexCount, size_t indexC
 		}
 	}
 
-	if (buffersRecreated && m_vertexBufferHandle != 0 && m_indexBufferHandle != 0)
-	{
-		configureVertexAttributes();
-	}
+	//if (buffersRecreated && m_vertexBufferHandle != 0 && m_indexBufferHandle != 0)
+	//{
+	//	configureVertexAttributes();
+	//}
 }
 
 void RaylibRenderBackend::configureVertexAttributes()

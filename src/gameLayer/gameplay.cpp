@@ -747,6 +747,7 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 
 bool Gameplay::update(Engine::AssetManager& assetManager)
 {
+	spriteBatch.begin();
 
 #pragma region delta time
 
@@ -1369,9 +1370,6 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	ClearBackground(BLANK);
 	BeginMode2D(camera);
 
-	spriteBatch.begin();
-
-
 #pragma region render world
 
 	//int debugRendering = 2;
@@ -1558,9 +1556,6 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	//}
 
 #pragma endregion
-
-
-	spriteBatch.end(backend);
 
 	EndMode2D();
 	EndTextureMode();
@@ -2339,6 +2334,9 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	DrawFPS(20, 20);
 
 #pragma endregion
+
+
+	spriteBatch.end(backend);
 
 	return true;
 }

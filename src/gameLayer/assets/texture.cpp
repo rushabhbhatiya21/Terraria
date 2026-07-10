@@ -1,5 +1,5 @@
 #include "texture.h"
-#include "texture.h"
+#include <glad/gl.h>
 #include <raylib.h>
 
 
@@ -45,6 +45,11 @@ namespace Engine
 	{
 		return impl->texture.id;
 	}
+	
+	//GLuint Texture::getNativeHandle() const
+	//{
+
+	//}
 
 	Texture::~Texture() = default;
 }
