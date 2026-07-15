@@ -672,6 +672,9 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	// renderer
 	renderer.init(gameMap, assetManager, spriteBatch);
 
+	// backend
+	backend.initialize();
+
 	// lighting init
 	recalculateLight(gameMap);
 

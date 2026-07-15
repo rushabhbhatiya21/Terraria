@@ -6,6 +6,8 @@ namespace Engine
 {
     class Texture
     {
+        friend class OpenGLRenderBackend;
+
     public:
         Texture();
 
@@ -19,7 +21,7 @@ namespace Engine
 
         int getWidth() const;
         int getHeight() const;
-        uint32_t getNativeHandle() const;
+        //uint32_t getNativeHandle() const;
 
     private:
         class TextureImpl;

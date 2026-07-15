@@ -30,7 +30,7 @@ void RaylibRenderBackend::render(
 	for (auto& cmd : drawCommands)
 	{
 		// Bind cmd.renderState.texture
-		rlEnableTexture(static_cast<unsigned int>(cmd.renderState.texture->getNativeHandle()));
+		//rlEnableTexture(static_cast<unsigned int>(cmd.renderState.texture->getNativeHandle()));
 
 		// Draw cmd.firstIndex, cmd.indexCount
 		rlDrawVertexArrayElements(

@@ -52,7 +52,7 @@ void OpenGLRenderBackend::render(const std::vector<Vertex>& vertexBuffer, const 
 
 	for (auto& cmd : drawCommands)
 	{
-		glBindTexture(GL_TEXTURE_2D, cmd.renderState.texture->getNativeHandle());
+		//glBindTexture(GL_TEXTURE_2D, cmd.renderState.texture->getNativeHandle());
 
 		// draw
 	}

@@ -1,6 +1,6 @@
 #pragma once
 #include "IRenderBackend.h"
-#include <glad.h>
+#include <glad/gl.h>
 
 class OpenGLRenderBackend : public IRenderBackend
 {
