@@ -32,7 +32,8 @@
 
 #include "ui/popupText.h"
 
-//using Engine::AssetManager;
+#include <rlgl.h>
+
 
 #pragma region sky colors
 
@@ -310,7 +311,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const It
 	//	c
 	//);
 
-	Sprite selectedSlot
+	Engine::Sprite selectedSlot
 	{
 		assetManager.frame,
 		getTextureAtlas(0, 0, assetManager.frame.getWidth(), assetManager.frame.getHeight()),
@@ -336,7 +337,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const It
 		//	c
 		//);
 
-		Sprite selectedItem
+		Engine::Sprite selectedItem
 		{
 			tex,
 			atlas,
@@ -468,7 +469,7 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& ass
 	//	Color{ 255,255,255,180 }
 	//);
 
-	Sprite draggeItemSprite
+	Engine::Sprite draggedItemSprite
 	{
 		tex,
 		atlas,
@@ -477,7 +478,7 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& ass
 		0.f,
 		Color{ 255,255,255,180 }
 	};
-	spriteBatch.submitSprite(draggeItemSprite);
+	spriteBatch.submitSprite(draggedItemSprite);
 }
 
 void Gameplay::drawDisplauNameUI(ItemId itemId, Rectangle parentRect, float fontSize, float spacing, float paddingX, float paddingY, Color rectColor, Color textColor)
@@ -673,7 +674,9 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	renderer.init(gameMap, assetManager, spriteBatch);
 
 	// backend
-	backend.initialize();
+	bool res = backend.initialize();
+	if (res == 0)
+		std::cout << "****************** INIT FAILED *****************" << "\n";
 
 	// lighting init
 	recalculateLight(gameMap);
@@ -1423,7 +1426,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		//	WHITE
 		//);
 
-		Sprite frame
+		Engine::Sprite frame
 		{
 			assetManager.frame,
 			{ 0,0,(float)assetManager.frame.getWidth(),(float)assetManager.frame.getHeight()},
@@ -1735,13 +1738,19 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		oneHeartRectangle.width = oneHeartRectangle.height;
 		oneHeartRectangle.x += oneHeartRectangle.width * i;
 
-
 		int x = 0;
 
+		//if (damagedLife >= 10)
+		//	x = assetManager.hearts.getWidth() / 3;
+		//else if (damagedLife >= 5)
+		//	x = assetManager.hearts.getWidth() * 2 / 3;
+
 		if(damagedLife >= 10)
-			x = assetManager.hearts.getWidth() / 3;
+			x = 0;
 		else if (damagedLife >= 5)
-			x = assetManager.hearts.getWidth() * 2 / 3;
+			x = 1;
+		else
+			x = 2;
 
 		//DrawTexturePro(
 		//	assetManager.hearts,
@@ -1752,7 +1761,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		//	WHITE
 		//);
 
-		Sprite heart
+		Engine::Sprite heart
 		{
 			assetManager.hearts,
 			getTextureAtlas(x, 0, assetManager.hearts.getWidth() / 3, assetManager.hearts.getHeight()),
@@ -2057,7 +2066,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			//	itemColor
 			//);
 
-			Sprite craftingRecipe
+			Engine::Sprite craftingRecipe
 			{
 				tex,
 				atlas,
@@ -2096,7 +2105,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 				//	itemColor
 				//);
 
-				Sprite craftingIngredient
+				Engine::Sprite craftingIngredient
 				{
 					tex,
 					atlas,
@@ -2338,8 +2347,44 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma endregion
 
+	rlDrawRenderBatchActive();
+	rlDisableBackfaceCulling();
+
+	// save raylib's GL state
+	GLint prevFBO, prevProgram, prevVAO, prevVBO, prevEBO;
+	GLint prevViewport[4];
+	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevFBO);
+	glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
+	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prevVAO);
+	glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &prevVBO);
+	glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &prevEBO);
+	glGetIntegerv(GL_VIEWPORT, prevViewport);
+
+	// draw with your backend (renders to default framebuffer)
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	// update projection to match raylib's camera
+	backend.updateProjection(
+		(float)GetScreenWidth(),
+		(float)GetScreenHeight(),
+		camera.target.x,
+		camera.target.y,
+		camera.offset.x,
+		camera.offset.y,
+		camera.zoom
+	);
 
 	spriteBatch.end(backend);
+
+	// restore raylib's GL state
+	glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
+	glUseProgram(prevProgram);
+	glBindVertexArray(prevVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, prevVBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prevEBO);
+	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+
+	rlEnableBackfaceCulling();
 
 	return true;
 }

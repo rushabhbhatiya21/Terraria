@@ -1,7 +1,10 @@
 #pragma once
 #include <assets/texture.h>
 
-struct RenderState
+namespace Engine
 {
-	const Engine::Texture* texture = nullptr;
-};
+	struct RenderState
+	{
+		const Texture* texture = nullptr;
+	};
+}

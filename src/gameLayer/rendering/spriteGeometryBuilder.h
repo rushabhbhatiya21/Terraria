@@ -2,13 +2,16 @@
 #include "sprite.h"
 #include "drawCommand.h"
 
-class IGeometrySink;
-
-class SpriteGeometryBuilder
+namespace Engine
 {
-public:
-	void build(const Sprite& sprite, IGeometrySink& sink);
+	class IGeometrySink;
 
-private:
-	Vertex generateVertex(const Sprite& sprite, Vector2& corner, Vector2& uv, const Vector2& textureSize, const float c, const float s);
-};
+	class SpriteGeometryBuilder
+	{
+	public:
+		void build(const Sprite& sprite, IGeometrySink& sink);
+
+	private:
+		Vertex generateVertex(const Sprite& sprite, Vector2& corner, Vector2& uv, const Vector2& textureSize, const float c, const float s);
+	};
+}

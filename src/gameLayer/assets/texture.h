@@ -35,5 +35,6 @@ namespace Engine
 
     private:
         void loadFromFile(const std::string& path);
+        uint32_t getNativeHandle() const;
     };
 }

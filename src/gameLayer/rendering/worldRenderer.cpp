@@ -8,7 +8,7 @@
 #include "sprite.h"
 #include "spriteBatch.h"
 
-void WorldRenderer::init(GameMap& map, Engine::AssetManager& assets, SpriteBatch& spriteBatch)
+void WorldRenderer::init(GameMap& map, Engine::AssetManager& assets, Engine::SpriteBatch& spriteBatch)
 {
 	this->map = &map;
 	this->assets = &assets;
@@ -104,7 +104,7 @@ void WorldRenderer::drawTile(const CachedTile& tile)
 		255
 	};
 
-	Sprite sprite
+	Engine::Sprite sprite
 	{
 		assets->textures,
 		tile.srcRect,

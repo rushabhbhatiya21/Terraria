@@ -1,38 +1,48 @@
 #pragma once
 #include "IRenderBackend.h"
 #include <glad/gl.h>
+#include <array>
 
-class OpenGLRenderBackend : public IRenderBackend
+
+namespace Engine
 {
-public:
-	OpenGLRenderBackend();
-	~OpenGLRenderBackend() = default;
+	class OpenGLRenderBackend : public IRenderBackend
+	{
+	public:
+		OpenGLRenderBackend();
+		~OpenGLRenderBackend() = default;
 
-	bool initialize();
-	void render(
-		const std::vector<Vertex>& vertexBuffer,
-		const std::vector<Index>& indexBuffer,
-		const std::vector<DrawCommand>& drawCommands
-	) override;
+		bool initialize();
+		void render(
+			const std::vector<Vertex>& vertexBuffer,
+			const std::vector<Index>& indexBuffer,
+			const std::vector<DrawCommand>& drawCommands
+		) override;
+		void renderTestQuad();
+		void updateProjection(float screenWidth, float screenHeight, float targetX, float targetY, float offsetX, float offsetY, float zoom);
 
-private:
-	size_t growCapacity(size_t current, size_t required) const;
-	void ensureBufferCapacity(size_t vertexCount, size_t indexCount);
-	void configureVertexAttributes();
-	GLuint compileShader(GLenum type, const std::string& source);
-	GLuint createShaderProgram(GLuint vertexShader, GLuint fragmentShader);
+	private:
+		size_t growCapacity(size_t current, size_t required) const;
+		void ensureBufferCapacity(size_t vertexCount, size_t indexCount);
+		void configureVertexAttributes();
+		GLuint compileShader(GLenum type, const std::string& source);
+		GLuint createShaderProgram(GLuint vertexShader, GLuint fragmentShader);
 
-private:
-	// GPU Resources
-	GLuint shaderProgramHandle = 0;
+	private:
+		// GPU Resources
+		GLuint shaderProgramHandle = 0;
 
-	GLint m_projectionLocation = -1;
-	GLint m_textureLocation = -1;
+		GLint m_projectionLocation = -1;
+		GLint m_textureLocation = -1;
+		GLint m_useTextureLocation = -1;
 
-	unsigned int m_vertexBufferHandle = 0;
-	unsigned int m_indexBufferHandle = 0;
-	unsigned int m_vertexArrayHandle = 0;
+		unsigned int m_vertexBufferHandle = 0;
+		unsigned int m_indexBufferHandle = 0;
+		unsigned int m_vertexArrayHandle = 0;
 
-	size_t m_vertexCapacity = 0;
-	size_t m_indexCapacity = 0;
-};
+		size_t m_vertexCapacity = 0;
+		size_t m_indexCapacity = 0;
+
+		std::array<float, 16> projection{};
+	};
+}

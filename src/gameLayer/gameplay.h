@@ -80,10 +80,10 @@ struct Gameplay
 	DrawBackground background;
 
 	// render
-	SpriteGeometryBuilder builder;
-	SpriteBatch spriteBatch{ builder };
+	Engine::SpriteGeometryBuilder builder;
+	Engine::SpriteBatch spriteBatch{ builder };
+	Engine::OpenGLRenderBackend backend = {};
 	WorldRenderer renderer = {};
-	OpenGLRenderBackend backend = {};
 
 	float lifetime = 0;
 

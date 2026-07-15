@@ -13,7 +13,8 @@ namespace Engine
 
 		for (auto& t : texList)
 		{
-			*t.tex = loadTextureFromFile(t.path);
+			const std::string& p = std::string(RESOURCES_PATH) + std::string(t.path);
+			*t.tex = loadTextureFromFile(p);
 		}
 
 		for (auto& s : shaderList)
@@ -27,33 +28,33 @@ namespace Engine
 		//SetTextureFilter(forestBG, TEXTURE_FILTER_TRILINEAR);
 
 		//0 means default
-		feetArmour[0] = loadTextureFromFile("body/player_feet.png");
-		headArmour[0] = loadTextureFromFile("body/player_head.png");
-		frontArmour[0] = loadTextureFromFile("body/player_front.png");
-		backArmour[0] = loadTextureFromFile("body/player_back.png");
+		feetArmour[0] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/player_feet.png");
+		headArmour[0] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/player_head.png");
+		frontArmour[0] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/player_front.png");
+		backArmour[0] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/player_back.png");
 
-		headArmour[Items::partyHat] = loadTextureFromFile("body/party_hat.png");
-		headArmour[Items::sunGlasses] = loadTextureFromFile("body/sunglasses.png");
+		headArmour[Items::partyHat] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/party_hat.png");
+		headArmour[Items::sunGlasses] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/sunglasses.png");
 
-		feetArmour[Items::copperBoots] = loadTextureFromFile("body/copper_armour_feet.png");
-		headArmour[Items::copperHelmet] = loadTextureFromFile("body/copper_armour_head.png");
-		frontArmour[Items::copperChestPlate] = loadTextureFromFile("body/copper_armour_front.png");
-		backArmour[Items::copperChestPlate] = loadTextureFromFile("body/copper_armour_back.png");
+		feetArmour[Items::copperBoots] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/copper_armour_feet.png");
+		headArmour[Items::copperHelmet] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/copper_armour_head.png");
+		frontArmour[Items::copperChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/copper_armour_front.png");
+		backArmour[Items::copperChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/copper_armour_back.png");
 
-		feetArmour[Items::ironBoots] = loadTextureFromFile("body/iron_armour_feet.png");
-		headArmour[Items::ironHelmet] = loadTextureFromFile("body/iron_armour_head.png");
-		frontArmour[Items::ironChestPlate] = loadTextureFromFile("body/iron_armour_front.png");
-		backArmour[Items::ironChestPlate] = loadTextureFromFile("body/iron_armour_back.png");
+		feetArmour[Items::ironBoots] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/iron_armour_feet.png");
+		headArmour[Items::ironHelmet] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/iron_armour_head.png");
+		frontArmour[Items::ironChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/iron_armour_front.png");
+		backArmour[Items::ironChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/iron_armour_back.png");
 
-		feetArmour[Items::goldBoots] = loadTextureFromFile("body/gold_armour_feet.png");
-		headArmour[Items::goldHelmet] = loadTextureFromFile("body/gold_armour_head.png");
-		frontArmour[Items::goldChestPlate] = loadTextureFromFile("body/gold_armour_front.png");
-		backArmour[Items::goldChestPlate] = loadTextureFromFile("body/gold_armour_back.png");
+		feetArmour[Items::goldBoots] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/gold_armour_feet.png");
+		headArmour[Items::goldHelmet] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/gold_armour_head.png");
+		frontArmour[Items::goldChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/gold_armour_front.png");
+		backArmour[Items::goldChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/gold_armour_back.png");
 
-		feetArmour[Items::iceBoots] = loadTextureFromFile("body/ice_armour_feet.png");
-		headArmour[Items::iceHelmet] = loadTextureFromFile("body/ice_armour_head.png");
-		frontArmour[Items::iceChestPlate] = loadTextureFromFile("body/ice_armour_front.png");
-		backArmour[Items::iceChestPlate] = loadTextureFromFile("body/ice_armour_back.png");
+		feetArmour[Items::iceBoots] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/ice_armour_feet.png");
+		headArmour[Items::iceHelmet] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/ice_armour_head.png");
+		frontArmour[Items::iceChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/ice_armour_front.png");
+		backArmour[Items::iceChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/ice_armour_back.png");
 	}
 
 	const Texture& AssetManager::getHeadTexture(int item)

@@ -1,6 +1,7 @@
 #include "texture.h"
 #include <glad/gl.h>
 #include <raylib.h>
+#include <asserts.h>
 
 
 namespace Engine
@@ -32,12 +33,14 @@ namespace Engine
 	void Texture::loadFromFile(const std::string& path)
 	{
 		// load image with raylib
-		Image image = LoadImage((std::string(RESOURCES_PATH) + path).c_str());
+		Image image = LoadImage(path.c_str());
 
-		if (!image.data)
-		{
-			// error handling
-		}
+		permaAssertDevelopement(!image.data);
+		//if (!image.data)
+		//{
+		//	// error handling
+		//	printf("Error loading image.");
+		//}
 
 		width = image.width;
 		height = image.height;
@@ -60,6 +63,11 @@ namespace Engine
 		//impl->texture = LoadTexture((std::string(RESOURCES_PATH) + path).c_str());
 		//width = impl->texture.width;
 		//height = impl->texture.height;
+	}
+
+	uint32_t Texture::getNativeHandle() const
+	{
+		return (uint32_t)impl->textureId;
 	}
 
 	int Texture::getWidth() const

@@ -1,9 +1,12 @@
 #pragma once
 #include <raylib.h>
 
-struct Vertex
+namespace Engine
 {
-	Vector2 position = {};
-	Vector2 uv = {};
-	Color tint = {};
-};
+	struct Vertex
+	{
+		Vector2 position = {};
+		Vector2 uv = {};
+		Color tint = {};
+	};
+}
