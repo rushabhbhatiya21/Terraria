@@ -2,8 +2,8 @@
 #include <assets/assetManager.h>
 #include <raymath.h>
 #include <assert.h>
-
-//using Engine::AssetManager;
+#include <rendering/sprite.h>
+#include <rendering/spriteBatch.h>
 
 void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor)
 {
@@ -84,6 +84,17 @@ void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, C
 			//	0.f, 
 			//	skyColor
 			//);
+
+			Engine::Sprite bgSprite
+			{
+				*bg,
+				src,
+				dest,
+				{ 0,0 },
+				0.f,
+				WHITE
+			};
+			//spriteBatch.submitSprite(bgSprite);
 		};
 
 	drawBackground(currentBackgroundType, 0.3f, 1.f, skyColor);

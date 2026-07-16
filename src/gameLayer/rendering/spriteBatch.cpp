@@ -59,8 +59,6 @@ namespace Engine
 
 	void SpriteBatch::flush(IRenderBackend& backend) const
 	{
-		//std::vector<DrawCommand> commands = buildDrawCommands();
-		//executeDrawCommands(drawCommands);
 		backend.render(vertexBuffer, indexBuffer, drawCommands);
 	}
 

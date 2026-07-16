@@ -20,6 +20,7 @@ namespace Engine
 		) override;
 		void renderTestQuad();
 		void updateProjection(float screenWidth, float screenHeight, float targetX, float targetY, float offsetX, float offsetY, float zoom);
+		void updateScreenProjection(float screenWidth, float screenHeight);
 
 	private:
 		size_t growCapacity(size_t current, size_t required) const;

@@ -33,8 +33,11 @@ note: recipes only visible when near crafting station
 19. add platform and its logic to go up and down - done
 
 Engine Recommendations
-Geometry-oriented API for GeometrySink
-RenderBatch to separate SpriteBatch builder and its data
+1. Add IRenderCollector interface to collect all render data and then sort and batch it before sending to GPU
+1. Add RenderPass that updates projection matrix and remove multiple SpriteBatch.Begin() and SpriteBatch.End() calls
+2. Batching and Sorting of Sprites
+3. Geometry-oriented API for GeometrySink
+4. RenderBatch to separate SpriteBatch builder and its data
 
 
 - copy/paste tree into structures, old tree.bin removed 

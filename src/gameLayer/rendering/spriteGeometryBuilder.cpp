@@ -4,20 +4,11 @@
 #include <math/utils.h>
 #include <math/vector2overloads.h>
 #include "IGeometrySink.h"
-//#include <iostream>
 
 namespace Engine
 {
 	void SpriteGeometryBuilder::build(const Sprite& sprite, IGeometrySink& sink)
 	{
-		//std::cout << "Texture width  = " << sprite.texture.getWidth() << '\n';
-		//std::cout << "Texture height = " << sprite.texture.getHeight() << '\n';
-
-		//std::cout << "srcRect.x      = " << sprite.srcRect.x << '\n';
-		//std::cout << "srcRect.y      = " << sprite.srcRect.y << '\n';
-		//std::cout << "srcRect.width  = " << sprite.srcRect.width << '\n';
-		//std::cout << "srcRect.height = " << sprite.srcRect.height << '\n';
-
 		std::array<Vector2, 4> corners =
 		{
 			Vector2{0, 0},

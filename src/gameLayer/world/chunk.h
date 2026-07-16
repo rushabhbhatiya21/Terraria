@@ -3,7 +3,6 @@
 #include <unordered_map>
 #include <items/blocks.h>
 #include <asserts.h>
-//#include <iostream>
 
 constexpr int CHUNK_SIZE = 16;
 constexpr int CHUNK_SHIFT = 4;

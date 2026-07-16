@@ -5,7 +5,6 @@
 #include <settings.h>
 #include <ui.h>
 #include <drawBackground.h>
-#include <iostream>
 
 
 #pragma region global variables
@@ -45,7 +44,7 @@ bool updateGame()
 		c.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
 		c.target = Vector2{ 500,500 };
 		c.zoom = 20;
-		backgroundForMenu.draw(GetFrameTime(), assetManager, c, { 1000,1000 }, WHITE);
+		//backgroundForMenu.draw(GetFrameTime(), assetManager, c, { 1000,1000 }, WHITE);
 
 		mainMenuButtons.addTitle("Canvas Adventures");
 

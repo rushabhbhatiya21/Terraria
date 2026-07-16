@@ -3,7 +3,6 @@
 #include <iostream>
 #include <raylib.h>
 #include <assert.h>
-#include <iostream>
 
 namespace Engine
 {
@@ -74,17 +73,6 @@ namespace Engine
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, uv)));
 		glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tint)));
 
-		// for debug only
-		//glVertexAttribPointer(
-		//	0,
-		//	2,
-		//	GL_FLOAT,
-		//	GL_FALSE,
-		//	sizeof(float) * 2,
-		//	nullptr);
-
-		//glEnableVertexAttribArray(0);
-
 		// enable vao
 		glEnableVertexAttribArray(0);
 		glEnableVertexAttribArray(1);
@@ -95,6 +83,12 @@ namespace Engine
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		glViewport(0, 0, GetScreenWidth(), GetScreenHeight());
+
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_CULL_FACE);
+
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 		std::cout
 			<< "Generated VAO=" << m_vertexArrayHandle
@@ -110,73 +104,25 @@ namespace Engine
 		}
 
 		std::cout << "sizeof(Vertex) = " << sizeof(Vertex) << '\n';
-
-		std::cout << "position offset = "
-			<< offsetof(Vertex, position) << '\n';
-
-		std::cout << "uv offset = "
-			<< offsetof(Vertex, uv) << '\n';
-
-		std::cout << "tint offset = "
-			<< offsetof(Vertex, tint) << '\n';
+		std::cout << "position offset = " << offsetof(Vertex, position) << '\n';
+		std::cout << "uv offset = " << offsetof(Vertex, uv) << '\n';
+		std::cout << "tint offset = " << offsetof(Vertex, tint) << '\n';
 
 		return true;
 	}
 
 	void OpenGLRenderBackend::render(const std::vector<Vertex>& vertexBuffer, const std::vector<Index>& indexBuffer, const std::vector<DrawCommand>& drawCommands)
 	{
-		//std::cout << "render() this = " << this << '\n';
-		//std::cout << "VBO after initialize = " << m_vertexBufferHandle << '\n';
-		//if (!vertexBuffer.empty())
-		//{
-		//	for (int i = 0; i < 4; i++)
-		//	{
-		//		std::cout
-		//			<< "Vertex " << i << "\n"
-		//			<< "Positon" << "\n"
-		//			<< vertexBuffer[i].position.x << ", " << vertexBuffer[i].position.y << "\n"
-		//			<< "UV" << "\n"
-		//			<< vertexBuffer[i].uv.x << ", " << vertexBuffer[i].uv.y << "\n"
-		//			<< "Color" << "\n"
-		//			<< (int)vertexBuffer[i].tint.r << ", " << (int)vertexBuffer[i].tint.g << ", " << (int)vertexBuffer[i].tint.b << ", " << (int)vertexBuffer[i].tint.a
-		//			<< "\n";
-		//	}
-		//}
-
-		glClear(GL_COLOR_BUFFER_BIT);
 		glBindVertexArray(m_vertexArrayHandle);
 		glUseProgram(shaderProgramHandle);
 
-		GLenum err1 = glGetError();
-		//std::cout << "err1 = 0x" << std::hex << err1 << std::dec << '\n';
-		assert(err1 == GL_NO_ERROR);
-
 		// upload vertex buffer
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferHandle);
-
-		// debug vbo
-		GLint currentVBO = 0;
-		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &currentVBO);
-
-		//std::cout << "Expected VBO: " << m_vertexBufferHandle << '\n';
-		//std::cout << "Bound VBO   : " << currentVBO << '\n';
-
-		GLenum err1_5 = glGetError();
-		//std::cout << "Error after bind = 0x" << std::hex << err1_5 << std::dec << '\n';
-
 		glBufferData(GL_ARRAY_BUFFER, vertexBuffer.size() * sizeof(Vertex), vertexBuffer.data(), GL_DYNAMIC_DRAW);
-
-		GLenum err2 = glGetError();
-		//std::cout << "err2 = 0x" << std::hex << err2 << std::dec << '\n';
-		assert(err2 == GL_NO_ERROR);
 
 		// upload index buffer
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferHandle);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.size() * sizeof(Index), indexBuffer.data(), GL_DYNAMIC_DRAW);
-
-		GLenum err3 = glGetError();
-		//std::cout << "err3 = 0x" << std::hex << err3 << std::dec << '\n';
-		assert(err3 == GL_NO_ERROR);
 
 		for (auto& cmd : drawCommands)
 		{
@@ -184,16 +130,10 @@ namespace Engine
 			assert(glIsTexture(textureId));
 			glActiveTexture(GL_TEXTURE0);
 			glBindTexture(GL_TEXTURE_2D, textureId);
-			GLenum err4 = glGetError();
-			//std::cout << "err4 = 0x" << std::hex << err4 << std::dec << '\n';
-			assert(err4 == GL_NO_ERROR);
 
-			// draw
+			// draw — indices are already absolute, no baseVertex needed
 			size_t indexOffset = cmd.firstIndex * sizeof(Index);
-			glDrawElementsBaseVertex(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const void*>(indexOffset), cmd.firstVertex);
-			GLenum err5 = glGetError();
-			//std::cout << "err5 = 0x" << std::hex << err5 << std::dec << '\n';
-			assert(err5 == GL_NO_ERROR);
+			glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const void*>(indexOffset));
 		}
 	}
 
@@ -403,6 +343,20 @@ namespace Engine
 		projection[10] = 1.0f;
 		projection[12] = tx;
 		projection[13] = ty;
+		projection[15] = 1.0f;
+
+		glUseProgram(shaderProgramHandle);
+		glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, projection.data());
+	}
+
+	void OpenGLRenderBackend::updateScreenProjection(float screenWidth, float screenHeight)
+	{
+		projection = {};
+		projection[0] = 2.0f / screenWidth;
+		projection[5] = -2.0f / screenHeight;
+		projection[10] = 1.0f;
+		projection[12] = -1.0f;
+		projection[13] = 1.0f;
 		projection[15] = 1.0f;
 
 		glUseProgram(shaderProgramHandle);

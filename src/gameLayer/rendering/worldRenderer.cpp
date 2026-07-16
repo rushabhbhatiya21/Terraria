@@ -49,7 +49,7 @@ void WorldRenderer::rebuildChunkRenderData(const int cx, const int cy)
 
 			int worldX = cx * CHUNK_SIZE + lx;
 			int worldY = cy * CHUNK_SIZE + ly;
-			Rectangle srcRect = getTextureAtlas(b.type, b.variation, 32, 32);
+			Rectangle srcRect = getTextureAtlas(b.type, 0, 32, 32);
 
 			chunk.renderData.addTile(worldX, worldY, srcRect, &b);
 		}
@@ -81,11 +81,14 @@ void WorldRenderer::drawBlocks(int startYView, int endYView, int startXView, int
 			{
 				permaAssertComment(cache.block, "Invalid cached block, please contact developer.");
 				drawTile(cache);
-				//visibleBlocks++;
 			}
 		}
 	}
-	//return visibleBlocks;
+}
+
+void WorldRenderer::submitSprite(const Engine::Sprite& sprite)
+{
+	spriteBatch->submitSprite(sprite);
 }
 
 void WorldRenderer::drawTile(const CachedTile& tile)
@@ -114,7 +117,7 @@ void WorldRenderer::drawTile(const CachedTile& tile)
 		tint
 	};
 
-	spriteBatch->submitSprite(sprite);
+	submitSprite(sprite);
 }
 
 //void ChunkRendererTexture::initializeChunkRenderTextures(GameMap& gameMap)

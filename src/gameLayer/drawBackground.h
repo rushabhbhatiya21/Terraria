@@ -4,6 +4,7 @@
 namespace Engine
 {
 	struct AssetManager;
+	class SpriteBatch;
 }
 
 struct DrawBackground

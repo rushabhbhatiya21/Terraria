@@ -164,7 +164,7 @@ struct Gameplay
 	void drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, Engine::AssetManager& assetManager);
 	int getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRectangle, const Inventory& inventory, bool insideInventory);
 	void drawDraggedItem(const ItemStack& stack, Engine::AssetManager& assetManager);
-	void drawDisplauNameUI(
+	void drawDisplayNameUI(
 		ItemId itemId, 
 		Rectangle parentRect, 
 		float fontSize  = 10.f,
