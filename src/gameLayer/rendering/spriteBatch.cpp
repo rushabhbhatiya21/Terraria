@@ -10,21 +10,9 @@ namespace Engine
 	{
 	}
 
-	void SpriteBatch::begin()
-	{
-		vertexBuffer.clear();
-		indexBuffer.clear();
-		drawCommands.clear();
-	}
-
 	void SpriteBatch::submitSprite(const Sprite& sprite)
 	{
 		builder.build(sprite, *this);
-	}
-
-	void SpriteBatch::end(IRenderBackend& backend)
-	{
-		flush(backend);
 	}
 
 	//std::vector<DrawCommand> SpriteBatch::buildDrawCommands()
@@ -57,9 +45,12 @@ namespace Engine
 		//}
 	//}
 
-	void SpriteBatch::flush(IRenderBackend& backend) const
+	void SpriteBatch::flush(IRenderBackend& backend)
 	{
 		backend.render(vertexBuffer, indexBuffer, drawCommands);
+		vertexBuffer.clear();
+		indexBuffer.clear();
+		drawCommands.clear();
 	}
 
 	void SpriteBatch::beginEmission(const RenderState& renderState)

@@ -46,7 +46,7 @@ struct Projectile : public Entity
 
 	static constexpr float HIT_COUNT_TIME = .2f;
 
-	void render(Engine::AssetManager& assetManager) override;
+	void render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 

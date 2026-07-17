@@ -7,12 +7,12 @@
 #include <assets/assetManager.h>
 #include "sprite.h"
 #include "spriteBatch.h"
+#include "IRenderCollector.h"
 
-void WorldRenderer::init(GameMap& map, Engine::AssetManager& assets, Engine::SpriteBatch& spriteBatch)
+void WorldRenderer::init(GameMap& map, Engine::AssetManager& assets)
 {
 	this->map = &map;
 	this->assets = &assets;
-	this->spriteBatch = &spriteBatch;
 }
 
 void WorldRenderer::rebuildDirtyChunkRenderData()
@@ -56,7 +56,7 @@ void WorldRenderer::rebuildChunkRenderData(const int cx, const int cy)
 	}
 }
 
-void WorldRenderer::drawBlocks(int startYView, int endYView, int startXView, int endXView)
+void WorldRenderer::drawBlocks(int startYView, int endYView, int startXView, int endXView, Engine::IRenderCollector& collector)
 {
 	//int visibleBlocks = 0;
 	startYView >>= CHUNK_SHIFT;
@@ -80,18 +80,13 @@ void WorldRenderer::drawBlocks(int startYView, int endYView, int startXView, int
 			for (auto& cache : chunk->renderData.tiles)
 			{
 				permaAssertComment(cache.block, "Invalid cached block, please contact developer.");
-				drawTile(cache);
+				drawTile(cache, collector);
 			}
 		}
 	}
 }
 
-void WorldRenderer::submitSprite(const Engine::Sprite& sprite)
-{
-	spriteBatch->submitSprite(sprite);
-}
-
-void WorldRenderer::drawTile(const CachedTile& tile)
+void WorldRenderer::drawTile(const CachedTile& tile, Engine::IRenderCollector& collector)
 {
 	Vector2 shake = getShakeOffset((int)tile.position.x, (int)tile.position.y);
 
@@ -117,7 +112,7 @@ void WorldRenderer::drawTile(const CachedTile& tile)
 		tint
 	};
 
-	submitSprite(sprite);
+	collector.submitSprite(sprite);
 }
 
 //void ChunkRendererTexture::initializeChunkRenderTextures(GameMap& gameMap)

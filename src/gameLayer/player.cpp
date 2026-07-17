@@ -4,11 +4,12 @@
 #include <entityHolder.h>
 #include <items/blocks.h>
 #include "particles.h"
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
 // todo: make AttackStyle struct and add enum to it, and have item manage update and spawn and all
-//using Engine::AssetManager;
 
-void Player::render(Engine::AssetManager& assetManager)
+void Player::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	bool flashing = flashTimer > 0;
 
@@ -26,7 +27,7 @@ void Player::render(Engine::AssetManager& assetManager)
 		);
 	}
 
-	drawSprite(assetManager);
+	drawSprite(assetManager, collector);
 
 	if (flashing)
 	{
@@ -34,7 +35,7 @@ void Player::render(Engine::AssetManager& assetManager)
 	}
 }
 
-void Player::drawSprite(Engine::AssetManager& assetManager)
+void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	Transform2D playerSprite = physics.transform;
 	playerSprite.w = 1;
@@ -50,6 +51,51 @@ void Player::drawSprite(Engine::AssetManager& assetManager)
 	//DrawTexturePro(assetManager.getBackTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
 	// --- FRONT LAYER ---
 	//DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+
+	Engine::Sprite bootsSprite
+	{
+		assetManager.getFeetTexture(equipments.boots.itemId),
+		textureUV,
+		aabb,
+		{0,0},
+		0.f,
+		WHITE
+	};
+
+	Engine::Sprite helmetSprite
+	{
+		assetManager.getHeadTexture(equipments.helmet.itemId),
+		textureUV,
+		aabb,
+		{0,0},
+		0.f,
+		WHITE
+	};
+
+	Engine::Sprite backChestSprite
+	{
+		assetManager.getBackTexture(equipments.chest.itemId),
+		textureUV,
+		aabb,
+		{0,0},
+		0.f,
+		WHITE
+	};
+
+	Engine::Sprite frontChectSprite
+	{
+		assetManager.getFrontTexture(equipments.chest.itemId),
+		textureUV,
+		aabb,
+		{0,0},
+		0.f,
+		WHITE
+	};
+
+	collector.submitSprite(bootsSprite);
+	collector.submitSprite(helmetSprite);
+	collector.submitSprite(backChestSprite);
+	collector.submitSprite(frontChectSprite);
 
 	ItemDefinition* item = getItem(heldItem);
 

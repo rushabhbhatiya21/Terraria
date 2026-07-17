@@ -3,7 +3,7 @@
 
 //using Engine::AssetManager;
 
-void Enemy::render(Engine::AssetManager& assetManager)
+void Enemy::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	bool flashing = flashTimer > 0;
 
@@ -29,7 +29,7 @@ void Enemy::render(Engine::AssetManager& assetManager)
 		return; // do not draw sprite
 	}
 
-	drawSprite(assetManager);
+	drawSprite(assetManager, collector);
 
 	if (flashing)
 	{
@@ -37,7 +37,7 @@ void Enemy::render(Engine::AssetManager& assetManager)
 	}
 }
 
-void Enemy::renderHealthBar(Engine::AssetManager& assetManager)
+void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	float healthWidth = 1.6f;
 	float healthHeight = .4f;

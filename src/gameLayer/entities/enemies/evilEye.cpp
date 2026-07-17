@@ -7,7 +7,7 @@
 
 //using Engine::AssetManager;
 
-void EvilEye::drawSprite(Engine::AssetManager& assetManager)
+void EvilEye::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	Transform2D evilEyeSprite = physics.transform;
 

@@ -35,6 +35,7 @@ note: recipes only visible when near crafting station
 Engine Recommendations
 1. Add IRenderCollector interface to collect all render data and then sort and batch it before sending to GPU
 1. Add RenderPass that updates projection matrix and remove multiple SpriteBatch.Begin() and SpriteBatch.End() calls
+2. optimize backend
 2. Batching and Sorting of Sprites
 3. Geometry-oriented API for GeometrySink
 4. RenderBatch to separate SpriteBatch builder and its data

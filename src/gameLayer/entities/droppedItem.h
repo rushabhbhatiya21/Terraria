@@ -13,7 +13,7 @@ struct DroppedItem : public Entity
 	int itemType = 0;
 	int itemCounter = 1;
 
-	void render(Engine::AssetManager& assetManager) override;
+	void render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 

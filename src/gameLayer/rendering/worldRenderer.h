@@ -1,11 +1,10 @@
 #pragma once
-#include "IRenderCollector.h"
 
 namespace Engine
 {
 	class Sprite;
-	class SpriteBatch;
 	struct AssetManager;
+	class IRenderCollector;
 }
 
 struct Chunk;
@@ -27,21 +26,19 @@ constexpr int TILE_SIZE = 1;
 //	void rebuildChunkTexture(AssetManager& assetManager, GameMap& gameMap, Chunk& chunk);
 //}
 
-class WorldRenderer : public Engine::IRenderCollector
+class WorldRenderer
 {
 public:
 
-	void init(GameMap& map, Engine::AssetManager& assets, Engine::SpriteBatch& spriteBatch);
+	void init(GameMap& map, Engine::AssetManager& assets);
 	void rebuildDirtyChunkRenderData();
-	void drawBlocks(int startYView, int endYView, int startXView, int endXView);
-	void submitSprite(const Engine::Sprite& sprite) override;
+	void drawBlocks(int startYView, int endYView, int startXView, int endXView, Engine::IRenderCollector& collector);
 
 private:
-	void drawTile(const CachedTile& tile);
+	void drawTile(const CachedTile& tile, Engine::IRenderCollector& collector);
 	void rebuildChunkRenderData(const int cx, const int cy);
 
 private:
 	GameMap* map = nullptr;
 	Engine::AssetManager* assets = nullptr;
-	Engine::SpriteBatch* spriteBatch = nullptr;
 };

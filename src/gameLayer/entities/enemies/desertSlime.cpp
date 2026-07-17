@@ -9,7 +9,7 @@
 
 //using Engine::AssetManager;
 
-void DesertSlime::drawSprite(Engine::AssetManager& assetManager)
+void DesertSlime::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
 

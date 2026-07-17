@@ -13,7 +13,7 @@
 
 //using Engine::AssetManager;
 
-void Zombie::drawSprite(Engine::AssetManager& assetManager)
+void Zombie::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	Transform2D zombieSprite = physics.transform;
 	zombieSprite.w = 1;

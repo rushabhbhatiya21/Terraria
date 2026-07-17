@@ -3,7 +3,6 @@
 #include <glad/gl.h>
 #include <array>
 
-
 namespace Engine
 {
 	class OpenGLRenderBackend : public IRenderBackend
@@ -19,13 +18,13 @@ namespace Engine
 			const std::vector<DrawCommand>& drawCommands
 		) override;
 		void renderTestQuad();
-		void updateProjection(float screenWidth, float screenHeight, float targetX, float targetY, float offsetX, float offsetY, float zoom);
+		void setProjection(std::array<float, 16>& projection);
 		void updateScreenProjection(float screenWidth, float screenHeight);
 
 	private:
-		size_t growCapacity(size_t current, size_t required) const;
-		void ensureBufferCapacity(size_t vertexCount, size_t indexCount);
-		void configureVertexAttributes();
+		//size_t growCapacity(size_t current, size_t required) const;
+		//void ensureBufferCapacity(size_t vertexCount, size_t indexCount);
+		//void configureVertexAttributes();
 		GLuint compileShader(GLenum type, const std::string& source);
 		GLuint createShaderProgram(GLuint vertexShader, GLuint fragmentShader);
 
@@ -43,7 +42,5 @@ namespace Engine
 
 		size_t m_vertexCapacity = 0;
 		size_t m_indexCapacity = 0;
-
-		std::array<float, 16> projection{};
 	};
 }

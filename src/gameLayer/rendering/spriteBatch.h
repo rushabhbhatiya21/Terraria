@@ -38,14 +38,12 @@ namespace Engine
 
 	public:
 		SpriteBatch(SpriteGeometryBuilder& builder);
-		void begin();
 		void submitSprite(const Sprite& sprite);
-		void end(IRenderBackend& backend);
+		void flush(IRenderBackend& backend);
 
 	private:
 		//std::vector<DrawCommand> buildDrawCommands();
 		//void executeDrawCommands(const std::vector<DrawCommand>& commands);
-		void flush(IRenderBackend& backend) const;
 
 		void beginEmission(const RenderState& renderState) override;
 		void emitVertex(const Vertex& vertex) override;

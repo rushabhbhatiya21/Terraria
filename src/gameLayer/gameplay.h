@@ -11,6 +11,7 @@
 #include <rendering/worldRenderer.h>
 #include <rendering/spriteGeometryBuilder.h>
 #include <rendering/spriteBatch.h>
+#include <rendering/sceneRenderer.h>
 #include <rendering/openGLRenderBackend.h>
 
 #include <entityHolder.h>
@@ -81,8 +82,9 @@ struct Gameplay
 
 	// render
 	Engine::SpriteGeometryBuilder builder;
-	Engine::SpriteBatch spriteBatch{ builder };
 	Engine::OpenGLRenderBackend backend = {};
+	Engine::SpriteBatch spriteBatch{ builder };
+	SceneRenderer sceneRenderer{ spriteBatch, backend };
 	WorldRenderer renderer = {};
 
 	float lifetime = 0;

@@ -28,13 +28,13 @@ struct Enemy : public Entity
 	//float flashTimer = 0;
 	//float hurtTimer = 0;
 
-	void renderHealthBar(Engine::AssetManager& assetManager);
+	void renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector);
 
 	bool updateHealthBar(float deltatime);
 
-	virtual void render(Engine::AssetManager& assetManager) override;
+	virtual void render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector) override;
 
-	virtual void drawSprite(Engine::AssetManager& assetManager) = 0;
+	virtual void drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector) = 0;
 
 	virtual bool update(float deltaTime, EntityUpdateData& entityUpdateData) override = 0;
 

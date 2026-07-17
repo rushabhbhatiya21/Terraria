@@ -6,7 +6,7 @@
 
 //using Engine::AssetManager;
 
-void EvilEyeServant::drawSprite(Engine::AssetManager& assetManager)
+void EvilEyeServant::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	auto& tex = assetManager.evilEyeServant;
 	Rectangle aabb = getRectangleForEntity(physics.transform, spriteScale, spriteScale); // bottom-mid

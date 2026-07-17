@@ -56,9 +56,9 @@ namespace Engine
 			glUniform1i(m_textureLocation, 0);
 		}
 
-		// build projection
-		projection = buildProjectionMatrix((float)GetScreenWidth(), (float)GetScreenHeight());
-		glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, projection.data());
+		//// build projection
+		//projection = buildProjectionMatrix((float)GetScreenWidth(), (float)GetScreenHeight());
+		//glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, projection.data());
 
 		// bind vertex buffer
 		glGenBuffers(1, &m_vertexBufferHandle);
@@ -96,12 +96,6 @@ namespace Engine
 			<< " Generated EBO=" << m_indexBufferHandle
 			<< " ShaderProgram=" << shaderProgramHandle
 			<< '\n';
-
-		std::cout << "Matrix" << "\n";
-		for (int i = 0; i < projection.size(); i++)
-		{
-			std::cout << projection[i] << " ";
-		}
 
 		std::cout << "sizeof(Vertex) = " << sizeof(Vertex) << '\n';
 		std::cout << "position offset = " << offsetof(Vertex, position) << '\n';
@@ -327,38 +321,8 @@ namespace Engine
 		glFinish();
 	}
 
-	void OpenGLRenderBackend::updateProjection(float screenWidth, float screenHeight, float targetX, float targetY, float offsetX, float offsetY, float zoom)
+	void OpenGLRenderBackend::setProjection(std::array<float, 16>& projection)
 	{
-		// Raylib Camera2D: screenPos = (worldPos - target) * zoom + offset
-		// Then map screen to NDC: NDC = screen * (2/size) - 1  (with Y flipped)
-
-		float sx = 2.0f * zoom / screenWidth;
-		float sy = -2.0f * zoom / screenHeight;
-		float tx = -targetX * sx + (2.0f * offsetX / screenWidth - 1.0f);
-		float ty = -targetY * sy + (-2.0f * offsetY / screenHeight + 1.0f);
-
-		projection = {};
-		projection[0] = sx;
-		projection[5] = sy;
-		projection[10] = 1.0f;
-		projection[12] = tx;
-		projection[13] = ty;
-		projection[15] = 1.0f;
-
-		glUseProgram(shaderProgramHandle);
-		glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, projection.data());
-	}
-
-	void OpenGLRenderBackend::updateScreenProjection(float screenWidth, float screenHeight)
-	{
-		projection = {};
-		projection[0] = 2.0f / screenWidth;
-		projection[5] = -2.0f / screenHeight;
-		projection[10] = 1.0f;
-		projection[12] = -1.0f;
-		projection[13] = 1.0f;
-		projection[15] = 1.0f;
-
 		glUseProgram(shaderProgramHandle);
 		glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, projection.data());
 	}

@@ -12,7 +12,7 @@
 
 //using Engine::AssetManager;
 
-void Slime::drawSprite(Engine::AssetManager& assetManager)
+void Slime::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
 	Color color = WHITE;

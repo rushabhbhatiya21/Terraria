@@ -321,7 +321,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const It
 		c
 	};
 
-	spriteBatch.submitSprite(selectedSlot);
+	sceneRenderer.submitSprite(selectedSlot);
 
 	auto atlas = getTextureCoordinatesForItemType(stack.itemId);
 	auto& tex = getTextureForItemType(stack.itemId, assetManager);
@@ -346,7 +346,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const It
 			0.f,
 			c
 		};
-		spriteBatch.submitSprite(selectedItem);
+		sceneRenderer.submitSprite(selectedItem);
 
 		if (stack.count != 0 && isStackable(stack.itemId))
 		{
@@ -478,7 +478,7 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& ass
 		0.f,
 		Color{ 255,255,255,180 }
 	};
-	spriteBatch.submitSprite(draggedItemSprite);
+	sceneRenderer.submitSprite(draggedItemSprite);
 }
 
 void Gameplay::drawDisplayNameUI(ItemId itemId, Rectangle parentRect, float fontSize, float spacing, float paddingX, float paddingY, Color rectColor, Color textColor)
@@ -671,7 +671,7 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	generateWorld(gameMap, w, h);
 
 	// renderer
-	renderer.init(gameMap, assetManager, spriteBatch);
+	renderer.init(gameMap, assetManager);
 
 	// backend
 	bool res = backend.initialize();
@@ -753,7 +753,7 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 
 bool Gameplay::update(Engine::AssetManager& assetManager)
 {
-	spriteBatch.begin();
+	sceneRenderer.beginFrame();
 
 #pragma region delta time
 
@@ -1204,7 +1204,8 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			assetManager,
 			camera,
 			{ (float)gameMap.w, (float)gameMap.h },
-			skyData.skyColor
+			skyData.skyColor,
+			sceneRenderer
 		);
 	}
 
@@ -1378,11 +1379,13 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	glClearColor(0, 0, 0, 0);
 	//BeginMode2D(camera);
 
+	sceneRenderer.beginPass(Engine::RenderPass::World, camera);
+
 #pragma region render world
 
 	//int debugRendering = 2;
 
-	renderer.drawBlocks(startYView, endYView, startXView, endXView);
+	renderer.drawBlocks(startYView, endYView, startXView, endXView, sceneRenderer);
 
 	//auto start = std::chrono::high_resolution_clock::now();
 
@@ -1434,7 +1437,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			0.f,
 			WHITE
 		};
-		spriteBatch.submitSprite(frame);
+		sceneRenderer.submitSprite(frame);
 	}
 
 	// todo: show this inside inventury menu or not
@@ -1463,7 +1466,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			);
 		}
 
-		e.second->render(assetManager);
+		e.second->render(assetManager, sceneRenderer);
 	}
 
 #pragma endregion
@@ -1474,7 +1477,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	for (auto& e : entityHolder.enemies)
 	{
-		e->renderHealthBar(assetManager);
+		e->renderHealthBar(assetManager, sceneRenderer);
 		e->updateHealthBar(deltaTime);
 	}
 
@@ -1483,7 +1486,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region render player
 
-	player.render(assetManager);
+	player.render(assetManager, sceneRenderer);
 
 #pragma endregion
 
@@ -1562,50 +1565,6 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma endregion
 
-	//EndMode2D();
-	//EndTextureMode();
-
-	rlDrawRenderBatchActive();
-	rlDisableBackfaceCulling();
-
-	// save raylib's GL state
-	GLint prevFBO, prevProgram, prevVAO, prevVBO, prevEBO;
-	GLint prevViewport[4];
-	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevFBO);
-	glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
-	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prevVAO);
-	glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &prevVBO);
-	glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &prevEBO);
-	glGetIntegerv(GL_VIEWPORT, prevViewport);
-
-	// draw with your backend (renders to default framebuffer)
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// update projection to match raylib's camera
-	backend.updateProjection(
-		(float)GetScreenWidth(),
-		(float)GetScreenHeight(),
-		camera.target.x,
-		camera.target.y,
-		camera.offset.x,
-		camera.offset.y,
-		camera.zoom
-	);
-
-	spriteBatch.end(backend);
-
-	// restore raylib's GL state
-	glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
-	glUseProgram(prevProgram);
-	glBindVertexArray(prevVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, prevVBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prevEBO);
-	glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
-
-	rlEnableBackfaceCulling();
-
-
-	spriteBatch.begin();
 
 #pragma region draw glow stuff
 
@@ -1754,6 +1713,9 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma endregion
 
+	sceneRenderer.endPass();
+
+	sceneRenderer.beginPass(Engine::RenderPass::UI, camera);
 
 #pragma	region ui
 
@@ -1811,7 +1773,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			0.f,
 			WHITE
 		};
-		spriteBatch.submitSprite(heart);
+		sceneRenderer.submitSprite(heart);
 	}
 
 #pragma endregion
@@ -2116,7 +2078,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 				0.f,
 				itemColor
 			};
-			spriteBatch.submitSprite(craftingRecipe);
+			sceneRenderer.submitSprite(craftingRecipe);
 
 			if (itemType != selectedItemType) continue;
 
@@ -2155,7 +2117,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 					0.f,
 					itemColor
 				};
-				spriteBatch.submitSprite(craftingIngredient);
+				sceneRenderer.submitSprite(craftingIngredient);
 
 				std::string str = std::to_string(selectedItemIngredients[j].count);
 				Vector2 textPos =
@@ -2388,39 +2350,35 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma endregion
 
-	rlDrawRenderBatchActive();
-	rlDisableBackfaceCulling();
+	sceneRenderer.endPass();
 
-	// save raylib's GL state
-	GLint sprevFBO, sprevProgram, sprevVAO, sprevVBO, sprevEBO;
-	GLint sprevViewport[4];
-	glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &sprevFBO);
-	glGetIntegerv(GL_CURRENT_PROGRAM, &sprevProgram);
-	glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &sprevVAO);
-	glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &sprevVBO);
-	glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &sprevEBO);
-	glGetIntegerv(GL_VIEWPORT, sprevViewport);
-
-	// draw with your backend (renders to default framebuffer)
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	// update projection to match raylib's camera
-	backend.updateScreenProjection(
-		(float)GetScreenWidth(),
-		(float)GetScreenHeight()
-	);
-
-	spriteBatch.end(backend);
-
-	// restore raylib's GL state
-	glBindFramebuffer(GL_FRAMEBUFFER, sprevFBO);
-	glUseProgram(sprevProgram);
-	glBindVertexArray(sprevVAO);
-	glBindBuffer(GL_ARRAY_BUFFER, sprevVBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprevEBO);
-	glViewport(sprevViewport[0], sprevViewport[1], sprevViewport[2], sprevViewport[3]);
-
-	rlEnableBackfaceCulling();
+	//rlDrawRenderBatchActive();
+	//rlDisableBackfaceCulling();
+	//
+	//// save raylib's GL state
+	//GLint sprevFBO, sprevProgram, sprevVAO, sprevVBO, sprevEBO;
+	//GLint sprevViewport[4];
+	//glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &sprevFBO);
+	//glGetIntegerv(GL_CURRENT_PROGRAM, &sprevProgram);
+	//glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &sprevVAO);
+	//glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &sprevVBO);
+	//glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &sprevEBO);
+	//glGetIntegerv(GL_VIEWPORT, sprevViewport);
+	//
+	//// draw with your backend (renders to default framebuffer)
+	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	//
+	//spriteBatch.end(backend);
+	//
+	//// restore raylib's GL state
+	//glBindFramebuffer(GL_FRAMEBUFFER, sprevFBO);
+	//glUseProgram(sprevProgram);
+	//glBindVertexArray(sprevVAO);
+	//glBindBuffer(GL_ARRAY_BUFFER, sprevVBO);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprevEBO);
+	//glViewport(sprevViewport[0], sprevViewport[1], sprevViewport[2], sprevViewport[3]);
+	//
+	//rlEnableBackfaceCulling();
 
 	return true;
 }

@@ -25,9 +25,9 @@ struct Player : public Entity
 		return physics.getPosition();
 	}
 
-	void render(Engine::AssetManager& assetManager) override;
+	void render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector) override;
 
-	void drawSprite(Engine::AssetManager& assetManager);
+	void drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector);
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 

@@ -6,13 +6,14 @@
 #include "combat/combatSystem.h"
 #include "gameMap.h"
 #include "shake.h"
-//#include "ui/popupText.h"
 #include "particles.h"
 
 #include "player.h"
 #include "entities/enemies/enemy.h"
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
-void Projectile::render(Engine::AssetManager& assetManager)
+void Projectile::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	float size = .5f;
 
@@ -39,6 +40,17 @@ void Projectile::render(Engine::AssetManager& assetManager)
 	//	rotation,
 	//	WHITE
 	//);
+
+	Engine::Sprite projectileSprite
+	{
+		tex,
+		rectangle,
+		renderRect,
+		{ size * 0.5f, size * 0.5f }, // want to rotate shuriken from middle
+		rotation,
+		WHITE
+	};
+	collector.submitSprite(projectileSprite);
 }
 
 bool Projectile::update(float deltaTime, EntityUpdateData& data)

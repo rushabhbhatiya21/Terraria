@@ -6,8 +6,10 @@
 #include <items/item.h>
 #include <inventory.h>
 #include <player.h>
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
-void DroppedItem::render(Engine::AssetManager& assetManager)
+void DroppedItem::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	float size = 1.f;
 
@@ -35,6 +37,18 @@ void DroppedItem::render(Engine::AssetManager& assetManager)
 	//	0.f,
 	//	WHITE
 	//);
+
+	Engine::Sprite sprite
+	{
+		tex,
+		rectangle,
+		aabb,
+		{ 0,0 },
+		0.f,
+		WHITE
+	};
+
+	collector.submitSprite(sprite);
 }
 
 

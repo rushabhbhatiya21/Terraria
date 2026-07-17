@@ -14,7 +14,7 @@ struct Slime : public Enemy
 	bool isColliding = false;
 	bool wasColliding = false;
 
-	void drawSprite(Engine::AssetManager& assetManager) override;
+	void drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 

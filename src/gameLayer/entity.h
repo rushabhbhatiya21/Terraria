@@ -12,6 +12,7 @@
 namespace Engine
 {
 	struct AssetManager;
+	class IRenderCollector;
 }
 
 struct Player;
@@ -92,7 +93,8 @@ struct Entity
 		physics.velocity += hitDirection * force;
 	}
 
-	virtual void render(Engine::AssetManager& assetManager) = 0;
+	//virtual void render(Engine::AssetManager& assetManager) = 0;
+	virtual void render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector) = 0;
 
 	virtual bool update(float deltaTime, EntityUpdateData& entityUpdateData) = 0;
 

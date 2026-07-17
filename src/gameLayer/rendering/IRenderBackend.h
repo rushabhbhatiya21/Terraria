@@ -16,5 +16,7 @@ namespace Engine
 			const std::vector<Index>& indexBuffer,
 			const std::vector<DrawCommand>& drawCommands
 		) = 0;
+
+		virtual void setProjection(std::array<float, 16>& projection) = 0;
 	};
 }

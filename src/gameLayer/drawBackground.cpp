@@ -3,9 +3,8 @@
 #include <raymath.h>
 #include <assert.h>
 #include <rendering/sprite.h>
-#include <rendering/spriteBatch.h>
 
-void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor)
+void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor, Engine::IRenderCollector& collector)
 {
 	auto drawBackground = [&](int type, float parallax, float opacity, Color skyColor)
 		{
@@ -94,6 +93,7 @@ void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, C
 				0.f,
 				WHITE
 			};
+			collector.submitSprite(bgSprite);
 			//spriteBatch.submitSprite(bgSprite);
 		};
 

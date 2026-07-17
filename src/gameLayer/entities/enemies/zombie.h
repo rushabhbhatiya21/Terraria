@@ -25,7 +25,7 @@ struct Zombie : public Enemy
 	Zombie_State currentState = Zombie_State::IDLE;
 	Zombie_State previouseState = Zombie_State::IDLE;
 
-	void drawSprite(Engine::AssetManager& assetManager) override;
+	void drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector) override;
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
