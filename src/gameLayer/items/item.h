@@ -5,6 +5,7 @@
 #include <raylib.h>
 #include "itemIds.h"
 #include "../combat/stats.h"
+#include <iostream>
 
 namespace Engine
 {
