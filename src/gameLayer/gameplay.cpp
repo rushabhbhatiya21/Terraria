@@ -1174,6 +1174,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma endregion
 
+	sceneRenderer.beginPass(Engine::RenderPass::Background, camera);
 
 #pragma region draw background
 
@@ -1211,6 +1212,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma endregion
 
+	sceneRenderer.endPass();
 
 #pragma region adjust lightmask for screen size
 
@@ -1375,8 +1377,6 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	//BeginTextureMode(sceneTexture);
 	//ClearBackground(BLANK);
-	glClear(GL_COLOR_BUFFER_BIT);
-	glClearColor(0, 0, 0, 0);
 	//BeginMode2D(camera);
 
 	sceneRenderer.beginPass(Engine::RenderPass::World, camera);
@@ -2352,33 +2352,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	sceneRenderer.endPass();
 
-	//rlDrawRenderBatchActive();
-	//rlDisableBackfaceCulling();
-	//
-	//// save raylib's GL state
-	//GLint sprevFBO, sprevProgram, sprevVAO, sprevVBO, sprevEBO;
-	//GLint sprevViewport[4];
-	//glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &sprevFBO);
-	//glGetIntegerv(GL_CURRENT_PROGRAM, &sprevProgram);
-	//glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &sprevVAO);
-	//glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &sprevVBO);
-	//glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &sprevEBO);
-	//glGetIntegerv(GL_VIEWPORT, sprevViewport);
-	//
-	//// draw with your backend (renders to default framebuffer)
-	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-	//
-	//spriteBatch.end(backend);
-	//
-	//// restore raylib's GL state
-	//glBindFramebuffer(GL_FRAMEBUFFER, sprevFBO);
-	//glUseProgram(sprevProgram);
-	//glBindVertexArray(sprevVAO);
-	//glBindBuffer(GL_ARRAY_BUFFER, sprevVBO);
-	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sprevEBO);
-	//glViewport(sprevViewport[0], sprevViewport[1], sprevViewport[2], sprevViewport[3]);
-	//
-	//rlEnableBackfaceCulling();
+	sceneRenderer.endFrame();
 
 	return true;
 }

@@ -6,6 +6,7 @@ namespace Engine
 {
 	enum class RenderPass
 	{
+		Background,
 		World,
 		UI
 	};

@@ -10,6 +10,7 @@ SceneRenderer::SceneRenderer(Engine::SpriteBatch& spriteBatch, Engine::IRenderBa
 
 void SceneRenderer::beginFrame()
 {
+	backend.beginFrame();
 }
 
 void SceneRenderer::beginPass(Engine::RenderPass pass, Camera2D& camera)
@@ -41,6 +42,7 @@ void SceneRenderer::beginPass(Engine::RenderPass pass, Camera2D& camera)
 		backend.setProjection(projection);
 		break;
 	}
+	case Engine::RenderPass::Background:
 	case Engine::RenderPass::UI:
 	{
 		projection = {};
@@ -50,6 +52,7 @@ void SceneRenderer::beginPass(Engine::RenderPass pass, Camera2D& camera)
 		projection[12] = -1.0f;
 		projection[13] = 1.0f;
 		projection[15] = 1.0f;
+
 		backend.setProjection(projection);
 		break;
 	}
@@ -66,6 +69,7 @@ void SceneRenderer::endPass()
 
 void SceneRenderer::endFrame()
 {
+	backend.endFrame();
 }
 
 void SceneRenderer::submitSprite(const Engine::Sprite& sprite)

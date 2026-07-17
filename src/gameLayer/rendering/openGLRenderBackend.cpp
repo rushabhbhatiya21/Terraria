@@ -3,6 +3,7 @@
 #include <iostream>
 #include <raylib.h>
 #include <assert.h>
+#include <rlgl.h>
 
 namespace Engine
 {
@@ -105,8 +106,21 @@ namespace Engine
 		return true;
 	}
 
+	void OpenGLRenderBackend::beginFrame()
+	{
+		glClearColor(0, 0, 0, 0);
+		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	void OpenGLRenderBackend::endFrame()
+	{
+
+	}
+
 	void OpenGLRenderBackend::render(const std::vector<Vertex>& vertexBuffer, const std::vector<Index>& indexBuffer, const std::vector<DrawCommand>& drawCommands)
 	{
+		beginExternalRendering();
+
 		glBindVertexArray(m_vertexArrayHandle);
 		glUseProgram(shaderProgramHandle);
 
@@ -129,6 +143,8 @@ namespace Engine
 			size_t indexOffset = cmd.firstIndex * sizeof(Index);
 			glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const void*>(indexOffset));
 		}
+
+		endExternalRendering();
 	}
 
 	GLuint OpenGLRenderBackend::compileShader(GLenum shaderType, const std::string& shaderPath)
@@ -220,6 +236,38 @@ namespace Engine
 		glDeleteShader(fragmentShader);
 
 		return programHandle;
+	}
+
+	void OpenGLRenderBackend::beginExternalRendering()
+	{
+		// Temporary compatibility layer while the engine still uses Raylib rendering.
+		// Remove once all rendering goes through OpenGLRenderBackend.
+		rlDrawRenderBatchActive();
+		rlDisableBackfaceCulling();
+
+		// save raylib's GL state
+		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &prevFBO);
+		glGetIntegerv(GL_CURRENT_PROGRAM, &prevProgram);
+		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &prevVAO);
+		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &prevVBO);
+		glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &prevEBO);
+		glGetIntegerv(GL_VIEWPORT, prevViewport);
+
+		// draw with your backend (renders to default framebuffer)
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	void OpenGLRenderBackend::endExternalRendering()
+	{
+		// restore raylib's GL state
+		glBindFramebuffer(GL_FRAMEBUFFER, prevFBO);
+		glUseProgram(prevProgram);
+		glBindVertexArray(prevVAO);
+		glBindBuffer(GL_ARRAY_BUFFER, prevVBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, prevEBO);
+		glViewport(prevViewport[0], prevViewport[1], prevViewport[2], prevViewport[3]);
+
+		rlEnableBackfaceCulling();
 	}
 
 	void OpenGLRenderBackend::renderTestQuad()

@@ -3,6 +3,7 @@
 #include <raymath.h>
 #include <assert.h>
 #include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
 void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor, Engine::IRenderCollector& collector)
 {
@@ -94,7 +95,6 @@ void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, C
 				WHITE
 			};
 			collector.submitSprite(bgSprite);
-			//spriteBatch.submitSprite(bgSprite);
 		};
 
 	drawBackground(currentBackgroundType, 0.3f, 1.f, skyColor);

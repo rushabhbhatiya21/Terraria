@@ -1,12 +1,12 @@
 #pragma once
 #include <raylib.h>
-#include <rendering/IRenderCollector.h>
+//#include <rendering/IRenderCollector.h>
 
 namespace Engine
 {
 	struct AssetManager;
 	class SpriteBatch;
-	//class IRenderCollector;
+	class IRenderCollector;
 }
 
 

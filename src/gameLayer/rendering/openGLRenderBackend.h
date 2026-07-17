@@ -11,6 +11,7 @@ namespace Engine
 		OpenGLRenderBackend();
 		~OpenGLRenderBackend() = default;
 
+		void beginFrame() override;
 		bool initialize();
 		void render(
 			const std::vector<Vertex>& vertexBuffer,
@@ -18,8 +19,8 @@ namespace Engine
 			const std::vector<DrawCommand>& drawCommands
 		) override;
 		void renderTestQuad();
-		void setProjection(std::array<float, 16>& projection);
-		void updateScreenProjection(float screenWidth, float screenHeight);
+		void setProjection(std::array<float, 16>& projection) override;
+		void endFrame() override;
 
 	private:
 		//size_t growCapacity(size_t current, size_t required) const;
@@ -27,6 +28,8 @@ namespace Engine
 		//void configureVertexAttributes();
 		GLuint compileShader(GLenum type, const std::string& source);
 		GLuint createShaderProgram(GLuint vertexShader, GLuint fragmentShader);
+		void beginExternalRendering();
+		void endExternalRendering();
 
 	private:
 		// GPU Resources
@@ -42,5 +45,9 @@ namespace Engine
 
 		size_t m_vertexCapacity = 0;
 		size_t m_indexCapacity = 0;
+
+		// to save raylib state
+		GLint prevFBO = 0, prevProgram = 0, prevVAO = 0, prevVBO = 0, prevEBO = 0;
+		GLint prevViewport[4]{ 0,0,0,0 };
 	};
 }

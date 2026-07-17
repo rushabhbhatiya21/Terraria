@@ -11,6 +11,8 @@ namespace Engine
 	public:
 		virtual ~IRenderBackend() = default;
 
+		virtual void beginFrame() = 0;
+		virtual void endFrame() = 0;
 		virtual void render(
 			const std::vector<Vertex>& vertexBuffer,
 			const std::vector<Index>& indexBuffer,

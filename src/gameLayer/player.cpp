@@ -11,28 +11,28 @@
 
 void Player::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
-	bool flashing = flashTimer > 0;
+	//bool flashing = flashTimer > 0;
 
-	if (flashing)
-	{
-		float flash = 1.f;
+	//if (flashing)
+	//{
+	//	float flash = 1.f;
 
-		BeginShaderMode(assetManager.flashShader);
+	//	BeginShaderMode(assetManager.flashShader);
 
-		SetShaderValue(
-			assetManager.flashShader,
-			assetManager.flashShaderLocation,
-			&flash,
-			SHADER_UNIFORM_FLOAT
-		);
-	}
+	//	SetShaderValue(
+	//		assetManager.flashShader,
+	//		assetManager.flashShaderLocation,
+	//		&flash,
+	//		SHADER_UNIFORM_FLOAT
+	//	);
+	//}
 
 	drawSprite(assetManager, collector);
 
-	if (flashing)
-	{
-		EndShaderMode();
-	}
+	//if (flashing)
+	//{
+	//	EndShaderMode();
+	//}
 }
 
 void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
@@ -124,6 +124,16 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		destRect.y = playerSprite.getCenter().y;
 
 		//DrawTexturePro(textureItem, textureUVItem, destRect, { 0.5f,0.5f }, 0.f, WHITE);
+		Engine::Sprite heldItemSprite
+		{
+			textureItem,
+			textureUVItem,
+			destRect,
+			{.5f,.5f},
+			.0f,
+			WHITE
+		};
+		collector.submitSprite(heldItemSprite);
 		break;
 	}
 	case AttackStyle::CAST:
