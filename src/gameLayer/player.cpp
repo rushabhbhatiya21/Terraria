@@ -11,28 +11,28 @@
 
 void Player::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
-	//bool flashing = flashTimer > 0;
-	//
-	//if (flashing)
-	//{
-	//	float flash = 1.f;
-	//
-	//	BeginShaderMode(assetManager.flashShader);
-	//
-	//	SetShaderValue(
-	//		assetManager.flashShader,
-	//		assetManager.flashShaderLocation,
-	//		&flash,
-	//		SHADER_UNIFORM_FLOAT
-	//	);
-	//}
+	bool flashing = flashTimer > 0;
+	
+	if (flashing)
+	{
+		float flash = 1.f;
+	
+		BeginShaderMode(assetManager.flashShader);
+	
+		SetShaderValue(
+			assetManager.flashShader,
+			assetManager.flashShaderLocation,
+			&flash,
+			SHADER_UNIFORM_FLOAT
+		);
+	}
 
 	drawSprite(assetManager, collector);
 
-	//if (flashing)
-	//{
-	//	EndShaderMode();
-	//}
+	if (flashing)
+	{
+		EndShaderMode();
+	}
 }
 
 void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)

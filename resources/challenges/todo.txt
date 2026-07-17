@@ -41,7 +41,7 @@ Engine Recommendations
 6. RenderBatch to separate SpriteBatch builder and its data
 
 Bugs
-1. player keeps flickering
+1. player keeps flickering - fixed
 2. throwing star does not trigger attack in itemUse.cpp
 3. swingAttack changes item based on facing left or right, check flipTextureX function in swingAttack.cpp
 

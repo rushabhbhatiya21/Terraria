@@ -4,18 +4,23 @@
 
 Rectangle getTextureAtlas(int x, int y, int cellSizePixelX, int cellSizePixelY, bool flipX)
 {
-	float sizeX = cellSizePixelX;
+	Rectangle rect{};
+	rect.y = (float)y * cellSizePixelY;
+	rect.height = (float)cellSizePixelY;
 
-	if (flipX) { sizeX *= -1; }
+	if (flipX)
+	{
+		// A flipped source rectangle starts at the right edge and has a negative width.
+		rect.x = (float)(x + 1) * cellSizePixelX;
+		rect.width = -(float)cellSizePixelX;
+	}
+	else
+	{
+		rect.x = (float)x * cellSizePixelX;
+		rect.width = (float)cellSizePixelX;
+	}
 
-	return shrinkUV(
-		Rectangle{
-			(float)x * cellSizePixelX,
-			(float)y * cellSizePixelY,
-			(float)sizeX,
-			(float)cellSizePixelY
-		}
-	);
+	return shrinkUV(rect);
 }
 
 Rectangle getRectangleForEntity(Transform2D transform, float textureW, float textureH)
