@@ -34,11 +34,16 @@ note: recipes only visible when near crafting station
 
 Engine Recommendations
 1. Add IRenderCollector interface to collect all render data and then sort and batch it before sending to GPU
-1. Add RenderPass that updates projection matrix and remove multiple SpriteBatch.Begin() and SpriteBatch.End() calls
-2. optimize backend
-2. Batching and Sorting of Sprites
-3. Geometry-oriented API for GeometrySink
-4. RenderBatch to separate SpriteBatch builder and its data
+2. Add RenderPass that updates projection matrix and remove multiple SpriteBatch.Begin() and SpriteBatch.End() calls
+3. optimize backend
+4. Batching and Sorting of Sprites
+5. Geometry-oriented API for GeometrySink
+6. RenderBatch to separate SpriteBatch builder and its data
+
+Bugs
+1. player keeps flickering
+2. throwing star does not trigger attack in itemUse.cpp
+3. swingAttack changes item based on facing left or right, check flipTextureX function in swingAttack.cpp
 
 
 - copy/paste tree into structures, old tree.bin removed 
