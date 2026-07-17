@@ -5,13 +5,18 @@
 #include "../items/item.h"
 #include "../bfs.h"
 
+namespace Engine
+{
+	struct AssetManager;
+	class IRenderCollector;
+}
+
 struct Block;
 struct Enemy;
 struct Entity;
 struct GameMap;
 struct Particle;
 struct EntityHolder;
-struct AssetManager;
 struct EntityUpdateData;
 
 //struct Swing
@@ -55,7 +60,7 @@ struct SwingAttack
 	Vector2 weaponTip{};
 	float   weaponLength = 1.5f; // add this in weaponData
 
-	void render(Engine::AssetManager& assetManager);
+	void render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector);
 	void updateAnimation(float deltaTime);
 	void startSwing(Entity& entity, Vector2 mousePosition);
 	void updateSwings(float deltaTime, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng);

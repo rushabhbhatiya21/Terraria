@@ -1,15 +1,17 @@
 #pragma once
 #include "zombie.h"
-#include "../droppedItem.h"
+#include <entities/droppedItem.h>
 #include <items/blocks.h>
 #include <gameMap.h>
 #include <assets/assetManager.h>
 #include <helper.h>
 #include <entityHolder.h>
 #include <player.h>
-#include "../../combat/combatSystem.h"
-#include "../../ui/popupText.h"
-#include "../../shake.h"
+#include <combat/combatSystem.h>
+#include <ui/popupText.h>
+#include <shake.h>
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
 //using Engine::AssetManager;
 
@@ -31,6 +33,17 @@ void Zombie::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 	//	0.f, // rotation
 	//	WHITE // tint
 	//);
+
+	Engine::Sprite sprite
+	{
+		assetManager.zombie,
+		getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft),
+		aabb,
+		{ 0,0 },
+		0.f,
+		WHITE
+	};
+	collector.submitSprite(sprite);
 }
 
 bool Zombie::update(float deltaTime, EntityUpdateData& data)

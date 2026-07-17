@@ -1,7 +1,7 @@
 #include "enemy.h"
 #include <assets/assetManager.h>
-
-//using Engine::AssetManager;
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
 void Enemy::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
@@ -61,6 +61,17 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 	//	WHITE
 	//);
 
+	Engine::Sprite healthBarSprite
+	{
+		assetManager.healthBar,
+		{ 0,0,(float)assetManager.healthBar.getWidth(), (float)assetManager.healthBar.getHeight()},
+		healthBarPos,
+		{ 0,0 },
+		0.f,
+		WHITE
+	};
+	collector.submitSprite(healthBarSprite);
+
 	healthBarPos.width = life * healthWidth / stats.defensive.maxHealth;
 
 	Color color = WHITE;
@@ -87,17 +98,28 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 	//	color
 	//);
 
-	//if (damageTakenHealthBarTimer >= 0)
-	//{
-	//	float progress = 1.f - (damageTakenHealthBarTimer / 2);
-	//	float fade = 1.f - pow(progress, 3.f);
+	Engine::Sprite healthSprite
+	{
+		assetManager.health,
+		{ 0,0,(float)assetManager.health.getWidth(), (float)assetManager.health.getHeight()},
+		healthBarPos,
+		{ 0,0 },
+		0.f,
+		WHITE
+	};
+	collector.submitSprite(healthSprite);
 
-	//	Rectangle r{
-	//		baseX + healthBarPos.width,
-	//		healthBarPos.y,
-	//		damageTaken * fade * healthWidth / stats.defensive.maxHealth,
-	//		healthHeight
-	//	};
+	if (damageTakenHealthBarTimer >= 0)
+	{
+		float progress = 1.f - (damageTakenHealthBarTimer / 2);
+		float fade = 1.f - pow(progress, 3.f);
+	
+		Rectangle r{
+			baseX + healthBarPos.width,
+			healthBarPos.y,
+			damageTaken * fade * healthWidth / stats.defensive.maxHealth,
+			healthHeight
+		};
 
 	//	DrawTexturePro(
 	//		assetManager.health,
@@ -107,7 +129,18 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 	//		0,
 	//		Color{ 255,255,255,80 }
 	//	);
-	//}
+
+		Engine::Sprite healthSpriteTemp
+		{
+			assetManager.health,
+			{ 0,0,(float)assetManager.health.getWidth(), (float)assetManager.health.getHeight()},
+			r,
+			{ 0,0 },
+			0.f,
+			Color{ 255,255,255,80 }
+		};
+		collector.submitSprite(healthSpriteTemp);
+	}
 }
 
 bool Enemy::updateHealthBar(float deltaTime)

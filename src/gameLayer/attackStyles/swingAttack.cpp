@@ -13,14 +13,16 @@
 #include "../combat/combatSystem.h"
 #include "../entities/enemies/enemy.h"
 #include <lighting.h>
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
-void SwingAttack::render(Engine::AssetManager& assetManager)
+void SwingAttack::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	if (!owner) return;
 	
 	if (!isPlayingAnimation) return;
 
-	auto&      tex           = getTextureForItemType(itemId, assetManager);
+	auto& tex = getTextureForItemType(itemId, assetManager);
 	Rectangle  textureUVItem = getTextureCoordinatesForItemType(itemId);
 
 	// player position
@@ -54,6 +56,16 @@ void SwingAttack::render(Engine::AssetManager& assetManager)
 	destRect.y = handPos.y - origin.y;
 
 	//DrawTexturePro(tex, textureUVItem, destRect, origin, currentSwingAngle, WHITE);
+	Engine::Sprite sprite
+	{
+		tex,
+		textureUVItem,
+		destRect,
+		origin,
+		currentSwingAngle,
+		WHITE
+	};
+	collector.submitSprite(sprite);
 }
 
 void SwingAttack::startSwing(Entity& owner, Vector2 mousePosition)

@@ -3,7 +3,9 @@
 #include <assets/assetManager.h>
 #include <player.h>
 #include "evilEyeServant.h"
-#include "../../combat/combatSystem.h"
+#include <combat/combatSystem.h>
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
 //using Engine::AssetManager;
 
@@ -45,6 +47,16 @@ void EvilEye::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColl
 	//	rotation, // rotation
 	//	WHITE // tint
 	//);
+	Engine::Sprite sprite
+	{
+		*tex,
+		getTextureAtlas(animations.positionX, animations.positionY, currentPhaseData->cellSizeX, currentPhaseData->cellSizeY),
+		aabb,
+		{ 1.2f, 2.5f },
+		rotation,
+		WHITE
+	};
+	collector.submitSprite(sprite);
 }
 
 // done - keeps on dashing if in range, have 3 dashes and hover for some time

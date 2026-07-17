@@ -3,14 +3,13 @@
 #include <helper.h>
 #include <player.h>
 #include <combat/combatSystem.h>
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
 //using Engine::AssetManager;
 
 void EvilEyeServant::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
-	auto& tex = assetManager.evilEyeServant;
-	Rectangle aabb = getRectangleForEntity(physics.transform, spriteScale, spriteScale); // bottom-mid
-
 	//DrawTexturePro(
 	//	tex,
 	//	getTextureAtlas(animations.positionX, animations.positionY, 16, 16, animations.movingLeft),
@@ -19,6 +18,17 @@ void EvilEyeServant::drawSprite(Engine::AssetManager& assetManager, Engine::IRen
 	//	rotation, // rotation
 	//	WHITE // tint
 	//);
+
+	Engine::Sprite sprite
+	{
+		assetManager.evilEyeServant,
+		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
+		getRectangleForEntity(physics.transform, spriteScale, spriteScale),
+		{ 0.f, spriteScale / 2 }, // origin (aabb - already mid so no need to touch x)
+		rotation,
+		WHITE
+	};
+	collector.submitSprite(sprite);
 
 	if (currentState == ServantState::DEAD_ANIM)
 	{

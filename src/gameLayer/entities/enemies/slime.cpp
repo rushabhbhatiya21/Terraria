@@ -9,6 +9,8 @@
 #include "combat/combatSystem.h"
 #include "shake.h"
 #include "ui/popupText.h"
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
 //using Engine::AssetManager;
 
@@ -27,6 +29,16 @@ void Slime::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollec
 	//	0.f, // rotation
 	//	color // tint
 	//);
+	Engine::Sprite sprite
+	{
+		assetManager.slime,
+		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
+		aabb,
+		{ 0,0 },
+		0.f,
+		WHITE
+	};
+	collector.submitSprite(sprite);
 }
 
 bool Slime::update(float deltaTime, EntityUpdateData& data)

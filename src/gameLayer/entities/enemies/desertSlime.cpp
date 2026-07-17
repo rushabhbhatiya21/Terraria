@@ -6,6 +6,8 @@
 #include <entityHolder.h>
 #include <player.h>
 #include "entities/droppedItem.h"
+#include <rendering/sprite.h>
+#include <rendering/IRenderCollector.h>
 
 //using Engine::AssetManager;
 
@@ -21,6 +23,17 @@ void DesertSlime::drawSprite(Engine::AssetManager& assetManager, Engine::IRender
 	//	0.f,
 	//	WHITE
 	//);
+
+	Engine::Sprite sprite
+	{
+		assetManager.desertSlime,
+		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
+		aabb,
+		{ 0,0 },
+		0.f,
+		WHITE
+	};
+	collector.submitSprite(sprite);
 }
 
 bool DesertSlime::update(float deltaTime, EntityUpdateData& data)

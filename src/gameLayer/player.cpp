@@ -12,13 +12,13 @@
 void Player::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	//bool flashing = flashTimer > 0;
-
+	//
 	//if (flashing)
 	//{
 	//	float flash = 1.f;
-
+	//
 	//	BeginShaderMode(assetManager.flashShader);
-
+	//
 	//	SetShaderValue(
 	//		assetManager.flashShader,
 	//		assetManager.flashShaderLocation,
@@ -105,7 +105,7 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 	{
 	case AttackStyle::SWING:
 	{
-		swingStyle.render(assetManager);
+		swingStyle.render(assetManager, collector);
 		break;
 	}
 	case AttackStyle::THRUST:
