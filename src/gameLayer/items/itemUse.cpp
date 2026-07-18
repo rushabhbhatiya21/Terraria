@@ -11,7 +11,6 @@
 #include "attackStyles/swingAttack.h"
 #include "attackStyles/throwAttack.h"
 #include "attackStyles/shootAttack.h"
-#include <iostream>
 
 constexpr float TICKS_PER_SECOND = 60.f;
 
@@ -29,17 +28,11 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, GameM
 	// todo: make sure item useTimer does not go below 0, not important now, but in future when we start implementing attack speed, it will be important
 	entity->useTimer = item->useTime / TICKS_PER_SECOND;
 
-	std::cout
-		<< "id=" << stack.itemId << ", "
-		<< "category=" << (int)item->category
-		<< '\n';
-
 	switch (item->category)
 	{
 	case ItemCategory::WEAPON:
 	case ItemCategory::TOOL:
 	case ItemCategory::AMMO:
-		printf("using weapon item...");
 		useStyle(entity, stack, *item, entityHolder, mouseWorldPos);
 		break;
 
@@ -62,7 +55,6 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, GameM
 
 void useStyle(Entity* entity, ItemStack& stack, const ItemDefinition& item, EntityHolder& entityHolder, Vector2 mouseWorldPos)
 {
-	printf("using style...");
 	switch (item.attackStyle)
 	{
 	case AttackStyle::SWING:
@@ -76,7 +68,6 @@ void useStyle(Entity* entity, ItemStack& stack, const ItemDefinition& item, Enti
 		break;
 	case AttackStyle::THROW:
 	{
-		printf("throw attack...");
 		ThrowAttack attack;
 		attack.owner = entity;
 		attack.itemId = stack.itemId;

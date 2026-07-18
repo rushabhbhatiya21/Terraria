@@ -45,6 +45,7 @@ Rectangle getUVForTexture(Texture2D tex, Rectangle atlas)
 
 Rectangle flipTextureAtlasX(Rectangle r)
 {
+	r.x += r.width;
 	r.width = -r.width;
 	return r;
 }
