@@ -47,6 +47,7 @@ namespace Engine
 
 	void SpriteBatch::flush(IRenderBackend& backend)
 	{
+		sortByTextures();
 		backend.render(vertexBuffer, indexBuffer, drawCommands);
 		vertexBuffer.clear();
 		indexBuffer.clear();
@@ -85,6 +86,16 @@ namespace Engine
 		};
 
 		drawCommands.emplace_back(drawCommand);
+	}
+
+	void SpriteBatch::sortByTextures()
+	{
+		std::sort(drawCommands.begin(), drawCommands.end(),
+			[](const DrawCommand& a, const DrawCommand& b)
+			{
+				return a.renderState.texture <
+					b.renderState.texture;
+			});
 	}
 
 }

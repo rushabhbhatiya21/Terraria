@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <algorithm>
 #include "index.h"
 #include "IGeometrySink.h"
 #include "renderState.h"
@@ -49,5 +50,6 @@ namespace Engine
 		void emitVertex(const Vertex& vertex) override;
 		void emitIndex(const Index index) override;
 		void endEmission() override;
+		void sortByTextures();
 	};
 }
