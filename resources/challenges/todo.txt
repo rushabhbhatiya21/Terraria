@@ -42,7 +42,7 @@ Engine Recommendations
 
 Bugs
 1. player keeps flickering - fixed
-2. throwing star does not trigger attack in itemUse.cpp
+2. throwing star does not trigger attack in itemUse.cpp - fix
 3. swingAttack changes item based on facing left or right, check flipTextureX function in swingAttack.cpp
 
 

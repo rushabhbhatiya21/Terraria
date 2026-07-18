@@ -37,21 +37,7 @@ bool isItem(ItemId itemType)
 
 static void reg(ItemId id, ItemDefinition def)
 {
-    if (id == (ItemId)530)
-    {
-        std::cout
-            << "nameBefore=" << getItem((ItemId)535)->displayName << ", "
-            << "categoryBefore=" << (int)getItem((ItemId)535)->category
-            << '\n';
-    }
-    itemDatabase.insert(itemDatabase.begin() + id, def);
-    if (id == (ItemId)530)
-    {
-        std::cout
-            << "nameAfter=" << getItem((ItemId)535)->displayName << ", "
-            << "categoryAfter=" << (int)getItem((ItemId)535)->category
-            << '\n';
-    }
+    itemDatabase.at(id) = def;
 }
 
 const Engine::Texture& getTextureForItemType(int itemType, const Engine::AssetManager& assetManager)
@@ -271,25 +257,9 @@ void registerItems()
             AttackStyle::THROW    // attackStyle
         ));
 
-    std::cout
-        << "Shuriken Item Category after reg() Line 261="
-        << getItem((ItemId)535)->displayName << ", "
-        << (int)getItem((ItemId)535)->category << '\n';
-
     // ── Consumables ───────────────────────────────────────────────────────────
     reg(Items::healthPotion, D::makeConsumable("Health Potion", 50, 0, 999, 20));
-
-    std::cout
-        << "Shuriken Item Category after reg() Line 267="
-        << getItem((ItemId)535)->displayName << ", "
-        << (int)getItem((ItemId)535)->category << '\n';
-
     reg(Items::apple,        D::makeConsumable("Apple",         10, 0, 999, 20));
-
-    std::cout
-        << "Shuriken Item Category after reg() Line 272="
-        << getItem((ItemId)535)->displayName << ", "
-        << (int)getItem((ItemId)535)->category << '\n';
 
     // ── Armor — copper ───────────────────────────────────────────────────────
 
@@ -304,22 +274,11 @@ void registerItems()
     reg(Items::copperChestPlate, D::makeArmor("Copper Chestplate", ArmorSlot::CHEST, 3, 5, 4));
     reg(Items::copperBoots, D::makeArmor("Copper Boots", ArmorSlot::BOOTS, 2, 0, 2));
 
-    std::cout
-        << "Shuriken Item Category after reg() Line 288="
-        << getItem((ItemId)535)->displayName << ", "
-        << (int)getItem((ItemId)535)->category << '\n';
-
-
     // ── Armor — iron ─────────────────────────────────────────────────────────
 
     reg(Items::ironHelmet, D::makeArmor("Iron Helmet", ArmorSlot::HELMET, 3, 0, 3));
     reg(Items::ironChestPlate, D::makeArmor("Iron Chestplate", ArmorSlot::CHEST, 5, 10, 6));
     reg(Items::ironBoots, D::makeArmor("Iron Boots", ArmorSlot::BOOTS, 4, 0, 3));
-
-    std::cout 
-        << "Shuriken Item Category after reg() Line 301="
-        << getItem((ItemId)535)->displayName << ", "
-        << (int)getItem((ItemId)535)->category << '\n';
 
     // ── Armor — gold ─────────────────────────────────────────────────────────
 
@@ -334,11 +293,6 @@ void registerItems()
     reg(Items::iceChestPlate, D::makeArmor("Ice Chestplate", ArmorSlot::CHEST, 6, 15, 6));
     reg(Items::iceBoots, D::makeArmor("Ice Boots", ArmorSlot::BOOTS, 4, 5, 4));
 
-    std::cout <<
-        "Shuriken Item Category after reg() Line 318="
-        << getItem((ItemId)535)->displayName << ", "
-        << (int)getItem((ItemId)535)->category << '\n';
-
     // ── Accessories ───────────────────────────────────────────────────────────
     reg(Items::partyHat, D::makeAccessory("Party Hat"));
     reg(Items::sunGlasses, D::makeAccessory("Sunglasses"));
@@ -346,9 +300,4 @@ void registerItems()
     // ── Range — wooden ──────────────────────────────────────────────────────────
     reg(Items::woodenBow,   D::makeWeapon("Wooden Bow", 4, 4, 100, 0, 0, 1, 0, 30, WeaponType::BOW, DamageType::RANGED, AttackStyle::SHOOT, AmmoType::ARROW));
     reg(Items::woodenArrow, D::makeAmmo("Wooden Arrow", 5, 0, 0, 0, 2, 0, 1, 16.f, 5.f, 0, true, false, 999, DamageType::RANGED, AmmoType::ARROW));
-
-    std::cout <<
-        "Shuriken Item Category after after reg() Line 332=" 
-        << getItem((ItemId)535)->displayName << ", "
-        << (int)getItem((ItemId)535)->category << '\n';
 }
