@@ -14,7 +14,7 @@
 
 constexpr float TICKS_PER_SECOND = 60.f;
 
-void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, GameMap& gameMap, Vector2 mouseWorldPos)
+void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, GameMap& gameMap, Engine::Vec2 mouseWorldPos)
 {
 	if (stack.count <= 0) return;
 
@@ -53,7 +53,7 @@ void useItem(Entity* entity, ItemStack& stack, EntityHolder& entityHolder, GameM
 	}
 }
 
-void useStyle(Entity* entity, ItemStack& stack, const ItemDefinition& item, EntityHolder& entityHolder, Vector2 mouseWorldPos)
+void useStyle(Entity* entity, ItemStack& stack, const ItemDefinition& item, EntityHolder& entityHolder, Engine::Vec2 mouseWorldPos)
 {
 	switch (item.attackStyle)
 	{
@@ -71,7 +71,7 @@ void useStyle(Entity* entity, ItemStack& stack, const ItemDefinition& item, Enti
 		ThrowAttack attack;
 		attack.owner = entity;
 		attack.itemId = stack.itemId;
-		Vector2 direction = Vector2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
+		Engine::Vec2 direction = Engine::Vec2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
 		attack.use(entityHolder, stack, direction);
 		break;
 	}
@@ -80,7 +80,7 @@ void useStyle(Entity* entity, ItemStack& stack, const ItemDefinition& item, Enti
 		ShootAttack attack;
 		attack.owner = entity;
 		attack.itemId = stack.itemId;
-		Vector2 direction = Vector2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
+		Engine::Vec2 direction = Engine::Vec2Normalize(mouseWorldPos - entity->physics.transform.getCenter());
 		attack.use(entityHolder, direction);
 		break;
 	}
@@ -91,7 +91,7 @@ void useStyle(Entity* entity, ItemStack& stack, const ItemDefinition& item, Enti
 	}
 }
 
-void useBlock(Entity* entity, const ItemDefinition& item, GameMap& gameMap, Vector2 mouseWorldPos)
+void useBlock(Entity* entity, const ItemDefinition& item, GameMap& gameMap, Engine::Vec2 mouseWorldPos)
 {
 	const BlockData& block = item.block;
 	spawnBlock(mouseWorldPos, entity->getPosition(), (int)block.type);

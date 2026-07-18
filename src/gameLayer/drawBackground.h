@@ -1,6 +1,7 @@
 #pragma once
-#include <raylib.h>
-//#include <rendering/IRenderCollector.h>
+#include <math/vec2.h>
+#include <math/cam.h>
+#include <math/color.h>
 
 namespace Engine
 {
@@ -8,7 +9,6 @@ namespace Engine
 	class SpriteBatch;
 	class IRenderCollector;
 }
-
 
 struct DrawBackground
 {
@@ -27,7 +27,7 @@ struct DrawBackground
 	int currentTransitionType = 0;
 	float transitionTime = 0.f;
 
-	void draw(float deltaTime, Engine::AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor, Engine::IRenderCollector& collector);
+	void draw(float deltaTime, Engine::AssetManager& assetManager, Engine::Cam& camera, Engine::Vec2 mapSize, Engine::Color4f skyColor, Engine::IRenderCollector& collector);
 
 	void setBackground(int background);
 };

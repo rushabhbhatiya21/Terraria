@@ -1,5 +1,6 @@
 #pragma once
 #include "enemy.h"
+#include <math/vec2.h>
 #include <combat/stats.h>
 #include <spawnManager.h>
 
@@ -119,11 +120,11 @@ struct EvilEye : public Enemy
 		physics.transform.h = 2.5f;
 	}
 
-	Vector2 moveDirection   = {};
-	Vector2 lockedPlayerPos = {};
-	Vector2 hoverTarget     = {};
-	Vector2 dashDirection   = {};
-	Vector2 dashPosition    = {};
+	Engine::Vec2 moveDirection   = {};
+	Engine::Vec2 lockedPlayerPos = {};
+	Engine::Vec2 hoverTarget     = {};
+	Engine::Vec2 dashDirection   = {};
+	Engine::Vec2 dashPosition    = {};
 
 	bool wasColliding = false;
 	bool isColliding  = false;

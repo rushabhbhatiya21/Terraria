@@ -35,15 +35,17 @@ note: recipes only visible when near crafting station
 Engine Recommendations
 1. Add IRenderCollector interface to collect all render data - done
 2. Add RenderPass that updates projection matrix and remove multiple SpriteBatch.Begin() and SpriteBatch.End() calls - done
-3. optimize backend
-4. Batching and Sorting of Sprites
-5. Geometry-oriented API for GeometrySink
-6. RenderBatch to separate SpriteBatch builder and its data
+3. optimize backend - done
+4. Batching and Sorting of Sprites - done for now
+5. Geometry-oriented API for GeometrySink - no need for now
+6. RenderBatch to separate SpriteBatch builder and its data - no need for now
+7. Add rectangle draw, text renderer, etc
 
 Bugs
 1. player keeps flickering - fixed
 2. throwing star does not trigger attack in itemUse.cpp - fix
 3. swingAttack changes item based on facing left or right, check flipTextureX function in swingAttack.cpp - fixed
+4. hearts are empty, checkout player life and heart display logic
 
 
 - copy/paste tree into structures, old tree.bin removed 

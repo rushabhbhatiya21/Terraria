@@ -48,10 +48,10 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 	// knockback
 	int knockback = info.attacker->stats.offensive.knockback;
 
-	knockback = Clamp(knockback, 0, 100);
+	knockback = std::clamp(knockback, 0, 100);
 
 	int resist = target->stats.defensive.knockbackResist;
-	resist = Clamp(resist, 0, 100);
+	resist = std::clamp(resist, 0, 100);
 
 	int finalKnockback = knockback * (100 - resist) / 100;
 
@@ -62,7 +62,7 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 
 	spawnPopupText(
 		target->getPosition(),
-		Vector2{ .1f, .1f },
+		Engine::Vec2{ .1f, .1f },
 		std::to_string(int(std::floor(result.finalDamage))),
 		1,
 		.4f,

@@ -6,8 +6,6 @@
 #include <rendering/sprite.h>
 #include <rendering/IRenderCollector.h>
 
-//using Engine::AssetManager;
-
 void EvilEyeServant::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	//DrawTexturePro(
@@ -26,7 +24,7 @@ void EvilEyeServant::drawSprite(Engine::AssetManager& assetManager, Engine::IRen
 		getRectangleForEntity(physics.transform, spriteScale, spriteScale),
 		{ 0.f, spriteScale / 2 }, // origin (aabb - already mid so no need to touch x)
 		rotation,
-		WHITE
+		Engine::White
 	};
 	collector.submitSprite(sprite);
 
@@ -62,7 +60,7 @@ bool EvilEyeServant::update(float deltaTime, EntityUpdateData& data)
 		isColliding = true;
 		DamageInfo info;
 		info.attacker = this;
-		info.hitDirection = Vector2Normalize(physics.velocity);
+		info.hitDirection = Engine::Vec2Normalize(physics.velocity);
 		CombatSystem::applyDamage(&data.player, info);
 	}
 
@@ -101,15 +99,15 @@ bool EvilEyeServant::update(float deltaTime, EntityUpdateData& data)
 		break;
 	}
 
-	if (Vector2LengthSqr(moveDirection) > 0.0001f)
+	if (Engine::Vec2LengthSqr(moveDirection) > 0.0001f)
 	{
-		moveDirection = Vector2Normalize(moveDirection);
+		moveDirection = Engine::Vec2Normalize(moveDirection);
 	}
 
-	if (moveSpeed != 0.f && moveDirection != Vector2{ 0,0 })
+	if (moveSpeed != 0.f && moveDirection != Engine::Vec2{ 0,0 })
 	{
-		Vector2 desiredVelocity = moveDirection * moveSpeed;
-		Vector2 steering = desiredVelocity - physics.velocity;
+		Engine::Vec2 desiredVelocity = moveDirection * moveSpeed;
+		Engine::Vec2 steering = desiredVelocity - physics.velocity;
 		physics.velocity += steering * 3.f * deltaTime;
 		physics.transform.pos += physics.velocity * deltaTime;
 	}
@@ -131,7 +129,7 @@ void EvilEyeServant::enterState(ServantState newState)
 		break;
 	case EvilEyeServant::ServantState::DEAD_ANIM:
 	{
-		physics.velocity = Vector2Zero();
+		physics.velocity = Engine::Vec2Zero();
 		stateChangeTimer = DEAD_TIMER;
 		break;
 	}

@@ -20,7 +20,7 @@ struct Player : public Entity
 
 	int selectedHotbarSlot = 0;
 
-	Vector2& getPosition()
+	Engine::Vec2& getPosition()
 	{
 		return physics.getPosition();
 	}
@@ -99,8 +99,8 @@ struct Player : public Entity
 	//static constexpr int TRAIL_SIZE = 8;
 
 	//struct TrailPoint {
-	//	Vector2 tip;
-	//	Vector2 base;
+	//	Engine::Vec2 tip;
+	//	Engine::Vec2 base;
 	//	float alpha; // 1.0 = fresh, 0.0 = gone
 	//};
 

@@ -1,12 +1,13 @@
 #pragma once
-#include <raylib.h>
 #include <string>
 #include <vector>
+#include <raylib.h>
+#include <math/vec2.h>
 
 struct PopupText
 {
-	Vector2 position = {};
-	Vector2 velocity = {};
+	Engine::Vec2 position = {};
+	Engine::Vec2 velocity = {};
 	float startX = 0;
 
 	std::string text;
@@ -24,7 +25,7 @@ extern std::vector<PopupText> popupTexts;
 void DrawTextOutlined(
 	Font font,
 	const std::string& text,
-	Vector2 position,
+	Engine::Vec2 position,
 	float fontSize,
 	float spacing,
 	Color textColor,
@@ -33,8 +34,8 @@ void DrawTextOutlined(
 );
 
 void spawnPopupText(
-	Vector2 position,
-	Vector2 velocity,
+	Engine::Vec2 position,
+	Engine::Vec2 velocity,
 	std::string text,
 	float lifetime,
 	float size,

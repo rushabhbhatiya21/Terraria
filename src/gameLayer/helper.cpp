@@ -1,10 +1,10 @@
 #pragma once
-#include <unordered_set>
 #include "helper.h"
+#include <unordered_set>
 
-Rectangle getTextureAtlas(int x, int y, int cellSizePixelX, int cellSizePixelY, bool flipX)
+Engine::Rect getTextureAtlas(int x, int y, int cellSizePixelX, int cellSizePixelY, bool flipX)
 {
-	Rectangle rect{};
+	Engine::Rect rect{};
 	rect.y = (float)y * cellSizePixelY;
 	rect.height = (float)cellSizePixelY;
 
@@ -23,7 +23,7 @@ Rectangle getTextureAtlas(int x, int y, int cellSizePixelX, int cellSizePixelY, 
 	return shrinkUV(rect);
 }
 
-Rectangle getRectangleForEntity(Transform2D transform, float textureW, float textureH)
+Engine::Rect getRectangleForEntity(Transform2D transform, float textureW, float textureH)
 {
 	Transform2D result = transform;
 	result.w = textureW;
@@ -34,23 +34,23 @@ Rectangle getRectangleForEntity(Transform2D transform, float textureW, float tex
 	return result.getAABB();
 }
 
-Rectangle getUVForTexture(Texture2D tex, Rectangle atlas)
+Engine::Rect getUVForTexture(Engine::Texture tex, Engine::Rect atlas)
 {
-	atlas.x /= tex.width;
-	atlas.width /= tex.width;
-	atlas.y /= tex.height;
-	atlas.height /= tex.height;
+	atlas.x /= tex.getWidth();
+	atlas.width /= tex.getWidth();
+	atlas.y /= tex.getHeight();
+	atlas.height /= tex.getHeight();
 	return atlas;
 }
 
-Rectangle flipTextureAtlasX(Rectangle r)
+Engine::Rect flipTextureAtlasX(Engine::Rect r)
 {
 	r.x += r.width;
 	r.width = -r.width;
 	return r;
 }
 
-Rectangle shrinkUV(Rectangle in)
+Engine::Rect shrinkUV(Engine::Rect in)
 {
 	float shrink = 0.1;
 

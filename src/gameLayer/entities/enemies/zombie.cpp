@@ -41,7 +41,7 @@ void Zombie::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		aabb,
 		{ 0,0 },
 		0.f,
-		WHITE
+		Engine::White
 	};
 	collector.submitSprite(sprite);
 }
@@ -66,8 +66,8 @@ bool Zombie::update(float deltaTime, EntityUpdateData& data)
 	if (attackRecoverTimer > 0)   attackRecoverTimer -= deltaTime;
 	if (hurtTimer          > 0)   hurtTimer -= deltaTime;
 
-	Vector2 dirVector = data.player.getPosition() - getPosition();
-	float dist = Vector2Length(dirVector);
+	Engine::Vec2 dirVector = data.player.getPosition() - getPosition();
+	float dist = Engine::Vec2Length(dirVector);
 
 	// exit chasing
 	if (dist > FORGET_RANGE && currentState == Zombie_State::CHASING)
@@ -257,7 +257,7 @@ void Zombie::doAttack(Player* player)
 	// implement attack here
 	DamageInfo info;
 	info.attacker = this;
-	info.hitDirection = Vector2Normalize(physics.velocity);
+	info.hitDirection = Engine::Vec2Normalize(physics.velocity);
 
 	CombatSystem::applyDamage(player, info);
 
@@ -307,9 +307,9 @@ void Zombie::dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHol
 	}
 }
 
-bool Zombie::shouldStepUp(Vector2 playerPos, GameMap& gameMap)
+bool Zombie::shouldStepUp(Engine::Vec2 playerPos, GameMap& gameMap)
 {
-	Vector2 zTotPlayerDirection = playerPos - getPosition();
+	Engine::Vec2 zTotPlayerDirection = playerPos - getPosition();
 
 	int nextX = int(getPosition().x) + 1;
 	int prevX = int(getPosition().x) - 1;

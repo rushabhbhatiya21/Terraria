@@ -47,7 +47,7 @@ const Engine::Texture& getTextureForItemType(int itemType, const Engine::AssetMa
     return assetManager.items;         // item atlas
 }
 
-Rectangle getTextureCoordinatesForItemType(int itemType, int cellSizeX, int cellSizeY, bool flipX)
+Engine::Rect getTextureCoordinatesForItemType(int itemType, int cellSizeX, int cellSizeY, bool flipX)
 {
     if (!isItem(itemType))
         return getTextureAtlas(itemType, 4, cellSizeX, cellSizeY, flipX);

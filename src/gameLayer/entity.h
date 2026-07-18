@@ -77,17 +77,17 @@ struct Entity
 		isAlive = true;
 	}
 
-	Vector2& getPosition()
+	Engine::Vec2& getPosition()
 	{
 		return physics.transform.pos;
 	}
 
-	void teleport(Vector2 pos)
+	void teleport(Engine::Vec2 pos)
 	{
 		physics.teleport(pos);
 	}
 
-	void knockback(Vector2 hitDirection, float finalKnockback)
+	void knockback(Engine::Vec2 hitDirection, float finalKnockback)
 	{
 		float force = MAX_FORCE * (finalKnockback / 100.0f);
 		physics.velocity += hitDirection * force;

@@ -2,10 +2,9 @@
 #include <string>
 #include <cstdint>
 #include <vector>
-#include <raylib.h>
+#include <math/rect.h>
 #include "itemIds.h"
 #include "../combat/stats.h"
-#include <iostream>
 
 namespace Engine
 {
@@ -354,4 +353,4 @@ bool            isItem(ItemId itemType);
 // ─── Texture helpers ──────────────────────────────────────────────────────────
 
 const Engine::Texture& getTextureForItemType(int itemType, const Engine::AssetManager& assetManager);
-Rectangle getTextureCoordinatesForItemType(int itemType, int cellSizeX = 32, int cellSizeY = 32, bool flipX = false);
+Engine::Rect getTextureCoordinatesForItemType(int itemType, int cellSizeX = 32, int cellSizeY = 32, bool flipX = false);

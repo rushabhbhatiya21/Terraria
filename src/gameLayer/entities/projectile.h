@@ -1,5 +1,5 @@
 #pragma once
-#include <raylib.h>
+#include <math/vec2.h>
 #include "entity.h"
 #include "physics.h"
 #include "items/item.h"
@@ -31,7 +31,7 @@ struct Projectile : public Entity
 	int cellSizeY = 0;
 	float rotation = 0;
 	float lifetime = 0;
-	Vector2 direction = { 0,0 };
+	Engine::Vec2 direction = { 0,0 };
 
 	float rotationSpeed = 800;
 
@@ -50,7 +50,7 @@ struct Projectile : public Entity
 
 	bool update(float deltaTime, EntityUpdateData& entityUpdateData) override;
 
-	static void spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction);
+	static void spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Engine::Vec2 direction);
 
 	bool checkCollisionWithTile(GameMap& gameMap);
 

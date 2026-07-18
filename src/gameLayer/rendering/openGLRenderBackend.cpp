@@ -1,4 +1,5 @@
 #include "openGLRenderBackend.h"
+#include <math/color.h>
 #include "fileUtils.h"
 #include <iostream>
 #include <raylib.h>
@@ -362,10 +363,10 @@ namespace Engine
 
 		std::vector<Vertex> vertices =
 		{
-			{ {100.0f, 100.0f}, {0.0f, 0.0f}, WHITE },
-			{ {132.0f, 100.0f}, {1.0f, 0.0f}, WHITE },
-			{ {132.0f, 132.0f}, {1.0f, 1.0f}, WHITE },
-			{ {100.0f, 132.0f}, {0.0f, 1.0f}, WHITE }
+			{ {100.0f, 100.0f}, {0.0f, 0.0f}, Engine::White },
+			{ {132.0f, 100.0f}, {1.0f, 0.0f}, Engine::White },
+			{ {132.0f, 132.0f}, {1.0f, 1.0f}, Engine::White },
+			{ {100.0f, 132.0f}, {0.0f, 1.0f}, Engine::White }
 		};
 
 		std::vector<Index> indices =

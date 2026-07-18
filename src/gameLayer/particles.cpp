@@ -2,7 +2,7 @@
 
 std::vector<Particle> particles;
 
-std::unordered_map<int, Color> blockColors = {
+std::unordered_map<int, Engine::Color4f> blockColors = {
     { Items::air,              {   0,   0,   0,   0 } }, // transparent
     { Items::dirt,             { 200, 118,  83, 255 } },
     { Items::grassBlock,       {  86, 152,  23, 255 } },
@@ -78,22 +78,22 @@ std::unordered_map<int, Color> blockColors = {
     { Items::snowBrickWall,    { 195, 210, 228, 255 } },
     { Items::boneBrickWall,    { 195, 185, 160, 255 } },
 
-    { Items::shuriken,         LIGHTGRAY },
-    { Items::woodenArrow,      BROWN }
+    { Items::shuriken,         Engine::LightGray },
+    { Items::woodenArrow,      Engine::Brown }
 };
 
 void Particle::render() const
 {
     // fade slowly at start
-    DrawRectangleV(positon, { .1f,.1f }, Fade(color, 1.f - (1.f - life) * (1.f - life))); // ease-out
+    //DrawRectangleV(positon, { .1f,.1f }, Fade(color, 1.f - (1.f - life) * (1.f - life))); // ease-out
 }
 
-Color getBlockColor(int type)
+Engine::Color4f getBlockColor(int type)
 {
     return blockColors[type];
 }
 
-void spawnParticles(Vector2 pos, std::ranlux24_base& rng, int blockType, int numberOfParticles, float maxOffset, int angleOffset, bool fullCircle)
+void spawnParticles(Engine::Vec2 pos, std::ranlux24_base& rng, int blockType, int numberOfParticles, float maxOffset, int angleOffset, bool fullCircle)
 {
     for (int i = 0; i < numberOfParticles; i++)
     {
@@ -104,9 +104,9 @@ void spawnParticles(Vector2 pos, std::ranlux24_base& rng, int blockType, int num
         p.positon.y = pos.y;
 
         if (fullCircle)
-            angle = getRandomFloat(rng, 0.0f, 360.0f) * DEG2RAD;
+            angle = getRandomFloat(rng, 0.0f, 360.0f) * Engine::Deg2Rad;
         else
-            angle = getRandomFloat(rng, 220 + angleOffset, 320 + angleOffset) * DEG2RAD;
+            angle = getRandomFloat(rng, 220 + angleOffset, 320 + angleOffset) * Engine::Deg2Rad;
         float speed = getRandomFloat(rng, 50, 150) / 30.f;
 
         p.velocity = { cosf(angle) * speed, sinf(angle) * speed };

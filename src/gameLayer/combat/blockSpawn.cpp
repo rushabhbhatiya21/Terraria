@@ -1,13 +1,12 @@
 #include "blockSpawn.h"
-#include <raymath.h>
 #include <gameMap.h>
 #include <inventory.h>
 
 std::vector<BlockSpawn> spawnBlocks;
 
-void spawnBlock(Vector2 position, Vector2 playerPos, int type)
+void spawnBlock(Engine::Vec2 position, Engine::Vec2 playerPos, int type)
 {
-	float dist = Vector2Distance(position, playerPos);
+	float dist = Engine::Vec2Distance(position, playerPos);
 
 	if (dist >= 5) return;
 

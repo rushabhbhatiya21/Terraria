@@ -2,7 +2,9 @@
 
 #include <unordered_map>
 #include <cmath>
-#include <raylib.h>
+#include <math/vec2.h>
+#include <input/input.h>
+#include <randomStuff.h>
 
 // =========================
 // Shake data
@@ -39,7 +41,7 @@ inline void triggerShake(int x, int y)
         0.15f,   // time
         0.15f,   // duration
         0.1f,   // strength (IMPORTANT: small because your tile size = 1)
-        GetRandomValue(0, 1000) / 100.0f // phase
+        randomFloat(0, 1000) / 100.0f // phase
     };
 }
 
@@ -62,7 +64,7 @@ inline void updateShake(float dt)
 // =========================
 // Get offset for a tile
 // =========================
-inline Vector2 getShakeOffset(int x, int y)
+inline Engine::Vec2 getShakeOffset(int x, int y)
 {
     long long key = getKey(x, y);
 
@@ -74,7 +76,7 @@ inline Vector2 getShakeOffset(int x, int y)
         float t = s.time / s.duration; // fade 1 → 0
         float strength = s.strength * t;
 
-        float time = (float)GetTime();
+        float time = (float)Engine::getTime();
 
         return {
             sinf(time * 40.0f + s.phase) * strength,

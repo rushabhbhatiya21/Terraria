@@ -1,5 +1,5 @@
 #pragma once
-#include <raylib.h>
+#include <math/vec2.h>
 
 struct Entity;
 struct ItemDefinition;
@@ -7,7 +7,7 @@ struct ItemDefinition;
 struct DamageInfo
 {
 	Entity* attacker = nullptr;
-	Vector2 hitDirection = { 0,0 };
+	Engine::Vec2 hitDirection = { 0,0 };
 };
 
 struct DamageResult

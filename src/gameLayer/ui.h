@@ -1,30 +1,30 @@
 #pragma once
 #include <vector>
 #include <string>
-#include <raylib.h>
+#include <math/rect.h>
 
 // top
-Rectangle placeRectangleTopLeft(Rectangle r);
-Rectangle placeRectangleCenterTop(Rectangle r, float w);
-Rectangle placeReactangleTopRightCorner(Rectangle r, float w);
+Engine::Rect placeRectangleTopLeft(Engine::Rect r);
+Engine::Rect placeRectangleCenterTop(Engine::Rect r, float w);
+Engine::Rect placeReactangleTopRightCorner(Engine::Rect r, float w);
 
 // center
-Rectangle placeRectangleCenterLeft(Rectangle r, float h);
-Rectangle placeRectangleCenter(Rectangle r, float w, float h);
-Rectangle placeRectangleCenterRight(Rectangle r, float w, float h);
+Engine::Rect placeRectangleCenterLeft(Engine::Rect r, float h);
+Engine::Rect placeRectangleCenter(Engine::Rect r, float w, float h);
+Engine::Rect placeRectangleCenterRight(Engine::Rect r, float w, float h);
 
 // bottom
-Rectangle placeRectangleBottomLeftCorner(Rectangle r, float h);
-Rectangle placeRectangleBottom(Rectangle r, float w, float h);
-Rectangle placeRectangleBottomRightCorner(Rectangle r, float w, float h);
+Engine::Rect placeRectangleBottomLeftCorner(Engine::Rect r, float h);
+Engine::Rect placeRectangleBottom(Engine::Rect r, float w, float h);
+Engine::Rect placeRectangleBottomRightCorner(Engine::Rect r, float w, float h);
 
 
 // implement 5 other functions to place in all possible spaces
 
-Rectangle enlargeRectanglePixels(Rectangle r, float pixelsX, float pixelsY);
+Engine::Rect enlargeRectanglePixels(Engine::Rect r, float pixelsX, float pixelsY);
 
-Rectangle enlargeRectanglePercentage(Rectangle r, float percentageX, float percentageY);
-Rectangle shrinkRectanglePercentage(Rectangle r, float percentageX, float percentageY);
+Engine::Rect enlargeRectanglePercentage(Engine::Rect r, float percentageX, float percentageY);
+Engine::Rect shrinkRectanglePercentage(Engine::Rect r, float percentageX, float percentageY);
 
 struct UIEngine
 {

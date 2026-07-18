@@ -1,6 +1,7 @@
 #pragma once
 #include "IRenderCollector.h"
-#include <raylib.h>
+#include <math/cam.h>
+
 
 namespace Engine
 {
@@ -21,7 +22,7 @@ class SceneRenderer : public Engine::IRenderCollector
 public:
 	SceneRenderer(Engine::SpriteBatch& spriteBatch, Engine::IRenderBackend& backend);
 	void beginFrame();
-	void beginPass(Engine::RenderPass pass, Camera2D& camera);
+	void beginPass(Engine::RenderPass pass, Engine::Cam& camera);
 	void endPass();
 	void endFrame();
 	void submitSprite(const Engine::Sprite& sprite) override;

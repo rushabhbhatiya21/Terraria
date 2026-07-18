@@ -1,13 +1,12 @@
 #include "drawBackground.h"
 #include <assets/assetManager.h>
-#include <raymath.h>
 #include <assert.h>
 #include <rendering/sprite.h>
 #include <rendering/IRenderCollector.h>
 
-void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, Camera2D camera, Vector2 mapSize, Color skyColor, Engine::IRenderCollector& collector)
+void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, Engine::Cam& camera, Engine::Vec2 mapSize, Engine::Color4f skyColor, Engine::IRenderCollector& collector)
 {
-	auto drawBackground = [&](int type, float parallax, float opacity, Color skyColor)
+	auto drawBackground = [&](int type, float parallax, float opacity, Engine::Color4f skyColor)
 		{
 			const Engine::Texture* bg = &assetManager.forestBG;
 
@@ -55,9 +54,9 @@ void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, C
 			const float cameraMinY = halfViewH;
 			const float cameraMaxY = mapSize.y - halfViewH;
 
-			Vector2 cameraPos = camera.target;
-			cameraPos.x = Clamp(cameraPos.x, cameraMinX, cameraMaxX);
-			cameraPos.y = Clamp(cameraPos.y, cameraMinY, cameraMaxY);
+			Engine::Vec2 cameraPos = camera.target;
+			cameraPos.x = std::clamp(cameraPos.x, cameraMinX, cameraMaxX);
+			cameraPos.y = std::clamp(cameraPos.y, cameraMinY, cameraMaxY);
 
 			const float cameraRangeX = std::max(0.f, cameraMaxX - cameraMinX);
 			const float cameraRangeY = std::max(0.f, cameraMaxY - cameraMinY);
@@ -71,8 +70,8 @@ void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, C
 			const float offX = -maxOffX * normX * parallax;
 			const float offY = -maxOffY * normY * parallax;
 
-			Rectangle src = { 0,0,(float)bg->getWidth(),(float)bg->getHeight()};
-			Rectangle dest = { offX, offY, bgW, bhH };
+			Engine::Rect src = { 0,0,(float)bg->getWidth(),(float)bg->getHeight()};
+			Engine::Rect dest = { offX, offY, bgW, bhH };
 
 			skyColor.a = opacity * 255;
 
@@ -92,7 +91,7 @@ void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, C
 				dest,
 				{ 0,0 },
 				0.f,
-				WHITE
+				Engine::White
 			};
 			collector.submitSprite(bgSprite);
 		};

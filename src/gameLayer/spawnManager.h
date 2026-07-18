@@ -1,5 +1,4 @@
 #pragma once
-#include <raylib.h>
 #include <memory>
 #include <type_traits>
 #include <entityHolder.h>
@@ -7,7 +6,7 @@
 struct SpawnManager
 {
 	template<typename T>
-	inline void spawnEnemy(EntityHolder& entityHolder, Vector2 position, Vector2 velocity)
+	inline void spawnEnemy(EntityHolder& entityHolder, Engine::Vec2 position, Engine::Vec2 velocity)
 	{
 		static_assert(std::is_base_of_v<Enemy, T>);
 

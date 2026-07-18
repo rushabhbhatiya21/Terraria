@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <math/vec2.h>
 #include <unordered_map>
 #include <items/blocks.h>
 #include <asserts.h>
@@ -20,8 +21,8 @@ static bool isPowerOfTwo(int n)
 
 struct CachedTile
 {
-	Vector2 position = {};
-	Rectangle srcRect = {};
+	Engine::Vec2 position = {};
+	Engine::Rect srcRect = {};
 	Block* block;
 };
 
@@ -29,13 +30,13 @@ struct ChunkRenderData
 {
 	std::vector<CachedTile> tiles;
 
-	void addTile(int worldX, int worldY, Rectangle srcRect, Block* b)
+	void addTile(int worldX, int worldY, Engine::Rect srcRect, Block* b)
 	{
 		tiles.emplace_back
 		(
 			CachedTile
 			{ 
-				Vector2{ (float)worldX, (float)worldY },
+				Engine::Vec2{ (float)worldX, (float)worldY },
 				srcRect, 
 				b 
 			}

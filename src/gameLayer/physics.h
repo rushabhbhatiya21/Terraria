@@ -1,9 +1,10 @@
 #pragma once
-#include "raylib.h"
-#include <raymath.h>
+//#include "raylib.h"
+//#include <raymath.h>
 #include <cmath>
 #include <nlohmann/json.hpp>
-#include <math/vector2overloads.h>
+#include <math/vec2.h>
+#include <math/rect.h>
 
 using Json = nlohmann::json;
 
@@ -11,42 +12,42 @@ using Json = nlohmann::json;
 
 struct Transform2D
 {
-	Vector2 pos = {}; // center
+	Engine::Vec2 pos = {}; // center
 
 	float w = 0; // width
 	float h = 0; // height
 
-	Vector2 getCenter()        const { return { pos.x, pos.y }; }
-	Vector2 getTop()           const { return { pos.x, pos.y - h * 0.5f}; }
-	Vector2 getBottom()        const { return { pos.x, pos.y + h * 0.5f }; }
-	Vector2 getLeft()          const { return { pos.x - w * 0.5f, pos.y }; }
-	Vector2 getRight()         const { return { pos.x + w * 0.5f, pos.y }; }
-	Vector2 getTopLeft()       const { return { pos.x - w * 0.5f, pos.y - h * 0.5f }; }
-	Vector2 getTopRight()      const { return { pos.x + w * 0.5f, pos.y - h * 0.5f }; }
-	Vector2 getBottomLeft()    const { return { pos.x - w * 0.5f, pos.y + h * 0.5f }; }
-	Vector2 getBottomRight()   const { return { pos.x + w * 0.5f, pos.y + h * 0.5f }; }
+	Engine::Vec2 getCenter()        const { return { pos.x, pos.y }; }
+	Engine::Vec2 getTop()           const { return { pos.x, pos.y - h * 0.5f}; }
+	Engine::Vec2 getBottom()        const { return { pos.x, pos.y + h * 0.5f }; }
+	Engine::Vec2 getLeft()          const { return { pos.x - w * 0.5f, pos.y }; }
+	Engine::Vec2 getRight()         const { return { pos.x + w * 0.5f, pos.y }; }
+	Engine::Vec2 getTopLeft()       const { return { pos.x - w * 0.5f, pos.y - h * 0.5f }; }
+	Engine::Vec2 getTopRight()      const { return { pos.x + w * 0.5f, pos.y - h * 0.5f }; }
+	Engine::Vec2 getBottomLeft()    const { return { pos.x - w * 0.5f, pos.y + h * 0.5f }; }
+	Engine::Vec2 getBottomRight()   const { return { pos.x + w * 0.5f, pos.y + h * 0.5f }; }
 
 	// useful for rendering
-	Rectangle getAABB()
+	Engine::Rect getAABB()
 	{
 		return { pos.x - w * 0.5f, pos.y - h * 0.5f, w, h };
 	}
 
-	bool intersectPoint(Vector2 point, float delta = 0)
+	bool intersectPoint(Engine::Vec2 point, float delta = 0)
 	{
-		Rectangle aabb = getAABB();
+		Engine::Rect aabb = getAABB();
 		aabb.x -= delta;
 		aabb.y -= delta;
 		aabb.width += 2 * delta;
 		aabb.height += 2 * delta;
 
-		return CheckCollisionPointRec(point, aabb);
+		return checkCollisionPointRec(point, aabb);
 	}
 
 	bool intersectTransform(Transform2D other, float delta = 0)
 	{
-		Rectangle a = getAABB();
-		Rectangle b = other.getAABB();
+		Engine::Rect a = getAABB();
+		Engine::Rect b = other.getAABB();
 
 		a.x -= delta;
 		a.y -= delta;
@@ -58,7 +59,7 @@ struct Transform2D
 		b.width += 2 * delta;
 		b.height += 2 * delta;
 
-		return CheckCollisionRecs(a, b);
+		return checkCollisionRecs(a, b);
 	}
 };
 
@@ -69,10 +70,10 @@ struct GameMap;
 struct PhysicalEntity
 {
 	Transform2D transform;
-	Vector2 lastPosition = {};
+	Engine::Vec2 lastPosition = {};
 
-	Vector2 velocity = {};
-	Vector2 acceleration = {};
+	Engine::Vec2 velocity = {};
+	Engine::Vec2 acceleration = {};
 
 	bool upTouch = 0;
 	bool downTouch = 0;
@@ -125,7 +126,7 @@ struct PhysicalEntity
 		return dropThroughTimer > 0.f;
 	}
 
-	void teleport(Vector2 pos)
+	void teleport(Engine::Vec2 pos)
 	{
 		transform.pos = pos;
 		lastPosition = pos;
@@ -222,7 +223,7 @@ struct PhysicalEntity
 		}
 
 		// Clamp horizontal speed
-		velocity.x = Clamp(velocity.x, -MOVE_SPEED, MOVE_SPEED);
+		velocity.x = std::clamp(velocity.x, -MOVE_SPEED, MOVE_SPEED);
 	}
 
 	void updateForces(float deltaTime)
@@ -231,17 +232,17 @@ struct PhysicalEntity
 		transform.pos += velocity * deltaTime;
 
 		// Universal drag (air resistance)
-		Vector2 dragVector = {
+		Engine::Vec2 dragVector = {
 			velocity.x * std::abs(velocity.x),
 			velocity.y * std::abs(velocity.y)
 		};
 		float drag = 0.01f;
-		if (Vector2Length(dragVector) * drag * deltaTime > Vector2Length(velocity))
+		if (Engine::Vec2Length(dragVector) * drag * deltaTime > Engine::Vec2Length(velocity))
 			velocity = {};
 		else
 			velocity -= dragVector * drag * deltaTime;
 
-		if (Vector2Length(velocity) < 0.01f)
+		if (Engine::Vec2Length(velocity) < 0.01f)
 			velocity = {};
 
 		// ── Terminal velocity (downward only) ─────────────────────────────────
@@ -264,7 +265,7 @@ struct PhysicalEntity
 			velocity.y = -force;
 	}
 
-	Vector2& getPosition()
+	Engine::Vec2& getPosition()
 	{
 		return transform.pos;
 	}
@@ -313,7 +314,7 @@ struct PhysicalEntity
 
 	void resolveConstrains(GameMap& mapData);
 
-	void checkCollisionOnce(GameMap& mapData, Vector2& pos);
+	void checkCollisionOnce(GameMap& mapData, Engine::Vec2& pos);
 
-	Vector2 performCollisionsOnOneAxis(GameMap& mapData, Vector2 pos, Vector2 delta);
+	Engine::Vec2 performCollisionsOnOneAxis(GameMap& mapData, Engine::Vec2 pos, Engine::Vec2 delta);
 };

@@ -2,7 +2,10 @@
 
 #include <vector>
 #include <string>
-#include <raylib.h>
+#include <math/vec2.h>
+#include <math/rect.h>
+#include <math/cam.h>
+#include <math/color.h>
 
 #include <world/chunk.h>
 
@@ -65,10 +68,10 @@ struct WorldTimeClock
 
 struct SkyData
 {
-	Color       skyColor;
-	Color       ambientColor;
-	float       darkness;
-	DayPhase phase;
+	Engine::Color4f skyColor;
+	Engine::Color4f ambientColor;
+	float           darkness;
+	DayPhase        phase;
 };
 
 
@@ -77,7 +80,7 @@ struct Gameplay
 	// core
 	GameMap gameMap = {};
 	GameMap backgroundMap = {};
-	Camera2D camera = {};
+	Engine::Cam camera = {};
 	DrawBackground background;
 
 	// render
@@ -103,8 +106,8 @@ struct Gameplay
 
 	// structure save
 	Structure copyStructure;
-	Vector2 selectionStart = {};
-	Vector2 selectionEnd = {};
+	Engine::Vec2 selectionStart = {};
+	Engine::Vec2 selectionEnd = {};
 	char saveName[100] = {};
 
 	SecondOrderDynamics camFollow;
@@ -122,11 +125,11 @@ struct Gameplay
 
 	bool lightingNeedsRebuild = false;
 
-	RenderTexture2D lightMask = { 0 };
-	RenderTexture2D sceneTexture = { 0 };
-	RenderTexture2D blurredLightTexture = { 0 };
-	RenderTexture2D blurredGlowTexture = { 0 };
-	RenderTexture2D glowTexture = { 0 };
+	//RenderTexture2D lightMask = { 0 };
+	//RenderTexture2D sceneTexture = { 0 };
+	//RenderTexture2D blurredLightTexture = { 0 };
+	//RenderTexture2D blurredGlowTexture = { 0 };
+	//RenderTexture2D glowTexture = { 0 };
 
 	// world time
 	float worldTime = 0;
@@ -145,46 +148,46 @@ struct Gameplay
 	float getDayPercent(float t);
 	WorldTimeClock getWorldTimeClock(float t);
 
-	//void spawnDesertSlime(Vector2 position);
+	//void spawnDesertSlime(Engine::Vec2 position);
 
-	//void spawnEvilEye(Vector2 position);
+	//void spawnEvilEye(Engine::Vec2 position);
 
-	//void spawnZombie(Vector2 position);
+	//void spawnZombie(Engine::Vec2 position);
 
-	void spawnDroppedItem(Vector2 positon, int type);
+	void spawnDroppedItem(Engine::Vec2 positon, int type);
 
-	Rectangle getInventoryRectangle(float w, float h);
+	Engine::Rect getInventoryRectangle(float w, float h);
 
-	Rectangle getCraftRectangle(float w, float h);
+	Engine::Rect getCraftRectangle(float w, float h);
 
-	Rectangle getRecipeRectangle(float w, float h, Rectangle craftRectangle);
-	Rectangle getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle);
+	Engine::Rect getRecipeRectangle(float w, float h, Engine::Rect craftRectangle);
+	Engine::Rect getIngredientsRectangle(float w, float h, Engine::Rect craftRectangle, Engine::Rect recipeRectangle);
 
-	void drawInventoryBackground(const Rectangle& inventoryRectangle, const Inventory& inventory, bool insideInventory);
-	void drawInventorySlot(bool isDragged, const Rectangle& rect, const ItemStack& stack, bool selected, Engine::AssetManager& assetManager);
-	Rectangle getInventorySlotRect(int index, const Rectangle& inventoryRectangle, const Inventory& inventory);
-	void drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, Engine::AssetManager& assetManager);
-	int getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRectangle, const Inventory& inventory, bool insideInventory);
+	void drawInventoryBackground(const Engine::Rect& inventoryRectangle, const Inventory& inventory, bool insideInventory);
+	void drawInventorySlot(bool isDragged, const Engine::Rect& rect, const ItemStack& stack, bool selected, Engine::AssetManager& assetManager);
+	Engine::Rect getInventorySlotRect(int index, const Engine::Rect& inventoryRectangle, const Inventory& inventory);
+	void drawInventorySlotByIndex(int index, bool isDragged, const Engine::Rect& inventoryRectangle, const Inventory& inventory, const Player& player, Engine::AssetManager& assetManager);
+	int getHoveredInventorySlot(Engine::Vec2 mousePos, Engine::Rect inventoryRectangle, const Inventory& inventory, bool insideInventory);
 	void drawDraggedItem(const ItemStack& stack, Engine::AssetManager& assetManager);
 	void drawDisplayNameUI(
-		ItemId itemId, 
-		Rectangle parentRect, 
-		float fontSize  = 10.f,
-		float spacing   = 1.f,
-		float paddingX  = 8.f, 
-		float paddingY  = 4.f,
-		Color rectColor = Color{255,255,255,200},
-		Color textColor = BLACK
+		ItemId itemId,
+		Engine::Rect parentRect,
+		float fontSize = 10.f,
+		float spacing = 1.f,
+		float paddingX = 8.f,
+		float paddingY = 4.f,
+		Engine::Color4f rectColor = Engine::Color4f{ 255,255,255,200 },
+		Engine::Color4f textColor = Engine::Black
 	);
 
-	Recipes::CraftingStation getNearbyStation(Vector2 playerPos);
+	Recipes::CraftingStation getNearbyStation(Engine::Vec2 playerPos);
 
 	//void floodFillLight(int x, int y, int offsetX, int offsetY, float value, bool isTorch = false);
 
 	//void addLight(int worldX, int worldY, float radius, float intensity, bool isTorch = false);
 
 	template<typename T>
-	void spawnEnemyHelper(Vector2 position)
+	void spawnEnemyHelper(Engine::Vec2 position)
 	{
 		auto id = entityHolder.idHolder.getEntityIdAndIncreament();
 		auto enemy = std::make_unique<T>();

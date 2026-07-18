@@ -2,6 +2,7 @@
 #include <chrono>
 #include <iostream>
 #include <imgui.h>
+#include <input/input.h>
 
 #include <ui.h>
 #include <audio.h>
@@ -16,6 +17,7 @@
 #include <shake.h>
 #include <lighting.h>
 #include <rendering/worldRenderer.h>
+#include <rendering/text.h>
 
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>
@@ -38,24 +40,24 @@
 #pragma region sky colors
 
 // Bright, slightly warm white — more natural than pure white
-const Color dayColor = { 255, 250, 230, 255 };
+const Engine::Color4f dayColor = { 255, 250, 230, 255 };
 
 // Deeper, richer sky blue — more contrast against terrain
-const Color daySky = { 85, 170, 255, 255 };
+const Engine::Color4f daySky = { 85, 170, 255, 255 };
 
 // Sunrise — cool pink/gold, feels like early morning mist
-const Color sunriseA = { 255, 200, 160, 255 };  // warm gold horizon
-const Color sunriseB = { 200, 160, 220, 255 };  // soft lavender upper sky
-const Color sunriseSky = { 255, 180, 140, 255 };  // peachy horizon glow
+const Engine::Color4f sunriseA = { 255, 200, 160, 255 };  // warm gold horizon
+const Engine::Color4f sunriseB = { 200, 160, 220, 255 };  // soft lavender upper sky
+const Engine::Color4f sunriseSky = { 255, 180, 140, 255 };  // peachy horizon glow
 
 // Sunset — deeper, moodier, clearly different from sunrise
-const Color sunsetA = { 255, 100,  60, 255 };  // burnt orange-red
-const Color sunsetB = { 120,  50, 140, 255 };  // deep violet
-const Color sunsetSky = { 100,  60, 130, 255 };  // dusky purple
+const Engine::Color4f sunsetA = { 255, 100,  60, 255 };  // burnt orange-red
+const Engine::Color4f sunsetB = { 120,  50, 140, 255 };  // deep violet
+const Engine::Color4f sunsetSky = { 100,  60, 130, 255 };  // dusky purple
 
 // Night — slightly cooler/deeper, more contrast at night
-const Color nightColor = { 20,  35,  80, 255 };
-const Color nightSky = { 8,  12,  40, 255 };  // near-black deep blue
+const Engine::Color4f nightColor = { 20,  35,  80, 255 };
+const Engine::Color4f nightSky = { 8,  12,  40, 255 };  // near-black deep blue
 
 #pragma endregion
 
@@ -81,7 +83,7 @@ const KeyboardKey hotbarKeys[] =
 
 #pragma region sky color helpers
 
-static Color lerpColor(Color a, Color b, float t)
+static Engine::Color4f lerpColor(Engine::Color4f a, Engine::Color4f b, float t)
 {
 	return
 	{
@@ -161,7 +163,7 @@ WorldTimeClock Gameplay::getWorldTimeClock(float t)
 
 #pragma region spawn helpers
 
-void Gameplay::spawnDroppedItem(Vector2 position, int type)
+void Gameplay::spawnDroppedItem(Engine::Vec2 position, int type)
 {
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
 	auto item = std::make_unique<DroppedItem>();
@@ -179,9 +181,9 @@ void Gameplay::spawnDroppedItem(Vector2 position, int type)
 
 #pragma region rect ui helpers
 
-Rectangle Gameplay::getInventoryRectangle(float w, float h)
+Engine::Rect Gameplay::getInventoryRectangle(float w, float h)
 {
-	Rectangle inventoryRectangle = {};
+	Engine::Rect inventoryRectangle = {};
 
 	inventoryRectangle.height = h * .3f;
 	inventoryRectangle.width = inventoryRectangle.height * 3.34; // 3 for 9 cols, 3.34 for 10 cols
@@ -202,9 +204,9 @@ Rectangle Gameplay::getInventoryRectangle(float w, float h)
 	return inventoryRectangle;
 }
 
-Rectangle Gameplay::getCraftRectangle(float w, float h)
+Engine::Rect Gameplay::getCraftRectangle(float w, float h)
 {
-	Rectangle craftRectangle = {};
+	Engine::Rect craftRectangle = {};
 
 	// Base size
 	craftRectangle.width = w * 0.25f;
@@ -226,9 +228,9 @@ Rectangle Gameplay::getCraftRectangle(float w, float h)
 	return craftRectangle;
 }
 
-Rectangle Gameplay::getRecipeRectangle(float w, float h, Rectangle craftRectangle)
+Engine::Rect Gameplay::getRecipeRectangle(float w, float h, Engine::Rect craftRectangle)
 {
-	Rectangle recipeRectangle = {};
+	Engine::Rect recipeRectangle = {};
 
 	float padding = 10.f;
 
@@ -246,9 +248,9 @@ Rectangle Gameplay::getRecipeRectangle(float w, float h, Rectangle craftRectangl
 	return recipeRectangle;
 }
 
-Rectangle Gameplay::getIngredientsRectangle(float w, float h, Rectangle craftRectangle, Rectangle recipeRectangle)
+Engine::Rect Gameplay::getIngredientsRectangle(float w, float h, Engine::Rect craftRectangle, Engine::Rect recipeRectangle)
 {
-	Rectangle ingredientRectangle = {};
+	Engine::Rect ingredientRectangle = {};
 
 	float padding = 10.f;
 
@@ -266,7 +268,7 @@ Rectangle Gameplay::getIngredientsRectangle(float w, float h, Rectangle craftRec
 	return ingredientRectangle;
 }
 
-void Gameplay::drawInventoryBackground(const Rectangle& inventoryRectangle, const Inventory& inventory, bool insideInventory)
+void Gameplay::drawInventoryBackground(const Engine::Rect& inventoryRectangle, const Inventory& inventory, bool insideInventory)
 {
 	// hotbar always visible
 	DrawRectangle(
@@ -290,11 +292,11 @@ void Gameplay::drawInventoryBackground(const Rectangle& inventoryRectangle, cons
 	}
 }
 
-void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const ItemStack& stack, bool selected, Engine::AssetManager& assetManager)
+void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const ItemStack& stack, bool selected, Engine::AssetManager& assetManager)
 {
-	Color c = { 180,180,200,240 };
+	Engine::Color4f c = { 180,180,200,240 };
 
-	if (CheckCollisionPointRec(GetMousePosition(), rect))
+	if (Engine::checkCollisionPointRec(Engine::getMousePosition(), rect))
 		c = { 220,250,220,250 };
 
 	if (selected)
@@ -350,33 +352,34 @@ void Gameplay::drawInventorySlot(bool isDragged, const Rectangle& rect, const It
 
 		if (stack.count != 0 && isStackable(stack.itemId))
 		{
-			Vector2 textPos =
+			Engine::Vec2 textPos =
 			{
 				rect.x + rect.width * 0.5f,
 				rect.y + rect.height * 0.75f
 			};
 			std::string str = std::to_string(stack.count);
-			Vector2 textSize = MeasureTextEx(GetFontDefault(), str.c_str(), 25.f, 2.f);
+			Engine::Vec2 textSize = Engine::measureTextEx(GetFontDefault(), str.c_str(), 25.f, 2.f);
 
 			// write item count as text
-			DrawTextPro(
-				GetFontDefault(),
-				str.c_str(),
-				textPos,
-				{ textSize.x / 2.f, textSize.y / 2.f },
-				0.f,
-				25.f,
-				1.f,
-				{ 255, 255, 255, 200 }
-			);
+			// draw text using renderer
+			//DrawTextPro(
+			//	GetFontDefault(),
+			//	str.c_str(),
+			//	textPos,
+			//	{ textSize.x / 2.f, textSize.y / 2.f },
+			//	0.f,
+			//	25.f,
+			//	1.f,
+			//	{ 255, 255, 255, 200 }
+			//);
 		}
 	}
 
 }
 
-Rectangle Gameplay::getInventorySlotRect(int index, const Rectangle& inventoryRectangle, const Inventory& inventory)
+Engine::Rect Gameplay::getInventorySlotRect(int index, const Engine::Rect& inventoryRectangle, const Inventory& inventory)
 {
-	Rectangle rect = shrinkRectanglePercentage(
+	Engine::Rect rect = shrinkRectanglePercentage(
 		inventoryRectangle,
 		0.01f,
 		0.01f
@@ -388,7 +391,7 @@ Rectangle Gameplay::getInventorySlotRect(int index, const Rectangle& inventoryRe
 	int row = index / inventory.columns;
 	int col = index % inventory.columns;
 
-	Rectangle newRect;
+	Engine::Rect newRect;
 	newRect.x = rect.x + col * cellWidth;
 	newRect.y = rect.y + row * cellHeight;
 	newRect.width = cellWidth;
@@ -403,9 +406,9 @@ Rectangle Gameplay::getInventorySlotRect(int index, const Rectangle& inventoryRe
 	return newRect;
 }
 
-void Gameplay::drawInventorySlotByIndex(int index, bool isDragged, const Rectangle& inventoryRectangle, const Inventory& inventory, const Player& player, Engine::AssetManager& assetManager)
+void Gameplay::drawInventorySlotByIndex(int index, bool isDragged, const Engine::Rect& inventoryRectangle, const Inventory& inventory, const Player& player, Engine::AssetManager& assetManager)
 {
-	Rectangle slotRect = getInventorySlotRect(index, inventoryRectangle, inventory);
+	Engine::Rect slotRect = getInventorySlotRect(index, inventoryRectangle, inventory);
 
 	const ItemStack& stack = inventory.slots[index];
 
@@ -418,7 +421,7 @@ void Gameplay::drawInventorySlotByIndex(int index, bool isDragged, const Rectang
 	);
 }
 
-int Gameplay::getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRectangle, const Inventory& inventory, bool insideInventory)
+int Gameplay::getHoveredInventorySlot(Engine::Vec2 mousePos, Engine::Rect inventoryRectangle, const Inventory& inventory, bool insideInventory)
 {
 	inventoryRectangle = shrinkRectanglePercentage(
 		inventoryRectangle,
@@ -448,9 +451,9 @@ int Gameplay::getHoveredInventorySlot(Vector2 mousePos, Rectangle inventoryRecta
 
 void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& assetManager)
 {
-	Vector2 mouse = GetMousePosition();
+	Engine::Vec2 mouse = Engine::getMousePosition();
 
-	Rectangle r;
+	Engine::Rect r;
 	r.width = 48;
 	r.height = 48;
 	r.x = mouse.x - r.width / 2.f;
@@ -466,7 +469,7 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& ass
 	//	r,
 	//	{ 0,0 },
 	//	0.f,
-	//	Color{ 255,255,255,180 }
+	//	Engine::Color4f{ 255,255,255,180 }
 	//);
 
 	Engine::Sprite draggedItemSprite
@@ -476,12 +479,12 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& ass
 		r,
 		{ 0,0 },
 		0.f,
-		Color{ 255,255,255,180 }
+		Engine::Color4f{ 255,255,255,180 }
 	};
 	sceneRenderer.submitSprite(draggedItemSprite);
 }
 
-void Gameplay::drawDisplayNameUI(ItemId itemId, Rectangle parentRect, float fontSize, float spacing, float paddingX, float paddingY, Color rectColor, Color textColor)
+void Gameplay::drawDisplayNameUI(ItemId itemId, Engine::Rect parentRect, float fontSize, float spacing, float paddingX, float paddingY, Engine::Color4f rectColor, Engine::Color4f textColor)
 {
 	ItemDefinition* selectedIngredient = getItem(itemId);
 
@@ -493,36 +496,38 @@ void Gameplay::drawDisplayNameUI(ItemId itemId, Rectangle parentRect, float font
 	//float paddingX = 6.f;
 	//float paddingY = 2.f;
 
-	Vector2 textSize = MeasureTextEx(GetFontDefault(), selectedIngredient->displayName, fontSize, spacing);
+	Engine::Vec2 textSize = Engine::measureTextEx(GetFontDefault(), selectedIngredient->displayName, fontSize, spacing);
 
-	Rectangle rectPos{
+	Engine::Rect rectPos{
 		parentRect.x + parentRect.width / 2 - (textSize.x + paddingX * 2) / 2, // center horizontally
 		parentRect.y - textSize.y - paddingY * 2 - 5,                   // above item slot
 		textSize.x + paddingX * 2,
 		textSize.y + paddingY * 2
 	};
 
-	DrawRectangleRounded(
-		rectPos,
-		.7f,
-		1,
-		//Color{ 255,255,255,200 }
-		rectColor
-	);
+	// draw rect using renderer
+	//DrawRectangleRounded(
+	//	rectPos,
+	//	.7f,
+	//	1,
+	//	//Engine::Color4f{ 255,255,255,200 }
+	//	rectColor
+	//);
 
-	DrawTextPro(
-		GetFontDefault(),
-		selectedIngredient->displayName,
-		{
-			rectPos.x + paddingX,
-			rectPos.y + paddingY
-		},
-		{ 0, 0 },
-		0.f,
-		fontSize,
-		spacing,
-		textColor
-	);
+	// draw text using renderer
+	//DrawTextPro(
+	//	GetFontDefault(),
+	//	selectedIngredient->displayName,
+	//	{
+	//		rectPos.x + paddingX,
+	//		rectPos.y + paddingY
+	//	},
+	//	{ 0, 0 },
+	//	0.f,
+	//	fontSize,
+	//	spacing,
+	//	textColor
+	//);
 }
 
 #pragma endregion
@@ -530,7 +535,7 @@ void Gameplay::drawDisplayNameUI(ItemId itemId, Rectangle parentRect, float font
 
 #pragma region craft helpers
 
-Recipes::CraftingStation Gameplay::getNearbyStation(Vector2 playerPos)
+Recipes::CraftingStation Gameplay::getNearbyStation(Engine::Vec2 playerPos)
 {
 	Recipes::CraftingStation nearbyCraftingStation = Recipes::CraftingStation::NONE;
 	for (int y = playerPos.y - 3; y <= playerPos.y + 3; y++)
@@ -695,17 +700,17 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	// player spawn
 	player.teleport({ 20, 60 });
 
-	// Use a RenderTexture to capture the scene
-	sceneTexture =        LoadRenderTexture(screenW, screenH);
-	lightMask =           LoadRenderTexture(screenW / LIGHT_SCALE, screenH / LIGHT_SCALE);
-	glowTexture =         LoadRenderTexture(screenW / LIGHT_SCALE, screenH / LIGHT_SCALE);
-	blurredLightTexture = LoadRenderTexture(screenW / LIGHT_SCALE, screenH / LIGHT_SCALE);
-	blurredGlowTexture =  LoadRenderTexture(screenW / LIGHT_SCALE, screenH / LIGHT_SCALE);
+	//// Use a RenderTexture to capture the scene
+	//sceneTexture =        LoadRenderTexture(screenW, screenH);
+	//lightMask =           LoadRenderTexture(screenW / LIGHT_SCALE, screenH / LIGHT_SCALE);
+	//glowTexture =         LoadRenderTexture(screenW / LIGHT_SCALE, screenH / LIGHT_SCALE);
+	//blurredLightTexture = LoadRenderTexture(screenW / LIGHT_SCALE, screenH / LIGHT_SCALE);
+	//blurredGlowTexture =  LoadRenderTexture(screenW / LIGHT_SCALE, screenH / LIGHT_SCALE);
 
-	SetTextureFilter(lightMask.texture,           TEXTURE_FILTER_BILINEAR);
-	SetTextureFilter(glowTexture.texture,         TEXTURE_FILTER_BILINEAR);
-	SetTextureFilter(blurredLightTexture.texture, TEXTURE_FILTER_BILINEAR);
-	SetTextureFilter(blurredGlowTexture.texture,  TEXTURE_FILTER_BILINEAR);
+	//SetTextureFilter(lightMask.texture,           TEXTURE_FILTER_BILINEAR);
+	//SetTextureFilter(glowTexture.texture,         TEXTURE_FILTER_BILINEAR);
+	//SetTextureFilter(blurredLightTexture.texture, TEXTURE_FILTER_BILINEAR);
+	//SetTextureFilter(blurredGlowTexture.texture,  TEXTURE_FILTER_BILINEAR);
 
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
@@ -772,7 +777,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	float t = worldTime / FULL_DAY_LENGTH;
 
 	SkyData skyData = getSkyData(t);
-	Color ambientColor = skyData.ambientColor;
+	Engine::Color4f ambientColor = skyData.ambientColor;
 	float darkness = skyData.darkness;
 
 #pragma endregion
@@ -792,7 +797,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
 
-	Vector2 camOffset = { 0, 0 };
+	Engine::Vec2 camOffset = { 0, 0 };
 
 	if (camShake.time > 0.0f)
 	{
@@ -805,7 +810,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		camOffset.y = cosf(time * 30.0f + camShake.phase) * strength;
 	}
 
-	Vector2 smoothTarget = camFollow.Update(deltaTime, player.getPosition());
+	Engine::Vec2 smoothTarget = camFollow.Update(deltaTime, player.getPosition());
 
 	camera.target.x = smoothTarget.x + camOffset.x;
 	camera.target.y = smoothTarget.y + camOffset.y;
@@ -873,8 +878,8 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	{
 		int blockType = 1;
 		// spawn particles at feet
-		Vector2 playerPos = player.physics.transform.getBottom();
-		Vector2 playerPosLeft = player.physics.transform.getBottomLeft();
+		Engine::Vec2 playerPos = player.physics.transform.getBottom();
+		Engine::Vec2 playerPosLeft = player.physics.transform.getBottomLeft();
 
 		// get block below feet
 		// check collider left
@@ -886,7 +891,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		else
 		{
 			// check collider right
-			Vector2 playerPosRight = player.physics.transform.getBottomRight();
+			Engine::Vec2 playerPosRight = player.physics.transform.getBottomRight();
 			auto b = gameMap.getBlockSafe((int)playerPosRight.x, (int)playerPosRight.y);
 			if (b && b->type != Items::air) blockType = b->type;
 		}
@@ -956,7 +961,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		}
 		else
 		{
-			camera.target.x = Clamp(camera.target.x, minX, maxX);
+			camera.target.x = std::clamp(camera.target.x, minX, maxX);
 		}
 
 		if (maxY < minY)
@@ -965,7 +970,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		}
 		else
 		{
-			camera.target.y = Clamp(camera.target.y, minY, maxY);
+			camera.target.y = std::clamp(camera.target.y, minY, maxY);
 		}
 	}
 
@@ -1025,24 +1030,24 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region handle input
 
-	Rectangle inventoryRectangle = getInventoryRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
+	Engine::Rect inventoryRectangle = getInventoryRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
 
 	// inside hotbar meu
 	bool insideHotbarMenu = false;
-	Rectangle hotbarRectangle = inventoryRectangle;
+	Engine::Rect hotbarRectangle = inventoryRectangle;
 	hotbarRectangle.height /= player.inventory.rows;
-	insideHotbarMenu = CheckCollisionPointRec(GetMousePosition(), hotbarRectangle);
+	insideHotbarMenu = Engine::checkCollisionPointRec(Engine::getMousePosition(), hotbarRectangle);
 
 	// inside inventory except hotbar
 	bool insideInventoryGrid = false;
-	insideInventoryGrid = CheckCollisionPointRec(GetMousePosition(), inventoryRectangle) && insideInventory;
+	insideInventoryGrid = Engine::checkCollisionPointRec(Engine::getMousePosition(), inventoryRectangle) && insideInventory;
 
 	// inside craft menu
 	bool insideCraftingMenu = false;
-	Rectangle craftRectangle = getCraftRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
-	insideCraftingMenu = CheckCollisionPointRec(GetMousePosition(), craftRectangle) && insideCraft;
+	Engine::Rect craftRectangle = getCraftRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
+	insideCraftingMenu = Engine::checkCollisionPointRec(Engine::getMousePosition(), craftRectangle) && insideCraft;
 
-	Vector2 worldPos = GetScreenToWorld2D(GetMousePosition(), camera);
+	Engine::Vec2 worldPos = Engine::getScreenToWorld2D(Engine::getMousePosition(), camera);
 	int blockX = (int)floor(worldPos.x);
 	int blockY = (int)floor(worldPos.y);
 
@@ -1054,15 +1059,15 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	{
 		if (IsKeyPressed(KEY_ONE))
 		{
-			selectionStart = Vector2{ float(blockX), float(blockY) };
+			selectionStart = Engine::Vec2{ float(blockX), float(blockY) };
 		}
 		if (IsKeyPressed(KEY_TWO))
 		{
-			selectionEnd = Vector2{ float(blockX), float(blockY) };
+			selectionEnd = Engine::Vec2{ float(blockX), float(blockY) };
 		}
 		if (IsKeyPressed(KEY_THREE))
 		{
-			copyStructure.pasteIntoMap(gameMap, Vector2{ float(blockX), float(blockY) });
+			copyStructure.pasteIntoMap(gameMap, Engine::Vec2{ float(blockX), float(blockY) });
 		}
 
 		if (selectionStart.x > selectionEnd.x)
@@ -1220,38 +1225,38 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	int screenW = GetScreenWidth();
 	int screenH = GetScreenHeight();
 
-	if (lightMask.id == 0 ||
-		sceneTexture.id == 0 ||
-		glowTexture.id == 0 ||
-		blurredLightTexture.id == 0 ||
-		blurredGlowTexture.id == 0 ||
-		screenW != lastScreenWidth ||
-		screenH != lastScreenHeight)
-	{
-		if (lightMask.id != 0)
-			UnloadRenderTexture(lightMask);
+	//if (lightMask.id == 0 ||
+	//	sceneTexture.id == 0 ||
+	//	glowTexture.id == 0 ||
+	//	blurredLightTexture.id == 0 ||
+	//	blurredGlowTexture.id == 0 ||
+	//	screenW != lastScreenWidth ||
+	//	screenH != lastScreenHeight)
+	//{
+	//	if (lightMask.id != 0)
+	//		UnloadRenderTexture(lightMask);
 
-		if (sceneTexture.id != 0)
-			UnloadRenderTexture(sceneTexture);
+	//	if (sceneTexture.id != 0)
+	//		UnloadRenderTexture(sceneTexture);
 
-		if (glowTexture.id != 0)
-			UnloadRenderTexture(glowTexture);
+	//	if (glowTexture.id != 0)
+	//		UnloadRenderTexture(glowTexture);
 
-		if (blurredLightTexture.id != 0)
-			UnloadRenderTexture(blurredLightTexture);
+	//	if (blurredLightTexture.id != 0)
+	//		UnloadRenderTexture(blurredLightTexture);
 
-		if (blurredGlowTexture.id != 0)
-			UnloadRenderTexture(blurredGlowTexture);
+	//	if (blurredGlowTexture.id != 0)
+	//		UnloadRenderTexture(blurredGlowTexture);
 
-		lightMask = LoadRenderTexture(screenW, screenH);
-		sceneTexture = LoadRenderTexture(screenW, screenH);
-		glowTexture = LoadRenderTexture(screenW, screenH);
-		blurredLightTexture = LoadRenderTexture(screenW, screenH);
-		blurredGlowTexture = LoadRenderTexture(screenW, screenH);
+	//	lightMask = LoadRenderTexture(screenW, screenH);
+	//	sceneTexture = LoadRenderTexture(screenW, screenH);
+	//	glowTexture = LoadRenderTexture(screenW, screenH);
+	//	blurredLightTexture = LoadRenderTexture(screenW, screenH);
+	//	blurredGlowTexture = LoadRenderTexture(screenW, screenH);
 
-		lastScreenWidth = screenW;
-		lastScreenHeight = screenH;
-	}
+	//	lastScreenWidth = screenW;
+	//	lastScreenHeight = screenH;
+	//}
 
 #pragma endregion
 
@@ -1309,7 +1314,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	//
 	//unsigned char ambientByte = (unsigned char)(0.08f * 255.f);
 
-	//ClearBackground(Color{
+	//ClearBackground(Engine::Color4f{
 	//	ambientByte,
 	//	ambientByte,
 	//	ambientByte,
@@ -1337,7 +1342,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	//			y,
 	//			1,
 	//			1,
-	//			Color{ c, c, c, 255 }
+	//			Engine::Color4f{ c, c, c, 255 }
 	//		);
 	//	}
 	//}
@@ -1435,7 +1440,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			{ (float)blockX, (float)blockY, 1, 1 },
 			{ 0,0 },
 			0.f,
-			WHITE
+			Engine::White
 		};
 		sceneRenderer.submitSprite(frame);
 	}
@@ -1459,11 +1464,12 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	{
 		if (DEBUG_MODE == 1)
 		{
-			DrawRectangleLinesEx(
-				e.second->physics.transform.getAABB(),
-				.1f,
-				PURPLE
-			);
+			// draw rect using renderer
+			//DrawRectangleLinesEx(
+			//	e.second->physics.transform.getAABB(),
+			//	.1f,
+			//	PURPLE
+			//);
 		}
 
 		e.second->render(assetManager, sceneRenderer);
@@ -1503,7 +1509,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	// show structure selection
 	if (showImgui)
 	{
-		Rectangle rect;
+		Engine::Rect rect;
 		rect.x = selectionStart.x;
 		rect.y = selectionStart.y;
 		rect.width = selectionEnd.x - selectionStart.x;
@@ -1512,11 +1518,12 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		rect.width++;
 		rect.height++;
 
-		DrawRectangleLinesEx(
-			rect,
-			0.1f,
-			{ 20,101,250,145 }
-		);
+		// draw rect using renderer
+		//DrawRectangleLinesEx(
+		//	rect,
+		//	0.1f,
+		//	{ 20,101,250,145 }
+		//);
 	}
 
 #pragma endregion
@@ -1568,41 +1575,43 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region draw glow stuff
 
-	// draw only glow stuff here
-	BeginTextureMode(glowTexture);
-	ClearBackground(BLACK);
-	BeginMode2D(camera);
+	//// draw only glow stuff here
+	//BeginTextureMode(glowTexture);
+	//ClearBackground(BLACK);
+	//BeginMode2D(camera);
 
-	// render torches here
-	// static torch at 29, 59
-	DrawCircleGradient(
-		29,
-		59,
-		1.2f,
-		Color{ 255,255,0,255 },
-		Color{ 0,0,0,0 }
-	);
+	//// render torches here
+	//// static torch at 29, 59
+	//DrawCircleGradient(
+	//	29,
+	//	59,
+	//	1.2f,
+	//	Engine::Color4f{ 255,255,0,255 },
+	//	Engine::Color4f{ 0,0,0,0 }
+	//);
 
-	EndMode2D();
-	EndTextureMode();
+	//EndMode2D();
+	//EndTextureMode();
 
 #pragma endregion
 
 
 #pragma region glow shader
 
-	// blur glow texture
-	BeginTextureMode(blurredGlowTexture);
-	BeginShaderMode(assetManager.blurShader);
-	ClearBackground(BLACK);
-	DrawTextureRec(
-		glowTexture.texture,
-		Rectangle{ 0, 0, (float)glowTexture.texture.width, (float)-glowTexture.texture.height },
-		Vector2{ 0, 0 },
-		WHITE
-	);
-	EndShaderMode();
-	EndTextureMode();
+	// // blur glow texture
+	//BeginTextureMode(blurredGlowTexture);
+	//BeginShaderMode(assetManager.blurShader);
+	//ClearBackground(BLACK);
+	//
+	// draw texture rect using renderer
+	//DrawTextureRec(
+	//	glowTexture.texture,
+	//	Engine::Rect{ 0, 0, (float)glowTexture.texture.width, (float)-glowTexture.texture.height },
+	//	Engine::Vec2{ 0, 0 },
+	//	WHITE
+	//);
+	//EndShaderMode();
+	//EndTextureMode();
 
 #pragma endregion
 
@@ -1611,11 +1620,11 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	float depth = player.getPosition().y;
 
-	float caveDarkness = Clamp((depth - 110.0f) / 40.0f, 0.0f, 1.0f);
+	float caveDarkness = std::clamp((depth - 110.0f) / 40.0f, 0.0f, 1.0f);
 
 	float lightingAmount = std::max(isNight(t) ? 1.0f : 0.0f, caveDarkness);
 
-	Color tint = {
+	Engine::Color4f tint = {
 		255,
 		255,
 		255,
@@ -1623,63 +1632,65 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	};
 
 	// draw scene
-	DrawTextureRec(
-		sceneTexture.texture,
-		{ 0, 0, (float)screenW, -(float)screenH },
-		{ 0, 0 },
-		WHITE
-	);
+	// draw using renderer
+	//DrawTextureRec(
+	//	sceneTexture.texture,
+	//	{ 0, 0, (float)screenW, -(float)screenH },
+	//	{ 0, 0 },
+	//	WHITE
+	//);
 
 	// apply darkness only at night/caves
 	if (lightingAmount > 0.0f)
 	{
 		// multiply lighting
-		BeginBlendMode(BLEND_MULTIPLIED);
+		//BeginBlendMode(BLEND_MULTIPLIED);
+		//
+		// draw texture using renderer
+		//DrawTexturePro(
+		//	blurredLightTexture.texture,
+		//	Engine::Rect { // source
+		//		0,
+		//		0,
+		//		(float)blurredLightTexture.texture.width,
+		//		-(float)blurredLightTexture.texture.height
+		//	},
+		//	Engine::Rect { // dest
+		//		0,
+		//		0,
+		//		(float)screenW,
+		//		(float)screenH
+		//	},
+		//	{ 0,0 }, // origin
+		//	0,      // rotation
+		//	tint   // tint
+		//);
+		//
+		//EndBlendMode();
 
-		DrawTexturePro(
-			blurredLightTexture.texture,
-			Rectangle { // source
-				0,
-				0,
-				(float)blurredLightTexture.texture.width,
-				-(float)blurredLightTexture.texture.height
-			},
-			Rectangle { // dest
-				0,
-				0,
-				(float)screenW,
-				(float)screenH
-			},
-			{ 0,0 }, // origin
-			0,      // rotation
-			tint   // tint
-		);
-
-		EndBlendMode();
-
-		// ADD GLOW/TORCHES ON TOP
-		BeginBlendMode(BLEND_ADDITIVE);
-
-		DrawTexturePro(
-			blurredGlowTexture.texture,
-			{
-				0,
-				0,
-				(float)blurredGlowTexture.texture.width,
-				-(float)blurredGlowTexture.texture.height
-			},
-			{
-				0,
-				0,
-				(float)screenW,
-				(float)screenH
-			},
-			{ 0,0 },
-			0,
-			WHITE
-		);
-
-		EndBlendMode();
+		// // ADD GLOW/TORCHES ON TOP
+		//BeginBlendMode(BLEND_ADDITIVE);
+		//
+		//DrawTexturePro(
+		//	blurredGlowTexture.texture,
+		//	{
+		//		0,
+		//		0,
+		//		(float)blurredGlowTexture.texture.width,
+		//		-(float)blurredGlowTexture.texture.height
+		//	},
+		//	{
+		//		0,
+		//		0,
+		//		(float)screenW,
+		//		(float)screenH
+		//	},
+		//	{ 0,0 },
+		//	0,
+		//	WHITE
+		//);
+		//
+		//EndBlendMode();
 	}
 
 #pragma endregion
@@ -1724,7 +1735,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region life ui
 
-	Rectangle heartRectangle{};
+	Engine::Rect heartRectangle{};
 	heartRectangle.height = h * .05f;
 	heartRectangle.width = heartRectangle.height * 5;
 
@@ -1737,7 +1748,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	// todo: create maxLife variable since we can increase it with items
 	for (int i = 0; i < (player.stats.defensive.maxHealth / 10); i++, damagedLife -= 10)
 	{
-		Rectangle oneHeartRectangle = heartRectangle;
+		Engine::Rect oneHeartRectangle = heartRectangle;
 		oneHeartRectangle.width = oneHeartRectangle.height;
 		oneHeartRectangle.x += oneHeartRectangle.width * i;
 
@@ -1771,7 +1782,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			oneHeartRectangle,
 			{ 0,0 },
 			0.f,
-			WHITE
+			Engine::White
 		};
 		sceneRenderer.submitSprite(heart);
 	}
@@ -1826,7 +1837,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	// swap item
 	int hoveredSlot = getHoveredInventorySlot(
-		GetMousePosition(),
+		Engine::getMousePosition(),
 		inventoryRectangle,
 		player.inventory,
 		insideInventory
@@ -1881,7 +1892,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	// draw display name of item
 	if (hoveredSlot != -1)
 	{
-		Rectangle slotRect = getInventorySlotRect(hoveredSlot, inventoryRectangle, player.inventory);
+		Engine::Rect slotRect = getInventorySlotRect(hoveredSlot, inventoryRectangle, player.inventory);
 		ItemId hoveredItem = player.inventory.slots[hoveredSlot].itemId;
 		drawDisplayNameUI(hoveredItem, slotRect);
 	}
@@ -1933,22 +1944,23 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		float w = (float)GetScreenWidth();
 		float h = (float)GetScreenHeight();
 
-		Rectangle craftRectangle = getCraftRectangle(w, h);
+		// draw rect using renderer
+		Engine::Rect craftRectangle = getCraftRectangle(w, h);
 		craftRectangle = shrinkRectanglePercentage(craftRectangle, .01f, .01f);
-		DrawRectangleLinesEx(craftRectangle, 2, RED);
+		//DrawRectangleLinesEx(craftRectangle, 2, RED);
 
-		Rectangle recipeRect = getRecipeRectangle(w, h, craftRectangle);
+		Engine::Rect recipeRect = getRecipeRectangle(w, h, craftRectangle);
 		recipeRect = shrinkRectanglePercentage(recipeRect, .01f, .01f);
-		DrawRectangleLinesEx(recipeRect, 1, YELLOW);
+		//DrawRectangleLinesEx(recipeRect, 1, YELLOW);
 
-		Rectangle ingredientRect = getIngredientsRectangle(w, h, craftRectangle, recipeRect);
+		Engine::Rect ingredientRect = getIngredientsRectangle(w, h, craftRectangle, recipeRect);
 		ingredientRect = shrinkRectanglePercentage(ingredientRect, .01f, .01f);
-		DrawRectangleLinesEx(ingredientRect, 1, GREEN);
+		//DrawRectangleLinesEx(ingredientRect, 1, GREEN);
 
 		float baseCellSize = recipeRect.width * .7f;
 
 		// RECIPE
-		Rectangle oneCellRectangleRecipe = {};
+		Engine::Rect oneCellRectangleRecipe = {};
 		oneCellRectangleRecipe.width = baseCellSize;
 		oneCellRectangleRecipe.height = baseCellSize;
 		oneCellRectangleRecipe.x = recipeRect.x + (recipeRect.width - oneCellRectangleRecipe.width) * 0.5f;
@@ -1957,7 +1969,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		//DrawRectangleLinesEx(oneCellRectangleRecipe, 1, BLUE);
 
 		// INGREDIENT
-		Rectangle oneCellRectangleIngredient = {};
+		Engine::Rect oneCellRectangleIngredient = {};
 		oneCellRectangleIngredient.width = baseCellSize;
 		oneCellRectangleIngredient.height = baseCellSize;
 		oneCellRectangleIngredient.x = ingredientRect.x;
@@ -2018,15 +2030,15 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			bool canCraft = craftingResult.canCraft;
 
 			// item rectangle
-			Rectangle rr = oneCellRectangleRecipe;
+			Engine::Rect rr = oneCellRectangleRecipe;
 			rr.y += (i - Crafting::startPointer) * (oneCellRectangleRecipe.height + padding);
 			rr = shrinkRectanglePercentage(rr, .1f, .1f);
 
 			// item and bg colors
-			Color bg;
-			Color itemColor;
+			Engine::Color4f bg;
+			Engine::Color4f itemColor;
 
-			if (CheckCollisionPointRec(GetMousePosition(), rr))
+			if (Engine::checkCollisionPointRec(Engine::getMousePosition(), rr))
 			{
 				selectedRecipeIndex = i;
 
@@ -2044,16 +2056,17 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 				// Selected item
 				rr = enlargeRectanglePercentage(rr, .2f, .2f);
 				bg = { 255, 220, 20, 255 };
-				itemColor = canCraft ? WHITE : ColorAlpha(WHITE, 0.55f);
+				itemColor = canCraft ? Engine::White : Engine::colorAlpha(Engine::White, 0.55f);
 			}
 			else
 			{
 				// Normal slot
-				bg = canCraft ? Color{ 48, 125, 255, 255 } : Color{ 28, 55, 110, 255 };
-				itemColor = canCraft ? WHITE : ColorAlpha(WHITE, 0.4f);
+				bg = canCraft ? Engine::Color4f{ 48, 125, 255, 255 } : Engine::Color4f{ 28, 55, 110, 255 };
+				itemColor = canCraft ? Engine::White : Engine::colorAlpha(Engine::White, 0.4f);
 			}
 
-			DrawRectangleRounded(rr, .3f, 6, bg);
+			// draw rect using renderer
+			//DrawRectangleRounded(rr, .3f, 6, bg);
 
 			rr = shrinkRectanglePercentage(rr, .4f, .4f);
 
@@ -2084,7 +2097,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 			for (int j = 0; j < Recipes::all[itemType].ingredients.size(); j++)
 			{
-				Rectangle ri = oneCellRectangleIngredient;
+				Engine::Rect ri = oneCellRectangleIngredient;
 				ri.x += j * oneCellRectangleIngredient.width;
 				ri.y += (i - Crafting::startPointer) * (oneCellRectangleRecipe.height + padding);
 				ri = shrinkRectanglePercentage(ri, .3f, .3f);
@@ -2092,7 +2105,8 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 				int ingredient = selectedItemIngredients[j].itemId;
 				bool hasEnoughIngredients = Crafting::hasEnoughIngredients(player.inventory.slots, selectedItemIngredients[j]);
 
-				DrawRectangleRounded(ri, .3f, 1, { 48, 125, 255, 255 }); // blue color
+				// draw rect using renderer
+				//DrawRectangleRounded(ri, .3f, 1, { 48, 125, 255, 255 }); // blue color
 
 				ri = shrinkRectanglePercentage(ri, .25f, .25f);
 
@@ -2120,25 +2134,26 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 				sceneRenderer.submitSprite(craftingIngredient);
 
 				std::string str = std::to_string(selectedItemIngredients[j].count);
-				Vector2 textPos =
+				Engine::Vec2 textPos =
 				{
 					ri.x + ri.width * 0.5f,
 					ri.y + ri.height * 0.85f
 				};
-				Vector2 textSize = MeasureTextEx(GetFontDefault(), str.c_str(), 10.f, 1.f);
+				Engine::Vec2 textSize = Engine::measureTextEx(GetFontDefault(), str.c_str(), 10.f, 1.f);
 
-				DrawTextPro(
-					GetFontDefault(),
-					str.c_str(),
-					textPos,
-					{ textSize.x / 2.f, textSize.y / 2.f },
-					0.f,
-					10.f,
-					1.f,
-					hasEnoughIngredients ? Color{ 255, 255, 255, 200 } : RED
-				);
+				// draw text using renderer
+				//DrawTextPro(
+				//	GetFontDefault(),
+				//	str.c_str(),
+				//	textPos,
+				//	{ textSize.x / 2.f, textSize.y / 2.f },
+				//	0.f,
+				//	10.f,
+				//	1.f,
+				//	hasEnoughIngredients ? Engine::Color4f{ 255, 255, 255, 200 } : RED
+				//);
 
-				if (CheckCollisionPointRec(GetMousePosition(), ri))
+				if (Engine::checkCollisionPointRec(Engine::getMousePosition(), ri))
 				{
 					drawDisplayNameUI(selectedItemIngredients[j].itemId, ri);
 				}
@@ -2162,23 +2177,24 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	std::string strClock = hour + " : " + minute;
 
-	DrawTextEx(
-		GetFontDefault(),
-		strClock.c_str(),
-		{ 20,40 },
-		20,
-		5,
-		GREEN
-	);
+	// draw using renderer
+	//DrawTextEx(
+	//	GetFontDefault(),
+	//	strClock.c_str(),
+	//	{ 20,40 },
+	//	20,
+	//	5,
+	//	GREEN
+	//);
 
-	DrawTextEx(
-		GetFontDefault(),
-		phase_to_str(skyData.phase),
-		{ 120, 40 },
-		20,
-		5,
-		GREEN
-	);
+	//DrawTextEx(
+	//	GetFontDefault(),
+	//	phase_to_str(skyData.phase),
+	//	{ 120, 40 },
+	//	20,
+	//	5,
+	//	GREEN
+	//);
 
 #pragma endregion
 
@@ -2192,7 +2208,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		ImGui::Begin("Game Control");
 
 		ImGui::Text("Debug Tile Cords: ");
-		Vector2 mousePos = GetScreenToWorld2D(GetMousePosition(), camera);
+		Engine::Vec2 mousePos = Engine::getScreenToWorld2D(Engine::getMousePosition(), camera);
 		ImGui::Text("%.2f, %.2f", mousePos.x, mousePos.y);
 
 		std::string s = "Projectiles: ";
@@ -2359,11 +2375,11 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 void Gameplay::closeGame(Engine::AssetManager& assetManager) const
 {
-	UnloadRenderTexture(lightMask);
-	UnloadRenderTexture(sceneTexture);
-	UnloadRenderTexture(glowTexture);
-	UnloadRenderTexture(blurredLightTexture);
-	UnloadRenderTexture(blurredGlowTexture);
+	//UnloadRenderTexture(lightMask);
+	//UnloadRenderTexture(sceneTexture);
+	//UnloadRenderTexture(glowTexture);
+	//UnloadRenderTexture(blurredLightTexture);
+	//UnloadRenderTexture(blurredGlowTexture);
 
 	UnloadShader(assetManager.blurShader);
 	UnloadShader(assetManager.bloomShader);

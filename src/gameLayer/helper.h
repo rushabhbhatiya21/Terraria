@@ -1,16 +1,16 @@
 #pragma once
 #include <unordered_set>
-#include <raylib.h>
 #include <physics.h>
+#include <assets/texture.h>
 
-Rectangle getTextureAtlas(int x, int y, int cellSizePixelX, int cellSizePixelY, bool flipX = false);
+Engine::Rect getTextureAtlas(int x, int y, int cellSizePixelX, int cellSizePixelY, bool flipX = false);
 
-Rectangle getRectangleForEntity(Transform2D transform, float textureW, float textureH);
+Engine::Rect getRectangleForEntity(Transform2D transform, float textureW, float textureH);
 
-Rectangle getUVForTexture(Texture2D tex, Rectangle atlas);
+Engine::Rect getUVForTexture(Engine::Texture tex, Engine::Rect atlas);
 
-Rectangle flipTextureAtlasX(Rectangle r);
+Engine::Rect flipTextureAtlasX(Engine::Rect r);
 
-Rectangle shrinkUV(Rectangle in);
+Engine::Rect shrinkUV(Engine::Rect in);
 
 std::unordered_set<int> generateRandomItemArray(int max);

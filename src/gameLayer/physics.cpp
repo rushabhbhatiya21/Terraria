@@ -20,9 +20,9 @@ void PhysicalEntity::resolveConstrains(GameMap& mapData)
 	rightTouch = false;
 	standingOnPlatform = false;
 
-	Vector2& pos = transform.pos;
+	Engine::Vec2& pos = transform.pos;
 
-	float distance = Vector2Distance(pos, lastPosition);
+	float distance = Engine::Vec2Distance(pos, lastPosition);
 
 	if (distance == 0)
 	{
@@ -38,15 +38,15 @@ void PhysicalEntity::resolveConstrains(GameMap& mapData)
 	}
 	else
 	{
-		Vector2 newPos = lastPosition;
-		Vector2 delta = pos - lastPosition;
-		delta = Vector2Normalize(delta);
+		Engine::Vec2 newPos = lastPosition;
+		Engine::Vec2 delta = pos - lastPosition;
+		delta = Engine::Vec2Normalize(delta);
 		delta *= GRANULARITY * 0.99f;
 
 		do
 		{
 			newPos += delta;
-			Vector2 posTest = newPos;
+			Engine::Vec2 posTest = newPos;
 			checkCollisionOnce(mapData, newPos);
 
 			// check if checkCollisionOnce changed the pos, so collision happened
@@ -55,7 +55,7 @@ void PhysicalEntity::resolveConstrains(GameMap& mapData)
 				pos = newPos;
 				goto end;
 			}
-		} while (Vector2Length((newPos + delta) - pos) > GRANULARITY);
+		} while (Engine::Vec2Length((newPos + delta) - pos) > GRANULARITY);
 
 		// check last time
 		checkCollisionOnce(mapData, pos);
@@ -73,21 +73,21 @@ end:
 	if (downTouch && velocity.y > 0) { velocity.y = 0; }
 }
 
-void PhysicalEntity::checkCollisionOnce(GameMap& mapData, Vector2& pos)
+void PhysicalEntity::checkCollisionOnce(GameMap& mapData, Engine::Vec2& pos)
 {
-	Vector2 delta = pos - lastPosition;
+	Engine::Vec2 delta = pos - lastPosition;
 
-	Vector2 newPos = performCollisionsOnOneAxis(mapData, { pos.x, lastPosition.y }, { delta.x, 0 });
+	Engine::Vec2 newPos = performCollisionsOnOneAxis(mapData, { pos.x, lastPosition.y }, { delta.x, 0 });
 
 	pos = performCollisionsOnOneAxis(mapData, { newPos.x, pos.y }, { 0, delta.y });
 }
 
-Vector2 PhysicalEntity::performCollisionsOnOneAxis(GameMap& mapData, Vector2 pos, Vector2 delta)
+Engine::Vec2 PhysicalEntity::performCollisionsOnOneAxis(GameMap& mapData, Engine::Vec2 pos, Engine::Vec2 delta)
 {
 	if (delta.x == 0 && delta.y == 0) { return pos; }
 
 	// get entity dimentions
-	Vector2 dimentions = { transform.w, transform.h };
+	Engine::Vec2 dimentions = { transform.w, transform.h };
 
 	// make sure box that we check is bigger than entity collider box
 	int minX = floor(pos.x - dimentions.x / 2.f - 1);

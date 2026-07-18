@@ -1,18 +1,18 @@
 #pragma once
-#include <raylib.h>
 #include <cmath>
+#include <math/vec2.h>
 
 struct SecondOrderDynamics
 {
     // state
-    Vector2 xp;   // previous input
-    Vector2 y;    // output
-    Vector2 yd;   // output velocity
+    Engine::Vec2 xp;   // previous input
+    Engine::Vec2 y;    // output
+    Engine::Vec2 yd;   // output velocity
 
     // constants
     float k1, k2, k3;
 
-    //SecondOrderDynamics(float f, float z, float r, Vector2 x0)
+    //SecondOrderDynamics(float f, float z, float r, Engine::Vec2 x0)
     //{
     //    // compute constants
     //    float pi = 3.14159265359f;
@@ -26,7 +26,7 @@ struct SecondOrderDynamics
     //    yd = { 0.0f, 0.0f };
     //}
 
-    void init(float f, float z, float r, Vector2 x0)
+    void init(float f, float z, float r, Engine::Vec2 x0)
     {
         // compute constants
         float pi = 3.14159265359f;
@@ -40,7 +40,7 @@ struct SecondOrderDynamics
         yd = { 0.0f, 0.0f };
     }
 
-    Vector2 Update(float dt, Vector2 x, Vector2 xd = { 0.0f, 0.0f }, bool hasXd = false)
+    Engine::Vec2 Update(float dt, Engine::Vec2 x, Engine::Vec2 xd = { 0.0f, 0.0f }, bool hasXd = false)
     {
         if (dt <= 0.0f) return y;
 

@@ -1,9 +1,9 @@
 #pragma once
-#include <raylib.h>
+#include <math/vec2.h>
 
-Vector2 rotateAroundOrigin(const Vector2& point, float c, float s)
+inline Engine::Vec2 rotateAroundOrigin(const Engine::Vec2& point, float c, float s)
 {
 	float xDash = (point.x * c) - (point.y * s);
 	float yDash = (point.x * s) + (point.y * c);
-	return Vector2{ xDash, yDash };
+	return Engine::Vec2{ xDash, yDash };
 }

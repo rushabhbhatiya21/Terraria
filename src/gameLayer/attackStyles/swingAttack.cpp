@@ -23,13 +23,13 @@ void SwingAttack::render(Engine::AssetManager& assetManager, Engine::IRenderColl
 	if (!isPlayingAnimation) return;
 
 	auto& tex = getTextureForItemType(itemId, assetManager);
-	Rectangle  textureUVItem = getTextureCoordinatesForItemType(itemId);
+	Engine::Rect  textureUVItem = getTextureCoordinatesForItemType(itemId);
 
 	// player position
 	auto pos = owner->physics.transform.getAABB();
 
 	// approx. hand position
-	Vector2 handPos{};
+	Engine::Vec2 handPos{};
 	handPos.x = pos.x + (facingLeft ? 1.5f : .5f);
 	handPos.y = pos.y + 1.5f;
 
@@ -37,12 +37,12 @@ void SwingAttack::render(Engine::AssetManager& assetManager, Engine::IRenderColl
 	float weaponWidth = 1.0f;
 	float weaponHeight = 1.0f;
 
-	Rectangle destRect{};
+	Engine::Rect destRect{};
 	destRect.width = weaponWidth;
 	destRect.height = weaponHeight;
 
 	// Pivot inside the weapon sprite
-	Vector2 origin{};
+	Engine::Vec2 origin{};
 
 	if (facingLeft)
 	{
@@ -63,20 +63,20 @@ void SwingAttack::render(Engine::AssetManager& assetManager, Engine::IRenderColl
 		destRect,
 		origin,
 		currentSwingAngle,
-		WHITE
+		Engine::White
 	};
 	collector.submitSprite(sprite);
 }
 
-void SwingAttack::startSwing(Entity& owner, Vector2 mousePosition)
+void SwingAttack::startSwing(Entity& owner, Engine::Vec2 mousePosition)
 {
 	this->facingLeft = owner.animations.movingLeft;
 	this->itemId = owner.heldItem;
 
 	this->owner = &owner;
 	this->direction = facingLeft
-		? Vector2{ -1.f, 0.f }
-	    : Vector2{  1.f, 0.f };
+		? Engine::Vec2{ -1.f, 0.f }
+	    : Engine::Vec2{  1.f, 0.f };
 
 	// swing exists briefly
 	this->lifetime = owner.useTimer;
@@ -112,7 +112,7 @@ void SwingAttack::updateAnimation(float deltaTime)
 	weaponBase = owner->getPosition();
 
 	float t = 1.f - (swingTimer / animationDuration);
-	t = Clamp(t, 0.f, 1.f);
+	t = std::clamp(t, 0.f, 1.f);
 	t = t * t * (3.f - 2.f * t);
 
 	float startAngle, endAngle;
@@ -120,7 +120,7 @@ void SwingAttack::updateAnimation(float deltaTime)
 	if (!facingLeft) { startAngle = -210.f; endAngle = 90.f; }
 	else { startAngle = 210.f; endAngle = -90.f; }
 
-	currentSwingAngle = Lerp(startAngle, endAngle, t);
+	currentSwingAngle = Engine::Lerp(startAngle, endAngle, t);
 
 	float radians = DEG2RAD * currentSwingAngle;
 	weaponTip.x = weaponBase.x + cosf(radians) * weaponLength;
@@ -166,7 +166,7 @@ void SwingAttack::updateSwings(float deltaTime, GameMap& gameMap, EntityHolder& 
 
 	if (item->category != ItemCategory::TOOL) return;
 
-	Vector2i blockPos{
+	Engine::Vec2i blockPos{
 		(int)mousePosition.x,
 		(int)mousePosition.y
 	};
@@ -176,7 +176,7 @@ void SwingAttack::updateSwings(float deltaTime, GameMap& gameMap, EntityHolder& 
 
 	if (!b || !bDef || !bDef->block.isCollidable()) return;
 
-	float dist = Vector2Distance(blockPos.toVector2(), owner->getPosition());
+	float dist = Engine::Vec2Distance(blockPos.toVec2(), owner->getPosition());
 	int toolRange = item->tool.tool.range;
 
 	if (dist <= toolRange)
@@ -199,11 +199,11 @@ bool SwingAttack::checkForHits(Enemy& enemy) const
 
 	for (float t = 0; t <= 1; t += 0.2f)
 	{
-		Vector2 p = Vector2Lerp(weaponBase, weaponTip, t);
+		Engine::Vec2 p = Engine::Vec2Lerp(weaponBase, weaponTip, t);
 
 		//DrawCircleV(p, .1f, YELLOW);
 
-		if (CheckCollisionPointRec(p, enemy.physics.transform.getAABB()))
+		if (Engine::checkCollisionPointRec(p, enemy.physics.transform.getAABB()))
 		{
 			return true;
 		}
@@ -216,8 +216,8 @@ void SwingAttack::onHitEnemy(Enemy* enemy)
 	DamageInfo info;
 	info.attacker = owner;
 	info.hitDirection = facingLeft
-		? Vector2{ -1.f, 0.f }
-	    : Vector2{ 1.f, 0.f };;
+		? Engine::Vec2{ -1.f, 0.f }
+	    : Engine::Vec2{ 1.f, 0.f };;
 
 	// this will trigger onHit for each entity
 	CombatSystem::applyDamage(enemy, info);
@@ -227,7 +227,7 @@ void SwingAttack::onHitEnemy(Enemy* enemy)
 	return;
 }
 
-void SwingAttack::onHitBlock(int power, Vector2i blockPos, Block& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng)
+void SwingAttack::onHitBlock(int power, Engine::Vec2i blockPos, Block& b, GameMap& gameMap, EntityHolder& entityHolder, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
 	auto brokenType = b.type;
 	if (damageBlock(power, blockPos, b, particles, rng))
@@ -238,7 +238,7 @@ void SwingAttack::onHitBlock(int power, Vector2i blockPos, Block& b, GameMap& ga
 	return;
 }
 
-void SwingAttack::onHitTree(Vector2i blockPos, GameMap& gameMap, EntityHolder& entityHolder)
+void SwingAttack::onHitTree(Engine::Vec2i blockPos, GameMap& gameMap, EntityHolder& entityHolder)
 {
 	auto res = bfs(blockPos, gameMap);
 
@@ -253,15 +253,15 @@ void SwingAttack::onHitTree(Vector2i blockPos, GameMap& gameMap, EntityHolder& e
 	}
 }
 
-bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, Block& block, std::vector<Particle>& particles, std::ranlux24_base& rng)
+bool SwingAttack::damageBlock(int power, const Engine::Vec2i& blockPos, Block& block, std::vector<Particle>& particles, std::ranlux24_base& rng)
 {
 	// make particles global like popupText or camShake
 	triggerShake(blockPos.x, blockPos.y);
 	spawnParticles({ (float)blockPos.x, (float)blockPos.y }, rng, block.type, 10);
 
 	spawnPopupText(
-		blockPos.toVector2(),
-		Vector2{ 0, .1f },
+		blockPos.toVec2(),
+		Engine::Vec2{ 0, .1f },
 		std::to_string(power),
 		1,
 		.2f,
@@ -279,7 +279,7 @@ bool SwingAttack::damageBlock(int power, const Vector2i& blockPos, Block& block,
 	return false;
 }
 
-void SwingAttack::destroyBlock(const Vector2i& blockPos, Block& block, GameMap& gameMap, EntityHolder& entityHolder)
+void SwingAttack::destroyBlock(const Engine::Vec2i& blockPos, Block& block, GameMap& gameMap, EntityHolder& entityHolder)
 {
 	if (block.type == Items::air)
 		return;

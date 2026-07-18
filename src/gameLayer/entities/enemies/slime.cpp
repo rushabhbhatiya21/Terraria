@@ -36,7 +36,7 @@ void Slime::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollec
 		aabb,
 		{ 0,0 },
 		0.f,
-		WHITE
+		Engine::White
 	};
 	collector.submitSprite(sprite);
 }
@@ -75,7 +75,7 @@ bool Slime::update(float deltaTime, EntityUpdateData& data)
 	{
 		changeStateTimer = getRandomFloat(data.rng, 1, 7);
 
-		float distance = Vector2Distance(getPosition(), data.player.getPosition());
+		float distance = Vec2Distance(getPosition(), data.player.getPosition());
 
 		if (distance < 20.f)
 		{

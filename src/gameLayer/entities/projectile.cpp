@@ -17,10 +17,10 @@ void Projectile::render(Engine::AssetManager& assetManager, Engine::IRenderColle
 {
 	float size = .5f;
 
-	// not using getRectangleForEntity because we do not want bottom anchored sprite
-	//auto aabb = getRectangleForEntity(physics.transform, size, size);
+	// not using getEngine::RectForEntity because we do not want bottom anchored sprite
+	//auto aabb = getEngine::RectForEntity(physics.transform, size, size);
 
-	Rectangle renderRect
+	Engine::Rect renderRect
 	{
 		physics.transform.pos.x,
 		physics.transform.pos.y,
@@ -30,11 +30,9 @@ void Projectile::render(Engine::AssetManager& assetManager, Engine::IRenderColle
 
 	auto& tex = getTextureForItemType(itemType, assetManager);
 
-	Rectangle rectangle = getTextureCoordinatesForItemType(itemType, 32, 32, facingLeft);
-
 	//DrawTexturePro(
 	//	tex,
-	//	rectangle,
+	//	Engine::Rect,
 	//	renderRect,
 	//	{ size * 0.5f, size * 0.5f }, // want to rotate shuriken from middle
 	//	rotation,
@@ -44,11 +42,11 @@ void Projectile::render(Engine::AssetManager& assetManager, Engine::IRenderColle
 	Engine::Sprite projectileSprite
 	{
 		tex,
-		rectangle,
+		getTextureCoordinatesForItemType(itemType, 32, 32, facingLeft),
 		renderRect,
 		{ size * 0.5f, size * 0.5f }, // want to rotate shuriken from middle
 		rotation,
-		WHITE
+		Engine::White
 	};
 	collector.submitSprite(projectileSprite);
 }
@@ -99,7 +97,7 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			// todo: if it hits 
 			DamageInfo info;
 			info.attacker = this;
-			info.hitDirection = Vector2Normalize(physics.velocity);
+			info.hitDirection = Engine::Vec2Normalize(physics.velocity);
 
 			auto result = CombatSystem::applyDamage(e, info);
 
@@ -137,7 +135,7 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 			//hitCountTimer = HIT_COUNT_TIME;
 			DamageInfo info;
 			info.attacker = this;
-			info.hitDirection = Vector2Normalize(physics.velocity);
+			info.hitDirection = Engine::Vec2Normalize(physics.velocity);
 
 			auto result = CombatSystem::applyDamage(&data.player, info);
 
@@ -162,14 +160,14 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 }
 
 // done: have speed, should apply gravity, should update forces(pass through walls),  pierce count, lifetime etc. be part of projectile item
-void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Vector2 direction)
+void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHolder, Engine::Vec2 direction)
 {
 	auto id = entityHolder.idHolder.getEntityIdAndIncreament();
 	auto projectile = std::make_unique<Projectile>();
 
 	float offset = owner->animations.movingLeft ? .2f : -.2f;
 
-	Vector2 position = { owner->getPosition().x + offset, owner->getPosition().y };
+	Engine::Vec2 position = { owner->getPosition().x + offset, owner->getPosition().y };
 	ItemDefinition* item = getItem(stack.itemId);
 
 	if (!owner) return;
@@ -182,7 +180,7 @@ void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHold
 	projectile->stats.offensive += owner->stats.offensive;
 	projectile->teleport(position);
 	projectile->rotation = atan2f(direction.y, direction.x) * RAD2DEG - 90.f;
-	projectile->physics.velocity = Vector2Scale(Vector2Normalize(direction), item->ammo.projectile.speed);
+	projectile->physics.velocity = Engine::Vec2Scale(Engine::Vec2Normalize(direction), item->ammo.projectile.speed);
 	projectile->lifetime = item->ammo.projectile.lifetime;
 	projectile->shouldApplyGravity = item->ammo.projectile.affectedByGravity;
 	projectile->shouldResolveConstraints = item->ammo.projectile.shouldPassThroughWorld;
@@ -194,7 +192,7 @@ void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHold
 
 bool Projectile::checkCollisionWithTile(GameMap& gameMap)
 {
-	Rectangle projectileRect = physics.transform.getAABB();
+	Engine::Rect projectileRect = physics.transform.getAABB();
 
 	// projectile bounds in tile coordinates
 	int minX = (int)floor(projectileRect.x);
@@ -219,7 +217,7 @@ bool Projectile::checkCollisionWithTile(GameMap& gameMap)
 			Block* b = gameMap.getBlockSafe(x, y);
 			if (!b || !b->isCollidable()) continue;
 
-			Rectangle blockRect =
+			Engine::Rect blockRect =
 			{
 				(float)x,
 				(float)y,
@@ -227,7 +225,7 @@ bool Projectile::checkCollisionWithTile(GameMap& gameMap)
 				1.f
 			};
 
-			if (CheckCollisionRecs(projectileRect, blockRect))
+			if (Engine::checkCollisionRecs(projectileRect, blockRect))
 			{
 				return true;
 			}

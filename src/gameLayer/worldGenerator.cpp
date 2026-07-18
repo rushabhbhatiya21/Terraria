@@ -359,7 +359,7 @@ void generateWorld(GameMap& gameMap, const int w, const int h, int seed)
 
             if (type == Items::grassBlock)
             {
-                Vector2 spawnPos{ float(x) - treeStructure.w / 2.f, float(y) - treeStructure.h };
+                Engine::Vec2 spawnPos{ float(x) - treeStructure.w / 2.f, float(y) - treeStructure.h };
                 treeStructure.pasteIntoMap(gameMap, spawnPos);
                 x += 3;
             }

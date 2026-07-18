@@ -31,7 +31,7 @@ void DesertSlime::drawSprite(Engine::AssetManager& assetManager, Engine::IRender
 		aabb,
 		{ 0,0 },
 		0.f,
-		WHITE
+		Engine::White
 	};
 	collector.submitSprite(sprite);
 }
@@ -44,7 +44,7 @@ bool DesertSlime::update(float deltaTime, EntityUpdateData& data)
 	{
 		changeStateTimer = getRandomFloat(data.rng, 1, 7);
 
-		float distance = Vector2Distance(getPosition(), data.player.getPosition());
+		float distance = Engine::Vec2Distance(getPosition(), data.player.getPosition());
 
 		if (distance < 20.f)
 		{

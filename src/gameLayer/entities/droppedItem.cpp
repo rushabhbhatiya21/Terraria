@@ -27,7 +27,7 @@ void DroppedItem::render(Engine::AssetManager& assetManager, Engine::IRenderColl
 	auto aabb = getRectangleForEntity(physics.transform, size, size);
 
 	auto& tex = getTextureForItemType(itemType, assetManager);
-	Rectangle rectangle = getTextureCoordinatesForItemType(itemType);
+	auto& rectangle = getTextureCoordinatesForItemType(itemType);
 
 	//DrawTexturePro(
 	//	tex,
@@ -45,7 +45,7 @@ void DroppedItem::render(Engine::AssetManager& assetManager, Engine::IRenderColl
 		aabb,
 		{ 0,0 },
 		0.f,
-		WHITE
+		Engine::White
 	};
 
 	collector.submitSprite(sprite);
@@ -75,7 +75,7 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData& data)
 
 		if (itemType == other->itemType)
 		{
-			if (Vector2Distance(getPosition(), other->getPosition()) < 0.7f)
+			if (Engine::Vec2Distance(getPosition(), other->getPosition()) < 0.7f)
 			{
 				int otherMaxStackSize = getMaxStackSize(other->itemType);
 

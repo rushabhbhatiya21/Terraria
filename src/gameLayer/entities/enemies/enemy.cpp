@@ -44,7 +44,7 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 	baseX = physics.transform.getTop().x - (healthWidth / 2);
 
 	// enemy middle = healthBar middle
-	Rectangle healthBarPos = Rectangle
+	Engine::Rect healthBarPos = Engine::Rect
 	{
 		baseX,
 		physics.transform.getTop().y - .6f,
@@ -68,17 +68,17 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 		healthBarPos,
 		{ 0,0 },
 		0.f,
-		WHITE
+		Engine::White
 	};
 	collector.submitSprite(healthBarSprite);
 
 	healthBarPos.width = life * healthWidth / stats.defensive.maxHealth;
 
-	Color color = WHITE;
+	Engine::Color4f color = Engine::White;
 
 	if (life > stats.defensive.maxHealth * .7f)
 	{
-		color = LIME;
+		color = Engine::Lime;
 	}
 	else if (life > stats.defensive.maxHealth * .3f && life <= stats.defensive.maxHealth * .7f)
 	{
@@ -86,7 +86,7 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 	}
 	else
 	{
-		color = RED;
+		color = Engine::Red;
 	}
 
 	//DrawTexturePro(
@@ -105,7 +105,7 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 		healthBarPos,
 		{ 0,0 },
 		0.f,
-		WHITE
+		Engine::White
 	};
 	collector.submitSprite(healthSprite);
 
@@ -114,7 +114,7 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 		float progress = 1.f - (damageTakenHealthBarTimer / 2);
 		float fade = 1.f - pow(progress, 3.f);
 	
-		Rectangle r{
+		Engine::Rect r{
 			baseX + healthBarPos.width,
 			healthBarPos.y,
 			damageTaken * fade * healthWidth / stats.defensive.maxHealth,
@@ -137,7 +137,7 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 			r,
 			{ 0,0 },
 			0.f,
-			Color{ 255,255,255,80 }
+			Engine::Color4f{ 255,255,255,80 }
 		};
 		collector.submitSprite(healthSpriteTemp);
 	}

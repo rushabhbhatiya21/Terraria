@@ -4,7 +4,7 @@
 std::vector<PopupText> popupTexts;
 //static std::string critText = "CRITICAL";
 
-void spawnPopupText(Vector2 position, Vector2 velocity, std::string text, float lifetime, float size, float offset, Color color, bool crit)
+void spawnPopupText(Engine::Vec2 position, Engine::Vec2 velocity, std::string text, float lifetime, float size, float offset, Color color, bool crit)
 {
 	PopupText popup{};
 
@@ -65,7 +65,7 @@ void updatePopupText(float deltaTime)
 void DrawTextOutlined(
 	Font font,
 	const std::string& text,
-	Vector2 position,
+	Engine::Vec2 position,
 	float fontSize,
 	float spacing,
 	Color textColor,
@@ -81,29 +81,29 @@ void DrawTextOutlined(
 			if (x == 0 && y == 0)
 				continue;
 
-			DrawTextEx(
-				font,
-				text.c_str(),
-				{
-					position.x + x * thickness,
-					position.y + y * thickness
-				},
-				fontSize,
-				spacing,
-				outlineColor
-			);
+			//DrawTextEx(
+			//	font,
+			//	text.c_str(),
+			//	{
+			//		position.x + x * thickness,
+			//		position.y + y * thickness
+			//	},
+			//	fontSize,
+			//	spacing,
+			//	outlineColor
+			//);
 		}
 	}
 
-	// main text
-	DrawTextEx(
-		font,
-		text.c_str(),
-		position,
-		fontSize,
-		spacing,
-		textColor
-	);
+	//// main text
+	//DrawTextEx(
+	//	font,
+	//	text.c_str(),
+	//	position,
+	//	fontSize,
+	//	spacing,
+	//	textColor
+	//);
 }
 
 void drawPopuptext()
@@ -113,60 +113,29 @@ void drawPopuptext()
 		PopupText& popup = popupTexts[i];
 		if (popup.crit)
 		{
-			//Vector2 critSize = MeasureTextEx(
-			//	GetFontDefault(),
-			//	critText.c_str(),
-			//	popup.size,
-			//	0.02f
-			//);
-
-			//Vector2 damageSize = MeasureTextEx(
+			//DrawTextOutlined(
 			//	GetFontDefault(),
 			//	popup.text.c_str(),
-			//	popup.size,
-			//	0.02f
-			//);
-
-			//float maxWidth = std::max(critSize.x, damageSize.x);
-
-			//float critX = popup.position.x + (maxWidth - critSize.x) / 2.f;
-
-			//float damageX = popup.position.x + (maxWidth - damageSize.x) / 2.f;
-
-			//DrawTextOutlined(
-			//	GetFontDefault(), 
-			//	critText,
-			//	{ critX, popup.position.y },
-			//	popup.size,
-			//	0.02f,
+			//	popup.position,
+			//	popup.size * 2,
+			//	0.05f,
 			//	Color{ 255, 80, 80, 255 },
-			//	BLACK,
-			//	.05f
+			//	Color{ 0,0,0,160 },
+			//	.03f
 			//);
-
-			DrawTextOutlined(
-				GetFontDefault(),
-				popup.text.c_str(),
-				popup.position,
-				popup.size * 2,
-				0.05f,
-				Color{ 255, 80, 80, 255 },
-				Color{ 0,0,0,160 },
-				.03f
-			);
 		}
 		else
 		{
-			DrawTextOutlined(
-				GetFontDefault(),
-				popup.text.c_str(),
-				popup.position,
-				popup.size,
-				0.05f,
-				popup.color,
-				Color{ 0,0,0,160 },
-				.03f
-			);
+			//DrawTextOutlined(
+			//	GetFontDefault(),
+			//	popup.text.c_str(),
+			//	popup.position,
+			//	popup.size,
+			//	0.05f,
+			//	popup.color,
+			//	Color{ 0,0,0,160 },
+			//	.03f
+			//);
 		}
 		//DrawTextEx(
 		//	GetFontDefault(),

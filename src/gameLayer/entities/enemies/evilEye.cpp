@@ -54,7 +54,7 @@ void EvilEye::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColl
 		aabb,
 		{ 1.2f, 2.5f },
 		rotation,
-		WHITE
+		Engine::White
 	};
 	collector.submitSprite(sprite);
 }
@@ -92,7 +92,7 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 	//	break;
 	//}
 
-	Vector2 facingDirection = data.player.getPosition() - getPosition();
+	Engine::Vec2 facingDirection = data.player.getPosition() - getPosition();
 
 	// todo: hurt player faction
 	isColliding = physics.transform.intersectTransform(data.player.physics.transform);
@@ -143,7 +143,7 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 
 	if (currentState == EvilEyeState::POSITION_FOR_DASH)
 	{
-		if (Vector2Distance(getPosition(), dashPosition) < currentPhaseData->dashPositionEpsilon)
+		if (Engine::Vec2Distance(getPosition(), dashPosition) < currentPhaseData->dashPositionEpsilon)
 		{
 			enterState(EvilEyeState::DASH_WINDUP, data);
 		}
@@ -169,7 +169,7 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 			}
 			else
 			{
-				dashDirection = Vector2Normalize(data.player.getPosition() - getPosition());
+				dashDirection = Engine::Vec2Normalize(data.player.getPosition() - getPosition());
 				enterState(EvilEyeState::DASH, data);
 			}
 		}
@@ -210,7 +210,7 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 		moveDirection = hoverTarget - getPosition();
 
 		// if in range of desired position, statechangetimer decrese speed double
-		if (Vector2Length(moveDirection) <= 1.f && stateChangeTimer > 0)
+		if (Engine::Vec2Length(moveDirection) <= 1.f && stateChangeTimer > 0)
 			stateChangeTimer -= deltaTime;
 
 		moveSpeed = currentPhaseData->hoverSpeed;
@@ -258,20 +258,20 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 		break;
 	}
 
-	if (Vector2LengthSqr(moveDirection) > 0.0001f)
+	if (Engine::Vec2LengthSqr(moveDirection) > 0.0001f)
 	{
-		moveDirection = Vector2Normalize(moveDirection);
+		moveDirection = Engine::Vec2Normalize(moveDirection);
 	}
 
 	if (moveSpeed == 0.f)
 	{
-		physics.velocity = Vector2Lerp(physics.velocity, Vector2Zero(), 10.f * deltaTime);
+		physics.velocity = Engine::Vec2Lerp(physics.velocity, Engine::Vec2Zero(), 10.f * deltaTime);
 	}
 
-	if (moveSpeed != 0.f && moveDirection != Vector2{ 0,0 })
+	if (moveSpeed != 0.f && moveDirection != Engine::Vec2{ 0,0 })
 	{
-		Vector2 desiredVelocity = moveDirection * moveSpeed;
-		Vector2 steering = desiredVelocity - physics.velocity;
+		Engine::Vec2 desiredVelocity = moveDirection * moveSpeed;
+		Engine::Vec2 steering = desiredVelocity - physics.velocity;
 		physics.velocity += steering * currentPhaseData->moveAcceleration * deltaTime;
 		physics.transform.pos += physics.velocity * deltaTime;
 	}
@@ -299,8 +299,8 @@ void EvilEye::enterState(EvilEyeState newState, EntityUpdateData& data)
 	}
 	case EvilEyeState::POSITION_FOR_DASH:
 	{
-		Vector2 toPlayer = Vector2Normalize(data.player.getPosition() - getPosition());
-		Vector2 side = { -toPlayer.y,  toPlayer.x };
+		Engine::Vec2 toPlayer = Engine::Vec2Normalize(data.player.getPosition() - getPosition());
+		Engine::Vec2 side = { -toPlayer.y,  toPlayer.x };
 		dashPosition =
 		{
 			data.player.getPosition().x + side.x * currentPhaseData->dashSideOffset,
@@ -311,7 +311,7 @@ void EvilEye::enterState(EvilEyeState newState, EntityUpdateData& data)
 	}
 	case EvilEyeState::DASH_WINDUP:
 	{
-		dashDirection = Vector2Normalize(data.player.getPosition() - getPosition());
+		dashDirection = Engine::Vec2Normalize(data.player.getPosition() - getPosition());
 		stateChangeTimer = currentPhaseData->dashWindupTime;
 		break;
 	}
@@ -346,7 +346,7 @@ void EvilEye::spawnServant(EntityUpdateData& data)
 {
 	float offset = getRandomFloat(data.rng, 0.f, 360.f);
 	float angle = (offset + 120.f * spawnedServantsCount) * DEG2RAD;
-	Vector2 spawnVel = { cosf(angle) * 5.f, sinf(angle) * 5.f };
+	Engine::Vec2 spawnVel = { cosf(angle) * 5.f, sinf(angle) * 5.f };
 	spawnManager.spawnEnemy<EvilEyeServant>(data.entityHolder, getPosition(), spawnVel);
 }
 

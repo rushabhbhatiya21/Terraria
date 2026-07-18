@@ -1,7 +1,6 @@
 #pragma once
 #include <vector>
-#include <raylib.h>
-
+#include <math/vec2.h>
 #include <items/blocks.h>
 
 struct GameMap;
@@ -18,6 +17,6 @@ struct Structure
 	Block& getBlockUnsafe(int x, int y);
 	Block* getBlockSafe(int x, int y);
 
-	void copyFromMap(GameMap& map, Vector2 start, Vector2 end);
-	void pasteIntoMap(GameMap& map, Vector2 start);
+	void copyFromMap(GameMap& map, Engine::Vec2 start, Engine::Vec2 end);
+	void pasteIntoMap(GameMap& map, Engine::Vec2 start);
 };

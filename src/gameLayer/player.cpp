@@ -43,14 +43,14 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 	playerSprite.pos.y -= (playerSprite.h - physics.transform.h) / 2;
 
 	auto aabb = playerSprite.getAABB();
-	Rectangle textureUV = getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft);
+	Engine::Rect textureUV = getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft);
 
 	// --- BACK LAYER ---
-	//DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
-	//DrawTexturePro(assetManager.getHeadTexture(equipments.helmet.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
-	//DrawTexturePro(assetManager.getBackTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	//DrawTexturePro(assetManager.getFeetTexture(equipments.boots.itemId), textureUV, aabb, { 0,0 }, 0.f, Engine::White);
+	//DrawTexturePro(assetManager.getHeadTexture(equipments.helmet.itemId), textureUV, aabb, { 0,0 }, 0.f, Engine::White);
+	//DrawTexturePro(assetManager.getBackTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, Engine::White);
 	// --- FRONT LAYER ---
-	//DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, WHITE);
+	//DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, Engine::White);
 
 	Engine::Sprite bootsSprite
 	{
@@ -59,7 +59,7 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		aabb,
 		{0,0},
 		0.f,
-		WHITE
+		Engine::White
 	};
 
 	Engine::Sprite helmetSprite
@@ -69,7 +69,7 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		aabb,
 		{0,0},
 		0.f,
-		WHITE
+		Engine::White
 	};
 
 	Engine::Sprite backChestSprite
@@ -79,7 +79,7 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		aabb,
 		{0,0},
 		0.f,
-		WHITE
+		Engine::White
 	};
 
 	Engine::Sprite frontChectSprite
@@ -89,7 +89,7 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		aabb,
 		{0,0},
 		0.f,
-		WHITE
+		Engine::White
 	};
 
 	collector.submitSprite(bootsSprite);
@@ -114,16 +114,16 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		break;
 	case AttackStyle::SHOOT:
 	{
-		auto& textureItem   = getTextureForItemType(heldItem, assetManager);
-		Rectangle textureUVItem = getTextureCoordinatesForItemType(heldItem, 32, 32, animations.movingLeft);
+		auto& textureItem = getTextureForItemType(heldItem, assetManager);
+		Engine::Rect textureUVItem = getTextureCoordinatesForItemType(heldItem, 32, 32, animations.movingLeft);
 
-		Rectangle destRect{};
-		destRect.width  = 1.0;
+		Engine::Rect destRect{};
+		destRect.width = 1.0;
 		destRect.height = 1.0;
 		destRect.x = playerSprite.getCenter().x + (animations.movingLeft ? -.6f : .6f);
 		destRect.y = playerSprite.getCenter().y;
 
-		//DrawTexturePro(textureItem, textureUVItem, destRect, { 0.5f,0.5f }, 0.f, WHITE);
+		//DrawTexturePro(textureItem, textureUVItem, destRect, { 0.5f,0.5f }, 0.f, Engine::White);
 		Engine::Sprite heldItemSprite
 		{
 			textureItem,
@@ -131,7 +131,7 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 			destRect,
 			{.5f,.5f},
 			.0f,
-			WHITE
+			Engine::White
 		};
 		collector.submitSprite(heldItemSprite);
 		break;

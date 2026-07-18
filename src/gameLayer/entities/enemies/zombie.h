@@ -1,5 +1,6 @@
 #pragma once
 #include "enemy.h"
+#include <math/vec2.h>
 
 struct Zombie : public Enemy
 {
@@ -33,7 +34,7 @@ struct Zombie : public Enemy
 
 	//void enterState(int newState, EntityUpdateData& entityUpdateData);
 
-	bool shouldStepUp(Vector2 playerPos, GameMap& gameMap);
+	bool shouldStepUp(Engine::Vec2 playerPos, GameMap& gameMap);
 
 	bool isOnLedge(GameMap& gameMap);
 
@@ -43,7 +44,7 @@ struct Zombie : public Enemy
 
 	//void enterState(int newState, EntityUpdateData& entityUpdateData) override;
 
-	//bool shouldStepUp(Vector2 playerPos, GameMap& gameMap) override;
+	//bool shouldStepUp(Engine::Vec2 playerPos, GameMap& gameMap) override;
 
 	//bool isOnLedge(GameMap& gameMap) override;
 

@@ -1,4 +1,6 @@
 #pragma once
+#include <math/vec2.h>
+#include <math/color.h>
 #include <physics.h>
 #include <randomStuff.h>
 #include <entityAnimation.h>
@@ -20,7 +22,7 @@ struct Enemy : public Entity
 	float baseX = 0;
 	int shaderLoc = -1;
 
-	Vector2& getPosition()
+	Engine::Vec2& getPosition()
 	{
 		return physics.getPosition();
 	}
@@ -44,7 +46,7 @@ struct Enemy : public Entity
 
 	//virtual void enterState(int newState, EntityUpdateData& entityUpdateData) = 0;
 
-	//virtual bool shouldStepUp(Vector2 playerPos, GameMap& gameMap) = 0;
+	//virtual bool shouldStepUp(Engine::Vec2 playerPos, GameMap& gameMap) = 0;
 
 	//virtual bool isOnLedge(GameMap& gameMap) = 0;
 

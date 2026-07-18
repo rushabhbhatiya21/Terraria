@@ -1,5 +1,5 @@
 #pragma once
-#include <raylib.h>
+#include <math/vec2.h>
 #include "../items/item.h"
 
 struct Entity;
@@ -10,5 +10,5 @@ struct ThrowAttack
 	ItemId itemId = Items::air;
 	Entity* owner = nullptr;
 
-	void use(EntityHolder& entityHolder, ItemStack& stack, Vector2 direction);
+	void use(EntityHolder& entityHolder, ItemStack& stack, Engine::Vec2 direction);
 };

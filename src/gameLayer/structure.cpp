@@ -32,7 +32,7 @@ Block* Structure::getBlockSafe(int x, int y)
 	return &mapData[x + y * w];
 }
 
-void Structure::copyFromMap(GameMap& map, Vector2 start, Vector2 end)
+void Structure::copyFromMap(GameMap& map, Engine::Vec2 start, Engine::Vec2 end)
 {
 	if (end.x > map.w) { end.x = map.w - 1; }
 	if (start.x > map.w) { start.x = map.w - 1; }
@@ -46,7 +46,7 @@ void Structure::copyFromMap(GameMap& map, Vector2 start, Vector2 end)
 	if (start.x > end.x) { std::swap(start.x, end.x); }
 	if (start.y > end.y) { std::swap(start.y, end.y); }
 
-	Vector2 size = Vector2{ end.x - start.x + 1, end.y - start.y + 1 };
+	Engine::Vec2 size = Engine::Vec2{ end.x - start.x + 1, end.y - start.y + 1 };
 
 	if (size.x > map.w) { return; }
 	if (size.y > map.h) { return; }
@@ -62,7 +62,7 @@ void Structure::copyFromMap(GameMap& map, Vector2 start, Vector2 end)
 	}
 }
 
-void Structure::pasteIntoMap(GameMap& map, Vector2 start)
+void Structure::pasteIntoMap(GameMap& map, Engine::Vec2 start)
 {
 	for (int y = 0; y < h; y++)
 	{

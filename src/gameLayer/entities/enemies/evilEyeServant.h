@@ -40,7 +40,7 @@ struct EvilEyeServant : public Enemy
 	bool isColliding = false;
 	bool wasColliding = false;
 
-	Vector2 moveDirection = {};
+	Engine::Vec2 moveDirection = {};
 
 	ServantState currentState = ServantState::CHASING;
 	ServantState previousState = currentState;

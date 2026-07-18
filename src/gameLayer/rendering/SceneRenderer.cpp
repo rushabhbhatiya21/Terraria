@@ -1,4 +1,5 @@
 #include "sceneRenderer.h"
+#include <window/window.h>
 #include <array>
 #include <rendering/spriteBatch.h>
 #include <rendering/IRenderBackend.h>
@@ -13,10 +14,10 @@ void SceneRenderer::beginFrame()
 	backend.beginFrame();
 }
 
-void SceneRenderer::beginPass(Engine::RenderPass pass, Camera2D& camera)
+void SceneRenderer::beginPass(Engine::RenderPass pass, Engine::Cam& camera)
 {
-	float screenWidth = (float)GetScreenWidth();
-	float screenHeight = (float)GetScreenHeight();
+	float screenWidth = (float)Engine::getScreenWidth();
+	float screenHeight = (float)Engine::getScreenHeight();
 
 	std::array<float, 16> projection {};
 	switch (pass)

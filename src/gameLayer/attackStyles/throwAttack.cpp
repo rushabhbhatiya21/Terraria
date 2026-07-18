@@ -3,7 +3,7 @@
 #include "entity.h"
 #include "../entities/projectile.h"
 
-void ThrowAttack::use(EntityHolder& entityHolder, ItemStack& stack, Vector2 direction)
+void ThrowAttack::use(EntityHolder& entityHolder, ItemStack& stack, Engine::Vec2 direction)
 {
 	if (!owner) return;
 	if (stack.count <= 0) return;

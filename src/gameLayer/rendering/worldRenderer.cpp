@@ -1,5 +1,4 @@
 ﻿#include "worldRenderer.h"
-#include <raylib.h>
 #include <world/chunk.h>
 #include <helper.h>
 #include <shake.h>
@@ -49,7 +48,7 @@ void WorldRenderer::rebuildChunkRenderData(const int cx, const int cy)
 
 			int worldX = cx * CHUNK_SIZE + lx;
 			int worldY = cy * CHUNK_SIZE + ly;
-			Rectangle srcRect = getTextureAtlas(b.type, 0, 32, 32);
+			Engine::Rect srcRect = getTextureAtlas(b.type, 0, 32, 32);
 
 			chunk.renderData.addTile(worldX, worldY, srcRect, &b);
 		}
@@ -88,14 +87,14 @@ void WorldRenderer::drawBlocks(int startYView, int endYView, int startXView, int
 
 void WorldRenderer::drawTile(const CachedTile& tile, Engine::IRenderCollector& collector)
 {
-	Vector2 shake = getShakeOffset((int)tile.position.x, (int)tile.position.y);
+	Engine::Vec2 shake = getShakeOffset((int)tile.position.x, (int)tile.position.y);
 
 	float drawX = (tile.position.x * TILE_SIZE) + shake.x;
 	float drawY = (tile.position.y * TILE_SIZE) + shake.y;
 
 	float l = (std::max((float)tile.block->light, (float)tile.block->sunLight)) * 17.0f;
 
-	Color tint = {
+	Engine::Color4f tint = {
 		(uint8_t)l,
 		(uint8_t)l,
 		(uint8_t)l,
@@ -269,7 +268,7 @@ void WorldRenderer::drawTile(const CachedTile& tile, Engine::IRenderCollector& c
 //				if (b.type > Items::LAST_BLOCK)
 //					b.variation = 0;
 //
-//				Vector2 shake = getShakeOffset(x, y);
+//				Engine::Vec2 shake = getShakeOffset(x, y);
 //
 //				float drawX = posX + shake.x;
 //				float drawY = posY + shake.y;

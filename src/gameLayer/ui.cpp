@@ -1,21 +1,22 @@
 #include "ui.h"
+#include <input/input.h>
 
 // top
-Rectangle placeRectangleTopLeft(Rectangle r)
+Engine::Rect placeRectangleTopLeft(Engine::Rect r)
 {
 	r.x = 0;
 	r.y = 0;
 	return r;
 }
 
-Rectangle placeRectangleCenterTop(Rectangle r, float w)
+Engine::Rect placeRectangleCenterTop(Engine::Rect r, float w)
 {
 	r.x = (w - r.width) / 2.0f;
 	r.y = 0;
 	return r;
 }
 
-Rectangle placeReactangleTopRightCorner(Rectangle r, float w)
+Engine::Rect placeReactangleTopRightCorner(Engine::Rect r, float w)
 {
 	r.x = w - r.width;
 	r.y = 0;
@@ -23,21 +24,21 @@ Rectangle placeReactangleTopRightCorner(Rectangle r, float w)
 }
 
 // center
-Rectangle placeRectangleCenter(Rectangle r, float w, float h)
+Engine::Rect placeRectangleCenter(Engine::Rect r, float w, float h)
 {
 	r.x = (w - r.width) * 0.5f;
 	r.y = (h - r.height) * 0.5f;
 	return r;
 }
 
-Rectangle placeRectangleCenterLeft(Rectangle r, float h)
+Engine::Rect placeRectangleCenterLeft(Engine::Rect r, float h)
 {
 	r.x = 0;
 	r.y = (h - r.height) * 0.5f;
 	return r;
 }
 
-Rectangle placeRectangleCenterRight(Rectangle r, float w, float h)
+Engine::Rect placeRectangleCenterRight(Engine::Rect r, float w, float h)
 {
 	r.x = (w - r.width) / 2.0f;
 	r.y = (h - r.height) * 0.5f;
@@ -45,21 +46,21 @@ Rectangle placeRectangleCenterRight(Rectangle r, float w, float h)
 }
 
 // bottom
-Rectangle placeRectangleBottomLeftCorner(Rectangle r, float h)
+Engine::Rect placeRectangleBottomLeftCorner(Engine::Rect r, float h)
 {
 	r.x = 0;
 	r.y = h - r.height;
 	return r;
 }
 
-Rectangle placeRectangleBottom(Rectangle r, float w, float h)
+Engine::Rect placeRectangleBottom(Engine::Rect r, float w, float h)
 {
 	r.x = (w - r.width) * 0.5f;
 	r.y = h - r.height;
 	return r;
 }
 
-Rectangle placeRectangleBottomRightCorner(Rectangle r, float w, float h)
+Engine::Rect placeRectangleBottomRightCorner(Engine::Rect r, float w, float h)
 {
 	r.x = w - r.width;
 	r.y = h - r.height;
@@ -67,7 +68,7 @@ Rectangle placeRectangleBottomRightCorner(Rectangle r, float w, float h)
 }
 
 // enlarge and shrink
-Rectangle enlargeRectanglePixels(Rectangle r, float pixelsX, float pixelsY)
+Engine::Rect enlargeRectanglePixels(Engine::Rect r, float pixelsX, float pixelsY)
 {
 	r.width += pixelsX;
 	r.height += pixelsY;
@@ -77,7 +78,7 @@ Rectangle enlargeRectanglePixels(Rectangle r, float pixelsX, float pixelsY)
 	return r;
 }
 
-Rectangle enlargeRectanglePercentage(Rectangle r, float percentageX, float percentageY)
+Engine::Rect enlargeRectanglePercentage(Engine::Rect r, float percentageX, float percentageY)
 {
 	float enlargeX = r.width * percentageX;
 	float enlargeY = r.height * percentageY;
@@ -91,7 +92,7 @@ Rectangle enlargeRectanglePercentage(Rectangle r, float percentageX, float perce
 	return r;
 }
 
-Rectangle shrinkRectanglePercentage(Rectangle r, float percentageX, float percentageY)
+Engine::Rect shrinkRectanglePercentage(Engine::Rect r, float percentageX, float percentageY)
 {
 	float shrinkX = r.width * percentageX;
 	float shrinkY = r.height * percentageY;
@@ -109,7 +110,7 @@ void UIEngine::updateAndRender()
 	float w = GetScreenWidth();
 	float h = GetScreenHeight();
 
-	Rectangle oneButtonRectangle = {};
+	Engine::Rect oneButtonRectangle = {};
 	oneButtonRectangle.width = w * .8f;
 	oneButtonRectangle.height = h / (widgets.size() + 1);
 
@@ -122,11 +123,11 @@ void UIEngine::updateAndRender()
 
 	for (auto& w : widgets)
 	{
-		Rectangle smallerRect = shrinkRectanglePercentage(oneButtonRectangle, .01f, .1f);
+		Engine::Rect smallerRect = shrinkRectanglePercentage(oneButtonRectangle, .01f, .1f);
 
 		//DrawRectangle(smallerRect.x, smallerRect.y, smallerRect.width, smallerRect.height, { 90,90,110,205 });
 
-		auto drawText = [&](Rectangle smallerRect, float yOffset = 0)
+		auto drawText = [&](Engine::Rect smallerRect, float yOffset = 0)
 			{
 				int textWidth = MeasureText(w.text.c_str(), fontSize);
 				int textHeight = fontSize; // in raylib font height = font size default
@@ -144,7 +145,7 @@ void UIEngine::updateAndRender()
 		w.isBeingClicked = false;
 		w.isReleased = false;
 
-		if (CheckCollisionPointRec(GetMousePosition(), smallerRect))
+		if (Engine::checkCollisionPointRec(Engine::getMousePosition(), smallerRect))
 		{
 			w.isHovered = true;
 

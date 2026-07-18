@@ -7,7 +7,7 @@ void CameraShake::triggerCameraShake(float duration, float strength)
     this->time = duration;
     this->duration = duration;
     this->strength = strength;
-    this->phase = GetRandomValue(0, 1000) / 100.0f;
+    this->phase = randomFloat(0, 1000) / 100.0f;
 }
 
 void CameraShake::updateCameraShake(float dt)

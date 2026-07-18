@@ -3,7 +3,7 @@
 #include "entity.h"
 #include "../entities/projectile.h"
 
-void ShootAttack::use(EntityHolder& entityHolder, Vector2 direction)
+void ShootAttack::use(EntityHolder& entityHolder, Engine::Vec2 direction)
 {
 	auto* equippedItem = getItem(owner->heldItem);
 
