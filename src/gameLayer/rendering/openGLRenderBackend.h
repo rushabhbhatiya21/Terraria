@@ -23,9 +23,9 @@ namespace Engine
 		void endFrame() override;
 
 	private:
-		//size_t growCapacity(size_t current, size_t required) const;
-		//void ensureBufferCapacity(size_t vertexCount, size_t indexCount);
-		//void configureVertexAttributes();
+		size_t growCapacity(size_t current, size_t required) const;
+		void ensureBufferCapacity(size_t vertexCount, size_t indexCount);
+		void configureVertexAttributes();
 		GLuint compileShader(GLenum type, const std::string& source);
 		GLuint createShaderProgram(GLuint vertexShader, GLuint fragmentShader);
 		void beginExternalRendering();
@@ -33,7 +33,7 @@ namespace Engine
 
 	private:
 		// GPU Resources
-		GLuint shaderProgramHandle = 0;
+		GLuint m_shaderProgramHandle = 0;
 
 		GLint m_projectionLocation = -1;
 		GLint m_textureLocation = -1;
@@ -45,6 +45,11 @@ namespace Engine
 
 		size_t m_vertexCapacity = 0;
 		size_t m_indexCapacity = 0;
+
+		// for caching
+		GLuint m_currentTexture = 0;
+		GLuint m_currentProgram = 0;
+		GLuint m_currentVertexArray = 0;
 
 		// to save raylib state
 		GLint prevFBO = 0, prevProgram = 0, prevVAO = 0, prevVBO = 0, prevEBO = 0;

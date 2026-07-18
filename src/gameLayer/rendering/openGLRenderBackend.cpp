@@ -35,49 +35,27 @@ namespace Engine
 			return false;
 		}
 
-		shaderProgramHandle = createShaderProgram(vertShaderHandle, fragShaderHandle);
-		if (shaderProgramHandle == 0)
+		m_shaderProgramHandle = createShaderProgram(vertShaderHandle, fragShaderHandle);
+		if (m_shaderProgramHandle == 0)
 		{
 			std::cout << "Compile shader program failed. = " << this << '\n';
 			return false;
 		}
 
-		glUseProgram(shaderProgramHandle);
+		glUseProgram(m_shaderProgramHandle);
 
-		m_projectionLocation = glGetUniformLocation(shaderProgramHandle, "uProjection");
+		m_projectionLocation = glGetUniformLocation(m_shaderProgramHandle, "uProjection");
 		if (m_projectionLocation == -1)
 		{
 			std::cout << "Get Projection failed. = " << this << '\n';
 			//return false;
 		}
 
-		m_textureLocation = glGetUniformLocation(shaderProgramHandle, "uTexture");
+		m_textureLocation = glGetUniformLocation(m_shaderProgramHandle, "uTexture");
 		if (m_textureLocation != -1)
 		{
 			glUniform1i(m_textureLocation, 0);
 		}
-
-		//// build projection
-		//projection = buildProjectionMatrix((float)GetScreenWidth(), (float)GetScreenHeight());
-		//glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, projection.data());
-
-		// bind vertex buffer
-		glGenBuffers(1, &m_vertexBufferHandle);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferHandle);
-
-		// bind index buffer
-		glGenBuffers(1, &m_indexBufferHandle);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferHandle);
-
-		// describe vao
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, position)));
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, uv)));
-		glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tint)));
-
-		// enable vao
-		glEnableVertexAttribArray(0);
-		glEnableVertexAttribArray(1);
-		glEnableVertexAttribArray(2);
 
 		// unbind vao
 		glBindVertexArray(0);
@@ -95,7 +73,7 @@ namespace Engine
 			<< "Generated VAO=" << m_vertexArrayHandle
 			<< " Generated VBO=" << m_vertexBufferHandle
 			<< " Generated EBO=" << m_indexBufferHandle
-			<< " ShaderProgram=" << shaderProgramHandle
+			<< " ShaderProgram=" << m_shaderProgramHandle
 			<< '\n';
 
 		std::cout << "sizeof(Vertex) = " << sizeof(Vertex) << '\n';
@@ -117,27 +95,131 @@ namespace Engine
 
 	}
 
+	size_t OpenGLRenderBackend::growCapacity(size_t current, size_t required) const
+	{
+		if (current == 0)
+			current = 256;
+
+		while (current < required)
+			current *= 2;
+
+		return current;
+	}
+
+	void OpenGLRenderBackend::ensureBufferCapacity(size_t vertexCount, size_t indexCount)
+	{
+		bool buffersRecreated = false;
+
+		if (m_vertexCapacity < vertexCount)
+		{
+			auto newCapacity = growCapacity(m_vertexCapacity, vertexCount);
+
+			// bind vertex buffer
+			GLuint vbo;
+			glGenBuffers(1, &vbo);
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			glBufferData(GL_ARRAY_BUFFER, newCapacity * sizeof(Vertex), nullptr, GL_DYNAMIC_DRAW);
+
+			// Vertex buffer growth
+			if (vbo != 0)
+			{
+				if (m_vertexBufferHandle != 0)
+					glDeleteBuffers(1, &m_vertexBufferHandle);
+
+				m_vertexBufferHandle = vbo;
+				m_vertexCapacity = newCapacity;
+				buffersRecreated = true;
+			}
+		}
+
+		if (m_indexCapacity < indexCount)
+		{
+			auto newCapacity = growCapacity(m_indexCapacity, indexCount);
+
+			// bind index buffer
+			GLuint ebo;
+			glGenBuffers(1, &ebo);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, newCapacity * sizeof(Index), nullptr, GL_DYNAMIC_DRAW);
+
+			// Index buffer growth
+			if (ebo != 0)
+			{
+				if (m_indexBufferHandle != 0)
+					glDeleteBuffers(1, &m_indexBufferHandle);
+
+				m_indexBufferHandle = ebo;
+				m_indexCapacity = newCapacity;
+				buffersRecreated = true;
+			}
+		}
+
+		if (buffersRecreated && m_vertexBufferHandle != 0 && m_indexBufferHandle != 0)
+		{
+			glBindVertexArray(m_vertexArrayHandle);
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferHandle);
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferHandle);
+
+			configureVertexAttributes();
+
+			glBindVertexArray(0);
+		}
+	}
+
+	void OpenGLRenderBackend::configureVertexAttributes()
+	{
+		// describe vao
+		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, position)));
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, uv)));
+		glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), reinterpret_cast<void*>(offsetof(Vertex, tint)));
+
+		// enable vao
+		glEnableVertexAttribArray(0);
+		glEnableVertexAttribArray(1);
+		glEnableVertexAttribArray(2);
+	}
+
 	void OpenGLRenderBackend::render(const std::vector<Vertex>& vertexBuffer, const std::vector<Index>& indexBuffer, const std::vector<DrawCommand>& drawCommands)
 	{
+		m_currentTexture = 0;
+		m_currentProgram = 0;
+		m_currentVertexArray = 0;
+
 		beginExternalRendering();
 
-		glBindVertexArray(m_vertexArrayHandle);
-		glUseProgram(shaderProgramHandle);
+		ensureBufferCapacity(vertexBuffer.size(), indexBuffer.size());
+
+		if (m_currentVertexArray != m_vertexArrayHandle)
+		{
+			glBindVertexArray(m_vertexArrayHandle);
+			m_currentVertexArray = m_vertexArrayHandle;
+		}
+
+		if (m_currentProgram != m_shaderProgramHandle)
+		{
+			glUseProgram(m_shaderProgramHandle);
+			m_currentProgram = m_shaderProgramHandle;
+		}
 
 		// upload vertex buffer
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferHandle);
-		glBufferData(GL_ARRAY_BUFFER, vertexBuffer.size() * sizeof(Vertex), vertexBuffer.data(), GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBuffer.size() * sizeof(Vertex), vertexBuffer.data());
 
 		// upload index buffer
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferHandle);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexBuffer.size() * sizeof(Index), indexBuffer.data(), GL_DYNAMIC_DRAW);
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, indexBuffer.size() * sizeof(Index), indexBuffer.data());
+
+		glActiveTexture(GL_TEXTURE0);
 
 		for (auto& cmd : drawCommands)
 		{
 			GLuint textureId = static_cast<GLuint>(cmd.renderState.texture->getNativeHandle());
-			assert(glIsTexture(textureId));
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, textureId);
+
+			if (m_currentTexture != textureId)
+			{
+				glBindTexture(GL_TEXTURE_2D, textureId);
+				m_currentTexture = textureId;
+			}
 
 			// draw — indices are already absolute, no baseVertex needed
 			size_t indexOffset = cmd.firstIndex * sizeof(Index);
@@ -276,7 +358,7 @@ namespace Engine
 		std::cout << "Stored VBO = " << m_vertexBufferHandle << '\n';
 		std::cout << "Stored EBO = " << m_indexBufferHandle << '\n';
 		std::cout << "Stored VAO = " << m_vertexArrayHandle << '\n';
-		std::cout << "Stored Program = " << shaderProgramHandle << '\n';
+		std::cout << "Stored Program = " << m_shaderProgramHandle << '\n';
 
 		std::vector<Vertex> vertices =
 		{
@@ -307,7 +389,7 @@ namespace Engine
 		glViewport(0, 0, GetScreenWidth(), GetScreenHeight());
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		glUseProgram(shaderProgramHandle);
+		glUseProgram(m_shaderProgramHandle);
 
 		GLint program = 0;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &program);
@@ -371,7 +453,7 @@ namespace Engine
 
 	void OpenGLRenderBackend::setProjection(std::array<float, 16>& projection)
 	{
-		glUseProgram(shaderProgramHandle);
+		glUseProgram(m_shaderProgramHandle);
 		glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, projection.data());
 	}
 }
