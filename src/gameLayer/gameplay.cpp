@@ -8,6 +8,7 @@
 #include <audio.h>
 #include <settings.h>
 
+#include <assets/font.h>
 #include <assets/assetManager.h>
 #include <helper.h>
 #include <saveMap.h>
@@ -17,7 +18,6 @@
 #include <shake.h>
 #include <lighting.h>
 #include <rendering/worldRenderer.h>
-#include <rendering/text.h>
 
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>
@@ -358,7 +358,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 				rect.y + rect.height * 0.75f
 			};
 			std::string str = std::to_string(stack.count);
-			Engine::Vec2 textSize = Engine::measureTextEx(GetFontDefault(), str.c_str(), 25.f, 2.f);
+			Engine::Vec2 textSize = defaultFont.measureText(str.c_str(), 25.f, 2.f);
 
 			// write item count as text
 			// draw text using renderer
@@ -496,7 +496,7 @@ void Gameplay::drawDisplayNameUI(ItemId itemId, Engine::Rect parentRect, float f
 	//float paddingX = 6.f;
 	//float paddingY = 2.f;
 
-	Engine::Vec2 textSize = Engine::measureTextEx(GetFontDefault(), selectedIngredient->displayName, fontSize, spacing);
+	Engine::Vec2 textSize = defaultFont.measureText(selectedIngredient->displayName, fontSize, spacing);
 
 	Engine::Rect rectPos{
 		parentRect.x + parentRect.width / 2 - (textSize.x + paddingX * 2) / 2, // center horizontally
@@ -683,6 +683,9 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	if (res == 0)
 		std::cout << "****************** INIT FAILED *****************" << "\n";
 
+	// font init
+	defaultFont.loadDefault();
+
 	// lighting init
 	recalculateLight(gameMap);
 
@@ -694,11 +697,12 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	camera.rotation = 0.f;
 	camera.zoom = CAMERA_ZOOM;
 
-	int screenW = GetScreenWidth();
-	int screenH = GetScreenHeight();
-
 	// player spawn
 	player.teleport({ 20, 60 });
+
+	//int screenW = GetScreenWidth();
+	//int screenH = GetScreenHeight();
+
 
 	//// Use a RenderTexture to capture the scene
 	//sceneTexture =        LoadRenderTexture(screenW, screenH);
@@ -722,7 +726,7 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	//spawnEnemyHelper<Slime>({ 32,60 });
 	//spawnEnemyHelper<Zombie>({ 25,60 });
 	//spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
-	maxEnemyCount = 1;
+	maxEnemyCount = 10;
 
 	// start item in inventory
 	player.inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
@@ -2139,7 +2143,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 					ri.x + ri.width * 0.5f,
 					ri.y + ri.height * 0.85f
 				};
-				Engine::Vec2 textSize = Engine::measureTextEx(GetFontDefault(), str.c_str(), 10.f, 1.f);
+				Engine::Vec2 textSize = defaultFont.measureText(str.c_str(), 10.f, 1.f);
 
 				// draw text using renderer
 				//DrawTextPro(

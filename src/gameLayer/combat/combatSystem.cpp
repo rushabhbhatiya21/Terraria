@@ -67,7 +67,7 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 		1,
 		.4f,
 		-1.f,
-		ORANGE,
+		Engine::Orange,
 		result.crit
 	);
 

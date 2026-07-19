@@ -4,7 +4,15 @@
 std::vector<PopupText> popupTexts;
 //static std::string critText = "CRITICAL";
 
-void spawnPopupText(Engine::Vec2 position, Engine::Vec2 velocity, std::string text, float lifetime, float size, float offset, Color color, bool crit)
+void spawnPopupText(Engine::Vec2 position,
+	Engine::Vec2 velocity,
+	std::string text,
+	float lifetime,
+	float size,
+	float offset,
+	Engine::Color4f color,
+	bool crit
+)
 {
 	PopupText popup{};
 
@@ -63,13 +71,13 @@ void updatePopupText(float deltaTime)
 }
 
 void DrawTextOutlined(
-	Font font,
+	const Engine::FontE& font,
 	const std::string& text,
 	Engine::Vec2 position,
 	float fontSize,
 	float spacing,
-	Color textColor,
-	Color outlineColor,
+	Engine::Color4f textColor,
+	Engine::Color4f outlineColor,
 	float thickness
 )
 {

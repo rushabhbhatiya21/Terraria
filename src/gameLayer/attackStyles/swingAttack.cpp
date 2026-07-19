@@ -266,7 +266,7 @@ bool SwingAttack::damageBlock(int power, const Engine::Vec2i& blockPos, Block& b
 		1,
 		.2f,
 		-1.f,
-		WHITE,
+		Engine::White,
 		false
 	);
 

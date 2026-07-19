@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
 #include <vector>
-#include <raylib.h>
 #include <math/vec2.h>
+#include <math/color.h>
+#include <assets/font.h>
 
 struct PopupText
 {
@@ -16,20 +17,20 @@ struct PopupText
 	float size = 0;
 	float baseSize = 0;
 
-	Color color = WHITE;
+	Engine::Color4f color = Engine::White;
 	bool crit = false;
 };
 
 extern std::vector<PopupText> popupTexts;
 
 void DrawTextOutlined(
-	Font font,
+	const Engine::FontE& font,
 	const std::string& text,
 	Engine::Vec2 position,
 	float fontSize,
 	float spacing,
-	Color textColor,
-	Color outlineColor,
+	Engine::Color4f textColor,
+	Engine::Color4f outlineColor,
 	float thickness
 );
 
@@ -40,7 +41,7 @@ void spawnPopupText(
 	float lifetime,
 	float size,
 	float offset,
-	Color color,
+	Engine::Color4f color,
 	bool crit
 );
 

@@ -6,6 +6,7 @@
 #include <math/rect.h>
 #include <math/cam.h>
 #include <math/color.h>
+#include <assets/font.h>
 
 #include <world/chunk.h>
 
@@ -103,6 +104,9 @@ struct Gameplay
 
 	// texture pack
 	char texturePackName[128] = "hdtextures";
+
+	// font
+	Engine::FontE defaultFont;
 
 	// structure save
 	Structure copyStructure;
