@@ -36,8 +36,6 @@
 
 #include "ui/popupText.h"
 
-#include <rlgl.h>
-
 
 #pragma region sky colors
 
