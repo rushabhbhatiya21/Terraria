@@ -18,7 +18,8 @@ namespace Engine
         FontE& operator=(const FontE&) = delete;
 
         void loadDefault();
-        Vec2 measureText(const std::string&, float, float) const;
+        Vec2 measureTextEx(const std::string&, float, float) const;
+        int measureText(const std::string&, float) const;
 
     private:
         class FontImpl;

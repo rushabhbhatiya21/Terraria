@@ -3,6 +3,7 @@
 #include <iostream>
 #include <imgui.h>
 #include <input/input.h>
+#include <window/window.h>
 
 #include <ui.h>
 #include <audio.h>
@@ -358,7 +359,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 				rect.y + rect.height * 0.75f
 			};
 			std::string str = std::to_string(stack.count);
-			Engine::Vec2 textSize = defaultFont.measureText(str.c_str(), 25.f, 2.f);
+			Engine::Vec2 textSize = defaultFont.measureTextEx(str.c_str(), 25.f, 2.f);
 
 			// write item count as text
 			// draw text using renderer
@@ -496,7 +497,7 @@ void Gameplay::drawDisplayNameUI(ItemId itemId, Engine::Rect parentRect, float f
 	//float paddingX = 6.f;
 	//float paddingY = 2.f;
 
-	Engine::Vec2 textSize = defaultFont.measureText(selectedIngredient->displayName, fontSize, spacing);
+	Engine::Vec2 textSize = defaultFont.measureTextEx(selectedIngredient->displayName, fontSize, spacing);
 
 	Engine::Rect rectPos{
 		parentRect.x + parentRect.width / 2 - (textSize.x + paddingX * 2) / 2, // center horizontally
@@ -700,8 +701,8 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	// player spawn
 	player.teleport({ 20, 60 });
 
-	//int screenW = GetScreenWidth();
-	//int screenH = GetScreenHeight();
+	//int screenW = Engine::getScreenWidth();
+	//int screenH = Engine::getScreenHeight();
 
 
 	//// Use a RenderTexture to capture the scene
@@ -799,7 +800,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region camera offset and smoothing
 
-	camera.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
+	camera.offset = { Engine::getScreenWidth() / 2.f, Engine::getScreenHeight() / 2.f };
 
 	Engine::Vec2 camOffset = { 0, 0 };
 
@@ -946,8 +947,8 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	{
 		float zoom = camera.zoom;
 
-		float screenWidth  = (float)GetScreenWidth();
-		float screenHeight = (float)GetScreenHeight();
+		float screenWidth  = (float)Engine::getScreenWidth();
+		float screenHeight = (float)Engine::getScreenHeight();
 
 		// half of visible area (adjusted for zoom)
 		float halfViewWidth = (screenWidth * 0.5f) / zoom;
@@ -1034,7 +1035,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region handle input
 
-	Engine::Rect inventoryRectangle = getInventoryRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
+	Engine::Rect inventoryRectangle = getInventoryRectangle((float)Engine::getScreenWidth(), (float)Engine::getScreenHeight());
 
 	// inside hotbar meu
 	bool insideHotbarMenu = false;
@@ -1048,7 +1049,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	// inside craft menu
 	bool insideCraftingMenu = false;
-	Engine::Rect craftRectangle = getCraftRectangle((float)GetScreenWidth(), (float)GetScreenHeight());
+	Engine::Rect craftRectangle = getCraftRectangle((float)Engine::getScreenWidth(), (float)Engine::getScreenHeight());
 	insideCraftingMenu = Engine::checkCollisionPointRec(Engine::getMousePosition(), craftRectangle) && insideCraft;
 
 	Engine::Vec2 worldPos = Engine::getScreenToWorld2D(Engine::getMousePosition(), camera);
@@ -1089,7 +1090,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	{
 		if (!insideInventoryGrid && !insideCraftingMenu && !insideHotbarMenu)
 		{
-			if (IsMouseButtonDown(MouseButton::MOUSE_BUTTON_MIDDLE))
+			if (Engine::isMouseButtonDown(Engine::MouseButton::Left))
 			{
 				auto b = gameMap.getBlockSafe(blockX, blockY);
 
@@ -1102,7 +1103,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 		if (!insideInventoryGrid && !insideCraftingMenu && !insideHotbarMenu)
 		{
-			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+			if (Engine::isMouseButtonDown(Engine::MouseButton::Left))
 			{
 				// attack, tool, place block, projectile done
 				// todo consumable 
@@ -1131,8 +1132,8 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 #pragma region get screen coords
 
 	// visible tile range dynamically based on screen resolution and zoom
-	float visibleWorldWidth = GetScreenWidth() / camera.zoom;
-	float visibleWorldHeight = GetScreenHeight() / camera.zoom;
+	float visibleWorldWidth = Engine::getScreenWidth() / camera.zoom;
+	float visibleWorldHeight = Engine::getScreenHeight() / camera.zoom;
 
 	int visibleTilesX = (int)ceilf(visibleWorldWidth / TILE_SIZE);
 	int visibleTilesY = (int)ceilf(visibleWorldHeight / TILE_SIZE);
@@ -1226,8 +1227,8 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 #pragma region adjust lightmask for screen size
 
 	// resize render textures if screen resized
-	int screenW = GetScreenWidth();
-	int screenH = GetScreenHeight();
+	int screenW = Engine::getScreenWidth();
+	int screenH = Engine::getScreenHeight();
 
 	//if (lightMask.id == 0 ||
 	//	sceneTexture.id == 0 ||
@@ -1734,8 +1735,8 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma	region ui
 
-	float w = (float)GetScreenWidth();
-	float h = (float)GetScreenHeight();
+	float w = (float)Engine::getScreenWidth();
+	float h = (float)Engine::getScreenHeight();
 
 #pragma region life ui
 
@@ -1856,7 +1857,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	// hotbar menu click to select
 	if (insideHotbarMenu && !insideInventory)
 	{
-		if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+		if (Engine::isMouseButtonPressed(Engine::MouseButton::Left))
 		{
 			// hotbar is selected while player using something, store it to pending and wait for usetimer to run out
 			if (player.useTimer > 0)
@@ -1879,7 +1880,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	 //equip item from hotbar
 	{
-		player.selectedHotbarSlot = Clamp(player.selectedHotbarSlot, 0, 8);
+		player.selectedHotbarSlot = std::clamp(player.selectedHotbarSlot, 0, 8);
 		ItemStack& selectedStack = player.inventory.slots[player.selectedHotbarSlot];
 
 		ItemDefinition* item = getItem(selectedStack.itemId);
@@ -1903,7 +1904,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	if (insideInventoryGrid)
 	{
-		if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT))
+		if (Engine::isMouseButtonPressed(Engine::MouseButton::Left))
 		{
 			if (hoveredSlot != -1)
 			{
@@ -1911,7 +1912,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			}
 		}
 
-		if (IsMouseButtonReleased(MouseButton::MOUSE_BUTTON_LEFT))
+		if (Engine::isMouseButtonReleased(Engine::MouseButton::Left))
 		{
 			if (hoveredSlot == -1)
 			{
@@ -1945,8 +1946,8 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	if (insideCraft)
 	{
-		float w = (float)GetScreenWidth();
-		float h = (float)GetScreenHeight();
+		float w = (float)Engine::getScreenWidth();
+		float h = (float)Engine::getScreenHeight();
 
 		// draw rect using renderer
 		Engine::Rect craftRectangle = getCraftRectangle(w, h);
@@ -2005,7 +2006,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 				Crafting::startPointer--;
 		}
 
-		selectedRecipeIndex = Clamp(selectedRecipeIndex, 0, maxRecipeSize - 1);
+		selectedRecipeIndex = std::clamp(selectedRecipeIndex, 0, maxRecipeSize - 1);
 
 		if (IsKeyPressed(KEY_ENTER))
 		{
@@ -2049,7 +2050,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 				drawDisplayNameUI(selectedItemType, rr);
 
 				// craft item if clicked
-				if (IsMouseButtonPressed(MouseButton::MOUSE_BUTTON_LEFT) && canCraft)
+				if (Engine::isMouseButtonPressed(Engine::MouseButton::Left) && canCraft)
 				{
 					Crafting::craft(player.inventory, selectedItemType);
 				}
@@ -2143,7 +2144,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 					ri.x + ri.width * 0.5f,
 					ri.y + ri.height * 0.85f
 				};
-				Engine::Vec2 textSize = defaultFont.measureText(str.c_str(), 10.f, 1.f);
+				Engine::Vec2 textSize = defaultFont.measureTextEx(str.c_str(), 10.f, 1.f);
 
 				// draw text using renderer
 				//DrawTextPro(

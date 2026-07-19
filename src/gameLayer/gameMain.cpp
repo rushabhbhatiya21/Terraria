@@ -24,6 +24,7 @@ bool initGame()
 	//Audio::init();
 	assetManager.loadAll();
 	assetManager.loadTexturePack("hdtextures");
+	mainMenuButtons.init();
 	loadSettings();
 
 	gameplay.init(assetManager);

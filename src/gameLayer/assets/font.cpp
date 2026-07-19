@@ -1,4 +1,5 @@
 #include "font.h"
+#include "font.h"
 #include <raylib.h>
 
 namespace Engine
@@ -24,7 +25,7 @@ namespace Engine
         impl->font = ::GetFontDefault();
     }
 
-    Vec2 FontE::measureText(const std::string& text, float fontSize, float spacing) const
+    Vec2 FontE::measureTextEx(const std::string& text, float fontSize, float spacing) const
     {
         ::Vector2 size = ::MeasureTextEx(
             impl->font,
@@ -33,5 +34,11 @@ namespace Engine
             spacing);
 
         return { size.x, size.y };
+    }
+
+    int FontE::measureText(const std::string& text, float fontSize) const
+    {
+        int size = ::MeasureText(text.c_str(), fontSize);
+        return size;
     }
 }

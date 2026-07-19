@@ -1,8 +1,8 @@
 #include "audio.h"
 #include <vector>
 #include <cmath>
+#include <algorithm>
 #include <raylib.h>
-#include <raymath.h>
 #include <asserts.h>
 #include <settings.h>
 
@@ -112,7 +112,7 @@ namespace Audio
 	{
 		if (sound <= Sounds::noneSound || sound >= Sounds::SOUNDS_COUNT) { return; }
 
-		volume = Clamp(volume, 0, 1);
+		volume = std::clamp(volume, 0.f, 1.f);
 
 		// less loud
 		volume *= getSettings().masterVolume * getSettings().masterVolume;

@@ -1,5 +1,4 @@
 #include "popupText.h"
-#include <raymath.h>
 
 std::vector<PopupText> popupTexts;
 //static std::string critText = "CRITICAL";
@@ -62,7 +61,7 @@ void updatePopupText(float deltaTime)
 		popup.color.a = (unsigned char)(255.f * fade);
 
 		// size 
-		popup.size = popup.baseSize * (1.2f - progress * 0.8f) + sin(progress * PI) * 0.2f;
+		popup.size = popup.baseSize * (1.2f - progress * 0.8f) + sin(progress * Engine::Pi) * 0.2f;
 
 
 		if (popup.size < 0.f)

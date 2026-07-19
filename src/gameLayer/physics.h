@@ -1,6 +1,4 @@
 #pragma once
-//#include "raylib.h"
-//#include <raymath.h>
 #include <cmath>
 #include <nlohmann/json.hpp>
 #include <math/vec2.h>

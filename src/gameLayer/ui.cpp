@@ -1,5 +1,7 @@
 #include "ui.h"
+#include <math/color.h>
 #include <input/input.h>
+#include <window/window.h>
 
 // top
 Engine::Rect placeRectangleTopLeft(Engine::Rect r)
@@ -105,10 +107,15 @@ Engine::Rect shrinkRectanglePercentage(Engine::Rect r, float percentageX, float 
 	return r;
 }
 
+void UIEngine::init()
+{
+	font.loadDefault();
+}
+
 void UIEngine::updateAndRender()
 {
-	float w = GetScreenWidth();
-	float h = GetScreenHeight();
+	float w = Engine::getScreenWidth();
+	float h = Engine::getScreenHeight();
 
 	Engine::Rect oneButtonRectangle = {};
 	oneButtonRectangle.width = w * .8f;
@@ -129,16 +136,16 @@ void UIEngine::updateAndRender()
 
 		auto drawText = [&](Engine::Rect smallerRect, float yOffset = 0)
 			{
-				int textWidth = MeasureText(w.text.c_str(), fontSize);
+				int textWidth = font.measureText(w.text.c_str(), fontSize);
 				int textHeight = fontSize; // in raylib font height = font size default
 
 				float textX = smallerRect.x + (smallerRect.width - textWidth) / 2.f;
 				float textY = smallerRect.y + (smallerRect.height - textHeight) / 2.f;
 
-				Color shadowColor = { 0,0,0,255 };
-				DrawText(w.text.c_str(), textX - fontSize * .08f, textY + fontSize * .08f + yOffset, fontSize, shadowColor);
+				Engine::Color4f shadowColor = { 0,0,0,255 };
+				//DrawText(w.text.c_str(), textX - fontSize * .08f, textY + fontSize * .08f + yOffset, fontSize, shadowColor);
 
-				DrawText(w.text.c_str(), textX, textY + yOffset, fontSize, WHITE);
+				//DrawText(w.text.c_str(), textX, textY + yOffset, fontSize, Engine::White);
 			};
 
 		w.isHovered = false;
@@ -149,12 +156,12 @@ void UIEngine::updateAndRender()
 		{
 			w.isHovered = true;
 
-			if (IsMouseButtonDown(MOUSE_BUTTON_LEFT))
+			if (Engine::isMouseButtonDown(Engine::MouseButton::Left))
 			{
 				w.isBeingClicked = true;
 			}
 
-			if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT))
+			if (Engine::isMouseButtonReleased(Engine::MouseButton::Left))
 			{
 				w.isReleased = true;
 			}
@@ -165,41 +172,41 @@ void UIEngine::updateAndRender()
 			case button:
 			{
 				const float clickOffset = .05f;
-				Color clickColor = { 120,120,135,205 };
-				Color defaultColor = { 90,90,110,205 };
+				Engine::Color4f clickColor = { 120,120,135,205 };
+				Engine::Color4f defaultColor = { 90,90,110,205 };
 
 				if (w.isBeingClicked)
 				{
-					DrawRectangle(
-						smallerRect.x, 
-						smallerRect.y + smallerRect.height * clickOffset,
-						smallerRect.width,
-						smallerRect.height, 
-						clickColor
-					);
+					//DrawRectangle(
+					//	smallerRect.x, 
+					//	smallerRect.y + smallerRect.height * clickOffset,
+					//	smallerRect.width,
+					//	smallerRect.height, 
+					//	clickColor
+					//);
 				}
 				else
 				{
 					if (w.isHovered)
 					{
-						DrawRectangle(
-							smallerRect.x,
-							smallerRect.y,
-							smallerRect.width,
-							smallerRect.height,
-							clickColor
-						);
+						//DrawRectangle(
+						//	smallerRect.x,
+						//	smallerRect.y,
+						//	smallerRect.width,
+						//	smallerRect.height,
+						//	clickColor
+						//);
 					}
 
 					if (w.isReleased)
 					{
-						DrawRectangle(
-							smallerRect.x,
-							smallerRect.y,
-							smallerRect.width,
-							smallerRect.height,
-							defaultColor
-						);
+						//DrawRectangle(
+						//	smallerRect.x,
+						//	smallerRect.y,
+						//	smallerRect.width,
+						//	smallerRect.height,
+						//	defaultColor
+						//);
 					}
 				}
 

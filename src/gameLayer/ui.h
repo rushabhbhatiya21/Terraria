@@ -2,6 +2,7 @@
 #include <vector>
 #include <string>
 #include <math/rect.h>
+#include <assets/font.h>
 
 // top
 Engine::Rect placeRectangleTopLeft(Engine::Rect r);
@@ -45,9 +46,13 @@ struct UIEngine
 		bool isReleased = false;
 	};
 
+	Engine::FontE font;
+
 	std::vector<Widget> widgets;
 
 	std::vector<Widget> lastFrameWidgets;
+
+	void init();
 
 	bool addButton(std::string text)
 	{

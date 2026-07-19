@@ -1,6 +1,6 @@
 #pragma once
 
-#include <raymath.h>
+#include <algorithm>
 
 struct Settings
 {
@@ -10,9 +10,9 @@ struct Settings
 
 	void sanitize()
 	{
-		musicVolume = Clamp(musicVolume, 0.f, 1.f);
-		masterVolume = Clamp(masterVolume, 0.f, 1.f);
-		soundsVolume = Clamp(soundsVolume, 0.f, 1.f);
+		musicVolume = std::clamp(musicVolume, 0.f, 1.f);
+		masterVolume = std::clamp(masterVolume, 0.f, 1.f);
+		soundsVolume = std::clamp(soundsVolume, 0.f, 1.f);
 	}
 
 	bool operator==(const Settings& other) const
