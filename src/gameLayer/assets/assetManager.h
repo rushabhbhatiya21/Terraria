@@ -1,9 +1,9 @@
 #pragma once
-#include "texture.h"
-#include <raylib.h>
 #include <string>
 #include <vector>
 #include <unordered_map>
+#include "texture.h"
+#include "shader.h"
 
 namespace Engine
 {
@@ -15,7 +15,7 @@ namespace Engine
 
 	struct ShaderEntry
 	{
-		Shader* shader;
+		ShaderE* shader;
 		const char* path;
 	};
 
@@ -46,9 +46,9 @@ namespace Engine
 		Texture caveBG = {};
 		Texture nightBG = {};
 
-		Shader blurShader = {};
-		Shader bloomShader = {};
-		Shader flashShader = {};
+		ShaderE blurShader = {};
+		ShaderE bloomShader = {};
+		ShaderE flashShader = {};
 
 		std::unordered_map<int, Texture> frontArmour;
 		std::unordered_map<int, Texture> backArmour;

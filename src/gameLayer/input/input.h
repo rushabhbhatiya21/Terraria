@@ -121,6 +121,4 @@ namespace Engine
     bool isKeyReleased(Key key);
 
     float getMouseWheelMove();
-
-	double getTime();
 }

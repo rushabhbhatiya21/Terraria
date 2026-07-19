@@ -63,9 +63,4 @@ namespace Engine
     {
         return ::GetMouseWheelMove();
     }
-
-    double getTime()
-    {
-        return ::GetTime();
-    }
 }

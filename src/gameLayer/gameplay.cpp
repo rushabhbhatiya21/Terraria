@@ -4,6 +4,7 @@
 #include <imgui.h>
 #include <input/input.h>
 #include <window/window.h>
+#include <time/time.h>
 
 #include <ui.h>
 #include <audio.h>
@@ -65,18 +66,18 @@ const Engine::Color4f nightSky = { 8,  12,  40, 255 };  // near-black deep blue
 
 #pragma region hotbar keys
 
-const KeyboardKey hotbarKeys[] =
+const Engine::Key hotbarKeys[] =
 {
-	KEY_ONE,
-	KEY_TWO,
-	KEY_THREE,
-	KEY_FOUR,
-	KEY_FIVE,
-	KEY_SIX,
-	KEY_SEVEN,
-	KEY_EIGHT,
-	KEY_NINE,
-	KEY_ZERO
+	Engine::Key::One,
+	Engine::Key::Two,
+	Engine::Key::Three,
+	Engine::Key::Four,
+	Engine::Key::Five,
+	Engine::Key::Six,
+	Engine::Key::Seven,
+	Engine::Key::Eight,
+	Engine::Key::Nine,
+	Engine::Key::Zero
 };
 
 #pragma endregion
@@ -272,24 +273,24 @@ Engine::Rect Gameplay::getIngredientsRectangle(float w, float h, Engine::Rect cr
 void Gameplay::drawInventoryBackground(const Engine::Rect& inventoryRectangle, const Inventory& inventory, bool insideInventory)
 {
 	// hotbar always visible
-	DrawRectangle(
-		(int)inventoryRectangle.x,
-		(int)inventoryRectangle.y,
-		(int)inventoryRectangle.width,
-		(int)inventoryRectangle.height / inventory.rows,
-		{ 100,100,100,100 }
-	);
+	//DrawRectangle(
+	//	(int)inventoryRectangle.x,
+	//	(int)inventoryRectangle.y,
+	//	(int)inventoryRectangle.width,
+	//	(int)inventoryRectangle.height / inventory.rows,
+	//	{ 100,100,100,100 }
+	//);
 
 	// remaining rows only when inventory is open
 	if (insideInventory)
 	{
-		DrawRectangle(
-			(int)inventoryRectangle.x,
-			(int)inventoryRectangle.y + (int)inventoryRectangle.height / inventory.rows,
-			(int)inventoryRectangle.width,
-			(int)inventoryRectangle.height * (inventory.rows - 1) / inventory.rows,
-			{ 100,100,100,100 }
-		);
+		//DrawRectangle(
+		//	(int)inventoryRectangle.x,
+		//	(int)inventoryRectangle.y + (int)inventoryRectangle.height / inventory.rows,
+		//	(int)inventoryRectangle.width,
+		//	(int)inventoryRectangle.height * (inventory.rows - 1) / inventory.rows,
+		//	{ 100,100,100,100 }
+		//);
 	}
 }
 
@@ -666,7 +667,7 @@ static float tileNoise(int x, int y)
 
 bool Gameplay::init(Engine::AssetManager& assetManager)
 {
-	double loadStart = GetTime();
+	double loadStart = Engine::getTime();
 
 	// items init
 	registerItems();
@@ -754,9 +755,8 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	std::cout << sizeof(ChunkGrid) << "\n";
 	std::cout << sizeof(Gameplay) << "\n";
 
-	double loadEnd = GetTime();
-	TraceLog(LOG_INFO, "Load time: %.3f seconds", loadEnd - loadStart);
-	TraceLog(LOG_INFO, "Raylib version: %s", RAYLIB_VERSION);
+	double loadEnd = Engine::getTime();
+	Engine::traceLog(Engine::LogLevel::Info, "Load time: %.3f seconds", loadEnd - loadStart);
 
 	return true;
 }
@@ -767,7 +767,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region delta time
 
-	float deltaTime = GetFrameTime();
+	float deltaTime = Engine::getFrameTime();
 	if (deltaTime > 1.f / 5.f) deltaTime = 1 / 5.f;
 
 #pragma endregion
@@ -809,7 +809,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		float t = camShake.time / camShake.duration;
 		float strength = camShake.strength * t;
 
-		float time = (float)GetTime();
+		float time = (float)Engine::getTime();
 
 		camOffset.x = sinf(time * 30.0f + camShake.phase) * strength;
 		camOffset.y = cosf(time * 30.0f + camShake.phase) * strength;
@@ -825,15 +825,15 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region key bindings
 
-	if (IsKeyPressed(KEY_F10)) { showImgui = !showImgui; }
+	if (Engine::isKeyPressed(Engine::Key::F10)) { showImgui = !showImgui; }
 
-	if (IsKeyPressed(KEY_TAB)) { insideInventory = !insideInventory; }
+	if (Engine::isKeyPressed(Engine::Key::Tab)) { insideInventory = !insideInventory; }
 
-	if (IsKeyPressed(KEY_C)) { insideCraft = !insideCraft; }
+	if (Engine::isKeyPressed(Engine::Key::C)) { insideCraft = !insideCraft; }
 
-	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_S)) { saveWorld(gameMap, entityHolder, player); }
+	if (Engine::isKeyPressed(Engine::Key::LeftControl) && Engine::isKeyPressed(Engine::Key::S)) { saveWorld(gameMap, entityHolder, player); }
 
-	if (IsKeyDown(KEY_LEFT_CONTROL) && IsKeyPressed(KEY_L)) { loadWorld(gameMap, entityHolder, player); }
+	if (Engine::isKeyPressed(Engine::Key::LeftControl) && Engine::isKeyPressed(Engine::Key::L)) { loadWorld(gameMap, entityHolder, player); }
 
 #pragma endregion
 
@@ -851,12 +851,12 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	// ── Creative mode fly ────────────────────────────────────────────────────
 	if (creative)
 	{
-		if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
+		if (Engine::isKeyDown(Engine::Key::Up) || Engine::isKeyDown(Engine::Key::W))
 			player.physics.transform.pos.y -= PhysicalEntity::MOVE_SPEED * deltaTime;
-		if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
+		if (Engine::isKeyDown(Engine::Key::Down) || Engine::isKeyDown(Engine::Key::S))
 			player.physics.transform.pos.y += PhysicalEntity::MOVE_SPEED * deltaTime;
-		if (GetMouseWheelMove() != 0.f)
-			camera.zoom += GetMouseWheelMove();
+		if (Engine::getMouseWheelMove() != 0.f)
+			camera.zoom += Engine::getMouseWheelMove();
 	}
 
 
@@ -1062,15 +1062,15 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	// selection
 	if (showImgui)
 	{
-		if (IsKeyPressed(KEY_ONE))
+		if (Engine::isKeyPressed(Engine::Key::One))
 		{
 			selectionStart = Engine::Vec2{ float(blockX), float(blockY) };
 		}
-		if (IsKeyPressed(KEY_TWO))
+		if (Engine::isKeyPressed(Engine::Key::Two))
 		{
 			selectionEnd = Engine::Vec2{ float(blockX), float(blockY) };
 		}
-		if (IsKeyPressed(KEY_THREE))
+		if (Engine::isKeyPressed(Engine::Key::Three))
 		{
 			copyStructure.pasteIntoMap(gameMap, Engine::Vec2{ float(blockX), float(blockY) });
 		}
@@ -1825,7 +1825,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	for (int i = 0; i < sizeof(hotbarKeys) / sizeof(hotbarKeys[0]); i++)
 	{
 
-		if (!showImgui && IsKeyPressed(hotbarKeys[i]))
+		if (!showImgui && Engine::isKeyPressed(hotbarKeys[i]))
 		{
 			// hotbar is selected while player using something, store it to pending and wait for usetimer to run out
 			if (player.useTimer > 0)
@@ -1985,7 +1985,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		auto nearbyStation = getNearbyStation(player.getPosition());
 		std::vector<ItemId> availableRecipes = Crafting::getAvailableRecipes(nearbyStation);
 		int maxRecipeSize = availableRecipes.size();
-		float scroll = GetMouseWheelMove();
+		float scroll = Engine::getMouseWheelMove();
 
 		if (scroll < 0)
 		{
@@ -2008,7 +2008,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 		selectedRecipeIndex = std::clamp(selectedRecipeIndex, 0, maxRecipeSize - 1);
 
-		if (IsKeyPressed(KEY_ENTER))
+		if (Engine::isKeyPressed(Engine::Key::Enter))
 		{
 			ItemId selectedItemType = availableRecipes[selectedRecipeIndex];
 			auto nearbyStation = getNearbyStation(player.getPosition());
@@ -2367,7 +2367,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region display fps
 
-	DrawFPS(20, 20);
+	Engine::drawFPS(20, 20);
 
 #pragma endregion
 
@@ -2386,7 +2386,7 @@ void Gameplay::closeGame(Engine::AssetManager& assetManager) const
 	//UnloadRenderTexture(blurredLightTexture);
 	//UnloadRenderTexture(blurredGlowTexture);
 
-	UnloadShader(assetManager.blurShader);
-	UnloadShader(assetManager.bloomShader);
-	UnloadShader(assetManager.flashShader);
+	assetManager.blurShader.unloadShader();
+	assetManager.bloomShader.unloadShader();
+	assetManager.flashShader.unloadShader();
 }

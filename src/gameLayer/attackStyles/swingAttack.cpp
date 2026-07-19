@@ -122,7 +122,7 @@ void SwingAttack::updateAnimation(float deltaTime)
 
 	currentSwingAngle = Engine::Lerp(startAngle, endAngle, t);
 
-	float radians = DEG2RAD * currentSwingAngle;
+	float radians = Engine::Deg2Rad * currentSwingAngle;
 	weaponTip.x = weaponBase.x + cosf(radians) * weaponLength;
 	weaponTip.y = weaponBase.y + sinf(radians) * weaponLength;
 }

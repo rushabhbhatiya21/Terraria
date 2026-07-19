@@ -9,13 +9,14 @@ namespace Engine
     {
     public:
         FontE();
-        ~FontE();
 
         FontE(FontE&&) noexcept;
         FontE& operator=(FontE&&) noexcept;
 
         FontE(const FontE&) = delete;
         FontE& operator=(const FontE&) = delete;
+
+        ~FontE();
 
         void loadDefault();
         Vec2 measureTextEx(const std::string&, float, float) const;

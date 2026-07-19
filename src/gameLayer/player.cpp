@@ -1,4 +1,5 @@
 ﻿#include "player.h"
+#include <input/input.h>
 #include <helper.h>
 #include <assets/assetManager.h>
 #include <entityHolder.h>
@@ -11,28 +12,28 @@
 
 void Player::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
-	bool flashing = flashTimer > 0;
-	
-	if (flashing)
-	{
-		float flash = 1.f;
-	
-		BeginShaderMode(assetManager.flashShader);
-	
-		SetShaderValue(
-			assetManager.flashShader,
-			assetManager.flashShaderLocation,
-			&flash,
-			SHADER_UNIFORM_FLOAT
-		);
-	}
+	//bool flashing = flashTimer > 0;
+	//
+	//if (flashing)
+	//{
+	//	float flash = 1.f;
+	//
+	//	BeginShaderMode(assetManager.flashShader);
+	//
+	//	SetShaderValue(
+	//		assetManager.flashShader,
+	//		assetManager.flashShaderLocation,
+	//		&flash,
+	//		SHADER_UNIFORM_FLOAT
+	//	);
+	//}
 
 	drawSprite(assetManager, collector);
 
-	if (flashing)
-	{
-		EndShaderMode();
-	}
+	//if (flashing)
+	//{
+	//	EndShaderMode();
+	//}
 }
 
 void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
@@ -178,19 +179,19 @@ void Player::updateMovement(float deltaTime)
 	bool moving = false;
 	bool droppedThrough = false;
 
-	if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
+	if (Engine::isKeyDown(Engine::Key::Left) || Engine::isKeyDown(Engine::Key::A))
 	{
 		inputX = -1.f;
 		moving = true;
 		animations.movingLeft = true;
 	}
-	if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
+	if (Engine::isKeyDown(Engine::Key::Right) || Engine::isKeyDown(Engine::Key::D))
 	{
 		inputX = 1.f;
 		moving = true;
 		animations.movingLeft = false;
 	}
-	if ((IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) && IsKeyPressed(KEY_SPACE) && physics.standingOnPlatform)
+	if ((Engine::isKeyDown(Engine::Key::Down) || Engine::isKeyDown(Engine::Key::S)) && Engine::isKeyPressed(Engine::Key::Space) && physics.standingOnPlatform)
 	{
 		printf("down jump pressed\n");
 		physics.dropThroughTimer = 0.2f;
@@ -201,8 +202,8 @@ void Player::updateMovement(float deltaTime)
 	{
 		physics.updateJump(
 			deltaTime,
-			IsKeyDown(KEY_SPACE),
-			IsKeyPressed(KEY_SPACE)
+			Engine::isKeyDown(Engine::Key::Space),
+			Engine::isKeyPressed(Engine::Key::Space)
 		);
 	}
 

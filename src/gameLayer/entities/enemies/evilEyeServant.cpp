@@ -82,7 +82,7 @@ bool EvilEyeServant::update(float deltaTime, EntityUpdateData& data)
 	case EvilEyeServant::ServantState::CHASING:
 	{
 		moveDirection = data.player.getPosition() - getPosition();
-		rotation = atan2f(moveDirection.y, moveDirection.x) * RAD2DEG;
+		rotation = atan2f(moveDirection.y, moveDirection.x) * Engine::Rad2Deg;
 		break;
 	}
 	case EvilEyeServant::ServantState::DEAD_ANIM:

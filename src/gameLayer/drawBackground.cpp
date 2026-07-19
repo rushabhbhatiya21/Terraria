@@ -1,4 +1,5 @@
 #include "drawBackground.h"
+#include <window/window.h>
 #include <assets/assetManager.h>
 #include <assert.h>
 #include <rendering/sprite.h>
@@ -23,8 +24,8 @@ void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, E
 
 			assert(bg);
 
-			int screenW = GetScreenWidth();
-			int screenH = GetScreenHeight();
+			int screenW = Engine::getScreenWidth();
+			int screenH = Engine::getScreenHeight();
 
 			float aspectRatio = (float)bg->getWidth()/ (float)bg->getHeight();
 			float bgScaleScreen = 2.f;

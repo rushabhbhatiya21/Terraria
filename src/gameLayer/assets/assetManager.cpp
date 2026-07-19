@@ -9,8 +9,7 @@ namespace Engine
 {
 	void AssetManager::loadAll()
 	{
-		//loadPlayer(RESOURCES_PATH "player.png");
-
+		ShaderE shader;
 		for (auto& t : texList)
 		{
 			const std::string& p = std::string(RESOURCES_PATH) + std::string(t.path);
@@ -19,10 +18,10 @@ namespace Engine
 
 		for (auto& s : shaderList)
 		{
-			*s.shader = LoadShader(0, (std::string(RESOURCES_PATH) + s.path).c_str());
+			s.shader->loadShader(0, (std::string(RESOURCES_PATH) + s.path).c_str());
 		}
 
-		flashShaderLocation = GetShaderLocation(flashShader, "flash");
+		flashShaderLocation = flashShader.getShaderLocation("flash");
 
 		//optional blur the background
 		//SetTextureFilter(forestBG, TEXTURE_FILTER_TRILINEAR);
@@ -120,7 +119,7 @@ namespace Engine
 
 		for (auto& t : texList)
 		{
-			if (FileExists((packPath + t.path).c_str()))
+			if (std::filesystem::exists(packPath + t.path))
 			{
 				*t.tex = loadTextureFromFile(packPath + t.path);
 			}

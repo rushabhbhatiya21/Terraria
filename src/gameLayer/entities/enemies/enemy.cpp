@@ -5,36 +5,36 @@
 
 void Enemy::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
-	bool flashing = flashTimer > 0;
+	//bool flashing = flashTimer > 0;
 
-	if (flashing)
-	{
-		float flash = 1.f;
+	//if (flashing)
+	//{
+	//	float flash = 1.f;
 
-		BeginShaderMode(assetManager.flashShader);
+	//	BeginShaderMode(assetManager.flashShader);
 
-		SetShaderValue(
-			assetManager.flashShader,
-			assetManager.flashShaderLocation,
-			&flash,
-			SHADER_UNIFORM_FLOAT
-		);
-	}
+	//	SetShaderValue(
+	//		assetManager.flashShader,
+	//		assetManager.flashShaderLocation,
+	//		&flash,
+	//		SHADER_UNIFORM_FLOAT
+	//	);
+	//}
 
-	bool blinking = blinkTimer > 0;
+	//bool blinking = blinkTimer > 0;
 
-	// flashing takes priority
-	if (!flashing && blinking)
-	{
-		return; // do not draw sprite
-	}
+	//// flashing takes priority
+	//if (!flashing && blinking)
+	//{
+	//	return; // do not draw sprite
+	//}
 
 	drawSprite(assetManager, collector);
 
-	if (flashing)
-	{
-		EndShaderMode();
-	}
+	//if (flashing)
+	//{
+	//	EndShaderMode();
+	//}
 }
 
 void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)

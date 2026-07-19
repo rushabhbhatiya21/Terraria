@@ -17,7 +17,7 @@
 void Slime::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	auto aabb = getRectangleForEntity(physics.transform, 1, 1);
-	Color color = WHITE;
+	Engine::Color4f color = Engine::White;
 
 	if (flashTimer > 0) { color = { 255,0,0,255 }; }
 

@@ -73,7 +73,7 @@ bool Projectile::update(float deltaTime, EntityUpdateData& data)
 	}
 	else
 	{
-		rotation = atan2f(physics.velocity.y, physics.velocity.x) * RAD2DEG - 90.f;
+		rotation = atan2f(physics.velocity.y, physics.velocity.x) * Engine::Rad2Deg - 90.f;
 	}
 
 	physics.transform.pos += physics.velocity * deltaTime;
@@ -179,7 +179,7 @@ void Projectile::spawn(Entity* owner, ItemStack& stack, EntityHolder& entityHold
 	projectile->stats.offensive = item->ammo.projectile.offensive;
 	projectile->stats.offensive += owner->stats.offensive;
 	projectile->teleport(position);
-	projectile->rotation = atan2f(direction.y, direction.x) * RAD2DEG - 90.f;
+	projectile->rotation = atan2f(direction.y, direction.x) * Engine::Rad2Deg - 90.f;
 	projectile->physics.velocity = Engine::Vec2Scale(Engine::Vec2Normalize(direction), item->ammo.projectile.speed);
 	projectile->lifetime = item->ammo.projectile.lifetime;
 	projectile->shouldApplyGravity = item->ammo.projectile.affectedByGravity;

@@ -111,13 +111,13 @@ bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 	// look toward player
 	if (currentState == EvilEyeState::DASH_WINDUP || currentState == EvilEyeState::DASH)
 	{
-		rotation = atan2f(dashDirection.y, dashDirection.x) * RAD2DEG - 90.f;
+		rotation = atan2f(dashDirection.y, dashDirection.x) * Engine::Rad2Deg - 90.f;
 	}
 	else
 	{
 		// rotation updated in movement for transition state
 		if (currentState != EvilEyeState::TRANSITION)
-			rotation = atan2f(facingDirection.y, facingDirection.x) * RAD2DEG - 90.f;
+			rotation = atan2f(facingDirection.y, facingDirection.x) * Engine::Rad2Deg - 90.f;
 	}
 
 	// state transitions
@@ -345,7 +345,7 @@ void EvilEye::enterState(EvilEyeState newState, EntityUpdateData& data)
 void EvilEye::spawnServant(EntityUpdateData& data)
 {
 	float offset = getRandomFloat(data.rng, 0.f, 360.f);
-	float angle = (offset + 120.f * spawnedServantsCount) * DEG2RAD;
+	float angle = (offset + 120.f * spawnedServantsCount) * Engine::Deg2Rad;
 	Engine::Vec2 spawnVel = { cosf(angle) * 5.f, sinf(angle) * 5.f };
 	spawnManager.spawnEnemy<EvilEyeServant>(data.entityHolder, getPosition(), spawnVel);
 }

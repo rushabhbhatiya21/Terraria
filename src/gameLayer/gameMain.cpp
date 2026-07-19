@@ -1,11 +1,15 @@
 #include "gameMain.h"
+#include <math/vec2.h>
+#include <math/cam.h>
+#include <window/window.h>
+#include <time/time.h>
+
 #include <gameplay.h>
 #include <assets/assetManager.h>
 #include <audio.h>
 #include <settings.h>
 #include <ui.h>
 #include <drawBackground.h>
-
 
 #pragma region global variables
 
@@ -37,15 +41,15 @@ bool updateGame()
 	//Audio::update();
 	updateSettings();
 
-	ClearBackground({ 0,0,0,255 });
+	//ClearBackground({ 0,0,0,255 });
 
 	if (!gameplayRunning)
 	{
-		Camera2D c = {};
-		c.offset = { GetScreenWidth() / 2.f, GetScreenHeight() / 2.f };
-		c.target = Vector2{ 500,500 };
+		Engine::Cam c = {};
+		c.offset = { Engine::getScreenWidth() / 2.f, Engine::getScreenHeight() / 2.f };
+		c.target = Engine::Vec2{ 500,500 };
 		c.zoom = 20;
-		//backgroundForMenu.draw(GetFrameTime(), assetManager, c, { 1000,1000 }, WHITE);
+		backgroundForMenu.draw(Engine::getFrameTime(), assetManager, c, {1000,1000}, Engine::White, gameplay.sceneRenderer);
 
 		mainMenuButtons.addTitle("Canvas Adventures");
 
