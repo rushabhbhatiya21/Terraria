@@ -58,7 +58,8 @@ void SwingAttack::render(Engine::AssetManager& assetManager, Engine::IRenderColl
 	//DrawTexturePro(tex, textureUVItem, destRect, origin, currentSwingAngle, WHITE);
 	Engine::Sprite sprite
 	{
-		tex,
+		&tex,
+		nullptr,
 		textureUVItem,
 		destRect,
 		origin,

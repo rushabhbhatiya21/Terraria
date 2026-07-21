@@ -63,7 +63,8 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 
 	Engine::Sprite healthBarSprite
 	{
-		assetManager.healthBar,
+		&assetManager.healthBar,
+		nullptr,
 		{ 0,0,(float)assetManager.healthBar.getWidth(), (float)assetManager.healthBar.getHeight()},
 		healthBarPos,
 		{ 0,0 },
@@ -100,7 +101,8 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 
 	Engine::Sprite healthSprite
 	{
-		assetManager.health,
+		&assetManager.health,
+		nullptr,
 		{ 0,0,(float)assetManager.health.getWidth(), (float)assetManager.health.getHeight()},
 		healthBarPos,
 		{ 0,0 },
@@ -132,7 +134,8 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 
 		Engine::Sprite healthSpriteTemp
 		{
-			assetManager.health,
+			&assetManager.health,
+			nullptr,
 			{ 0,0,(float)assetManager.health.getWidth(), (float)assetManager.health.getHeight()},
 			r,
 			{ 0,0 },

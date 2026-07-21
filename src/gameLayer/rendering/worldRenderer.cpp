@@ -103,7 +103,8 @@ void WorldRenderer::drawTile(const CachedTile& tile, Engine::IRenderCollector& c
 
 	Engine::Sprite sprite
 	{
-		assets->textures,
+		&assets->textures,
+		nullptr,
 		tile.srcRect,
 		{ drawX,drawY,TILE_SIZE,TILE_SIZE },
 		{ 0,0 },

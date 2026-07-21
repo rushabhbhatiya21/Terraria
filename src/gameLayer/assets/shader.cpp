@@ -1,4 +1,5 @@
 #include "shader.h"
+#include <iostream>
 #include <raylib.h>
 
 namespace Engine
@@ -22,6 +23,10 @@ namespace Engine
 	void ShaderE::loadShader(const char* vsFileName, const char* fsFileName)
 	{
 		impl->shader = ::LoadShader(vsFileName, fsFileName);
+		location = GetShaderLocation(impl->shader, "flash");
+		//std::cout << "**************************Shader id: "
+		//	<< impl->shader.id
+		//	<< "\n";
 	}
 
 	int ShaderE::getShaderLocation(const char* uniformName)
@@ -32,5 +37,15 @@ namespace Engine
 	void ShaderE::unloadShader()
 	{
 		UnloadShader(impl->shader);
+	}
+
+	unsigned int Engine::ShaderE::getNativeHandle() const
+	{
+		return impl->shader.id;
+	}
+
+	int Engine::ShaderE::getLocation() const
+	{
+		return location;
 	}
 }

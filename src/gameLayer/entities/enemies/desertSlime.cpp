@@ -26,7 +26,8 @@ void DesertSlime::drawSprite(Engine::AssetManager& assetManager, Engine::IRender
 
 	Engine::Sprite sprite
 	{
-		assetManager.desertSlime,
+		&assetManager.desertSlime,
+		nullptr,
 		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
 		aabb,
 		{ 0,0 },

@@ -196,12 +196,6 @@ namespace Engine
 			m_currentVertexArray = m_vertexArrayHandle;
 		}
 
-		if (m_currentProgram != m_shaderProgramHandle)
-		{
-			glUseProgram(m_shaderProgramHandle);
-			m_currentProgram = m_shaderProgramHandle;
-		}
-
 		// upload vertex buffer
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferHandle);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, vertexBuffer.size() * sizeof(Vertex), vertexBuffer.data());
@@ -214,12 +208,43 @@ namespace Engine
 
 		for (auto& cmd : drawCommands)
 		{
-			GLuint textureId = static_cast<GLuint>(cmd.renderState.texture->getNativeHandle());
+			// texture or default
+			GLuint textureId = 0;
+
+			if (cmd.renderState.texture)
+			{
+				textureId = static_cast<GLuint>(cmd.renderState.texture->getNativeHandle());
+			}
 
 			if (m_currentTexture != textureId)
 			{
 				glBindTexture(GL_TEXTURE_2D, textureId);
 				m_currentTexture = textureId;
+			}
+
+			// shader or default
+			GLuint shaderHandle = m_shaderProgramHandle;
+
+			if (cmd.renderState.shader)
+			{
+				shaderHandle = cmd.renderState.shader->getNativeHandle();
+				//std::cout << "Shader handle flash: " << shaderHandle << "\n";
+			}
+
+			if (m_currentProgram != shaderHandle)
+			{
+				glUseProgram(shaderHandle);
+				m_currentProgram = shaderHandle;
+
+				std::cout
+					<< "Projection location: "
+					<< cmd.renderState.shader->getLocation()
+					<< "\n";
+			}
+
+			if (cmd.renderState.shader)
+			{
+				glUniform1f(cmd.renderState.shader->getLocation(), cmd.renderState.flash);
 			}
 
 			// draw — indices are already absolute, no baseVertex needed

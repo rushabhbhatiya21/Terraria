@@ -12,11 +12,11 @@
 
 void Player::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
-	//bool flashing = flashTimer > 0;
+	bool flashing = flashTimer > 0;
 	//
-	//if (flashing)
-	//{
-	//	float flash = 1.f;
+	if (flashing)
+	{
+		float flash = 1.f;
 	//
 	//	BeginShaderMode(assetManager.flashShader);
 	//
@@ -26,7 +26,7 @@ void Player::render(Engine::AssetManager& assetManager, Engine::IRenderCollector
 	//		&flash,
 	//		SHADER_UNIFORM_FLOAT
 	//	);
-	//}
+	}
 
 	drawSprite(assetManager, collector);
 
@@ -53,44 +53,62 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 	// --- FRONT LAYER ---
 	//DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, Engine::White);
 
+	bool flashing = flashTimer > 0;
+	if (flashing)
+	{
+		float flash = 1.f;
+	}
+
 	Engine::Sprite bootsSprite
 	{
-		assetManager.getFeetTexture(equipments.boots.itemId),
+		&assetManager.getFeetTexture(equipments.boots.itemId),
+		&assetManager.flashShader,
+		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
 		0.f,
-		Engine::White
+		Engine::White,
+		flashing
 	};
 
 	Engine::Sprite helmetSprite
 	{
-		assetManager.getHeadTexture(equipments.helmet.itemId),
+		&assetManager.getHeadTexture(equipments.helmet.itemId),
+		&assetManager.flashShader,
+		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
 		0.f,
-		Engine::White
+		Engine::White,
+		flashing
 	};
 
 	Engine::Sprite backChestSprite
 	{
-		assetManager.getBackTexture(equipments.chest.itemId),
+		&assetManager.getBackTexture(equipments.chest.itemId),
+		&assetManager.flashShader,
+		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
 		0.f,
-		Engine::White
+		Engine::White,
+		flashing
 	};
 
 	Engine::Sprite frontChectSprite
 	{
-		assetManager.getFrontTexture(equipments.chest.itemId),
+		&assetManager.getFrontTexture(equipments.chest.itemId),
+		&assetManager.flashShader,
+		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
 		0.f,
-		Engine::White
+		Engine::White,
+		flashing
 	};
 
 	collector.submitSprite(bootsSprite);
@@ -127,7 +145,8 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		//DrawTexturePro(textureItem, textureUVItem, destRect, { 0.5f,0.5f }, 0.f, Engine::White);
 		Engine::Sprite heldItemSprite
 		{
-			textureItem,
+			&textureItem,
+			nullptr,
 			textureUVItem,
 			destRect,
 			{.5f,.5f},

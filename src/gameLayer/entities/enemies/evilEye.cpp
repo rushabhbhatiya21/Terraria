@@ -49,7 +49,8 @@ void EvilEye::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColl
 	//);
 	Engine::Sprite sprite
 	{
-		*tex,
+		tex,
+		nullptr,
 		getTextureAtlas(animations.positionX, animations.positionY, currentPhaseData->cellSizeX, currentPhaseData->cellSizeY),
 		aabb,
 		{ 1.2f, 2.5f },

@@ -19,7 +19,8 @@ void EvilEyeServant::drawSprite(Engine::AssetManager& assetManager, Engine::IRen
 
 	Engine::Sprite sprite
 	{
-		assetManager.evilEyeServant,
+		&assetManager.evilEyeServant,
+		nullptr,
 		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
 		getRectangleForEntity(physics.transform, spriteScale, spriteScale),
 		{ 0.f, spriteScale / 2 }, // origin (aabb - already mid so no need to touch x)
