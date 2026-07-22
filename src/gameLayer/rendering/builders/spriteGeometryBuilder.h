@@ -13,6 +13,6 @@ namespace Engine
 		void build(const Sprite& sprite, IGeometrySink& sink);
 
 	private:
-		Vertex generateVertex(const Sprite& sprite, Engine::Vec2& corner, Engine::Vec2& uv, const Engine::Vec2& textureSize, const float c, const float s);
+		Vertex generateVertex(const Sprite& sprite, Vec2& corner, Vec2& uv, const Vec2& textureSize, const float c, const float s);
 	};
 }
