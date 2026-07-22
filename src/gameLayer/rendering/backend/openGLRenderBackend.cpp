@@ -3,7 +3,7 @@
 #include "helper.h"
 #include <iostream>
 #include <raylib.h>
-#include <assert.h>
+#include <asserts.h>
 #include <rlgl.h>
 
 namespace Engine
@@ -170,12 +170,9 @@ namespace Engine
 		for (auto& cmd : drawCommands)
 		{
 			// texture or default
+			permaAssert(cmd.renderState.texture);
 			GLuint textureId = 0;
-
-			if (cmd.renderState.texture)
-			{
-				textureId = static_cast<GLuint>(cmd.renderState.texture->getNativeHandle());
-			}
+			textureId = static_cast<GLuint>(cmd.renderState.texture->getNativeHandle());
 
 			if (m_currentTexture != textureId)
 			{
@@ -184,8 +181,8 @@ namespace Engine
 			}
 
 			// shader or default
+			permaAssert(cmd.renderState.shader);
 			GLuint shaderHandle = m_shaderProgramHandle;
-
 			shaderHandle = cmd.renderState.shader->getNativeHandle();
 
 			if (m_currentProgram != shaderHandle)
@@ -201,11 +198,8 @@ namespace Engine
 				glUniform1f(flashLocation, cmd.renderState.flash);
 
 			// set uTexture to 0 - as we only bind 1 texture to GL_TEXTURE0
-			if (cmd.renderState.texture)
-			{
-				int textureLocation = cmd.renderState.shader->getTextureLocation();
-				glUniform1i(textureLocation, 0);
-			}
+			int textureLocation = cmd.renderState.shader->getTextureLocation();
+			glUniform1i(textureLocation, 0);
 
 			// set uProjection
 			if (m_projectionDirty)
