@@ -316,7 +316,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 	Engine::Sprite selectedSlot
 	{
 		&assetManager.frame,
-		nullptr,
+		&assetManager.defaultShader,
 		getTextureAtlas(0, 0, assetManager.frame.getWidth(), assetManager.frame.getHeight()),
 		rect,
 		{ 0,0 },
@@ -343,7 +343,7 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 		Engine::Sprite selectedItem
 		{
 			&tex,
-			nullptr,
+			&assetManager.defaultShader,
 			atlas,
 			shrinkRectanglePercentage(rect, .3f, .3f),
 			{ 0,0 },
@@ -477,7 +477,7 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& ass
 	Engine::Sprite draggedItemSprite
 	{
 		&tex,
-		nullptr,
+		&assetManager.defaultShader,
 		atlas,
 		r,
 		{ 0,0 },
@@ -1442,7 +1442,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		Engine::Sprite frame
 		{
 			&assetManager.frame,
-			nullptr,
+			&assetManager.defaultShader,
 			{ 0,0,(float)assetManager.frame.getWidth(),(float)assetManager.frame.getHeight()},
 			{ (float)blockX, (float)blockY, 1, 1 },
 			{ 0,0 },
@@ -1785,7 +1785,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		Engine::Sprite heart
 		{
 			&assetManager.hearts,
-			nullptr,
+			&assetManager.defaultShader,
 			getTextureAtlas(x, 0, assetManager.hearts.getWidth() / 3, assetManager.hearts.getHeight()),
 			oneHeartRectangle,
 			{ 0,0 },
@@ -2093,7 +2093,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			Engine::Sprite craftingRecipe
 			{
 				&tex,
-				nullptr,
+				&assetManager.defaultShader,
 				atlas,
 				rr,
 				{ 0,0 },
@@ -2134,7 +2134,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 				Engine::Sprite craftingIngredient
 				{
 					&tex,
-					nullptr,
+					&assetManager.defaultShader,
 					atlas,
 					ri,
 					{ 0,0 },

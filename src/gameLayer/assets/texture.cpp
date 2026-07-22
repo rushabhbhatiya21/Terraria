@@ -11,15 +11,10 @@ namespace Engine
 	public:
 		GLuint textureId = 0;
 
-		//Texture2D texture{};
-
 		~TextureImpl()
 		{
 			if (textureId != 0)
 				glDeleteTextures(1, &textureId);
-
-		//	if (texture.id != 0)
-		//		UnloadTexture(texture);
 		}
 	};
 
@@ -59,10 +54,6 @@ namespace Engine
 
 		UnloadImage(image);
 		glBindTexture(GL_TEXTURE_2D, 0);
-
-		//impl->texture = LoadTexture((std::string(RESOURCES_PATH) + path).c_str());
-		//width = impl->texture.width;
-		//height = impl->texture.height;
 	}
 
 	uint32_t Texture::getNativeHandle() const

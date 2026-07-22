@@ -15,48 +15,9 @@ namespace Engine
 
 	bool OpenGLRenderBackend::initialize()
 	{
-		std::cout << "initialize() this = " << this << '\n';
 		// bind vao
 		glGenVertexArrays(1, &m_vertexArrayHandle);
 		glBindVertexArray(m_vertexArrayHandle);
-
-		const std::string vSource = std::string(RESOURCES_PATH) + "shaders/sprite.vert";
-		GLuint vertShaderHandle = compileShader(GL_VERTEX_SHADER, vSource);
-		if (vertShaderHandle == 0)
-		{
-			std::cout << "Compile vertex shader failed. = " << this << '\n';
-			return false;
-		}
-
-		const std::string fSource = std::string(RESOURCES_PATH) + "shaders/sprite.frag";
-		GLuint fragShaderHandle = compileShader(GL_FRAGMENT_SHADER, fSource);
-		if (fragShaderHandle == 0)
-		{
-			std::cout << "Compile fragment shader failed. = " << this << '\n';
-			return false;
-		}
-
-		m_shaderProgramHandle = createShaderProgram(vertShaderHandle, fragShaderHandle);
-		if (m_shaderProgramHandle == 0)
-		{
-			std::cout << "Compile shader program failed. = " << this << '\n';
-			return false;
-		}
-
-		glUseProgram(m_shaderProgramHandle);
-
-		m_projectionLocation = glGetUniformLocation(m_shaderProgramHandle, "uProjection");
-		if (m_projectionLocation == -1)
-		{
-			std::cout << "Get Projection failed. = " << this << '\n';
-			//return false;
-		}
-
-		m_textureLocation = glGetUniformLocation(m_shaderProgramHandle, "uTexture");
-		if (m_textureLocation != -1)
-		{
-			glUniform1i(m_textureLocation, 0);
-		}
 
 		// unbind vao
 		glBindVertexArray(0);
@@ -77,10 +38,10 @@ namespace Engine
 			<< " ShaderProgram=" << m_shaderProgramHandle
 			<< '\n';
 
-		std::cout << "sizeof(Vertex) = " << sizeof(Vertex) << '\n';
-		std::cout << "position offset = " << offsetof(Vertex, position) << '\n';
-		std::cout << "uv offset = " << offsetof(Vertex, uv) << '\n';
-		std::cout << "tint offset = " << offsetof(Vertex, tint) << '\n';
+		std::cout << "sizeof(Vertex)=" << sizeof(Vertex) << '\n';
+		std::cout << "position offset=" << offsetof(Vertex, position) << '\n';
+		std::cout << "uv offset=" << offsetof(Vertex, uv) << '\n';
+		std::cout << "tint offset=" << offsetof(Vertex, tint) << '\n';
 
 		return true;
 	}
@@ -225,26 +186,38 @@ namespace Engine
 			// shader or default
 			GLuint shaderHandle = m_shaderProgramHandle;
 
-			if (cmd.renderState.shader)
-			{
-				shaderHandle = cmd.renderState.shader->getNativeHandle();
-				//std::cout << "Shader handle flash: " << shaderHandle << "\n";
-			}
+			shaderHandle = cmd.renderState.shader->getNativeHandle();
 
 			if (m_currentProgram != shaderHandle)
 			{
 				glUseProgram(shaderHandle);
 				m_currentProgram = shaderHandle;
-
-				std::cout
-					<< "Projection location: "
-					<< cmd.renderState.shader->getLocation()
-					<< "\n";
+				m_projectionDirty = true;
 			}
 
-			if (cmd.renderState.shader)
+			// set flash shader param
+			int flashLocation = cmd.renderState.shader->getShaderUniformLocation("flash");
+			if (flashLocation != -1)
+				glUniform1f(flashLocation, cmd.renderState.flash);
+
+			// set uTexture to 0 - as we only bind 1 texture to GL_TEXTURE0
+			if (cmd.renderState.texture)
 			{
-				glUniform1f(cmd.renderState.shader->getLocation(), cmd.renderState.flash);
+				int textureLocation = cmd.renderState.shader->getShaderUniformLocation("uTexture");
+				glUniform1i(textureLocation, 0);
+			}
+
+			// set uProjection
+			if (m_projectionDirty)
+			{
+				int projectionLocation = cmd.renderState.shader->getShaderUniformLocation("uProjection");
+				glUniformMatrix4fv(
+					projectionLocation,
+					1,
+					GL_FALSE,
+					m_currentProjection.data()
+				);
+				m_projectionDirty = false;
 			}
 
 			// draw — indices are already absolute, no baseVertex needed
@@ -293,9 +266,6 @@ namespace Engine
 			}
 			return 0;
 		}
-
-
-
 		return shaderHandle;
 	}
 
@@ -479,7 +449,7 @@ namespace Engine
 
 	void OpenGLRenderBackend::setProjection(std::array<float, 16>& projection)
 	{
-		glUseProgram(m_shaderProgramHandle);
-		glUniformMatrix4fv(m_projectionLocation, 1, GL_FALSE, projection.data());
+		m_currentProjection = projection;
+		m_projectionDirty = true;
 	}
 }

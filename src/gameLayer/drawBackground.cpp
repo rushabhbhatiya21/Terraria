@@ -88,7 +88,7 @@ void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, E
 			Engine::Sprite bgSprite
 			{
 				bg,
-				nullptr,
+				&assetManager.defaultShader,
 				src,
 				dest,
 				{ 0,0 },

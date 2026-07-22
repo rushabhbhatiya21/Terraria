@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 
 namespace Engine
 {
@@ -17,14 +16,17 @@ namespace Engine
 		~ShaderE();
 
 		void loadShader(const char* vsFileName, const char* fsFileName);
-		int getShaderLocation(const char* uniformName);
+		int getShaderUniformLocation(const char* uniformName) const;
 		void unloadShader();
 		unsigned int getNativeHandle() const;
-		int getLocation() const;
+
 
 	private:
-		class ShaderImpl;
-		std::unique_ptr<ShaderImpl> impl;
-		int location = 0;
+		unsigned int ID;
+
+		// uniforms
+		int flashLocation = 0;
+		int textureLocation = 0;
+		int projectionLocation = 0;
 	};
 }

@@ -9,7 +9,6 @@ namespace Engine
 {
 	void AssetManager::loadAll()
 	{
-		ShaderE shader;
 		for (auto& t : texList)
 		{
 			const std::string& p = std::string(RESOURCES_PATH) + std::string(t.path);
@@ -18,10 +17,12 @@ namespace Engine
 
 		for (auto& s : shaderList)
 		{
-			s.shader->loadShader(0, (std::string(RESOURCES_PATH) + s.path).c_str());
-		}
+			s.shader->loadShader(
+				(std::string(RESOURCES_PATH) + "shaders/sprite.vs").c_str(),
+				(std::string(RESOURCES_PATH) + s.path).c_str()
+			);
 
-		flashShaderLocation = flashShader.getShaderLocation("flash");
+		}
 
 		//optional blur the background
 		//SetTextureFilter(forestBG, TEXTURE_FILTER_TRILINEAR);

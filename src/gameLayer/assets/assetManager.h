@@ -46,6 +46,7 @@ namespace Engine
 		Texture caveBG = {};
 		Texture nightBG = {};
 
+		ShaderE defaultShader = {};
 		ShaderE blurShader = {};
 		ShaderE bloomShader = {};
 		ShaderE flashShader = {};
@@ -81,9 +82,10 @@ namespace Engine
 		};
 
 		std::vector<ShaderEntry> shaderList = {
-			{&blurShader,  "shaders/blur.fs"},
-			{&bloomShader, "shaders/bloom.fs"},
-			{&flashShader, "shaders/flash.fs"}
+			{&defaultShader, "shaders/sprite.fs"},
+			{&blurShader,    "shaders/blur.fs"  },
+			{&bloomShader,   "shaders/bloom.fs" },
+			{&flashShader,   "shaders/flash.fs" }
 		};
 
 		void loadAll();

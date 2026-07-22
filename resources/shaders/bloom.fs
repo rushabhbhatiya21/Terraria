@@ -1,11 +1,11 @@
-#version 330
+#version 330 core
 
 // Input vertex attributes (from vertex shader)
 in vec2 fragTexCoord;
 in vec4 fragColor;
 
 // Input uniform values
-uniform sampler2D texture0;
+uniform sampler2D uTexture;
 uniform vec4 colDiffuse;
 
 // Output fragment color
@@ -23,7 +23,7 @@ void main()
     vec2 sizeFactor = vec2(1)/size*quality;
 
     // Texel color fetching from texture sampler
-    vec4 source = texture(texture0, fragTexCoord);
+    vec4 source = texture(uTexture, fragTexCoord);
 
     const int range = 2;            // should be = (samples - 1)/2;
 
@@ -31,7 +31,7 @@ void main()
     {
         for (int y = -range; y <= range; y++)
         {
-            sum += texture(texture0, fragTexCoord + vec2(x, y)*sizeFactor);
+            sum += texture(uTexture, fragTexCoord + vec2(x, y)*sizeFactor);
         }
     }
 

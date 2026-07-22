@@ -59,7 +59,7 @@ void SwingAttack::render(Engine::AssetManager& assetManager, Engine::IRenderColl
 	Engine::Sprite sprite
 	{
 		&tex,
-		nullptr,
+		&assetManager.defaultShader,
 		textureUVItem,
 		destRect,
 		origin,

@@ -32,7 +32,7 @@ void Slime::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollec
 	Engine::Sprite sprite
 	{
 		&assetManager.slime,
-		nullptr,
+		&assetManager.defaultShader,
 		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
 		aabb,
 		{ 0,0 },

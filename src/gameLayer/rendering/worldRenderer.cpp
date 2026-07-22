@@ -104,7 +104,7 @@ void WorldRenderer::drawTile(const CachedTile& tile, Engine::IRenderCollector& c
 	Engine::Sprite sprite
 	{
 		&assets->textures,
-		nullptr,
+		&assets->defaultShader,
 		tile.srcRect,
 		{ drawX,drawY,TILE_SIZE,TILE_SIZE },
 		{ 0,0 },

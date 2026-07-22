@@ -146,7 +146,7 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		Engine::Sprite heldItemSprite
 		{
 			&textureItem,
-			nullptr,
+			&assetManager.defaultShader,
 			textureUVItem,
 			destRect,
 			{.5f,.5f},

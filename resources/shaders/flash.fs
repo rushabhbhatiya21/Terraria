@@ -3,14 +3,14 @@
 in vec2 fragTexCoord;
 in vec4 fragColor;
 
-uniform sampler2D texture0;
+uniform sampler2D uTexture;
 uniform float flash;
 
 out vec4 finalColor;
 
 void main()
 {
-	vec4 texel = texture(texture0, fragTexCoord);
+	vec4 texel = texture(uTexture, fragTexCoord);
 
 	vec3 color = mix(texel.rgb, vec3(1.0), flash);
 

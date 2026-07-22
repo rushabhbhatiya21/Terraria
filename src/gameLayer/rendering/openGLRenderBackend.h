@@ -35,10 +35,6 @@ namespace Engine
 		// GPU Resources
 		GLuint m_shaderProgramHandle = 0;
 
-		GLint m_projectionLocation = -1;
-		GLint m_textureLocation = -1;
-		GLint m_useTextureLocation = -1;
-
 		unsigned int m_vertexBufferHandle = 0;
 		unsigned int m_indexBufferHandle = 0;
 		unsigned int m_vertexArrayHandle = 0;
@@ -50,6 +46,8 @@ namespace Engine
 		GLuint m_currentTexture = 0;
 		GLuint m_currentProgram = 0;
 		GLuint m_currentVertexArray = 0;
+		bool m_projectionDirty = false;
+		std::array<float, 16> m_currentProjection{};
 
 		// to save raylib state
 		GLint prevFBO = 0, prevProgram = 0, prevVAO = 0, prevVBO = 0, prevEBO = 0;

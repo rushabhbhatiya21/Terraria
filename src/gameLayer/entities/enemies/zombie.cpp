@@ -37,7 +37,7 @@ void Zombie::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 	Engine::Sprite sprite
 	{
 		&assetManager.zombie,
-		nullptr,
+		&assetManager.defaultShader,
 		getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft),
 		aabb,
 		{ 0,0 },

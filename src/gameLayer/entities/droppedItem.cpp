@@ -41,7 +41,7 @@ void DroppedItem::render(Engine::AssetManager& assetManager, Engine::IRenderColl
 	Engine::Sprite sprite
 	{
 		&tex,
-		nullptr,
+		&assetManager.defaultShader,
 		rectangle,
 		aabb,
 		{ 0,0 },
