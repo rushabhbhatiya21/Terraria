@@ -1,19 +1,27 @@
 #include "spriteBatch.h"
 #include <asserts.h>
+#include <rendering/types/sprite.h>
+#include <rendering/types/coloredRect.h>
 #include <rendering/batching/drawCommand.h>
 #include <rendering/IRenderBackend.h>
 
 namespace Engine
 {
-	SpriteBatch::SpriteBatch(SpriteGeometryBuilder& builder)
-		: builder(builder)
+	SpriteBatch::SpriteBatch(SpriteGeometryBuilder& spriteBuilder, RectGeometryBuilder& rectBuilder)
+		: spriteBuilder(spriteBuilder), rectBuilder(rectBuilder)
 	{
 	}
 
 	void SpriteBatch::submitSprite(const Sprite& sprite)
 	{
-		builder.build(sprite, *this);
+		spriteBuilder.build(sprite, *this);
 	}
+
+	void SpriteBatch::submitRect(const ColoredRect& rect)
+	{
+		rectBuilder.build(rect, *this);
+	}
+
 
 	//std::vector<DrawCommand> SpriteBatch::buildDrawCommands()
 	//{

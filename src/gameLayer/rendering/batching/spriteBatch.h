@@ -3,12 +3,14 @@
 #include <algorithm>
 #include <rendering/IGeometrySink.h>
 #include <rendering/types/index.h>
-#include <rendering/types/sprite.h>
 #include <rendering/types/renderState.h>
 #include <rendering/builders/spriteGeometryBuilder.h>
+#include <rendering/builders/rectGeometryBuilder.h>
 
 namespace Engine
 {
+	struct Sprite;
+	struct ColoredRect;
 	struct DrawCommand;
 	class IRenderBackend;
 
@@ -35,11 +37,13 @@ namespace Engine
 
 		EmissionState currentEmission;
 
-		SpriteGeometryBuilder& builder;
+		SpriteGeometryBuilder& spriteBuilder;
+		RectGeometryBuilder& rectBuilder;
 
 	public:
-		SpriteBatch(SpriteGeometryBuilder& builder);
+		SpriteBatch(SpriteGeometryBuilder& spriteBuilder, RectGeometryBuilder& rectBuilder);
 		void submitSprite(const Sprite& sprite);
+		void submitRect(const ColoredRect& rect);
 		void flush(IRenderBackend& backend);
 
 	private:
