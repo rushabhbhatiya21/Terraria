@@ -1,4 +1,5 @@
 #include "sceneRenderer.h"
+#include "sceneRenderer.h"
 #include <array>
 #include <window/window.h>
 #include "IRenderBackend.h"
@@ -76,4 +77,9 @@ void SceneRenderer::endFrame()
 void SceneRenderer::submitSprite(const Engine::Sprite& sprite)
 {
 	spriteBatch.submitSprite(sprite);
+}
+
+void SceneRenderer::submitRect(const Engine::ColoredRect& rect)
+{
+	spriteBatch.submitRect(rect);
 }
