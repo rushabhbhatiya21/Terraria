@@ -16,9 +16,12 @@ namespace Engine
 		~ShaderE();
 
 		void loadShader(const char* vsFileName, const char* fsFileName);
-		int getShaderUniformLocation(const char* uniformName) const;
 		void unloadShader();
 		unsigned int getNativeHandle() const;
+		int getShaderUniformLocation(const char* uniformName) const;
+		int getFlashLocation() const;
+		int getTextureLocation() const;
+		int getProjectionLocation() const;
 
 
 	private:

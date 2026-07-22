@@ -1,4 +1,7 @@
 #include "shader.h"
+#include "shader.h"
+#include "shader.h"
+#include "shader.h"
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -106,11 +109,6 @@ namespace Engine
 		glDeleteShader(fragment);
 	}
 
-	int ShaderE::getShaderUniformLocation(const char* uniformName) const
-	{
-		return glGetUniformLocation(ID, uniformName);
-	}
-
 	void ShaderE::unloadShader()
 	{
 		glDeleteProgram(ID);
@@ -119,5 +117,25 @@ namespace Engine
 	unsigned int ShaderE::getNativeHandle() const
 	{
 		return ID;
+	}
+
+	int ShaderE::getShaderUniformLocation(const char* uniformName) const
+	{
+		return glGetUniformLocation(ID, uniformName);
+	}
+
+	int ShaderE::getFlashLocation() const
+	{
+		return flashLocation;
+	}
+
+	int Engine::ShaderE::getTextureLocation() const
+	{
+		return textureLocation;
+	}
+
+	int Engine::ShaderE::getProjectionLocation() const
+	{
+		return projectionLocation;
 	}
 }

@@ -196,21 +196,21 @@ namespace Engine
 			}
 
 			// set flash shader param
-			int flashLocation = cmd.renderState.shader->getShaderUniformLocation("flash");
+			int flashLocation = cmd.renderState.shader->getFlashLocation();
 			if (flashLocation != -1)
 				glUniform1f(flashLocation, cmd.renderState.flash);
 
 			// set uTexture to 0 - as we only bind 1 texture to GL_TEXTURE0
 			if (cmd.renderState.texture)
 			{
-				int textureLocation = cmd.renderState.shader->getShaderUniformLocation("uTexture");
+				int textureLocation = cmd.renderState.shader->getTextureLocation();
 				glUniform1i(textureLocation, 0);
 			}
 
 			// set uProjection
 			if (m_projectionDirty)
 			{
-				int projectionLocation = cmd.renderState.shader->getShaderUniformLocation("uProjection");
+				int projectionLocation = cmd.renderState.shader->getProjectionLocation();
 				glUniformMatrix4fv(
 					projectionLocation,
 					1,
