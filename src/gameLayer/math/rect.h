@@ -10,6 +10,38 @@ namespace Engine
         float height;           // Rectangle height
     };
 
+    inline Rect operator+=(Rect& a, Vec2& b)
+    {
+        a.x += b.x;
+        a.y += b.y;
+        return a;
+    }
+
+    inline Rect operator-=(Rect& a, Vec2& b)
+    {
+        a.x += b.x;
+        a.y += b.y;
+        return a;
+    }
+
+    inline Vec2 operator+(const Rect& a, const Vec2& b)
+    {
+        return Vec2
+        {
+            a.x + b.x,
+            a.y + b.y
+        };
+    }
+
+    inline Vec2 operator-(const Rect& a, const Vec2& b)
+    {
+        return Vec2
+        {
+            a.x - b.x,
+            a.y - b.y
+        };
+    }
+
     inline bool checkCollisionPointRec(Vec2 point, Rect rec)
     {
         bool collision = false;
