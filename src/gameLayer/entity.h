@@ -61,8 +61,10 @@ struct Entity
 	float life = 0.f;
 	bool shouldApplyGravity = true;
 	bool shouldResolveConstraints = true;
+	float flash = 0.f;
 
 	float useTimer = 0;
+	float maxFlashTime = 0.f;
 	float flashTimer = 0.f;
 	float blinkTimer = 0.f;
 	float hitStopTimer = 0.f;

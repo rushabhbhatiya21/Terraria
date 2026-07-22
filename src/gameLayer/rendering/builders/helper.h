@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <math/vec2.h>
+#include <math/rect.h>
 
 inline Engine::Vec2 rotateAroundOrigin(const Engine::Vec2& point, float c, float s)
 {
@@ -19,6 +20,27 @@ inline std::array<Engine::Vec2, 4> generateCorners(float w, float h)
 		Engine::Vec2{ 0, h }
 	};
 };
+
+inline std::array<Engine::Vec2, 4> generateTransformedCorners(
+	const Engine::Rect& rect,
+	const Engine::Vec2& origin,
+	float rotation)
+{
+	auto corners = generateCorners(rect.width, rect.height);
+
+	const float theta = rotation * Engine::Deg2Rad;
+	const float c = cosf(theta);
+	const float s = sinf(theta);
+
+	for (auto& corner : corners)
+	{
+		corner -= origin;
+		corner = rotateAroundOrigin(corner, c, s);
+		corner += Engine::Vec2{ rect.x, rect.y };
+	}
+
+	return corners;
+}
 
 inline std::array<Engine::Vec2, 4> generateUVs(float x, float y, float w, float h)
 {

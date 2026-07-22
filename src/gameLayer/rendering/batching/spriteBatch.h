@@ -6,11 +6,16 @@
 #include <rendering/types/renderState.h>
 #include <rendering/builders/spriteGeometryBuilder.h>
 #include <rendering/builders/rectGeometryBuilder.h>
+#include <rendering/builders/lineGeometryBuilder.h>
+#include <rendering/builders/outlinedRectGeometryBuilder.h>
 
 namespace Engine
 {
 	struct Sprite;
 	struct ColoredRect;
+	struct Line;
+	struct OutlinedRect;
+
 	struct DrawCommand;
 	class IRenderBackend;
 
@@ -39,11 +44,20 @@ namespace Engine
 
 		SpriteGeometryBuilder& spriteBuilder;
 		RectGeometryBuilder& rectBuilder;
+		LineGeometryBuilder& lineBuilder;
+		OutlinedRectGeometryBuilder& outlinedRectBuilder;
 
 	public:
-		SpriteBatch(SpriteGeometryBuilder& spriteBuilder, RectGeometryBuilder& rectBuilder);
+		SpriteBatch(
+			SpriteGeometryBuilder& spriteBuilder, 
+			RectGeometryBuilder& rectBuilder,
+			LineGeometryBuilder& lineBuilder,
+			OutlinedRectGeometryBuilder& outlinedRectBuilder
+		);
 		void submitSprite(const Sprite& sprite);
 		void submitRect(const ColoredRect& rect);
+		void submitLine(const Line& rect);
+		void submitOutlinedRect(const OutlinedRect& rect);
 		void flush(IRenderBackend& backend);
 
 	private:

@@ -1,5 +1,4 @@
 #pragma once
-#include <math/vec2.h>
 #include <math/rect.h>
 #include <math/color.h>
 #include <assets/texture.h>
@@ -7,30 +6,35 @@
 
 namespace Engine
 {
-	struct ColoredRect
+	struct OutlinedRect
 	{
-		Rect destRect = {};
-		Vec2 origin = { 0.0f, 0.0f };
+		Rect rect = {};
+		Vec2 origin = {};
 		float rotation = 0.f;
+		float thickness = 0.f;
 		Color4f tint = White;
 
 		const Texture& texture;
 		const ShaderE& shader;
 
-		ColoredRect(
-			const Rect& destRect,
+		OutlinedRect
+		(
+			const Rect& rect,
 			const Vec2& origin,
-			const float& rotation,
+			float rotation,
+			float thickness,
 			const Color4f& tint,
 			const Texture& texture,
 			const ShaderE& shader
 		)
-			: destRect(destRect),
-			origin(origin),
-			rotation(rotation),
-			tint(tint),
-			texture(texture),
-			shader(shader)
-		{ }
+			: rect(rect)
+			, origin(origin)
+			, rotation(rotation)
+			, thickness(thickness)
+			, tint(tint)
+			, texture(texture)
+			, shader(shader)
+		{
+		}
 	};
 }

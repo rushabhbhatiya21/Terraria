@@ -14,6 +14,8 @@ namespace Engine
 
 	struct Sprite;
 	struct ColoredRect;
+	struct Line;
+	struct OutlinedRect;
 
 	class SpriteBatch;
 	class IRenderBackend;
@@ -27,8 +29,11 @@ public:
 	void beginPass(Engine::RenderPass pass, Engine::Cam& camera);
 	void endPass();
 	void endFrame();
+
 	void submitSprite(const Engine::Sprite& sprite) override;
 	void submitRect(const Engine::ColoredRect& rect) override;
+	void submitLine(const Engine::Line& line) override;
+	void submitOutlinedRect(const Engine::OutlinedRect& rect) override;
 
 private:
 	Engine::SpriteBatch& spriteBatch;

@@ -4,6 +4,8 @@ namespace Engine
 {
 	struct Sprite;
 	struct ColoredRect;
+	struct Line;
+	struct OutlinedRect;
 
 	class IRenderCollector
 	{
@@ -12,5 +14,7 @@ namespace Engine
 
 		virtual void submitSprite(const Sprite& sprite) = 0;
 		virtual void submitRect(const ColoredRect& rect) = 0;
+		virtual void submitLine(const Line& line) = 0;
+		virtual void submitOutlinedRect(const OutlinedRect& rect) = 0;
 	};
 }

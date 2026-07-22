@@ -83,3 +83,13 @@ void SceneRenderer::submitRect(const Engine::ColoredRect& rect)
 {
 	spriteBatch.submitRect(rect);
 }
+
+void SceneRenderer::submitLine(const Engine::Line& line)
+{
+	spriteBatch.submitLine(line);
+}
+
+void SceneRenderer::submitOutlinedRect(const Engine::OutlinedRect& rect)
+{
+	spriteBatch.submitOutlinedRect(rect);
+}

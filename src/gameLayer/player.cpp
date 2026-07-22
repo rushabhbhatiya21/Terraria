@@ -12,32 +12,6 @@
 
 void Player::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
-	bool flashing = flashTimer > 0;
-	//
-	if (flashing)
-	{
-		float flash = 1.f;
-	//
-	//	BeginShaderMode(assetManager.flashShader);
-	//
-	//	SetShaderValue(
-	//		assetManager.flashShader,
-	//		assetManager.flashShaderLocation,
-	//		&flash,
-	//		SHADER_UNIFORM_FLOAT
-	//	);
-	}
-
-	drawSprite(assetManager, collector);
-
-	//if (flashing)
-	//{
-	//	EndShaderMode();
-	//}
-}
-
-void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
-{
 	Transform2D playerSprite = physics.transform;
 	playerSprite.w = 1;
 	playerSprite.h = 2;
@@ -53,15 +27,13 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 	// --- FRONT LAYER ---
 	//DrawTexturePro(assetManager.getFrontTexture(equipments.chest.itemId), textureUV, aabb, { 0,0 }, 0.f, Engine::White);
 
-	bool flashing = flashTimer > 0;
-	if (flashing)
+	if (flashTimer > 0)
 	{
-		float flash = 1.f;
+		flash = std::clamp(flashTimer / maxFlashTime, 0.0f, 1.0f);
 	}
 
 	Engine::Sprite bootsSprite
 	{
-		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
@@ -69,12 +41,11 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		Engine::White,
 		assetManager.getFeetTexture(equipments.boots.itemId),
 		assetManager.flashShader,
-		flashing
+		flash
 	};
 
 	Engine::Sprite helmetSprite
 	{
-		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
@@ -82,12 +53,11 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		Engine::White,
 		assetManager.getHeadTexture(equipments.helmet.itemId),
 		assetManager.flashShader,
-		flashing
+		flash
 	};
 
 	Engine::Sprite backChestSprite
 	{
-		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
@@ -95,12 +65,11 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		Engine::White,
 		assetManager.getBackTexture(equipments.chest.itemId),
 		assetManager.flashShader,
-		flashing
+		flash
 	};
 
 	Engine::Sprite frontChectSprite
 	{
-		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
@@ -108,7 +77,7 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		Engine::White,
 		assetManager.getFrontTexture(equipments.chest.itemId),
 		assetManager.flashShader,
-		flashing
+		flash
 	};
 
 	collector.submitSprite(bootsSprite);
@@ -212,7 +181,6 @@ void Player::updateMovement(float deltaTime)
 	}
 	if ((Engine::isKeyDown(Engine::Key::Down) || Engine::isKeyDown(Engine::Key::S)) && Engine::isKeyPressed(Engine::Key::Space) && physics.standingOnPlatform)
 	{
-		printf("down jump pressed\n");
 		physics.dropThroughTimer = 0.2f;
 		droppedThrough = true;
 	}
@@ -285,6 +253,7 @@ void Player::updateAnimation(float deltaTime)
 void Player::onHit()
 {
 	flashTimer = .15f;
+	maxFlashTime = flashTimer;
 }
 
 Json Player::formatToJson()

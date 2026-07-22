@@ -11,8 +11,5 @@ namespace Engine
 	{
 	public:
 		void build(const Sprite& sprite, IGeometrySink& sink);
-
-	private:
-		Vertex generateVertex(const Sprite& sprite, Vec2& corner, Vec2& uv, const Vec2& textureSize, const float c, const float s);
 	};
 }

@@ -16,12 +16,14 @@
 #include <saveMap.h>
 #include <worldGenerator.h>
 #include <crafting.h>
-
 #include <shake.h>
 #include <lighting.h>
 
+// renderable types
 #include <rendering/types/sprite.h>
 #include <rendering/types/coloredRect.h>
+#include <rendering/types/line.h>
+#include <rendering/types/outlinedRect.h>
 
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>
@@ -35,8 +37,7 @@
 #include <items/itemUse.h>
 
 #include <combat/blockSpawn.h>
-
-#include "ui/popupText.h"
+#include <ui/popupText.h>
 
 
 #pragma region sky colors
@@ -1519,6 +1520,18 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			//);
 		}
 
+		Engine::OutlinedRect orect
+		{
+			e.second->physics.transform.getAABB(),
+			{0,0},
+			0.f,
+			0.1f,
+			Engine::White,
+			assetManager.whiteTexture,
+			assetManager.defaultShader
+		};
+		sceneRenderer.submitOutlinedRect(orect);
+
 		e.second->render(assetManager, sceneRenderer);
 	}
 
@@ -1788,18 +1801,8 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	heartRectangle = placeReactangleTopRightCorner(heartRectangle, w);
 
+	// for debug
 	//DrawRectangle(heartRectangle.x, heartRectangle.y, heartRectangle.width, heartRectangle.height, RED);
-	
-	//Engine::ColoredRect lifeRect
-	//{
-	//	heartRectangle,
-	//	{ 0.0f, 0.0f },
-	//	0.f,
-	//	Engine::Blank,
-	//	assetManager.whiteTexture,
-	//	assetManager.defaultShader
-	//};
-	//sceneRenderer.submitRect(lifeRect);
 
 	float damagedLife = std::min((float)player.stats.defensive.maxHealth - player.life, (float)player.stats.defensive.maxHealth);
 

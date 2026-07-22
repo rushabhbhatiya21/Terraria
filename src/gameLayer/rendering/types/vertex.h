@@ -6,8 +6,19 @@ namespace Engine
 {
 	struct Vertex
 	{
-		Engine::Vec2 position = {};
-		Engine::Vec2 uv = {};
-		Engine::Color4f tint = {};
+		Vec2 position;
+		Vec2 uv;
+		Color4f tint;
+
+		Vertex(
+			const Vec2 position = {},
+			const Vec2 uv = {},
+			const Color4f tint = White
+		)
+			:
+			position(position),
+			uv(uv),
+			tint(tint)
+		{ }
 	};
 }

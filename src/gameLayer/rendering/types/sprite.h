@@ -9,14 +9,33 @@ namespace Engine
 {
 	struct Sprite
 	{
-		Rect srcRect = {};
-		Rect destRect = {};
-		Vec2 origin = {};
-		float rotation = 0.f;
-		Color4f tint = White;
+		Rect srcRect;
+		Rect destRect;
+		Vec2 origin;
+		float rotation;
+		Color4f tint;
 
 		const Texture& texture;
 		const ShaderE& shader;
 		float flash = 0.0f;
+
+		Sprite(
+			const Rect srcRect,
+			const Rect destRect,
+			const Vec2 origin,
+			const float rotation,
+			const Color4f tint,
+			const Texture& texture,
+			const ShaderE& shader,
+			const float flash = 0.f
+		)
+			: srcRect(srcRect),
+			destRect(destRect),
+			origin(origin),
+			rotation(rotation),
+			tint(tint),
+			texture(texture),
+			shader(shader)
+		{ }
 	};
 }

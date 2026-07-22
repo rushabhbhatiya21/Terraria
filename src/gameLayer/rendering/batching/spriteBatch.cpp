@@ -1,14 +1,23 @@
 #include "spriteBatch.h"
+#include "spriteBatch.h"
+#include "spriteBatch.h"
 #include <asserts.h>
 #include <rendering/types/sprite.h>
 #include <rendering/types/coloredRect.h>
+#include <rendering/types/line.h>
+#include <rendering/types/outlinedRect.h>
 #include <rendering/batching/drawCommand.h>
 #include <rendering/IRenderBackend.h>
 
 namespace Engine
 {
-	SpriteBatch::SpriteBatch(SpriteGeometryBuilder& spriteBuilder, RectGeometryBuilder& rectBuilder)
-		: spriteBuilder(spriteBuilder), rectBuilder(rectBuilder)
+	SpriteBatch::SpriteBatch(
+		SpriteGeometryBuilder& sb,
+		RectGeometryBuilder& rb,
+		LineGeometryBuilder& lb,
+		OutlinedRectGeometryBuilder& orb
+	)
+		: spriteBuilder(sb), rectBuilder(rb), lineBuilder(lb), outlinedRectBuilder(orb)
 	{
 	}
 
@@ -20,6 +29,16 @@ namespace Engine
 	void SpriteBatch::submitRect(const ColoredRect& rect)
 	{
 		rectBuilder.build(rect, *this);
+	}
+
+	void SpriteBatch::submitLine(const Line& line)
+	{
+		lineBuilder.build(line, *this);
+	}
+
+	void SpriteBatch::submitOutlinedRect(const OutlinedRect& rect)
+	{
+		outlinedRectBuilder.build(rect, *this);
 	}
 
 

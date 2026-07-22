@@ -14,8 +14,13 @@
 #include <drawBackground.h>
 
 #include <world/worldRenderer.h>
+
+// builders
 #include <rendering/builders/spriteGeometryBuilder.h>
 #include <rendering/builders/rectGeometryBuilder.h>
+#include <rendering/builders/lineGeometryBuilder.h>
+#include <rendering/builders/outlinedRectGeometryBuilder.h>
+
 #include <rendering/batching/spriteBatch.h>
 #include <rendering/backend/openGLRenderBackend.h>
 #include <rendering/sceneRenderer.h>
@@ -89,8 +94,11 @@ struct Gameplay
 	// render
 	Engine::SpriteGeometryBuilder spriteBuilder;
 	Engine::RectGeometryBuilder rectBuilder;
+	Engine::LineGeometryBuilder lineBuilder;
+	Engine::OutlinedRectGeometryBuilder outlinedRectBuilder{ lineBuilder };
+
 	Engine::OpenGLRenderBackend backend = {};
-	Engine::SpriteBatch spriteBatch{ spriteBuilder, rectBuilder };
+	Engine::SpriteBatch spriteBatch{ spriteBuilder, rectBuilder, lineBuilder, outlinedRectBuilder };
 	SceneRenderer sceneRenderer{ spriteBatch, backend };
 	WorldRenderer renderer = {};
 

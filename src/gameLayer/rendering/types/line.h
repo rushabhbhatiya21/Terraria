@@ -1,33 +1,32 @@
 #pragma once
 #include <math/vec2.h>
-#include <math/rect.h>
 #include <math/color.h>
 #include <assets/texture.h>
 #include <assets/shader.h>
 
 namespace Engine
 {
-	struct ColoredRect
+	struct Line
 	{
-		Rect destRect = {};
-		Vec2 origin = { 0.0f, 0.0f };
-		float rotation = 0.f;
+		Vec2 start = {};
+		Vec2 end = {};
+		float thickness = 0.f;
 		Color4f tint = White;
 
 		const Texture& texture;
 		const ShaderE& shader;
 
-		ColoredRect(
-			const Rect& destRect,
-			const Vec2& origin,
-			const float& rotation,
-			const Color4f& tint,
+		Line(
+			const Vec2 start,
+			const Vec2 end,
+			const float thickness,
+			const Color4f tint,
 			const Texture& texture,
 			const ShaderE& shader
 		)
-			: destRect(destRect),
-			origin(origin),
-			rotation(rotation),
+			: start(start),
+			end(end),
+			thickness(thickness),
 			tint(tint),
 			texture(texture),
 			shader(shader)

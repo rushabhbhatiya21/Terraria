@@ -6,8 +6,18 @@ namespace Engine
 {
 	struct RenderState
 	{
-		const Texture* texture = nullptr;
-		const ShaderE* shader = nullptr;
-		float flash = 0.f;
+		const Texture* texture;
+		const ShaderE* shader;
+		float flash;
+
+		RenderState(
+			const Texture* texture = nullptr,
+			const ShaderE* shader = nullptr,
+			const float flash = 0.f
+		)
+			: texture(texture),
+			shader(shader),
+			flash(flash)
+		{ }
 	};
 }
