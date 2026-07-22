@@ -9,6 +9,9 @@ namespace Engine
 {
 	void AssetManager::loadAll()
 	{
+		// default white texture
+		whiteTexture.createWhiteTexture();
+
 		for (auto& t : texList)
 		{
 			const std::string& p = std::string(RESOURCES_PATH) + std::string(t.path);

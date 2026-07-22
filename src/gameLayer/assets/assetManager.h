@@ -21,8 +21,7 @@ namespace Engine
 
 	struct AssetManager
 	{
-		int flashShaderLocation = 0;
-
+		Texture whiteTexture = {};
 		Texture dirt = {};
 		Texture textures = {};
 		Texture items = {};

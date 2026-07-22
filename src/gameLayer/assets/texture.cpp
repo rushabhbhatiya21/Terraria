@@ -71,6 +71,39 @@ namespace Engine
 		return height;
 	}
 
+	void Texture::createWhiteTexture()
+	{
+		width = 1, height = 1;
+
+		const unsigned char pixel[] =
+		{
+			255, 255, 255, 255 // RGBA
+		};
+
+		glGenTextures(1, &impl->textureId);
+		glBindTexture(GL_TEXTURE_2D, impl->textureId);
+
+		glTexImage2D(
+			GL_TEXTURE_2D,
+			0,
+			GL_RGBA8,
+			1,
+			1,
+			0,
+			GL_RGBA,
+			GL_UNSIGNED_BYTE,
+			pixel
+		);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
 	//uint32_t Texture::getNativeHandle() const
 	//{
 	//	return impl->texture.id;

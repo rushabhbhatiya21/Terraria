@@ -21,7 +21,7 @@ namespace Engine
 
         int getWidth() const;
         int getHeight() const;
-        //uint32_t getNativeHandle() const;
+        void createWhiteTexture();
 
     private:
         class TextureImpl;
