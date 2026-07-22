@@ -7,16 +7,14 @@
 
 namespace Engine
 {
-	struct Sprite
+	struct ColoredRect
 	{
-		Rect srcRect = {};
-		Rect destRect = {};
-		Vec2 origin = {};
+		Rect rect = {};
+		Vec2 origin = { 0.0f, 0.0f };
 		float rotation = 0.f;
 		Color4f tint = White;
 
 		const Texture* texture = nullptr;
 		const ShaderE* shader = nullptr;
-		float flash = 0.0f;
 	};
 }

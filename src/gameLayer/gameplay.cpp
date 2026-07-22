@@ -269,7 +269,7 @@ Engine::Rect Gameplay::getIngredientsRectangle(float w, float h, Engine::Rect cr
 
 void Gameplay::drawInventoryBackground(const Engine::Rect& inventoryRectangle, const Inventory& inventory, bool insideInventory)
 {
-	// hotbar always visible
+	//// hotbar always visible
 	//DrawRectangle(
 	//	(int)inventoryRectangle.x,
 	//	(int)inventoryRectangle.y,
