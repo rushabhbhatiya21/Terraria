@@ -31,13 +31,13 @@ void Slime::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollec
 	//);
 	Engine::Sprite sprite
 	{
-		&assetManager.slime,
-		&assetManager.defaultShader,
 		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
 		aabb,
 		{ 0,0 },
 		0.f,
-		Engine::White
+		Engine::White,
+		assetManager.slime,
+		assetManager.defaultShader
 	};
 	collector.submitSprite(sprite);
 }

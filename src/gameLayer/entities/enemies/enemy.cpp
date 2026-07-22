@@ -63,13 +63,13 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 
 	Engine::Sprite healthBarSprite
 	{
-		&assetManager.healthBar,
-		&assetManager.defaultShader,
 		{ 0,0,(float)assetManager.healthBar.getWidth(), (float)assetManager.healthBar.getHeight()},
 		healthBarPos,
 		{ 0,0 },
 		0.f,
-		Engine::White
+		Engine::White,
+		assetManager.healthBar,
+		assetManager.defaultShader
 	};
 	collector.submitSprite(healthBarSprite);
 
@@ -101,13 +101,13 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 
 	Engine::Sprite healthSprite
 	{
-		&assetManager.health,
-		&assetManager.defaultShader,
 		{ 0,0,(float)assetManager.health.getWidth(), (float)assetManager.health.getHeight()},
 		healthBarPos,
 		{ 0,0 },
 		0.f,
-		Engine::White
+		Engine::White,
+		assetManager.health,
+		assetManager.defaultShader
 	};
 	collector.submitSprite(healthSprite);
 
@@ -134,13 +134,13 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 
 		Engine::Sprite healthSpriteTemp
 		{
-			&assetManager.health,
-			&assetManager.defaultShader,
 			{ 0,0,(float)assetManager.health.getWidth(), (float)assetManager.health.getHeight()},
 			r,
 			{ 0,0 },
 			0.f,
-			Engine::Color4f{ 255,255,255,80 }
+			Engine::Color4f{ 255,255,255,80 },
+			assetManager.health,
+			assetManager.defaultShader
 		};
 		collector.submitSprite(healthSpriteTemp);
 	}

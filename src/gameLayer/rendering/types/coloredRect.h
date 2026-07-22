@@ -9,12 +9,12 @@ namespace Engine
 {
 	struct ColoredRect
 	{
-		Rect rect = {};
+		Rect destRect = {};
 		Vec2 origin = { 0.0f, 0.0f };
 		float rotation = 0.f;
 		Color4f tint = White;
 
-		const Texture* texture = nullptr;
-		const ShaderE* shader = nullptr;
+		const Texture& texture;
+		const ShaderE& shader;
 	};
 }

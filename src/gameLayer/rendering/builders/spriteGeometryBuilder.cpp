@@ -13,15 +13,15 @@ namespace Engine
 
 		const Vec2 textureSize
 		{
-			(float)sprite.texture->getWidth(),
-			(float)sprite.texture->getHeight()
+			(float)sprite.texture.getWidth(),
+			(float)sprite.texture.getHeight()
 		};
 
 		const float theta = Deg2Rad * sprite.rotation;
 		const float c = cosf(theta);
 		const float s = sinf(theta);
 
-		sink.beginEmission(RenderState{ sprite.texture, sprite.shader, sprite.flash });
+		sink.beginEmission(RenderState{ &sprite.texture, &sprite.shader, sprite.flash });
 
 		for (int i = 0; i < 4; i++)
 		{

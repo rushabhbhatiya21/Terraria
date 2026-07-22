@@ -15,8 +15,8 @@ namespace Engine
 		float rotation = 0.f;
 		Color4f tint = White;
 
-		const Texture* texture = nullptr;
-		const ShaderE* shader = nullptr;
+		const Texture& texture;
+		const ShaderE& shader;
 		float flash = 0.0f;
 	};
 }

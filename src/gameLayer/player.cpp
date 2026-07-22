@@ -61,53 +61,53 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 
 	Engine::Sprite bootsSprite
 	{
-		&assetManager.getFeetTexture(equipments.boots.itemId),
-		&assetManager.flashShader,
 		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
 		0.f,
 		Engine::White,
+		assetManager.getFeetTexture(equipments.boots.itemId),
+		assetManager.flashShader,
 		flashing
 	};
 
 	Engine::Sprite helmetSprite
 	{
-		&assetManager.getHeadTexture(equipments.helmet.itemId),
-		&assetManager.flashShader,
 		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
 		0.f,
 		Engine::White,
+		assetManager.getHeadTexture(equipments.helmet.itemId),
+		assetManager.flashShader,
 		flashing
 	};
 
 	Engine::Sprite backChestSprite
 	{
-		&assetManager.getBackTexture(equipments.chest.itemId),
-		&assetManager.flashShader,
 		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
 		0.f,
 		Engine::White,
+		assetManager.getBackTexture(equipments.chest.itemId),
+		assetManager.flashShader,
 		flashing
 	};
 
 	Engine::Sprite frontChectSprite
 	{
-		&assetManager.getFrontTexture(equipments.chest.itemId),
-		&assetManager.flashShader,
 		//nullptr,
 		textureUV,
 		aabb,
 		{0,0},
 		0.f,
 		Engine::White,
+		assetManager.getFrontTexture(equipments.chest.itemId),
+		assetManager.flashShader,
 		flashing
 	};
 
@@ -145,13 +145,13 @@ void Player::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 		//DrawTexturePro(textureItem, textureUVItem, destRect, { 0.5f,0.5f }, 0.f, Engine::White);
 		Engine::Sprite heldItemSprite
 		{
-			&textureItem,
-			&assetManager.defaultShader,
 			textureUVItem,
 			destRect,
 			{.5f,.5f},
 			.0f,
-			Engine::White
+			Engine::White,
+			textureItem,
+			assetManager.defaultShader
 		};
 		collector.submitSprite(heldItemSprite);
 		break;

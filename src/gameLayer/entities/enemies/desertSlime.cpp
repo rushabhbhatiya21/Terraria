@@ -26,13 +26,13 @@ void DesertSlime::drawSprite(Engine::AssetManager& assetManager, Engine::IRender
 
 	Engine::Sprite sprite
 	{
-		&assetManager.desertSlime,
-		&assetManager.defaultShader,
 		getTextureAtlas(animations.positionX, animations.positionY, 32, 32, animations.movingLeft),
 		aabb,
 		{ 0,0 },
 		0.f,
-		Engine::White
+		Engine::White,
+		assetManager.desertSlime,
+		assetManager.defaultShader,
 	};
 	collector.submitSprite(sprite);
 }

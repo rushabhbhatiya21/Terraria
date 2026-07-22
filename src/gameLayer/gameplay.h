@@ -15,6 +15,7 @@
 
 #include <world/worldRenderer.h>
 #include <rendering/builders/spriteGeometryBuilder.h>
+#include <rendering/builders/rectGeometryBuilder.h>
 #include <rendering/batching/spriteBatch.h>
 #include <rendering/backend/openGLRenderBackend.h>
 #include <rendering/sceneRenderer.h>
@@ -86,9 +87,10 @@ struct Gameplay
 	DrawBackground background;
 
 	// render
-	Engine::SpriteGeometryBuilder builder;
+	Engine::SpriteGeometryBuilder spriteBuilder;
+	Engine::RectGeometryBuilder rectBuilder;
 	Engine::OpenGLRenderBackend backend = {};
-	Engine::SpriteBatch spriteBatch{ builder };
+	Engine::SpriteBatch spriteBatch{ spriteBuilder, rectBuilder };
 	SceneRenderer sceneRenderer{ spriteBatch, backend };
 	WorldRenderer renderer = {};
 
@@ -168,13 +170,14 @@ struct Gameplay
 	Engine::Rect getRecipeRectangle(float w, float h, Engine::Rect craftRectangle);
 	Engine::Rect getIngredientsRectangle(float w, float h, Engine::Rect craftRectangle, Engine::Rect recipeRectangle);
 
-	void drawInventoryBackground(const Engine::Rect& inventoryRectangle, const Inventory& inventory, bool insideInventory);
+	void drawInventoryBackground(const Engine::AssetManager& assetManager, const Engine::Rect& inventoryRectangle, const Inventory& inventory, bool insideInventory);
 	void drawInventorySlot(bool isDragged, const Engine::Rect& rect, const ItemStack& stack, bool selected, Engine::AssetManager& assetManager);
 	Engine::Rect getInventorySlotRect(int index, const Engine::Rect& inventoryRectangle, const Inventory& inventory);
 	void drawInventorySlotByIndex(int index, bool isDragged, const Engine::Rect& inventoryRectangle, const Inventory& inventory, const Player& player, Engine::AssetManager& assetManager);
 	int getHoveredInventorySlot(Engine::Vec2 mousePos, Engine::Rect inventoryRectangle, const Inventory& inventory, bool insideInventory);
 	void drawDraggedItem(const ItemStack& stack, Engine::AssetManager& assetManager);
 	void drawDisplayNameUI(
+		const Engine::AssetManager& assetManager,
 		ItemId itemId,
 		Engine::Rect parentRect,
 		float fontSize = 10.f,

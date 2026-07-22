@@ -23,7 +23,7 @@ namespace Engine
 		const float c = cosf(theta);
 		const float s = sinf(theta);
 
-		sink.beginEmission(RenderState{ rect.texture, rect.shader, 0 });
+		sink.beginEmission(RenderState{ &rect.texture, &rect.shader, 0 });
 
 		for (int i = 0; i < 4; i++)
 		{

@@ -87,13 +87,13 @@ void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, E
 
 			Engine::Sprite bgSprite
 			{
-				bg,
-				&assetManager.defaultShader,
 				src,
 				dest,
 				{ 0,0 },
 				0.f,
-				Engine::White
+				Engine::White,
+				*bg,
+				assetManager.defaultShader,
 			};
 			collector.submitSprite(bgSprite);
 		};

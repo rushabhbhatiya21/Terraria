@@ -41,13 +41,13 @@ void Projectile::render(Engine::AssetManager& assetManager, Engine::IRenderColle
 
 	Engine::Sprite projectileSprite
 	{
-		&tex,
-		&assetManager.defaultShader,
 		getTextureCoordinatesForItemType(itemType, 32, 32, facingLeft),
 		renderRect,
 		{ size * 0.5f, size * 0.5f }, // want to rotate shuriken from middle
 		rotation,
-		Engine::White
+		Engine::White,
+		tex,
+		assetManager.defaultShader,
 	};
 	collector.submitSprite(projectileSprite);
 }

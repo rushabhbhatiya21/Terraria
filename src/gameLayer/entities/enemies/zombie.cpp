@@ -36,13 +36,13 @@ void Zombie::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColle
 
 	Engine::Sprite sprite
 	{
-		&assetManager.zombie,
-		&assetManager.defaultShader,
 		getTextureAtlas(animations.positionX, animations.positionY, 32, 64, animations.movingLeft),
 		aabb,
 		{ 0,0 },
 		0.f,
-		Engine::White
+		Engine::White,
+		assetManager.zombie,
+		assetManager.defaultShader
 	};
 	collector.submitSprite(sprite);
 }

@@ -102,13 +102,13 @@ void WorldRenderer::drawTile(const CachedTile& tile, Engine::IRenderCollector& c
 
 	Engine::Sprite sprite
 	{
-		&assets->textures,
-		&assets->defaultShader,
 		tile.srcRect,
 		{ drawX,drawY,TILE_SIZE,TILE_SIZE },
 		{ 0,0 },
 		0.f,
-		tint
+		tint,
+		assets->textures,
+		assets->defaultShader
 	};
 
 	collector.submitSprite(sprite);

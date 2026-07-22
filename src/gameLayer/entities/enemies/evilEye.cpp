@@ -49,13 +49,13 @@ void EvilEye::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColl
 	//);
 	Engine::Sprite sprite
 	{
-		tex,
-		&assetManager.defaultShader,
 		getTextureAtlas(animations.positionX, animations.positionY, currentPhaseData->cellSizeX, currentPhaseData->cellSizeY),
 		aabb,
 		{ 1.2f, 2.5f },
 		rotation,
-		Engine::White
+		Engine::White,
+		*tex,
+		assetManager.defaultShader
 	};
 	collector.submitSprite(sprite);
 }

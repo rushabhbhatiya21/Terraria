@@ -20,6 +20,9 @@
 #include <shake.h>
 #include <lighting.h>
 
+#include <rendering/types/sprite.h>
+#include <rendering/types/coloredRect.h>
+
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>
 #include <entities/enemies/slime.h>
@@ -267,16 +270,25 @@ Engine::Rect Gameplay::getIngredientsRectangle(float w, float h, Engine::Rect cr
 	return ingredientRectangle;
 }
 
-void Gameplay::drawInventoryBackground(const Engine::Rect& inventoryRectangle, const Inventory& inventory, bool insideInventory)
+void Gameplay::drawInventoryBackground(const Engine::AssetManager& assetManager, const Engine::Rect& inventoryRectangle, const Inventory& inventory, bool insideInventory)
 {
-	//// hotbar always visible
-	//DrawRectangle(
-	//	(int)inventoryRectangle.x,
-	//	(int)inventoryRectangle.y,
-	//	(int)inventoryRectangle.width,
-	//	(int)inventoryRectangle.height / inventory.rows,
-	//	{ 100,100,100,100 }
-	//);
+	Engine::ColoredRect rect
+	{
+		Engine::Rect{
+			inventoryRectangle.x,
+			inventoryRectangle.y,
+			inventoryRectangle.width,
+			inventoryRectangle.height / inventory.rows
+		},
+		{ 0.0f, 0.0f },
+		0.f,
+		Engine::Color4f{ 100,100,100,100 },
+		assetManager.whiteTexture,
+		assetManager.defaultShader
+	};
+
+	sceneRenderer.submitRect(rect);
+	
 
 	// remaining rows only when inventory is open
 	if (insideInventory)
@@ -288,6 +300,23 @@ void Gameplay::drawInventoryBackground(const Engine::Rect& inventoryRectangle, c
 		//	(int)inventoryRectangle.height * (inventory.rows - 1) / inventory.rows,
 		//	{ 100,100,100,100 }
 		//);
+
+		Engine::ColoredRect rect
+		{
+			Engine::Rect{
+				inventoryRectangle.x,
+				inventoryRectangle.y + (int)inventoryRectangle.height / inventory.rows,
+				inventoryRectangle.width,
+				inventoryRectangle.height* (inventory.rows - 1) / inventory.rows
+			},
+			{ 0.0f, 0.0f },
+			0.f,
+			Engine::Color4f{ 100,100,100,100 },
+			assetManager.whiteTexture,
+			assetManager.defaultShader
+		};
+
+		sceneRenderer.submitRect(rect);
 	}
 }
 
@@ -314,13 +343,13 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 
 	Engine::Sprite selectedSlot
 	{
-		&assetManager.frame,
-		&assetManager.defaultShader,
 		getTextureAtlas(0, 0, assetManager.frame.getWidth(), assetManager.frame.getHeight()),
 		rect,
 		{ 0,0 },
 		0.f,
-		c
+		c,
+		assetManager.frame,
+		assetManager.defaultShader,
 	};
 
 	sceneRenderer.submitSprite(selectedSlot);
@@ -341,13 +370,13 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 
 		Engine::Sprite selectedItem
 		{
-			&tex,
-			&assetManager.defaultShader,
 			atlas,
 			shrinkRectanglePercentage(rect, .3f, .3f),
 			{ 0,0 },
 			0.f,
-			c
+			c,
+			tex,
+			assetManager.defaultShader,
 		};
 		sceneRenderer.submitSprite(selectedItem);
 
@@ -475,18 +504,18 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& ass
 
 	Engine::Sprite draggedItemSprite
 	{
-		&tex,
-		&assetManager.defaultShader,
 		atlas,
 		r,
 		{ 0,0 },
 		0.f,
-		Engine::Color4f{ 255,255,255,180 }
+		Engine::Color4f{ 255,255,255,180 },
+		tex,
+		assetManager.defaultShader,
 	};
 	sceneRenderer.submitSprite(draggedItemSprite);
 }
 
-void Gameplay::drawDisplayNameUI(ItemId itemId, Engine::Rect parentRect, float fontSize, float spacing, float paddingX, float paddingY, Engine::Color4f rectColor, Engine::Color4f textColor)
+void Gameplay::drawDisplayNameUI(const Engine::AssetManager& assetManager, ItemId itemId, Engine::Rect parentRect, float fontSize, float spacing, float paddingX, float paddingY, Engine::Color4f rectColor, Engine::Color4f textColor)
 {
 	ItemDefinition* selectedIngredient = getItem(itemId);
 
@@ -512,9 +541,21 @@ void Gameplay::drawDisplayNameUI(ItemId itemId, Engine::Rect parentRect, float f
 	//	rectPos,
 	//	.7f,
 	//	1,
-	//	//Engine::Color4f{ 255,255,255,200 }
+	//	//Color{ 255,255,255,200 }
 	//	rectColor
 	//);
+
+	Engine::ColoredRect rect
+	{
+		rectPos,
+		{ 0.0f, 0.0f },
+		0.f,
+		Engine::Color4f{ 255,255,255,200 },
+		assetManager.whiteTexture,
+		assetManager.defaultShader
+	};
+
+	sceneRenderer.submitRect(rect);
 
 	// draw text using renderer
 	//DrawTextPro(
@@ -1440,13 +1481,13 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 		Engine::Sprite frame
 		{
-			&assetManager.frame,
-			&assetManager.defaultShader,
 			{ 0,0,(float)assetManager.frame.getWidth(),(float)assetManager.frame.getHeight()},
 			{ (float)blockX, (float)blockY, 1, 1 },
 			{ 0,0 },
 			0.f,
-			Engine::White
+			Engine::White,
+			assetManager.frame,
+			assetManager.defaultShader,
 		};
 		sceneRenderer.submitSprite(frame);
 	}
@@ -1748,6 +1789,17 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	heartRectangle = placeReactangleTopRightCorner(heartRectangle, w);
 
 	//DrawRectangle(heartRectangle.x, heartRectangle.y, heartRectangle.width, heartRectangle.height, RED);
+	
+	//Engine::ColoredRect lifeRect
+	//{
+	//	heartRectangle,
+	//	{ 0.0f, 0.0f },
+	//	0.f,
+	//	Engine::Blank,
+	//	assetManager.whiteTexture,
+	//	assetManager.defaultShader
+	//};
+	//sceneRenderer.submitRect(lifeRect);
 
 	float damagedLife = std::min((float)player.stats.defensive.maxHealth - player.life, (float)player.stats.defensive.maxHealth);
 
@@ -1760,17 +1812,10 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 		int x = 0;
 
-		//if (damagedLife >= 10)
-		//	x = assetManager.hearts.getWidth() / 3;
-		//else if (damagedLife >= 5)
-		//	x = assetManager.hearts.getWidth() * 2 / 3;
-
-		if(damagedLife >= 10)
-			x = 0;
+		if (damagedLife >= 10)
+			x = assetManager.hearts.getWidth() / 3;
 		else if (damagedLife >= 5)
-			x = 1;
-		else
-			x = 2;
+			x = assetManager.hearts.getWidth() * 2 / 3;
 
 		//DrawTexturePro(
 		//	assetManager.hearts,
@@ -1783,13 +1828,13 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 		Engine::Sprite heart
 		{
-			&assetManager.hearts,
-			&assetManager.defaultShader,
 			getTextureAtlas(x, 0, assetManager.hearts.getWidth() / 3, assetManager.hearts.getHeight()),
 			oneHeartRectangle,
 			{ 0,0 },
 			0.f,
-			Engine::White
+			Engine::White,
+			assetManager.hearts,
+			assetManager.defaultShader,
 		};
 		sceneRenderer.submitSprite(heart);
 	}
@@ -1802,6 +1847,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	// draw inventory rect
 	drawInventoryBackground(
+		assetManager,
 		inventoryRectangle,
 		player.inventory,
 		insideInventory
@@ -1901,7 +1947,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	{
 		Engine::Rect slotRect = getInventorySlotRect(hoveredSlot, inventoryRectangle, player.inventory);
 		ItemId hoveredItem = player.inventory.slots[hoveredSlot].itemId;
-		drawDisplayNameUI(hoveredItem, slotRect);
+		drawDisplayNameUI(assetManager, hoveredItem, slotRect);
 	}
 
 	if (insideInventoryGrid)
@@ -2049,7 +2095,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			{
 				selectedRecipeIndex = i;
 
-				drawDisplayNameUI(selectedItemType, rr);
+				drawDisplayNameUI(assetManager, selectedItemType, rr);
 
 				// craft item if clicked
 				if (Engine::isMouseButtonPressed(Engine::MouseButton::Left) && canCraft)
@@ -2091,13 +2137,13 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 			Engine::Sprite craftingRecipe
 			{
-				&tex,
-				&assetManager.defaultShader,
 				atlas,
 				rr,
 				{ 0,0 },
 				0.f,
-				itemColor
+				itemColor,
+				tex,
+				assetManager.defaultShader
 			};
 			sceneRenderer.submitSprite(craftingRecipe);
 
@@ -2132,13 +2178,13 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 				Engine::Sprite craftingIngredient
 				{
-					&tex,
-					&assetManager.defaultShader,
 					atlas,
 					ri,
 					{ 0,0 },
 					0.f,
-					itemColor
+					itemColor,
+					tex,
+					assetManager.defaultShader
 				};
 				sceneRenderer.submitSprite(craftingIngredient);
 
@@ -2164,7 +2210,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 				if (Engine::checkCollisionPointRec(Engine::getMousePosition(), ri))
 				{
-					drawDisplayNameUI(selectedItemIngredients[j].itemId, ri);
+					drawDisplayNameUI(assetManager, selectedItemIngredients[j].itemId, ri);
 				}
 			}
 		}

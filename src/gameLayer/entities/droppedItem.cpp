@@ -40,13 +40,13 @@ void DroppedItem::render(Engine::AssetManager& assetManager, Engine::IRenderColl
 
 	Engine::Sprite sprite
 	{
-		&tex,
-		&assetManager.defaultShader,
 		rectangle,
 		aabb,
 		{ 0,0 },
 		0.f,
-		Engine::White
+		Engine::White,
+		tex,
+		assetManager.defaultShader
 	};
 
 	collector.submitSprite(sprite);
