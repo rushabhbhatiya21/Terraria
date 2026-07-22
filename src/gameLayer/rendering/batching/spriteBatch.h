@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
 #include <algorithm>
-#include "index.h"
-#include "IGeometrySink.h"
-#include "renderState.h"
-#include "sprite.h"
-#include "spriteGeometryBuilder.h"
+#include <rendering/IGeometrySink.h>
+#include <rendering/types/index.h>
+#include <rendering/types/sprite.h>
+#include <rendering/types/renderState.h>
+#include <rendering/builders/spriteGeometryBuilder.h>
 
 namespace Engine
 {

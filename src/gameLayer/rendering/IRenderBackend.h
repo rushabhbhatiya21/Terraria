@@ -1,8 +1,8 @@
 #pragma	once
 #include <vector>
-#include "index.h"
-#include "vertex.h"
-#include "drawCommand.h"
+#include <rendering/types/index.h>
+#include <rendering/types/vertex.h>
+#include <rendering/batching/drawCommand.h>
 
 namespace Engine
 {

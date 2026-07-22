@@ -2,7 +2,7 @@
 #include <window/window.h>
 #include <assets/assetManager.h>
 #include <assert.h>
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 void DrawBackground::draw(float deltaTime, Engine::AssetManager& assetManager, Engine::Cam& camera, Engine::Vec2 mapSize, Engine::Color4f skyColor, Engine::IRenderCollector& collector)

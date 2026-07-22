@@ -1,6 +1,6 @@
 #include "enemy.h"
 #include <assets/assetManager.h>
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 void Enemy::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)

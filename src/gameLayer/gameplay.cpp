@@ -19,7 +19,6 @@
 
 #include <shake.h>
 #include <lighting.h>
-#include <rendering/worldRenderer.h>
 
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>

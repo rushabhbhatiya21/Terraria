@@ -1,7 +1,7 @@
 #pragma once
-#include "IRenderBackend.h"
-#include <glad/gl.h>
 #include <array>
+#include <glad/gl.h>
+#include <rendering/IRenderBackend.h>
 
 namespace Engine
 {
@@ -26,8 +26,6 @@ namespace Engine
 		size_t growCapacity(size_t current, size_t required) const;
 		void ensureBufferCapacity(size_t vertexCount, size_t indexCount);
 		void configureVertexAttributes();
-		GLuint compileShader(GLenum type, const std::string& source);
-		GLuint createShaderProgram(GLuint vertexShader, GLuint fragmentShader);
 		void beginExternalRendering();
 		void endExternalRendering();
 

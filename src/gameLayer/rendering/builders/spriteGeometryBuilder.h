@@ -1,8 +1,7 @@
 #pragma once
 #include <math/vec2.h>
-#include "sprite.h"
-#include "drawCommand.h"
-#include <math/vec2.h>
+#include <rendering/types/sprite.h>
+#include <rendering/batching/drawCommand.h>
 
 namespace Engine
 {

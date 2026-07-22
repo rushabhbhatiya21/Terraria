@@ -4,9 +4,8 @@
 #include <shake.h>
 #include <gameMap.h>
 #include <assets/assetManager.h>
-#include "sprite.h"
-#include "spriteBatch.h"
-#include "IRenderCollector.h"
+#include <rendering/types/sprite.h>
+#include <rendering/IRenderCollector.h>
 
 void WorldRenderer::init(GameMap& map, Engine::AssetManager& assets)
 {

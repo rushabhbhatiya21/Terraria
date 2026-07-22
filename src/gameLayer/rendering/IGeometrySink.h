@@ -1,5 +1,5 @@
 #pragma once
-#include "index.h"
+#include <rendering/types/index.h>
 
 namespace Engine
 {

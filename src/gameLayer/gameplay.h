@@ -12,11 +12,12 @@
 
 #include <gameMap.h>
 #include <drawBackground.h>
-#include <rendering/worldRenderer.h>
-#include <rendering/spriteGeometryBuilder.h>
-#include <rendering/spriteBatch.h>
+
+#include <world/worldRenderer.h>
+#include <rendering/builders/spriteGeometryBuilder.h>
+#include <rendering/batching/spriteBatch.h>
+#include <rendering/backend/openGLRenderBackend.h>
 #include <rendering/sceneRenderer.h>
-#include <rendering/openGLRenderBackend.h>
 
 #include <entityHolder.h>
 #include <structure.h>

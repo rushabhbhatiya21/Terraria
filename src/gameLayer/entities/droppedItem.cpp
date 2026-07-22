@@ -6,7 +6,7 @@
 #include <items/item.h>
 #include <inventory.h>
 #include <player.h>
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 void DroppedItem::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)

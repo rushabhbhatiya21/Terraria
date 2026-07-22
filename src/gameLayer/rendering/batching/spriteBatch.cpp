@@ -1,7 +1,7 @@
 #include "spriteBatch.h"
-#include "drawCommand.h"
-#include "IRenderBackend.h"
 #include <asserts.h>
+#include <rendering/batching/drawCommand.h>
+#include <rendering/IRenderBackend.h>
 
 namespace Engine
 {

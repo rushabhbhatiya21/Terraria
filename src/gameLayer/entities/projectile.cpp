@@ -10,7 +10,7 @@
 
 #include "player.h"
 #include "entities/enemies/enemy.h"
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 void Projectile::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)

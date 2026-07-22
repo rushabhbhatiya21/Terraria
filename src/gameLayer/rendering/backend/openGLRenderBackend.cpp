@@ -1,6 +1,6 @@
 #include "openGLRenderBackend.h"
 #include <math/color.h>
-#include "fileUtils.h"
+#include "helper.h"
 #include <iostream>
 #include <raylib.h>
 #include <assert.h>
@@ -226,94 +226,6 @@ namespace Engine
 		}
 
 		endExternalRendering();
-	}
-
-	GLuint OpenGLRenderBackend::compileShader(GLenum shaderType, const std::string& shaderPath)
-	{
-		GLuint shaderHandle = glCreateShader(shaderType);
-		if (shaderHandle == 0) return 0;
-
-		std::string shaderText = readTextFromFile(shaderPath);
-		if (shaderText.empty()) return 0;
-
-		const char* shaderSource = shaderText.c_str();
-		glShaderSource(shaderHandle, 1, &shaderSource, nullptr);
-		glCompileShader(shaderHandle);
-
-		GLint success;
-
-		glGetShaderiv(shaderHandle, GL_COMPILE_STATUS, &success);
-
-		if (success == GL_FALSE)
-		{
-			GLint buffSize; // max length
-			glGetShaderiv(shaderHandle, GL_INFO_LOG_LENGTH, &buffSize);
-
-			if (buffSize > 0)
-			{
-				std::string log;
-				log.resize(buffSize);
-
-				GLsizei length = 0;
-				glGetShaderInfoLog(shaderHandle, buffSize, &length, &log[0]);
-
-				log.resize(length);
-				std::cout << "Shader Create Error:\n" << log << std::endl;
-			}
-			else
-			{
-				std::cout << "Error creating shader, but no log was available." << std::endl;
-			}
-			return 0;
-		}
-		return shaderHandle;
-	}
-
-	GLuint OpenGLRenderBackend::createShaderProgram(GLuint vertexShader, GLuint fragmentShader)
-	{
-		GLuint programHandle = glCreateProgram();
-		if (programHandle == 0) return 0;
-
-		glAttachShader(programHandle, vertexShader);
-		glAttachShader(programHandle, fragmentShader);
-
-		glLinkProgram(programHandle);
-
-		GLint success;
-		glGetProgramiv(programHandle, GL_LINK_STATUS, &success);
-
-		if (success == GL_FALSE)
-		{
-			GLint buffSize;
-			glGetProgramiv(programHandle, GL_INFO_LOG_LENGTH, &buffSize);
-
-			if (buffSize > 0)
-			{
-				std::string log;
-				log.resize(buffSize);
-
-				GLsizei length = 0;
-				glGetProgramInfoLog(programHandle, buffSize, &length, &log[0]);
-
-				log.resize(length);
-				std::cout << "Shader Link Error:\n" << log << std::endl;
-			}
-			else
-			{
-				std::cout << "Error linking program, but no log was available." << std::endl;
-			}
-
-			//glDeleteProgram(programHandle);
-			return 0;
-		}
-
-		//glDetachShader(programHandle, vertexShader);
-		//glDetachShader(programHandle, fragmentShader);
-
-		glDeleteShader(vertexShader);
-		glDeleteShader(fragmentShader);
-
-		return programHandle;
 	}
 
 	void OpenGLRenderBackend::beginExternalRendering()

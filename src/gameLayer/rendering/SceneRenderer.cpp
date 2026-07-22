@@ -1,8 +1,8 @@
 #include "sceneRenderer.h"
-#include <window/window.h>
 #include <array>
-#include <rendering/spriteBatch.h>
-#include <rendering/IRenderBackend.h>
+#include <window/window.h>
+#include "IRenderBackend.h"
+#include <rendering/batching/spriteBatch.h>
 
 SceneRenderer::SceneRenderer(Engine::SpriteBatch& spriteBatch, Engine::IRenderBackend& backend)
 	: spriteBatch(spriteBatch), backend(backend)

@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "vertex.h"
-#include "renderState.h"
+#include <rendering/types/vertex.h>
+#include <rendering/types/renderState.h>
 
 namespace Engine
 {

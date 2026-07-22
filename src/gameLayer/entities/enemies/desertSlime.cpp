@@ -6,7 +6,7 @@
 #include <entityHolder.h>
 #include <player.h>
 #include "entities/droppedItem.h"
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 //using Engine::AssetManager;

@@ -3,7 +3,7 @@
 #include <helper.h>
 #include <player.h>
 #include <combat/combatSystem.h>
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 void EvilEyeServant::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)

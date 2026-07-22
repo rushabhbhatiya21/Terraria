@@ -10,7 +10,7 @@
 #include <combat/combatSystem.h>
 #include <ui/popupText.h>
 #include <shake.h>
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 //using Engine::AssetManager;

@@ -4,7 +4,7 @@
 #include <player.h>
 #include "evilEyeServant.h"
 #include <combat/combatSystem.h>
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 //using Engine::AssetManager;

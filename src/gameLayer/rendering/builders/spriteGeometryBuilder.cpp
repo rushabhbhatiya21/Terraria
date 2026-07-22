@@ -1,7 +1,7 @@
 #include "spriteGeometryBuilder.h"
 #include <array>
 #include <math/utils.h>
-#include "IGeometrySink.h"
+#include <rendering/IGeometrySink.h>
 
 namespace Engine
 {

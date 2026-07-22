@@ -9,7 +9,7 @@
 #include "combat/combatSystem.h"
 #include "shake.h"
 #include "ui/popupText.h"
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 //using Engine::AssetManager;

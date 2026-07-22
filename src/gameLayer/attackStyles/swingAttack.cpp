@@ -13,7 +13,7 @@
 #include <combat/combatSystem.h>
 #include <entities/enemies/enemy.h>
 #include <lighting.h>
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 void SwingAttack::render(Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)

@@ -5,7 +5,7 @@
 #include <entityHolder.h>
 #include <items/blocks.h>
 #include "particles.h"
-#include <rendering/sprite.h>
+#include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
 // todo: make AttackStyle struct and add enum to it, and have item manage update and spawn and all
