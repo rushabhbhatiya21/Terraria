@@ -4,10 +4,13 @@
 #include <rendering/IGeometrySink.h>
 #include <rendering/types/index.h>
 #include <rendering/types/renderState.h>
+
+// builders
 #include <rendering/builders/spriteGeometryBuilder.h>
 #include <rendering/builders/rectGeometryBuilder.h>
 #include <rendering/builders/lineGeometryBuilder.h>
 #include <rendering/builders/outlinedRectGeometryBuilder.h>
+#include <rendering/builders/circleGeometryBuilder.h>
 
 namespace Engine
 {
@@ -15,6 +18,7 @@ namespace Engine
 	struct ColoredRect;
 	struct Line;
 	struct OutlinedRect;
+	struct Circle;
 
 	struct DrawCommand;
 	class IRenderBackend;
@@ -46,18 +50,22 @@ namespace Engine
 		RectGeometryBuilder& rectBuilder;
 		LineGeometryBuilder& lineBuilder;
 		OutlinedRectGeometryBuilder& outlinedRectBuilder;
+		CircleGeometryBuilder& circleBuilder;
 
 	public:
 		SpriteBatch(
 			SpriteGeometryBuilder& spriteBuilder, 
 			RectGeometryBuilder& rectBuilder,
 			LineGeometryBuilder& lineBuilder,
-			OutlinedRectGeometryBuilder& outlinedRectBuilder
+			OutlinedRectGeometryBuilder& outlinedRectBuilder,
+			CircleGeometryBuilder& circleBuilder
 		);
 		void submitSprite(const Sprite& sprite);
 		void submitRect(const ColoredRect& rect);
 		void submitLine(const Line& rect);
 		void submitOutlinedRect(const OutlinedRect& rect);
+		void submitCircle(const Circle& circle);
+
 		void flush(IRenderBackend& backend);
 
 	private:

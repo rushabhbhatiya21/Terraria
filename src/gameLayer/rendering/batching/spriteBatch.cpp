@@ -1,6 +1,4 @@
 #include "spriteBatch.h"
-#include "spriteBatch.h"
-#include "spriteBatch.h"
 #include <asserts.h>
 #include <rendering/types/sprite.h>
 #include <rendering/types/coloredRect.h>
@@ -15,9 +13,10 @@ namespace Engine
 		SpriteGeometryBuilder& sb,
 		RectGeometryBuilder& rb,
 		LineGeometryBuilder& lb,
-		OutlinedRectGeometryBuilder& orb
+		OutlinedRectGeometryBuilder& orb,
+		CircleGeometryBuilder& cb
 	)
-		: spriteBuilder(sb), rectBuilder(rb), lineBuilder(lb), outlinedRectBuilder(orb)
+		: spriteBuilder(sb), rectBuilder(rb), lineBuilder(lb), outlinedRectBuilder(orb), circleBuilder(cb)
 	{
 	}
 
@@ -41,41 +40,16 @@ namespace Engine
 		outlinedRectBuilder.build(rect, *this);
 	}
 
-
-	//std::vector<DrawCommand> SpriteBatch::buildDrawCommands()
-	//{
-	//	std::vector<DrawCommand> commands;
-	//	commands.reserve(sprites.size());
-	//
-	//	for (const auto& sprite : sprites)
-	//	{
-	//		const DrawCommand command = builder.build(sprite);
-	//		commands.push_back(command);
-	//	}
-	//	return commands;
-	//
-	//}
-
-	//void SpriteBatch::executeDrawCommands(const std::vector<DrawCommand>& commands)
-	//{
-		//for (const auto& command : commands)
-		//{
-		//	const Sprite& sprite = command.sprite;
-		//	DrawTexturePro(
-		//		sprite.texture,  // texture
-		//		sprite.srcRect,  // source
-		//		sprite.destRect, // dest
-		//		sprite.origin,   // origin (top-left)
-		//		sprite.rotation, // rotation
-		//		sprite.tint
-		//	);
-		//}
-	//}
+	void SpriteBatch::submitCircle(const Circle& circle)
+	{
+		circleBuilder.build(circle, *this);
+	}
 
 	void SpriteBatch::flush(IRenderBackend& backend)
 	{
 		sortByTextures();
 		backend.render(vertexBuffer, indexBuffer, drawCommands);
+
 		vertexBuffer.clear();
 		indexBuffer.clear();
 		drawCommands.clear();

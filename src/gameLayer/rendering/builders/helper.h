@@ -2,6 +2,7 @@
 #include <array>
 #include <math/vec2.h>
 #include <math/rect.h>
+#include <asserts.h>
 
 inline Engine::Vec2 rotateAroundOrigin(const Engine::Vec2& point, float c, float s)
 {
@@ -40,6 +41,27 @@ inline std::array<Engine::Vec2, 4> generateTransformedCorners(
 	}
 
 	return corners;
+}
+
+inline std::vector<Engine::Vec2> generateCirclePoints(const float radius, const int segments)
+{
+	permaAssert(segments >= 3);
+	std::vector<Engine::Vec2> points;
+	points.reserve(segments + 1);
+	points.push_back(Engine::Vec2{ 0,0 });
+	const float angleStep = (360.f / segments) * Engine::Deg2Rad;
+
+	for (int i = 0; i < segments; i++)
+	{
+		Engine::Vec2 circlePoint{};
+
+		const float theta = i * angleStep;
+		circlePoint.x = cosf(theta) * radius;
+		circlePoint.y = sinf(theta) * radius;
+		points.push_back(circlePoint);
+	}
+
+	return points;
 }
 
 inline std::array<Engine::Vec2, 4> generateUVs(float x, float y, float w, float h)

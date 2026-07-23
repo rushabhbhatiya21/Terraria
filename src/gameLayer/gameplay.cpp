@@ -24,6 +24,7 @@
 #include <rendering/types/coloredRect.h>
 #include <rendering/types/line.h>
 #include <rendering/types/outlinedRect.h>
+#include <rendering/types/circle.h>
 
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>
@@ -1520,17 +1521,29 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 			//);
 		}
 
-		Engine::OutlinedRect orect
+		//Engine::OutlinedRect orect
+		//{
+		//	e.second->physics.transform.getAABB(),
+		//	{0,0},
+		//	0.f,
+		//	0.1f,
+		//	Engine::White,
+		//	assetManager.whiteTexture,
+		//	assetManager.defaultShader
+		//};
+		//sceneRenderer.submitOutlinedRect(orect);
+
+		Engine::Circle circle
 		{
-			e.second->physics.transform.getAABB(),
-			{0,0},
+			e.second->getPosition(),
+			2.f,
+			Engine::Vec2{0,0},
 			0.f,
-			0.1f,
-			Engine::White,
+			Engine::Red,
 			assetManager.whiteTexture,
 			assetManager.defaultShader
 		};
-		sceneRenderer.submitOutlinedRect(orect);
+		sceneRenderer.submitCircle(circle);
 
 		e.second->render(assetManager, sceneRenderer);
 	}

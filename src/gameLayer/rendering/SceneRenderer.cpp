@@ -93,3 +93,8 @@ void SceneRenderer::submitOutlinedRect(const Engine::OutlinedRect& rect)
 {
 	spriteBatch.submitOutlinedRect(rect);
 }
+
+void SceneRenderer::submitCircle(const Engine::Circle& circle)
+{
+	spriteBatch.submitCircle(circle);
+}
