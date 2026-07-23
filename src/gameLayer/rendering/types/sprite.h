@@ -35,7 +35,8 @@ namespace Engine
 			rotation(rotation),
 			tint(tint),
 			texture(texture),
-			shader(shader)
+			shader(shader),
+			flash(flash)
 		{ }
 	};
 }

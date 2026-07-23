@@ -47,7 +47,7 @@ Bugs
 3. swingAttack changes item based on facing left or right, check flipTextureX function in swingAttack.cpp - fixed
 4. hearts are empty, checkout player life and heart display logic - fixed
 5. as we take damage, hearts are disappearing instead of empty
-6. after passing float flash, not working, check new flash variables added in entity, maybe not working because of that
+6. after passing float flash, not working, check new flash variables added in entity, maybe not working because of that - fixed
 
 
 - copy/paste tree into structures, old tree.bin removed 
