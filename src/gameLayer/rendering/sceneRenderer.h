@@ -1,6 +1,8 @@
 #pragma once
+#include <memory>
 #include "IRenderCollector.h"
 #include <math/cam.h>
+#include <rendering/batching/spriteBatch.h>
 
 
 namespace Engine
@@ -19,16 +21,16 @@ namespace Engine
 	struct Circle;
 	struct OutlinedCircle;
 
-	class SpriteBatch;
 	class IRenderBackend;
 }
 
 class SceneRenderer : public Engine::IRenderCollector
 {
 public:
-	SceneRenderer(Engine::SpriteBatch& spriteBatch, Engine::IRenderBackend& backend);
+	SceneRenderer(std::unique_ptr<Engine::IRenderBackend> backend);
+	void initialize();
 	void beginFrame();
-	void beginPass(Engine::RenderPass pass, Engine::Cam& camera);
+	void beginPass(Engine::RenderPass pass, const Engine::Cam& camera);
 	void endPass();
 	void endFrame();
 
@@ -40,6 +42,6 @@ public:
 	void submitOutlinedCircle(const Engine::OutlinedCircle& circle) override;
 
 private:
-	Engine::SpriteBatch& spriteBatch;
-	Engine::IRenderBackend& backend;
+	Engine::SpriteBatch m_spriteBatch;
+	std::unique_ptr<Engine::IRenderBackend> m_backend;
 };

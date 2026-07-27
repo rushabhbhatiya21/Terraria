@@ -10,15 +10,7 @@
 
 namespace Engine
 {
-	SpriteBatch::SpriteBatch(
-		SpriteGeometryBuilder& sb,
-		RectGeometryBuilder& rb,
-		LineGeometryBuilder& lb,
-		OutlinedRectGeometryBuilder& orb,
-		CircleGeometryBuilder& cb,
-		OutlinedCircleGeometryBuilder& ocb
-	)
-		: spriteBuilder(sb), rectBuilder(rb), lineBuilder(lb), outlinedRectBuilder(orb), circleBuilder(cb), outlinedCircleBuilder(ocb)
+	SpriteBatch::SpriteBatch()
 	{
 	}
 

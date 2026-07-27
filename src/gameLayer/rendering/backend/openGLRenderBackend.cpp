@@ -5,6 +5,7 @@
 #include <raylib.h>
 #include <asserts.h>
 #include <rlgl.h>
+#include "raylibRenderBackend.h"
 
 namespace Engine
 {
@@ -13,7 +14,7 @@ namespace Engine
 	{
 	}
 
-	bool OpenGLRenderBackend::initialize()
+	void OpenGLRenderBackend::initialize()
 	{
 		// bind vao
 		glGenVertexArrays(1, &m_vertexArrayHandle);
@@ -42,8 +43,6 @@ namespace Engine
 		std::cout << "position offset=" << offsetof(Vertex, position) << '\n';
 		std::cout << "uv offset=" << offsetof(Vertex, uv) << '\n';
 		std::cout << "tint offset=" << offsetof(Vertex, tint) << '\n';
-
-		return true;
 	}
 
 	void OpenGLRenderBackend::beginFrame()

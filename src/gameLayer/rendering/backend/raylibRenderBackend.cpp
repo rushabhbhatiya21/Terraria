@@ -6,6 +6,10 @@ namespace Engine
 {
 	RaylibRenderBackend::RaylibRenderBackend()
 	{
+	}
+
+	void RaylibRenderBackend::initialize()
+	{
 		m_vertexArrayHandle = rlLoadVertexArray();
 	}
 

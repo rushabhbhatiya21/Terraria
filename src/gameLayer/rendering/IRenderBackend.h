@@ -11,6 +11,7 @@ namespace Engine
 	public:
 		virtual ~IRenderBackend() = default;
 
+		virtual void initialize() = 0;
 		virtual void beginFrame() = 0;
 		virtual void endFrame() = 0;
 		virtual void render(

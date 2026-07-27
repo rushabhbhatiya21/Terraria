@@ -724,10 +724,11 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	// renderer
 	renderer.init(gameMap, assetManager);
 
-	// backend
-	bool res = backend.initialize();
-	if (res == 0)
-		std::cout << "****************** INIT FAILED *****************" << "\n";
+	//// backend
+	//bool res = backend.initialize();
+	//if (res == 0)
+	//	std::cout << "****************** INIT FAILED *****************" << "\n";
+	sceneRenderer.initialize();
 
 	// font init
 	defaultFont.loadDefault();

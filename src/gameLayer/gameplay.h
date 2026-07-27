@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <string>
+#include <memory>
 #include <math/vec2.h>
 #include <math/rect.h>
 #include <math/cam.h>
@@ -15,17 +16,8 @@
 
 #include <world/worldRenderer.h>
 
-// builders
-#include <rendering/builders/spriteGeometryBuilder.h>
-#include <rendering/builders/rectGeometryBuilder.h>
-#include <rendering/builders/lineGeometryBuilder.h>
-#include <rendering/builders/outlinedRectGeometryBuilder.h>
-#include <rendering/builders/circleGeometryBuilder.h>
-#include <rendering/builders/outlinedCircleGeometryBuilder.h>
-
-#include <rendering/batching/spriteBatch.h>
-#include <rendering/backend/openGLRenderBackend.h>
 #include <rendering/sceneRenderer.h>
+#include <rendering/backend/openGLRenderBackend.h>
 
 #include <entityHolder.h>
 #include <structure.h>
@@ -93,18 +85,18 @@ struct Gameplay
 	Engine::Cam camera = {};
 	DrawBackground background;
 
-	// render
-	Engine::SpriteGeometryBuilder spriteBuilder;
-	Engine::RectGeometryBuilder rectBuilder;
-	Engine::LineGeometryBuilder lineBuilder;
-	Engine::OutlinedRectGeometryBuilder outlinedRectBuilder{ lineBuilder };
-	Engine::CircleGeometryBuilder circleBuilder;
-	Engine::OutlinedCircleGeometryBuilder outlinedCircleBuilder{ lineBuilder };
+	//// render
+	//Engine::SpriteGeometryBuilder spriteBuilder;
+	//Engine::RectGeometryBuilder rectBuilder;
+	//Engine::LineGeometryBuilder lineBuilder;
+	//Engine::OutlinedRectGeometryBuilder outlinedRectBuilder{ lineBuilder };
+	//Engine::CircleGeometryBuilder circleBuilder;
+	//Engine::OutlinedCircleGeometryBuilder outlinedCircleBuilder{ lineBuilder };
 
-	Engine::OpenGLRenderBackend backend = {};
-	Engine::SpriteBatch spriteBatch{ spriteBuilder, rectBuilder, lineBuilder, outlinedRectBuilder, circleBuilder, outlinedCircleBuilder };
+	//Engine::OpenGLRenderBackend backend = {};
+	//Engine::SpriteBatch spriteBatch{ spriteBuilder, rectBuilder, lineBuilder, outlinedRectBuilder, circleBuilder, outlinedCircleBuilder };
 
-	SceneRenderer sceneRenderer{ spriteBatch, backend };
+	SceneRenderer sceneRenderer = { std::make_unique<Engine::OpenGLRenderBackend>() };
 	WorldRenderer renderer = {};
 
 	float lifetime = 0;

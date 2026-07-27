@@ -48,22 +48,15 @@ namespace Engine
 
 		EmissionState currentEmission;
 
-		SpriteGeometryBuilder& spriteBuilder;
-		RectGeometryBuilder& rectBuilder;
-		LineGeometryBuilder& lineBuilder;
-		OutlinedRectGeometryBuilder& outlinedRectBuilder;
-		CircleGeometryBuilder& circleBuilder;
-		OutlinedCircleGeometryBuilder& outlinedCircleBuilder;
+		SpriteGeometryBuilder spriteBuilder;
+		RectGeometryBuilder rectBuilder;
+		LineGeometryBuilder lineBuilder;
+		OutlinedRectGeometryBuilder outlinedRectBuilder{ lineBuilder };
+		CircleGeometryBuilder circleBuilder;
+		OutlinedCircleGeometryBuilder outlinedCircleBuilder{ lineBuilder };
 
 	public:
-		SpriteBatch(
-			SpriteGeometryBuilder& spriteBuilder, 
-			RectGeometryBuilder& rectBuilder,
-			LineGeometryBuilder& lineBuilder,
-			OutlinedRectGeometryBuilder& outlinedRectBuilder,
-			CircleGeometryBuilder& circleBuilder,
-			OutlinedCircleGeometryBuilder& outlinedCircleBuilder
-		);
+		SpriteBatch();
 		void submitSprite(const Sprite& sprite);
 		void submitRect(const ColoredRect& rect);
 		void submitLine(const Line& rect);

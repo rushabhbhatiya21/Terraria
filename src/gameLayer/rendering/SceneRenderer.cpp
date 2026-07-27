@@ -4,22 +4,29 @@
 #include "IRenderBackend.h"
 #include <rendering/batching/spriteBatch.h>
 
-SceneRenderer::SceneRenderer(Engine::SpriteBatch& spriteBatch, Engine::IRenderBackend& backend)
-	: spriteBatch(spriteBatch), backend(backend)
+
+SceneRenderer::SceneRenderer(std::unique_ptr<Engine::IRenderBackend> backend)
+	: m_backend(std::move(backend))
 {
+}
+
+void SceneRenderer::initialize()
+{
+	if (m_backend)
+		m_backend->initialize();
 }
 
 void SceneRenderer::beginFrame()
 {
-	backend.beginFrame();
+	m_backend->beginFrame();
 }
 
-void SceneRenderer::beginPass(Engine::RenderPass pass, Engine::Cam& camera)
+void SceneRenderer::beginPass(Engine::RenderPass pass, const Engine::Cam& camera)
 {
 	float screenWidth = (float)Engine::getScreenWidth();
 	float screenHeight = (float)Engine::getScreenHeight();
 
-	std::array<float, 16> projection {};
+	std::array<float, 16> projection{};
 	switch (pass)
 	{
 	case Engine::RenderPass::World:
@@ -40,7 +47,7 @@ void SceneRenderer::beginPass(Engine::RenderPass pass, Engine::Cam& camera)
 		projection[13] = ty;
 		projection[15] = 1.0f;
 
-		backend.setProjection(projection);
+		m_backend->setProjection(projection);
 		break;
 	}
 	case Engine::RenderPass::Background:
@@ -54,7 +61,7 @@ void SceneRenderer::beginPass(Engine::RenderPass pass, Engine::Cam& camera)
 		projection[13] = 1.0f;
 		projection[15] = 1.0f;
 
-		backend.setProjection(projection);
+		m_backend->setProjection(projection);
 		break;
 	}
 
@@ -65,40 +72,40 @@ void SceneRenderer::beginPass(Engine::RenderPass pass, Engine::Cam& camera)
 
 void SceneRenderer::endPass()
 {
-	spriteBatch.flush(backend);
+	m_spriteBatch.flush(*m_backend);
 }
 
 void SceneRenderer::endFrame()
 {
-	backend.endFrame();
+	m_backend->endFrame();
 }
 
 void SceneRenderer::submitSprite(const Engine::Sprite& sprite)
 {
-	spriteBatch.submitSprite(sprite);
+	m_spriteBatch.submitSprite(sprite);
 }
 
 void SceneRenderer::submitRect(const Engine::ColoredRect& rect)
 {
-	spriteBatch.submitRect(rect);
+	m_spriteBatch.submitRect(rect);
 }
 
 void SceneRenderer::submitLine(const Engine::Line& line)
 {
-	spriteBatch.submitLine(line);
+	m_spriteBatch.submitLine(line);
 }
 
 void SceneRenderer::submitOutlinedRect(const Engine::OutlinedRect& rect)
 {
-	spriteBatch.submitOutlinedRect(rect);
+	m_spriteBatch.submitOutlinedRect(rect);
 }
 
 void SceneRenderer::submitCircle(const Engine::Circle& circle)
 {
-	spriteBatch.submitCircle(circle);
+	m_spriteBatch.submitCircle(circle);
 }
 
 void SceneRenderer::submitOutlinedCircle(const Engine::OutlinedCircle& circle)
 {
-	spriteBatch.submitOutlinedCircle(circle);
+	m_spriteBatch.submitOutlinedCircle(circle);
 }

@@ -9,6 +9,8 @@ namespace Engine
 		RaylibRenderBackend();
 		~RaylibRenderBackend() = default;
 
+		void initialize() override;
+
 		void render(
 			const std::vector<Vertex>& vertexBuffer,
 			const std::vector<Index>& indexBuffer,
