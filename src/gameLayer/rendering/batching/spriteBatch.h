@@ -12,6 +12,7 @@
 #include <rendering/builders/outlinedRectGeometryBuilder.h>
 #include <rendering/builders/circleGeometryBuilder.h>
 #include <rendering/builders/outlinedCircleGeometryBuilder.h>
+#include <rendering/builders/roundedRectGeometryBuilder.h>
 
 namespace Engine
 {
@@ -21,6 +22,7 @@ namespace Engine
 	struct OutlinedRect;
 	struct Circle;
 	struct OutlinedCircle;
+	struct RoundedRect;
 
 	struct DrawCommand;
 	class IRenderBackend;
@@ -54,6 +56,7 @@ namespace Engine
 		OutlinedRectGeometryBuilder outlinedRectBuilder{ lineBuilder };
 		CircleGeometryBuilder circleBuilder;
 		OutlinedCircleGeometryBuilder outlinedCircleBuilder{ lineBuilder };
+		RoundedRectGeometryBuilder roundedRectBuilder{ rectBuilder, circleBuilder };
 
 	public:
 		SpriteBatch();
@@ -63,13 +66,11 @@ namespace Engine
 		void submitOutlinedRect(const OutlinedRect& rect);
 		void submitCircle(const Circle& circle);
 		void submitOutlinedCircle(const OutlinedCircle& circle);
+		void submitRoundedRect(const RoundedRect& roundedRect);
 
 		void flush(IRenderBackend& backend);
 
 	private:
-		//std::vector<DrawCommand> buildDrawCommands();
-		//void executeDrawCommands(const std::vector<DrawCommand>& commands);
-
 		void beginEmission(const RenderState& renderState) override;
 		void emitVertex(const Vertex& vertex) override;
 		void emitIndex(const Index index) override;

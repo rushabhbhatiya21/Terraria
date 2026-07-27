@@ -21,8 +21,7 @@ namespace Engine
 
 		for (int i = 0; i < N; i++)
 		{
-			Vertex v = { circlePoints[i],  Vec2{0,0}, circle.tint };
-			sink.emitVertex(v);
+			sink.emitVertex(Vertex{ circlePoints[i],  Vec2{0,0}, circle.tint });
 		}
 
 		for (int i = 1; i < N; i++)

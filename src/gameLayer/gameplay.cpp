@@ -19,14 +19,17 @@
 #include <shake.h>
 #include <lighting.h>
 
-// renderable types
+#pragma region renderable types header
 #include <rendering/types/sprite.h>
 #include <rendering/types/coloredRect.h>
 #include <rendering/types/line.h>
 #include <rendering/types/outlinedRect.h>
 #include <rendering/types/circle.h>
 #include <rendering/types/outlinedCircle.h>
+#include <rendering/types/roundedRect.h>
+#pragma endregion
 
+#pragma region entity types header
 #include <entities/droppedItem.h>
 #include <entities/enemies/enemy.h>
 #include <entities/enemies/slime.h>
@@ -34,9 +37,12 @@
 #include <entities/enemies/zombie.h>
 #include <entities/enemies/evilEye.h>
 #include <entities/enemies/evilEyeServant.h>
+#pragma end region
 
+#pragma region item types header
 #include <items/item.h>
 #include <items/itemUse.h>
+#pragma end region
 
 #include <combat/blockSpawn.h>
 #include <ui/popupText.h>
@@ -1535,18 +1541,30 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		//};
 		//sceneRenderer.submitOutlinedRect(orect);
 
-		Engine::OutlinedCircle circle
+		//Engine::OutlinedCircle circle
+		//{
+		//	e.second->getPosition(),
+		//	2.f,
+		//	Engine::Vec2{0,0},
+		//	0.f,
+		//	.1f,
+		//	Engine::Red,
+		//	assetManager.whiteTexture,
+		//	assetManager.defaultShader
+		//};
+
+		Engine::RoundedRect rr
 		{
-			e.second->getPosition(),
-			2.f,
-			Engine::Vec2{0,0},
+			e.second->physics.transform.getAABB(),
+			{0,0},
+			.5f,
 			0.f,
-			.1f,
-			Engine::Red,
+			Engine::Green,
 			assetManager.whiteTexture,
 			assetManager.defaultShader
 		};
-		sceneRenderer.submitOutlinedCircle(circle);
+
+		sceneRenderer.submitRoundedRect(rr);
 
 		e.second->render(assetManager, sceneRenderer);
 	}

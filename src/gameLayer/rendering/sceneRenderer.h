@@ -20,6 +20,7 @@ namespace Engine
 	struct OutlinedRect;
 	struct Circle;
 	struct OutlinedCircle;
+	struct RoundedRect;
 
 	class IRenderBackend;
 }
@@ -40,6 +41,7 @@ public:
 	void submitOutlinedRect(const Engine::OutlinedRect& rect) override;
 	void submitCircle(const Engine::Circle& circle) override;
 	void submitOutlinedCircle(const Engine::OutlinedCircle& circle) override;
+	void submitRoundedRect(const Engine::RoundedRect& roundedRect) override;
 
 private:
 	Engine::SpriteBatch m_spriteBatch;

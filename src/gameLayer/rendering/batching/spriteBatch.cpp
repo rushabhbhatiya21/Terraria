@@ -1,4 +1,5 @@
 #include "spriteBatch.h"
+#include "spriteBatch.h"
 #include <asserts.h>
 #include <rendering/types/sprite.h>
 #include <rendering/types/coloredRect.h>
@@ -42,6 +43,11 @@ namespace Engine
 	void SpriteBatch::submitOutlinedCircle(const OutlinedCircle& circle)
 	{
 		outlinedCircleBuilder.build(circle, *this);
+	}
+
+	void SpriteBatch::submitRoundedRect(const RoundedRect& roundedRect)
+	{
+		roundedRectBuilder.build(roundedRect, *this);
 	}
 
 	void SpriteBatch::flush(IRenderBackend& backend)
