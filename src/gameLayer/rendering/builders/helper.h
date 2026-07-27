@@ -43,7 +43,7 @@ inline std::array<Engine::Vec2, 4> generateTransformedCorners(
 	return corners;
 }
 
-inline std::vector<Engine::Vec2> generateCirclePoints(const float radius, const int segments)
+inline std::vector<Engine::Vec2> generateCirclePoints(const float radius, const int segments, const int start = 0, const int end = 0)
 {
 	permaAssert(segments >= 3);
 	std::vector<Engine::Vec2> points;
@@ -51,7 +51,7 @@ inline std::vector<Engine::Vec2> generateCirclePoints(const float radius, const 
 	points.push_back(Engine::Vec2{ 0,0 });
 	const float angleStep = (360.f / segments) * Engine::Deg2Rad;
 
-	for (int i = 0; i < segments; i++)
+	for (int i = start; i < segments; i++)
 	{
 		Engine::Vec2 circlePoint{};
 
