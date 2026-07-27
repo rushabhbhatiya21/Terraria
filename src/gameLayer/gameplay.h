@@ -21,6 +21,7 @@
 #include <rendering/builders/lineGeometryBuilder.h>
 #include <rendering/builders/outlinedRectGeometryBuilder.h>
 #include <rendering/builders/circleGeometryBuilder.h>
+#include <rendering/builders/outlinedCircleGeometryBuilder.h>
 
 #include <rendering/batching/spriteBatch.h>
 #include <rendering/backend/openGLRenderBackend.h>
@@ -98,9 +99,10 @@ struct Gameplay
 	Engine::LineGeometryBuilder lineBuilder;
 	Engine::OutlinedRectGeometryBuilder outlinedRectBuilder{ lineBuilder };
 	Engine::CircleGeometryBuilder circleBuilder;
+	Engine::OutlinedCircleGeometryBuilder outlinedCircleBuilder{ lineBuilder };
 
 	Engine::OpenGLRenderBackend backend = {};
-	Engine::SpriteBatch spriteBatch{ spriteBuilder, rectBuilder, lineBuilder, outlinedRectBuilder, circleBuilder };
+	Engine::SpriteBatch spriteBatch{ spriteBuilder, rectBuilder, lineBuilder, outlinedRectBuilder, circleBuilder, outlinedCircleBuilder };
 
 	SceneRenderer sceneRenderer{ spriteBatch, backend };
 	WorldRenderer renderer = {};

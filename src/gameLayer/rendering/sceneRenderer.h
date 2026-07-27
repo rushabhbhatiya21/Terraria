@@ -17,6 +17,7 @@ namespace Engine
 	struct Line;
 	struct OutlinedRect;
 	struct Circle;
+	struct OutlinedCircle;
 
 	class SpriteBatch;
 	class IRenderBackend;
@@ -36,6 +37,7 @@ public:
 	void submitLine(const Engine::Line& line) override;
 	void submitOutlinedRect(const Engine::OutlinedRect& rect) override;
 	void submitCircle(const Engine::Circle& circle) override;
+	void submitOutlinedCircle(const Engine::OutlinedCircle& circle) override;
 
 private:
 	Engine::SpriteBatch& spriteBatch;

@@ -21,8 +21,8 @@ namespace Engine
 		(
 			const Rect& rect,
 			const Vec2& origin,
-			float rotation,
-			float thickness,
+			const float rotation,
+			const float thickness,
 			const Color4f& tint,
 			const Texture& texture,
 			const ShaderE& shader

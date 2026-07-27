@@ -13,21 +13,14 @@ namespace Engine
 	{
 		// static for now
 		int segments = 32;
-		std::vector<Vec2> circlePoints = generateCirclePoints(circle.radius, segments);
+		std::vector<Vec2> circlePoints = generateTransformedCirclePoints(circle.radius, segments, circle.rotation, circle.origin, circle.position);
 
 		sink.beginEmission(RenderState{ &circle.texture, &circle.shader, 0.f });
 
-		const float theta = circle.rotation * Deg2Rad;
-		const float c = cosf(theta);
-		const float s = sinf(theta);
 		const int N = circlePoints.size();
 
 		for (int i = 0; i < N; i++)
 		{
-			circlePoints[i] -= circle.origin;
-			rotateAroundOrigin(circlePoints[i], c, s);
-			circlePoints[i] += circle.position;
-
 			Vertex v = { circlePoints[i],  Vec2{0,0}, circle.tint };
 			sink.emitVertex(v);
 		}

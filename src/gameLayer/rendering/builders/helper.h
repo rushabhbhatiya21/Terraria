@@ -64,6 +64,30 @@ inline std::vector<Engine::Vec2> generateCirclePoints(const float radius, const 
 	return points;
 }
 
+inline std::vector<Engine::Vec2> generateTransformedCirclePoints(
+	const float radius,
+	const int segments,
+	const float rotation,
+	const Engine::Vec2 origin,
+	const Engine::Vec2 position
+)
+{
+	auto points = generateCirclePoints(radius, segments);
+
+	const float theta = rotation * Engine::Deg2Rad;
+	const float c = cosf(theta);
+	const float s = sinf(theta);
+
+	for (auto& point : points)
+	{
+		point -= origin;
+		point = rotateAroundOrigin(point, c, s);
+		point += position;
+	}
+
+	return points;
+}
+
 inline std::array<Engine::Vec2, 4> generateUVs(float x, float y, float w, float h)
 {
 	return std::array<Engine::Vec2, 4>

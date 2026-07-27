@@ -16,7 +16,7 @@ namespace Engine
 	{
 		auto corners = generateTransformedCorners(orect.rect, orect.origin, orect.rotation);
 
-		for (int i = 0; i < 4; i++)
+		for (int i = 0; i < corners.size(); i++)
 		{
 			int j = (i + 1) % 4;
 			Line line{ corners[i], corners[j], orect.thickness, orect.tint, orect.texture, orect.shader };

@@ -4,6 +4,7 @@
 #include <rendering/types/coloredRect.h>
 #include <rendering/types/line.h>
 #include <rendering/types/outlinedRect.h>
+#include <rendering/types/outlinedCircle.h>
 #include <rendering/batching/drawCommand.h>
 #include <rendering/IRenderBackend.h>
 
@@ -14,9 +15,10 @@ namespace Engine
 		RectGeometryBuilder& rb,
 		LineGeometryBuilder& lb,
 		OutlinedRectGeometryBuilder& orb,
-		CircleGeometryBuilder& cb
+		CircleGeometryBuilder& cb,
+		OutlinedCircleGeometryBuilder& ocb
 	)
-		: spriteBuilder(sb), rectBuilder(rb), lineBuilder(lb), outlinedRectBuilder(orb), circleBuilder(cb)
+		: spriteBuilder(sb), rectBuilder(rb), lineBuilder(lb), outlinedRectBuilder(orb), circleBuilder(cb), outlinedCircleBuilder(ocb)
 	{
 	}
 
@@ -43,6 +45,11 @@ namespace Engine
 	void SpriteBatch::submitCircle(const Circle& circle)
 	{
 		circleBuilder.build(circle, *this);
+	}
+
+	void SpriteBatch::submitOutlinedCircle(const OutlinedCircle& circle)
+	{
+		outlinedCircleBuilder.build(circle, *this);
 	}
 
 	void SpriteBatch::flush(IRenderBackend& backend)
