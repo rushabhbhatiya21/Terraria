@@ -1,5 +1,6 @@
 #include "sceneRenderer.h"
 #include "sceneRenderer.h"
+#include "sceneRenderer.h"
 #include <array>
 #include <window/window.h>
 #include "IRenderBackend.h"
@@ -109,6 +110,11 @@ void SceneRenderer::submitCircle(const Engine::Circle& circle)
 void SceneRenderer::submitOutlinedCircle(const Engine::OutlinedCircle& circle)
 {
 	m_spriteBatch.submitOutlinedCircle(circle);
+}
+
+void SceneRenderer::submitArc(const Engine::Arc& arc)
+{
+	m_spriteBatch.submitArc(arc);
 }
 
 void SceneRenderer::submitRoundedRect(const Engine::RoundedRect& roundedRect)

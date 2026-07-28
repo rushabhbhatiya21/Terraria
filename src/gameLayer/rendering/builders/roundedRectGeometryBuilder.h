@@ -5,17 +5,17 @@ namespace Engine
 	struct RoundedRect;
 	class IGeometrySink;
 	class RectGeometryBuilder;
-	class CircleGeometryBuilder;
+	class ArcGeometryBuilder;
 
 	class RoundedRectGeometryBuilder
 	{
 	public:
-		explicit RoundedRectGeometryBuilder(RectGeometryBuilder& rectBuilder, CircleGeometryBuilder& circleBuilder);
+		explicit RoundedRectGeometryBuilder(RectGeometryBuilder& rectBuilder, ArcGeometryBuilder& arcBuilder);
 
 		void build(const RoundedRect& rect, IGeometrySink& sink);
 
 	private:
 		RectGeometryBuilder& m_rectBuilder;
-		CircleGeometryBuilder& m_circleBuilder;
+		ArcGeometryBuilder& m_arcBuilder;
 	};
 }
