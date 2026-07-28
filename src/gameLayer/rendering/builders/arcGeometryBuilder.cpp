@@ -18,14 +18,14 @@ namespace Engine
 
 	void ArcGeometryBuilder::build(const Arc& arc, IGeometrySink& sink)
 	{
-		int segments = 64;
-		auto points = generateTransformedCirclePoints(arc.radius, segments, arc.rotation, arc.origin, arc.position, arc.startAngle, arc.endAngle);
+		int segments = calculateSegments(arc.radius);
+		auto points = generateTransformedArcMesh(arc.radius, segments, arc.rotation, arc.origin, arc.position, arc.startAngle, arc.endAngle);
 
 		sink.beginEmission(RenderState{ &arc.texture, &arc.shader, 0.f });
 
 		for (auto& p : points)
 		{
-			sink.emitVertex(Vertex{ p, Vec2{0,0}, arc.tint });
+			sink.emitVertex(Vertex{ p.position, p.uv, arc.tint });
 		}
 
 		int N = static_cast<int>(points.size());

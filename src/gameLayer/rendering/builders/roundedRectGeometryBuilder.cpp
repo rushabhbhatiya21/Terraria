@@ -19,9 +19,6 @@ namespace Engine
 
 	void Engine::RoundedRectGeometryBuilder::build(const RoundedRect& rect, IGeometrySink& sink)
 	{
-		// static for now
-		int segements = 32;
-
 		Rect center { 
 			rect.destRect.x + rect.roundness,
 			rect.destRect.y + rect.roundness,

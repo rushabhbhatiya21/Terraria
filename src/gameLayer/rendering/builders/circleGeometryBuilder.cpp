@@ -12,18 +12,17 @@ namespace Engine
 	void CircleGeometryBuilder::build(const Circle& circle, IGeometrySink& sink)
 	{
 		// static for now
-		int segments = 32;
-		std::vector<Vec2> circlePoints = generateTransformedCirclePoints(circle.radius, segments, circle.rotation, circle.origin, circle.position);
+		int segments = calculateSegments(circle.radius);
+		auto circlePoints = generateTransformedArcMesh(circle.radius, segments, circle.rotation, circle.origin, circle.position);
 
 		sink.beginEmission(RenderState{ &circle.texture, &circle.shader, 0.f });
 
-		const int N = circlePoints.size();
-
-		for (int i = 0; i < N; i++)
+		for (auto& p : circlePoints)
 		{
-			sink.emitVertex(Vertex{ circlePoints[i],  Vec2{0,0}, circle.tint });
+			sink.emitVertex(Vertex{ p.position,  p.uv, circle.tint });
 		}
 
+		const int N = circlePoints.size();
 		for (int i = 1; i < N; i++)
 		{
 			const int j = (i % (N - 1)) + 1;

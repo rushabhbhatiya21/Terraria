@@ -1,8 +1,10 @@
 #pragma once
 #include <array>
+#include <algorithm>
 #include <math/vec2.h>
 #include <math/rect.h>
 #include <asserts.h>
+#include <rendering/types/meshPoint.h>
 
 inline Engine::Vec2 rotateAroundOrigin(const Engine::Vec2& point, float c, float s)
 {
@@ -43,13 +45,19 @@ inline std::array<Engine::Vec2, 4> generateTransformedCorners(
 	return corners;
 }
 
-inline std::vector<Engine::Vec2> generateCirclePoints(const float radius, const int segments, const int start = 0, int end = 0)
+inline std::vector<Engine::MeshPoint> generateArcMesh(const float radius, const int segments, const int start = 0, int end = 0)
 {
 	permaAssert(segments >= 3);
-	std::vector<Engine::Vec2> points;
-	points.reserve(segments + 1);
-	points.push_back(Engine::Vec2{ 0,0 });
+	std::vector<Engine::MeshPoint> vertices;
+	vertices.reserve(segments + 1);
+	vertices.emplace_back(
+		Engine::MeshPoint{
+			Engine::Vec2{0,0},
+			Engine::Vec2{0.5f, 0.5f}
+		}
+	);
 	const float angleStep = (360.f / segments) * Engine::Deg2Rad;
+	const float invDiameter = 1.f / (2.f * radius);
 
 	if (start == 0 && end == 0)
 		end = segments;
@@ -61,13 +69,25 @@ inline std::vector<Engine::Vec2> generateCirclePoints(const float radius, const 
 		const float theta = i * angleStep;
 		circlePoint.x = cosf(theta) * radius;
 		circlePoint.y = sinf(theta) * radius;
-		points.push_back(circlePoint);
+
+		Engine::Vec2 uv{
+			(circlePoint.x + (float)radius) / invDiameter,
+			(circlePoint.y + (float)radius) / invDiameter,
+		};
+
+		vertices.emplace_back(
+			Engine::MeshPoint
+			{
+				circlePoint,
+				uv
+			}
+		);
 	}
 
-	return points;
+	return vertices;
 }
 
-inline std::vector<Engine::Vec2> generateTransformedCirclePoints(
+inline std::vector<Engine::MeshPoint> generateTransformedArcMesh(
 	const float radius,
 	const int segments,
 	const float rotation,
@@ -77,20 +97,20 @@ inline std::vector<Engine::Vec2> generateTransformedCirclePoints(
 	int end = 0
 )
 {
-	auto points = generateCirclePoints(radius, segments, start, end);
+	auto vertices = generateArcMesh(radius, segments, start, end);
 
 	const float theta = rotation * Engine::Deg2Rad;
 	const float c = cosf(theta);
 	const float s = sinf(theta);
 
-	for (auto& point : points)
+	for (auto& vertex : vertices)
 	{
-		point -= origin;
-		point = rotateAroundOrigin(point, c, s);
-		point += position;
+		vertex.position -= origin;
+		vertex.position = rotateAroundOrigin(vertex.position, c, s);
+		vertex.position += position;
 	}
 
-	return points;
+	return vertices;
 }
 
 inline std::array<Engine::Vec2, 4> generateUVs(float x, float y, float w, float h)
@@ -114,3 +134,11 @@ inline std::array<Engine::Vec2, 4> generateDefaultUVs()
 		Engine::Vec2{ 0,1 }
 	};
 };
+
+inline int calculateSegments(int radius)
+{
+	float c = 2.f * Engine::Pi * radius;
+	float segments = std::ceilf(c / 4.f);
+	segments = std::clamp(segments, 8.f, 64.f);
+	return static_cast<int>(segments);
+}
