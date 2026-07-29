@@ -3,7 +3,7 @@
 #include <rendering/types/coloredRect.h>
 #include <rendering/IGeometrySink.h>
 #include <rendering/types/renderState.h>
-#include <rendering/builders/helper.h>
+#include <rendering/builders/meshGeneration.h>
 
 namespace Engine
 {

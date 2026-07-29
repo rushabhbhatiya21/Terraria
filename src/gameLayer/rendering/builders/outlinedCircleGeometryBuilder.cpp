@@ -3,7 +3,7 @@
 #include <rendering/types/outlinedCircle.h>
 #include <rendering/types/line.h>
 #include <rendering/IGeometrySink.h>
-#include <rendering/builders/helper.h>
+#include <rendering/builders/meshGeneration.h>
 
 namespace Engine
 {

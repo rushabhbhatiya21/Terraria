@@ -1,5 +1,5 @@
 #include "arcGeometryBuilder.h"
-#include <rendering/builders/helper.h>
+#include <rendering/builders/meshGeneration.h>
 #include <rendering/IGeometrySink.h>
 
 #include <rendering/types/arc.h>

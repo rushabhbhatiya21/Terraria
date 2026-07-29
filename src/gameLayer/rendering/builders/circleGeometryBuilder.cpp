@@ -5,7 +5,7 @@
 #include <rendering/types/circle.h>
 #include <rendering/types/vertex.h>
 #include <rendering/types/renderState.h>
-#include <rendering/builders/helper.h>
+#include <rendering/builders/meshGeneration.h>
 
 namespace Engine
 {
