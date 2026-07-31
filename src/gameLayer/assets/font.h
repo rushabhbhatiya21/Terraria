@@ -1,29 +1,25 @@
 #pragma once
-#include <memory>
-#include <string>
-#include <math/vec2.h>
+#include <vector>
+#include <assets/texture.h>
 
 namespace Engine
 {
-    class FontE
-    {
-    public:
-        FontE();
+	struct Glyph
+	{
+		int value;              // Character value (Unicode)
+		int offsetX;            // Character offset X when drawing
+		int offsetY;            // Character offset Y when drawing
+		int advanceX;           // Character advance position X
+		Rect srcRect;
+	};
 
-        FontE(FontE&&) noexcept;
-        FontE& operator=(FontE&&) noexcept;
+	struct Font
+	{
+		int baseSize;           // Base size (default chars height)
+		int glyphCount;         // Number of glyph characters
+		int glyphPadding;       // Padding around the glyph characters
 
-        FontE(const FontE&) = delete;
-        FontE& operator=(const FontE&) = delete;
-
-        ~FontE();
-
-        void loadDefault();
-        Vec2 measureTextEx(const std::string&, float, float) const;
-        int measureText(const std::string&, float) const;
-
-    private:
-        class FontImpl;
-        std::unique_ptr<FontImpl> impl;
-    };
+		Texture* texture;
+		std::vector<Glyph> glyphs;
+	};
 }
