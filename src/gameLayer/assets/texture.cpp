@@ -27,20 +27,20 @@ namespace Engine
 
 	void Texture::loadFromFile(const std::string& path)
 	{
-		// load image with raylib
+		// load image with raylib for now
 		Image image = LoadImage(path.c_str());
 
 		permaAssertDevelopement(!image.data);
-		//if (!image.data)
-		//{
-		//	// error handling
-		//	printf("Error loading image.");
-		//}
-
-		width = image.width;
-		height = image.height;
 
 		ImageFormat(&image, PIXELFORMAT_UNCOMPRESSED_R8G8B8A8);
+		loadFromImage(image);
+		UnloadImage(image);
+	}
+
+	void Texture::loadFromImage(const Image& image)
+	{
+		width = image.width;
+		height = image.height;
 
 		glGenTextures(1, &impl->textureId);
 		glBindTexture(GL_TEXTURE_2D, impl->textureId);
@@ -52,7 +52,6 @@ namespace Engine
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-		UnloadImage(image);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -103,11 +102,6 @@ namespace Engine
 
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-
-	//uint32_t Texture::getNativeHandle() const
-	//{
-	//	return impl->texture.id;
-	//}
 
 	Texture::~Texture() = default;
 }

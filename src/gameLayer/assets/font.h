@@ -19,7 +19,6 @@ namespace Engine
 	struct Font
 	{
 		int baseSize;           // Base size (default chars height)
-		int glyphCount;         // Number of glyph characters
 		int glyphPadding;       // Padding around the glyph characters
 
 		Texture* texture;

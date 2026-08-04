@@ -2,6 +2,8 @@
 #include <string>
 #include <memory>
 
+struct Image;
+
 namespace Engine
 {
     class Texture
@@ -27,6 +29,7 @@ namespace Engine
         class TextureImpl;
 
         friend struct AssetManager;
+        friend class FontLoader;
 
         std::unique_ptr<TextureImpl> impl;
 
@@ -35,6 +38,7 @@ namespace Engine
 
     private:
         void loadFromFile(const std::string& path);
+        void loadFromImage(const Image& image);
         uint32_t getNativeHandle() const;
     };
 }

@@ -60,7 +60,7 @@ namespace Engine
 		frontArmour[Items::iceChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/ice_armour_front.png");
 		backArmour[Items::iceChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/ice_armour_back.png");
 
-		loadFont(std::string(RESOURCES_PATH) + "fonts/SEGOEPR.TTF");
+		defaultFont = loadFont(std::string(RESOURCES_PATH) + "fonts/SEGOEPR.TTF");
 	}
 
 	const Texture& AssetManager::getHeadTexture(int item)
@@ -148,7 +148,6 @@ namespace Engine
 
 	Font AssetManager::loadFont(const std::string& path)
 	{
-		Font font = m_fontLoader.load(path);
-		return font;
+		return m_fontLoader.load(path, fontTex);
 	}
 }

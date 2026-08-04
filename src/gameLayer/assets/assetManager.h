@@ -50,6 +50,10 @@ namespace Engine
 		Texture caveBG = {};
 		Texture nightBG = {};
 
+		Texture fontTex = {};
+
+		Font defaultFont{};
+
 		ShaderE defaultShader = {};
 		ShaderE blurShader = {};
 		ShaderE bloomShader = {};
