@@ -1,5 +1,6 @@
 #pragma once
 #include "assetManager.h"
+#include "font.h"
 #include <filesystem>
 #include <unordered_map>
 #include <items/item.h>
@@ -58,6 +59,8 @@ namespace Engine
 		headArmour[Items::iceHelmet] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/ice_armour_head.png");
 		frontArmour[Items::iceChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/ice_armour_front.png");
 		backArmour[Items::iceChestPlate] = loadTextureFromFile(std::string(RESOURCES_PATH) + "body/ice_armour_back.png");
+
+		loadFont(std::string(RESOURCES_PATH) + "fonts/SEGOEPR.TTF");
 	}
 
 	const Texture& AssetManager::getHeadTexture(int item)
@@ -141,5 +144,11 @@ namespace Engine
 		{
 			*t.tex = Texture{};
 		}
+	}
+
+	Font AssetManager::loadFont(const std::string& path)
+	{
+		Font font = m_fontLoader.load(path);
+		return font;
 	}
 }

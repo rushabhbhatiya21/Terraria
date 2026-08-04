@@ -1,9 +1,12 @@
 #pragma once
 #include <vector>
+#include <math/rect.h>
 #include <assets/texture.h>
 
 namespace Engine
 {
+	struct AssetManager;
+
 	struct Glyph
 	{
 		int value;              // Character value (Unicode)

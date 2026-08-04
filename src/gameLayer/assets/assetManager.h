@@ -4,9 +4,12 @@
 #include <unordered_map>
 #include "texture.h"
 #include "shader.h"
+#include "fontLoader.h"
 
 namespace Engine
 {
+	struct Font;
+
 	struct TexEntry
 	{
 		Texture* tex;
@@ -21,6 +24,8 @@ namespace Engine
 
 	struct AssetManager
 	{
+		FontLoader m_fontLoader;
+
 		Texture whiteTexture = {};
 		Texture dirt = {};
 		Texture textures = {};
@@ -98,5 +103,7 @@ namespace Engine
 
 		void loadTexturePack(const std::string& pack);
 		void unloadTexturePack();
+
+		Font loadFont(const std::string& path);
 	};
 }
