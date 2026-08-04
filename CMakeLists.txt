@@ -91,6 +91,8 @@ target_include_directories(glad
         thirdParty/glad/include
 )
 
+target_include_directories("${CMAKE_PROJECT_NAME}" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/freetype/include")
+
 # Link raylib library statically
 target_link_libraries("${CMAKE_PROJECT_NAME}"
     PRIVATE
@@ -100,4 +102,5 @@ target_link_libraries("${CMAKE_PROJECT_NAME}"
         fastNoiseSIMD
         nlohmann_json
         glad
+		"${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/freetype/lib/freetype.lib"
 )
