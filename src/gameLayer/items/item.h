@@ -8,7 +8,7 @@
 
 namespace Engine
 {
-    struct Texture;
+    class Texture;
     struct AssetManager;
 }
 
