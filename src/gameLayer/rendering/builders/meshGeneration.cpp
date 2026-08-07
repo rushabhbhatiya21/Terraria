@@ -42,6 +42,10 @@ std::array<Engine::Vec2, 4> generateTransformedCorners(
 std::vector<Engine::MeshPoint> generateArcMesh(const float radius, const int segments, const int start, int end)
 {
 	permaAssert(segments >= 3);
+
+	float startRad = start * Engine::Deg2Rad;
+	float endRad = end * Engine::Deg2Rad;
+
 	std::vector<Engine::MeshPoint> vertices;
 	vertices.reserve(segments + 1);
 	vertices.emplace_back(
@@ -50,20 +54,21 @@ std::vector<Engine::MeshPoint> generateArcMesh(const float radius, const int seg
 			Engine::Vec2{0.5f, 0.5f}
 		}
 	);
-	const float angleStep = (360.f / segments) * Engine::Deg2Rad;
+	const float angleStep = (endRad - startRad) / segments;
 	const float invDiameter = 1.f / (2.f * radius);
-	if (start == 0 && end == 0)
-		end = segments;
-	for (int i = start; i < end; i++)
+
+	for (int i = 0; i <= segments; i++)
 	{
 		Engine::Vec2 circlePoint{};
-		const float theta = i * angleStep;
+		const float theta = startRad + i * angleStep;
 		circlePoint.x = cosf(theta) * radius;
 		circlePoint.y = sinf(theta) * radius;
+
 		Engine::Vec2 uv{
-			(circlePoint.x + (float)radius) / invDiameter,
-			(circlePoint.y + (float)radius) / invDiameter,
+			(circlePoint.x + radius) * invDiameter,
+			(circlePoint.y + radius) * invDiameter,
 		};
+
 		vertices.emplace_back(
 			Engine::MeshPoint
 			{

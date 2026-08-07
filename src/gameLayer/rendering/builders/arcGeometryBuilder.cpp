@@ -1,10 +1,12 @@
 #include "arcGeometryBuilder.h"
+#include <cmath>
 #include <rendering/builders/meshGeneration.h>
 #include <rendering/IGeometrySink.h>
 
 #include <rendering/types/arc.h>
 #include <rendering/types/renderState.h>
 #include <rendering/types/vertex.h>
+
 
 namespace Engine
 {
@@ -29,12 +31,11 @@ namespace Engine
 		}
 
 		int N = static_cast<int>(points.size());
-		for (int i = 1; i < N; i++)
+		for (int i = 1; i < N-1; i++)
 		{
-			const int j = (i % (N - 1)) + 1;
 			sink.emitIndex(0);
 			sink.emitIndex(i);
-			sink.emitIndex(j);
+			sink.emitIndex(i + 1);
 		}
 
 		sink.endEmission();

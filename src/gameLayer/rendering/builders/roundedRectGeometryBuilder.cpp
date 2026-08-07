@@ -29,19 +29,42 @@ namespace Engine
 		// 4 corners 
 		auto& corners = generateTransformedCorners(center, rect.origin, rect.rotation);
 
-		// 4 corner circles
-		sink.beginEmission(RenderState{ &rect.texture, &rect.shader, 0.f });
+		//int startAngle = 0;
+		//for (auto& corner : corners)
+		//{
+		//	//auto& circle = Circle{ corner, rect.roundness, rect.origin, rect.rotation, rect.tint, rect.texture, rect.shader };
+		//	Arc arc{ corner, rect.origin, rect.rotation, rect.roundness, startAngle, startAngle + 90, rect.tint, rect.texture, rect.shader };
+		//	m_arcBuilder.build(arc, sink);
+		//	startAngle += 90;
+		//}
 
-		int startAngle = 0;
-		for (auto& corner : corners)
-		{
-			//auto& circle = Circle{ corner, rect.roundness, rect.origin, rect.rotation, rect.tint, rect.texture, rect.shader };
-			Arc arc{ corner, rect.origin, rect.rotation, rect.roundness, startAngle, startAngle + 90, rect.tint, rect.texture, rect.shader };
-			m_arcBuilder.build(arc, sink);
-			startAngle += 90;
-		}
+		m_arcBuilder.build(
+			Arc(corners[0], rect.origin, rect.rotation,
+				rect.roundness,
+				180, 270,
+				rect.tint, rect.texture, rect.shader),
+			sink);
 
-		sink.endEmission();
+		m_arcBuilder.build(
+			Arc(corners[1], rect.origin, rect.rotation,
+				rect.roundness,
+				270, 360,
+				rect.tint, rect.texture, rect.shader),
+			sink);
+
+		m_arcBuilder.build(
+			Arc(corners[2], rect.origin, rect.rotation,
+				rect.roundness,
+				0, 90,
+				rect.tint, rect.texture, rect.shader),
+			sink);
+
+		m_arcBuilder.build(
+			Arc(corners[3], rect.origin, rect.rotation,
+				rect.roundness,
+				90, 180,
+				rect.tint, rect.texture, rect.shader),
+			sink);
 
 		// all 4 rects
 		std::vector<Rect> allRects;

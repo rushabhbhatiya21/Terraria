@@ -393,12 +393,12 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 
 		if (stack.count != 0 && isStackable(stack.itemId))
 		{
-			Engine::Vec2 textPos =
-			{
-				rect.x + rect.width * 0.5f,
-				rect.y + rect.height
-			};
-			std::string str = std::to_string(stack.count);
+			//Engine::Vec2 textPos =
+			//{
+			//	rect.x + rect.width * 0.5f,
+			//	rect.y + rect.height
+			//};
+			//std::string str = std::to_string(stack.count);
 			//Engine::Vec2 textSize = defaultFont.measureTextEx(str.c_str(), 25.f, 2.f);
 
 			// write item count as text
@@ -414,15 +414,16 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 			//	{ 255, 255, 255, 200 }
 			//);
 
-			Engine::Vec2 size = Engine::TextLayout::measureText(assetManager.defaultFont, str, 16.f, 0.f);
-
 			Engine::Text text
 			{
-				textPos,
-				Engine::TextLayout::getOrigin(size, Engine::TextLayout::Anchor::BottomCenter),
+				{
+					rect.x + rect.width * 0.5f,
+					rect.y + rect.height * 0.85f // 0.85f so that its slightly above bottom line
+				},
+				Engine::TextLayout::Anchor::BottomCenter,
 				0.f,
 				Engine::White,
-				str,
+				std::to_string(stack.count),
 				16.f,
 				0.f,
 				&assetManager.defaultFont,
@@ -542,62 +543,62 @@ void Gameplay::drawDraggedItem(const ItemStack& stack, Engine::AssetManager& ass
 	sceneRenderer.submitSprite(draggedItemSprite);
 }
 
-void Gameplay::drawDisplayNameUI(const Engine::AssetManager& assetManager, ItemId itemId, Engine::Rect parentRect, float fontSize, float spacing, float paddingX, float paddingY, Engine::Color4f rectColor, Engine::Color4f textColor)
+void Gameplay::drawDisplayNameUI(
+	const Engine::AssetManager& assetManager,
+	ItemId itemId,
+	Engine::Rect parentRect,
+	float fontSize,
+	float spacing,
+	float paddingX,
+	float paddingY,
+	Engine::Color4f rectColor,
+	Engine::Color4f textColor)
 {
 	ItemDefinition* selectedIngredient = getItem(itemId);
 
 	if (!selectedIngredient)
 		return;
 
-	//float fontSize = 9.f;
-	//float spacing = 1.f;
-	//float paddingX = 6.f;
-	//float paddingY = 2.f;
+	Engine::TextMetrics metrics = Engine::TextLayout::measureText(assetManager.defaultFont, selectedIngredient->displayName, fontSize, spacing);
 
-	//Engine::Vec2 textSize = defaultFont.measureTextEx(selectedIngredient->displayName, fontSize, spacing);
+	Engine::Rect rectPos
+	{
+		parentRect.x + parentRect.width * 0.5f - (metrics.size.x + paddingX * 2.f) * 0.5f,
+		parentRect.y - metrics.size.y - paddingY * 2.f - 5.f,
+		metrics.size.x + paddingX * 2.f,
+		metrics.size.y + paddingY * 2.f
+	};
 
-	//Engine::Rect rectPos{
-	//	parentRect.x + parentRect.width / 2 - (textSize.x + paddingX * 2) / 2, // center horizontally
-	//	parentRect.y - textSize.y - paddingY * 2 - 5,                   // above item slot
-	//	textSize.x + paddingX * 2,
-	//	textSize.y + paddingY * 2
-	//};
+	Engine::RoundedRect roundedRect
+	{
+		rectPos,
+		{0,0},
+		5.f,
+		0.f,
+		rectColor,
+		assetManager.whiteTexture,
+		assetManager.defaultShader
+	};
 
-	// draw rect using renderer
-	//DrawRectangleRounded(
-	//	rectPos,
-	//	.7f,
-	//	1,
-	//	//Color{ 255,255,255,200 }
-	//	rectColor
-	//);
+	sceneRenderer.submitRoundedRect(roundedRect);
 
-	//Engine::ColoredRect rect
-	//{
-	//	rectPos,
-	//	{ 0.0f, 0.0f },
-	//	0.f,
-	//	Engine::Color4f{ 255,255,255,200 },
-	//	assetManager.whiteTexture,
-	//	assetManager.defaultShader
-	//};
+	Engine::Text text
+	{
+		{
+			rectPos.x + paddingX,
+			rectPos.y + paddingY
+		},
+		Engine::TextLayout::Anchor::TopLeft,
+		0.f,
+		textColor,
+		selectedIngredient->displayName,
+		fontSize,
+		spacing,
+		&assetManager.defaultFont,
+		&assetManager.defaultShader
+	};
 
-	//sceneRenderer.submitRect(rect);
-
-	// draw text using renderer
-	//DrawTextPro(
-	//	GetFontDefault(),
-	//	selectedIngredient->displayName,
-	//	{
-	//		rectPos.x + paddingX,
-	//		rectPos.y + paddingY
-	//	},
-	//	{ 0, 0 },
-	//	0.f,
-	//	fontSize,
-	//	spacing,
-	//	textColor
-	//);
+	sceneRenderer.submitText(text);
 }
 
 #pragma endregion
@@ -790,7 +791,7 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	// cam foloow player
 	camFollow.init(1.5f, .74f, 1.f, player.getPosition());
 
-	spawnEnemyHelper<EvilEye>({ 35,55 });
+	//spawnEnemyHelper<EvilEye>({ 35,55 });
 	//spawnEnemyHelper<EvilEyeServant>({ 35,55 });
 	//spawnEnemyHelper<Slime>({ 31,60 });
 	//spawnEnemyHelper<Slime>({ 29,60 });
@@ -1636,6 +1637,19 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		//	0.1f,
 		//	{ 20,101,250,145 }
 		//);
+
+		Engine::OutlinedRect outlinedRect
+		{
+			rect,
+			{0,0},
+			0.f,
+			0.1f,
+			Engine::Color4f{ 20,101,250,145 },
+			assetManager.whiteTexture,
+			assetManager.defaultShader
+		};
+
+		sceneRenderer.submitOutlinedRect(outlinedRect);
 	}
 
 #pragma endregion
@@ -2077,6 +2091,17 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		Engine::Rect ingredientRect = getIngredientsRectangle(w, h, craftRectangle, recipeRect);
 		ingredientRect = shrinkRectanglePercentage(ingredientRect, .01f, .01f);
 		//DrawRectangleLinesEx(ingredientRect, 1, GREEN);
+		//Engine::OutlinedRect ingredientOutlinedRect
+		//{
+		//	ingredientRect,
+		//	{0,0},
+		//	0.f,
+		//	1.f,
+		//	Engine::Green,
+		//	assetManager.whiteTexture,
+		//	assetManager.defaultShader
+		//};
+		//sceneRenderer.submitOutlinedRect(ingredientOutlinedRect);
 
 		float baseCellSize = recipeRect.width * .7f;
 
@@ -2188,6 +2213,17 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 			// draw rect using renderer
 			//DrawRectangleRounded(rr, .3f, 6, bg);
+			Engine::RoundedRect recipeRect
+			{
+				rr,
+				{0,0},
+				5.f,
+				0.f,
+				bg,
+				assetManager.whiteTexture,
+				assetManager.defaultShader
+			};
+			sceneRenderer.submitRoundedRect(recipeRect);
 
 			rr = shrinkRectanglePercentage(rr, .4f, .4f);
 
@@ -2256,12 +2292,28 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 				};
 				sceneRenderer.submitSprite(craftingIngredient);
 
-				std::string str = std::to_string(selectedItemIngredients[j].count);
+				//std::string str = std::to_string(selectedItemIngredients[j].count);
 				Engine::Vec2 textPos =
 				{
 					ri.x + ri.width * 0.5f,
 					ri.y + ri.height * 0.85f
 				};
+
+				Engine::Text ingredientCount
+				{
+					textPos,
+					Engine::TextLayout::Anchor::Center,
+					0.f,
+					Engine::Gray,
+					std::to_string(selectedItemIngredients[j].count),
+					16.f,
+					1.f,
+					&assetManager.defaultFont,
+					&assetManager.defaultShader
+				};
+
+				sceneRenderer.submitText(ingredientCount);
+
 				//Engine::Vec2 textSize = defaultFont.measureTextEx(str.c_str(), 10.f, 1.f);
 
 				// draw text using renderer
