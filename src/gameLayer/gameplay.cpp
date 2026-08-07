@@ -1,6 +1,6 @@
 #include "gameplay.h"
 #include <chrono>
-#include <iostream>
+//#include <iostream>
 #include <imgui.h>
 #include <input/input.h>
 #include <window/window.h>
@@ -819,11 +819,11 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	float randStartTime = getRandomFloat(rng, 0.4f, 0.6f);
 	worldTime = randStartTime * FULL_DAY_LENGTH;
 
-	// chunk grid testing
-	std::cout << sizeof(Block) << "\n";
-	std::cout << sizeof(Chunk) << "\n";
-	std::cout << sizeof(ChunkGrid) << "\n";
-	std::cout << sizeof(Gameplay) << "\n";
+	//// chunk grid testing
+	//std::cout << sizeof(Block) << "\n";
+	//std::cout << sizeof(Chunk) << "\n";
+	//std::cout << sizeof(ChunkGrid) << "\n";
+	//std::cout << sizeof(Gameplay) << "\n";
 
 	double loadEnd = Engine::getTime();
 	Engine::traceLog(Engine::LogLevel::Info, "Load time: %.3f seconds", loadEnd - loadStart);
@@ -1572,18 +1572,18 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		//	assetManager.defaultShader
 		//};
 
-		Engine::RoundedRect rr
-		{
-			e.second->physics.transform.getAABB(),
-			{0,0},
-			.5f,
-			0.f,
-			Engine::Green,
-			assetManager.whiteTexture,
-			assetManager.defaultShader
-		};
+		//Engine::RoundedRect rr
+		//{
+		//	e.second->physics.transform.getAABB(),
+		//	{0,0},
+		//	.5f,
+		//	0.f,
+		//	Engine::Green,
+		//	assetManager.whiteTexture,
+		//	assetManager.defaultShader
+		//};
 
-		sceneRenderer.submitRoundedRect(rr);
+		//sceneRenderer.submitRoundedRect(rr);
 
 		e.second->render(assetManager, sceneRenderer);
 	}
@@ -1845,7 +1845,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		auto end = std::chrono::high_resolution_clock::now();
 
 		auto duration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-		std::cout << "Total Lighting time: " << duration.count() << " us\n" << std::endl;
+		//std::cout << "Total Lighting time: " << duration.count() << " us\n" << std::endl;
 	}
 
 #pragma endregion

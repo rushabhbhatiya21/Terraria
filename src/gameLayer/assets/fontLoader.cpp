@@ -1,5 +1,4 @@
 #include "fontLoader.h"
-#include <iostream>
 #include <asserts.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -15,18 +14,16 @@ namespace Engine
 		constexpr int fontSize = 32;
 		constexpr int firstGlyph = 32;
 
+		// Need error handling here
 		std::vector<unsigned char> buffer(atlasWidth * atlasHeight * 4);
 		FT_Library library;
 		FT_Error error;
 		error = FT_Init_FreeType(&library);
-		std::cout << "Freetype Init Error: " << (int)error << '\n';
 
 		FT_Face face;
 		error = FT_New_Face(library, path.c_str(), 0, &face);
-		std::cout << "Face Error: " << (int)error << '\n';
 
 		error = FT_Set_Pixel_Sizes(face, 0, fontSize);
-		std::cout << "Set pixel Error: " << (int)error << '\n';
 
 		Font font;
 		font.ascent = face->size->metrics.ascender >> 6;

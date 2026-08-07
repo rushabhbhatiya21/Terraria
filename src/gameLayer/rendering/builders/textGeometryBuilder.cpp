@@ -1,5 +1,4 @@
 #include "textGeometryBuilder.h"
-#include <iostream>
 #include <asserts.h>
 #include <rendering/types/text.h>
 #include <rendering/types/sprite.h>

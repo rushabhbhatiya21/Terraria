@@ -1,7 +1,6 @@
 #include "lighting.h"
 #include "gameMap.h"
 #include <set>
-#include <iostream>
 #include <chrono>
 #include "helper.h"
 #include "assets/assetManager.h"
@@ -177,19 +176,19 @@ void recalculateLight(GameMap& gameMap)
 	initLight(gameMap);
 	auto e1 = std::chrono::high_resolution_clock::now();
 	auto d1 = std::chrono::duration_cast<std::chrono::microseconds>(e1 - s1);
-	std::cout << "Init Light time: " << d1.count() << " us" << std::endl;
+	//std::cout << "Init Light time: " << d1.count() << " us" << std::endl;
 
 	auto s2 = std::chrono::high_resolution_clock::now();
 	calculateSunlight(gameMap);
 	auto e2 = std::chrono::high_resolution_clock::now();
 	auto d2 = std::chrono::duration_cast<std::chrono::microseconds>(e2 - s2);
-	std::cout << "Calculate Sun Light time: " << d2.count() << " us" << std::endl;
+	//std::cout << "Calculate Sun Light time: " << d2.count() << " us" << std::endl;
 
 	auto s3 = std::chrono::high_resolution_clock::now();
 	calculateBlockLight(gameMap);
 	auto e3 = std::chrono::high_resolution_clock::now();
 	auto d3 = std::chrono::duration_cast<std::chrono::microseconds>(e3 - s3);
-	std::cout << "Calculate Block Light time: " << d3.count() << " us" << std::endl;
+	//std::cout << "Calculate Block Light time: " << d3.count() << " us" << std::endl;
 
 	clearDirtyRegions(gameMap);
 }

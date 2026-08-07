@@ -1,7 +1,7 @@
 #include "openGLRenderBackend.h"
 #include <math/color.h>
 #include "helper.h"
-#include <iostream>
+//#include <iostream>
 #include <raylib.h>
 #include <asserts.h>
 #include <rlgl.h>
@@ -32,17 +32,17 @@ namespace Engine
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-		std::cout
-			<< "Generated VAO=" << m_vertexArrayHandle
-			<< " Generated VBO=" << m_vertexBufferHandle
-			<< " Generated EBO=" << m_indexBufferHandle
-			<< " ShaderProgram=" << m_shaderProgramHandle
-			<< '\n';
+		//std::cout
+		//	<< "Generated VAO=" << m_vertexArrayHandle
+		//	<< " Generated VBO=" << m_vertexBufferHandle
+		//	<< " Generated EBO=" << m_indexBufferHandle
+		//	<< " ShaderProgram=" << m_shaderProgramHandle
+		//	<< '\n';
 
-		std::cout << "sizeof(Vertex)=" << sizeof(Vertex) << '\n';
-		std::cout << "position offset=" << offsetof(Vertex, position) << '\n';
-		std::cout << "uv offset=" << offsetof(Vertex, uv) << '\n';
-		std::cout << "tint offset=" << offsetof(Vertex, tint) << '\n';
+		//std::cout << "sizeof(Vertex)=" << sizeof(Vertex) << '\n';
+		//std::cout << "position offset=" << offsetof(Vertex, position) << '\n';
+		//std::cout << "uv offset=" << offsetof(Vertex, uv) << '\n';
+		//std::cout << "tint offset=" << offsetof(Vertex, tint) << '\n';
 	}
 
 	void OpenGLRenderBackend::beginFrame()
@@ -256,10 +256,10 @@ namespace Engine
 	void OpenGLRenderBackend::renderTestQuad()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		std::cout << "Stored VBO = " << m_vertexBufferHandle << '\n';
-		std::cout << "Stored EBO = " << m_indexBufferHandle << '\n';
-		std::cout << "Stored VAO = " << m_vertexArrayHandle << '\n';
-		std::cout << "Stored Program = " << m_shaderProgramHandle << '\n';
+		//std::cout << "Stored VBO = " << m_vertexBufferHandle << '\n';
+		//std::cout << "Stored EBO = " << m_indexBufferHandle << '\n';
+		//std::cout << "Stored VAO = " << m_vertexArrayHandle << '\n';
+		//std::cout << "Stored Program = " << m_shaderProgramHandle << '\n';
 
 		std::vector<Vertex> vertices =
 		{
@@ -277,15 +277,15 @@ namespace Engine
 
 		GLint cprogram;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &cprogram);
-		std::cout << "Current program = " << cprogram << std::endl;
+		// std::cout << "Current program = " << cprogram << std::endl;
 
 		GLint cvao;
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &cvao);
-		std::cout << "Current VAO = " << cvao << std::endl;
+		// std::cout << "Current VAO = " << cvao << std::endl;
 
 		GLint cfbo;
 		glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &cfbo);
-		std::cout << "Current FBO = " << cfbo << std::endl;
+		// std::cout << "Current FBO = " << cfbo << std::endl;
 
 		glViewport(0, 0, GetScreenWidth(), GetScreenHeight());
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -294,7 +294,7 @@ namespace Engine
 
 		GLint program = 0;
 		glGetIntegerv(GL_CURRENT_PROGRAM, &program);
-		std::cout << "Program after glUseProgram = " << program << '\n';
+		// std::cout << "Program after glUseProgram = " << program << '\n';
 
 		glBindVertexArray(m_vertexArrayHandle);
 
@@ -302,26 +302,26 @@ namespace Engine
 
 		GLint vao = 0;
 		glGetIntegerv(GL_VERTEX_ARRAY_BINDING, &vao);
-		std::cout << "VAO after bind = " << vao << '\n';
+		// std::cout << "VAO after bind = " << vao << '\n';
 
 		GLint arrayBuffer = 0;
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &arrayBuffer);
-		std::cout << "Array buffer before bind = " << arrayBuffer << '\n';
+		// std::cout << "Array buffer before bind = " << arrayBuffer << '\n';
 
-		std::cout << "m_vertexBufferHandle = " << m_vertexBufferHandle << '\n';
-		std::cout << "m_indexBufferHandle  = " << m_indexBufferHandle << '\n';
+		// std::cout << "m_vertexBufferHandle = " << m_vertexBufferHandle << '\n';
+		// std::cout << "m_indexBufferHandle  = " << m_indexBufferHandle << '\n';
 
 		glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferHandle);
 
 		GLenum err = glGetError();
-		std::cout << "BindBuffer error = 0x" << std::hex << err << std::dec << '\n';
+		// std::cout << "BindBuffer error = 0x" << std::hex << err << std::dec << '\n';
 
 		GLint bound = -1;
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &bound);
-		std::cout << "Bound ARRAY_BUFFER = " << bound << '\n';
+		// std::cout << "Bound ARRAY_BUFFER = " << bound << '\n';
 
 		glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &arrayBuffer);
-		std::cout << "Array buffer after bind = " << arrayBuffer << '\n';
+		// std::cout << "Array buffer after bind = " << arrayBuffer << '\n';
 
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
 
@@ -330,24 +330,24 @@ namespace Engine
 
 		GLint enabled = 0;
 		glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &enabled);
-		std::cout << "Attrib0 enabled = " << enabled << '\n';
+		// std::cout << "Attrib0 enabled = " << enabled << '\n';
 
 		GLint stride = 0;
 		glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &stride);
-		std::cout << "Attrib0 stride = " << stride << '\n';
+		// std::cout << "Attrib0 stride = " << stride << '\n';
 
 		GLint size = 0;
 		glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_SIZE, &size);
-		std::cout << "Attrib0 size = " << size << '\n';
+		// std::cout << "Attrib0 size = " << size << '\n';
 
 		GLint type = 0;
 		glGetVertexAttribiv(0, GL_VERTEX_ATTRIB_ARRAY_TYPE, &type);
-		std::cout << "Attrib0 type = 0x" << std::hex << type << std::dec << '\n';
+		// std::cout << "Attrib0 type = 0x" << std::hex << type << std::dec << '\n';
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, nullptr);
 
 		GLenum errAfterDraw = glGetError();
-		std::cout << "Draw error = 0x" << std::hex << errAfterDraw << std::dec << '\n';
+		// std::cout << "Draw error = 0x" << std::hex << errAfterDraw << std::dec << '\n';
 
 		glFinish();
 	}
