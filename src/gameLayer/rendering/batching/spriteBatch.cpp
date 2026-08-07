@@ -49,6 +49,11 @@ namespace Engine
 		roundedRectBuilder.build(roundedRect, *this);
 	}
 
+	void SpriteBatch::submitText(const Text& text)
+	{
+		textBuilder.build(text, *this);
+	}	
+
 	void SpriteBatch::flush(IRenderBackend& backend)
 	{
 		sortByTextures();

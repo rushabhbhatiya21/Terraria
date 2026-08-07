@@ -14,6 +14,7 @@
 #include <rendering/builders/outlinedCircleGeometryBuilder.h>
 #include <rendering/builders/arcGeometryBuilder.h>
 #include <rendering/builders/roundedRectGeometryBuilder.h>
+#include <rendering/builders/textGeometryBuilder.h>
 
 namespace Engine
 {
@@ -25,6 +26,7 @@ namespace Engine
 	struct OutlinedCircle;
 	struct Arc;
 	struct RoundedRect;
+	struct Text;
 
 	struct DrawCommand;
 	class IRenderBackend;
@@ -60,6 +62,7 @@ namespace Engine
 		OutlinedCircleGeometryBuilder outlinedCircleBuilder{ lineBuilder };
 		ArcGeometryBuilder arcBuilder;
 		RoundedRectGeometryBuilder roundedRectBuilder{ rectBuilder, arcBuilder };
+		TextGeometryBuilder textBuilder{ spriteBuilder };
 
 	public:
 		SpriteBatch();
@@ -71,6 +74,7 @@ namespace Engine
 		void submitOutlinedCircle(const OutlinedCircle& circle);
 		void submitArc(const Arc& arc);
 		void submitRoundedRect(const RoundedRect& roundedRect);
+		void submitText(const Text& text);
 
 		void flush(IRenderBackend& backend);
 

@@ -10,6 +10,7 @@ namespace Engine
 	struct OutlinedCircle;
 	struct Arc;
 	struct RoundedRect;
+	struct Text;
 
 	class IRenderCollector
 	{
@@ -24,5 +25,6 @@ namespace Engine
 		virtual void submitOutlinedCircle(const OutlinedCircle& circle) = 0;
 		virtual void submitArc(const Arc& arc) = 0;
 		virtual void submitRoundedRect(const RoundedRect& roundedRect) = 0;
+		virtual void submitText(const Text& text) = 0;
 	};
 }

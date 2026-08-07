@@ -121,3 +121,8 @@ void SceneRenderer::submitRoundedRect(const Engine::RoundedRect& roundedRect)
 {
 	m_spriteBatch.submitRoundedRect(roundedRect);
 }
+
+void SceneRenderer::submitText(const Engine::Text& text)
+{
+	m_spriteBatch.submitText(text);
+}

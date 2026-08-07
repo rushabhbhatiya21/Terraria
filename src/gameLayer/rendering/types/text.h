@@ -14,7 +14,9 @@ namespace Engine
 		float rotation;
 		Color4f tint;
 		std::string content;
-		Font* font;
+		float fontSize;
+		float letterSpacing;
+ 		Font* font;
 		ShaderE* shader;
 	};
 }
