@@ -3,9 +3,9 @@
 
 namespace Engine
 {
-	Vec2 TextLayout::measureText(const Font& font, std::string_view sv, float fontSize, float letterSpacing)
+	TextMetrics TextLayout::measureText(const Font& font, std::string_view sv, float fontSize, float letterSpacing)
 	{
-		float width = 0, maxTop = 0, maxBottom = 0;
+		float width = 0, maxTop = 0, maxBottom = 0, ascent = 0, descent = 0;
 		float scale = fontSize / font.baseSize;
 
 		for (const auto& ch : sv)
@@ -20,48 +20,52 @@ namespace Engine
 			width += glyph.advanceX * scale + letterSpacing;
 			maxTop = std::max(maxTop, glyph.offsetY * scale);
 			maxBottom = std::max(maxBottom, (glyph.srcRect.height - glyph.offsetY) * scale);
+
+			ascent = std::max(ascent, (float)glyph.offsetY * scale);
+			descent = std::max(descent, (float)(glyph.srcRect.height - glyph.offsetY) * scale);
 		}
 
 		width -= letterSpacing; // to accomodate for extra letterSpacing after the last charracter
-		return Vec2{ width, maxTop + maxBottom };
+		return TextMetrics
+		{
+			Vec2{ width, maxTop + maxBottom },
+			ascent,
+			descent
+		};
 	}
 
-	Vec2 TextLayout::getOrigin(const Vec2& textSize, Anchor anchor)
+	Vec2 TextLayout::getOrigin(const TextMetrics& metrics, Anchor anchor)
 	{
-		Vec2 origin{};
 		switch (anchor)
 		{
-		case Engine::TextLayout::Anchor::TopLeft:
-			origin = { 0,0 };
-			break;
-		case Engine::TextLayout::Anchor::TopCenter:
-			origin = { textSize.x / 2, 0 };
-			break;
-		case Engine::TextLayout::Anchor::TopRight:
-			origin = { textSize.x, 0 };
-			break;
-		case Engine::TextLayout::Anchor::CenterLeft:
-			origin = { 0, textSize.y / 2 };
-			break;
-		case Engine::TextLayout::Anchor::Center:
-			origin = { textSize.x / 2, textSize.y / 2 };
-			break;
-		case Engine::TextLayout::Anchor::CenterRight:
-			origin = { textSize.x, textSize.y / 2 };
-			break;
-		case Engine::TextLayout::Anchor::BottomLeft:
-			origin = { 0, textSize.y };
-			break;
-		case Engine::TextLayout::Anchor::BottomCenter:
-			origin = { textSize.x / 2, textSize.y };
-			break;
-		case Engine::TextLayout::Anchor::BottomRight:
-			origin = { textSize.x, textSize.y };
-			break;
-		default:
-			break;
+		case Anchor::TopLeft:
+			return { 0.f, 0.f };
+
+		case Anchor::TopCenter:
+			return { metrics.size.x * 0.5f, 0.f };
+
+		case Anchor::TopRight:
+			return { metrics.size.x, 0.f };
+
+		case Anchor::CenterLeft:
+			return { 0.f, metrics.size.y * 0.5f };
+
+		case Anchor::Center:
+			return { metrics.size.x * 0.5f, metrics.size.y * 0.5f };
+
+		case Anchor::CenterRight:
+			return { metrics.size.x, metrics.size.y * 0.5f };
+
+		case Anchor::BottomLeft:
+			return { 0.f, metrics.size.y };
+
+		case Anchor::BottomCenter:
+			return { metrics.size.x * 0.5f, metrics.size.y };
+
+		case Anchor::BottomRight:
+			return { metrics.size.x, metrics.size.y };
 		}
 
-		return origin;
+		return {};
 	}
 }

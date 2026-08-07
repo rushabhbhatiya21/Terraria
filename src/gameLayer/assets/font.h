@@ -21,6 +21,9 @@ namespace Engine
 		int firstGlyph;         // First ASCII value of glyph
 		int baseSize;           // Base size (default chars height)
 		int glyphPadding;       // Padding around the glyph characters
+		float ascent;           // maxTop
+		float descent;          // maxBottom
+		float lineHeight;       
 
 		Texture* texture;
 		std::vector<Glyph> glyphs;

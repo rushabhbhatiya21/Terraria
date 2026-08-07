@@ -5,6 +5,13 @@
 
 namespace Engine
 {
+    struct TextMetrics
+    {
+        Vec2 size;
+        float ascent;
+        float descent;
+    };
+
 	class TextLayout
 	{
 	public:
@@ -23,7 +30,7 @@ namespace Engine
             BottomRight
         };
 
-		static Vec2 measureText(const Font& font, std::string_view sv, float fontSize, float letterSpacing);
-        static Vec2 getOrigin(const Vec2& textSize, Anchor anchor);
+		static TextMetrics measureText(const Font& font, std::string_view sv, float fontSize, float letterSpacing);
+        static Vec2 getOrigin(const TextMetrics& metrics, Anchor anchor);
 	};
 }

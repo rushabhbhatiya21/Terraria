@@ -15,8 +15,13 @@ namespace Engine
 	}
 	void TextGeometryBuilder::build(const Text& text, IGeometrySink& sink)
 	{
-		Vec2 size = TextLayout::measureText(*text.font, text.content, text.fontSize, text.letterSpacing);
-		Vec2 pen = text.position - text.origin;
+		TextMetrics metrics = TextLayout::measureText(*text.font, text.content, text.fontSize, text.letterSpacing);
+		Vec2 origin = TextLayout::getOrigin(metrics, text.anchor);
+		Vec2 pen = text.position - origin;
+
+		// Move from top of bounding box to baseline
+		pen.y += metrics.ascent;
+
 		float scale = text.fontSize / text.font->baseSize;
 
 		for (const auto& ch : text.content)

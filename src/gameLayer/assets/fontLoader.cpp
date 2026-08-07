@@ -29,8 +29,11 @@ namespace Engine
 		std::cout << "Set pixel Error: " << (int)error << '\n';
 
 		Font font;
-		int cursorX = 0, cursorY = 0, rowHeight = 0, padding = 1;
+		font.ascent = face->size->metrics.ascender >> 6;
+		font.descent = -(face->size->metrics.descender >> 6); // make positive
+		font.lineHeight = face->size->metrics.height >> 6;
 
+		int cursorX = 0, cursorY = 0, rowHeight = 0, padding = 1;
 		for (int i = firstGlyph; i < 126; i++)
 		{
 			error = FT_Load_Char(face, static_cast<char>(i), FT_LOAD_RENDER);
