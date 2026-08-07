@@ -46,7 +46,7 @@ struct UIEngine
 		bool isReleased = false;
 	};
 
-	Engine::FontE font;
+	Engine::Font font;
 
 	std::vector<Widget> widgets;
 

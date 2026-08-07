@@ -24,7 +24,7 @@ struct PopupText
 extern std::vector<PopupText> popupTexts;
 
 void DrawTextOutlined(
-	const Engine::FontE& font,
+	const Engine::Font& font,
 	const std::string& text,
 	Engine::Vec2 position,
 	float fontSize,

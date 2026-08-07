@@ -113,9 +113,6 @@ struct Gameplay
 	// texture pack
 	char texturePackName[128] = "hdtextures";
 
-	// font
-	Engine::FontE defaultFont;
-
 	// structure save
 	Structure copyStructure;
 	Engine::Vec2 selectionStart = {};

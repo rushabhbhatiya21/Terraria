@@ -9,7 +9,7 @@ namespace Engine
 
 	struct Glyph
 	{
-		int value;              // Character value (Unicode)
+		int value;              // Character value (Unicode) - redundant for now
 		int offsetX;            // Character offset X when drawing
 		int offsetY;            // Character offset Y when drawing
 		int advanceX;           // Character advance position X
@@ -18,6 +18,7 @@ namespace Engine
 
 	struct Font
 	{
+		int firstGlyph;         // First ASCII value of glyph
 		int baseSize;           // Base size (default chars height)
 		int glyphPadding;       // Padding around the glyph characters
 

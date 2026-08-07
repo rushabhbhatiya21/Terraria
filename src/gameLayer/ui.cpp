@@ -109,7 +109,7 @@ Engine::Rect shrinkRectanglePercentage(Engine::Rect r, float percentageX, float 
 
 void UIEngine::init()
 {
-	font.loadDefault();
+	//font.loadDefault();
 }
 
 void UIEngine::updateAndRender()
@@ -136,11 +136,11 @@ void UIEngine::updateAndRender()
 
 		auto drawText = [&](Engine::Rect smallerRect, float yOffset = 0)
 			{
-				int textWidth = font.measureText(w.text.c_str(), fontSize);
+				//int textWidth = font.measureText(w.text.c_str(), fontSize);
 				int textHeight = fontSize; // in raylib font height = font size default
 
-				float textX = smallerRect.x + (smallerRect.width - textWidth) / 2.f;
-				float textY = smallerRect.y + (smallerRect.height - textHeight) / 2.f;
+				//float textX = smallerRect.x + (smallerRect.width - textWidth) / 2.f;
+				//float textY = smallerRect.y + (smallerRect.height - textHeight) / 2.f;
 
 				Engine::Color4f shadowColor = { 0,0,0,255 };
 				//DrawText(w.text.c_str(), textX - fontSize * .08f, textY + fontSize * .08f + yOffset, fontSize, shadowColor);

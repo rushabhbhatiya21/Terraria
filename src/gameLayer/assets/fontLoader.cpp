@@ -13,6 +13,7 @@ namespace Engine
 		constexpr int atlasWidth = 512;
 		constexpr int atlasHeight = 512;
 		constexpr int fontSize = 32;
+		constexpr int firstGlyph = 32;
 
 		std::vector<unsigned char> buffer(atlasWidth * atlasHeight * 4);
 		FT_Library library;
@@ -30,7 +31,7 @@ namespace Engine
 		Font font;
 		int cursorX = 0, cursorY = 0, rowHeight = 0, padding = 1;
 
-		for (int i = 32; i < 126; i++)
+		for (int i = firstGlyph; i < 126; i++)
 		{
 			error = FT_Load_Char(face, static_cast<char>(i), FT_LOAD_RENDER);
 			permaAssertDevelopement(error == 0);
@@ -45,13 +46,14 @@ namespace Engine
 				cursorY += rowHeight + padding;
 				rowHeight = 0;
 			}
+
 			permaAssertDevelopement(cursorY + face->glyph->bitmap.rows <= atlasHeight);
 
 			for (int y = 0; y < face->glyph->bitmap.rows; y++)
 			{
 				for (int x = 0; x < face->glyph->bitmap.width; x++)
 				{
-					const int index = (cursorY + y) * atlasWidth + (cursorX + x) * 4;
+					const int index = ((cursorY + y) * atlasWidth + (cursorX + x)) * 4;
 					buffer[index] = 255;
 					buffer[index + 1] = 255;
 					buffer[index + 2] = 255;
@@ -71,6 +73,7 @@ namespace Engine
 			rowHeight = std::max(rowHeight, (int)face->glyph->bitmap.rows);
 		}
 
+		font.firstGlyph = firstGlyph;
 		font.baseSize = fontSize;
 		font.glyphPadding = padding;
 

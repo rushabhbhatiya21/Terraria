@@ -27,6 +27,7 @@
 #include <rendering/types/circle.h>
 #include <rendering/types/outlinedCircle.h>
 #include <rendering/types/roundedRect.h>
+#include <rendering/types/text.h>
 #pragma endregion
 
 #pragma region entity types header
@@ -46,6 +47,7 @@
 
 #include <combat/blockSpawn.h>
 #include <ui/popupText.h>
+#include <ui/textLayout.h>
 
 
 #pragma region sky colors
@@ -394,10 +396,10 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 			Engine::Vec2 textPos =
 			{
 				rect.x + rect.width * 0.5f,
-				rect.y + rect.height * 0.75f
+				rect.y + rect.height
 			};
 			std::string str = std::to_string(stack.count);
-			Engine::Vec2 textSize = defaultFont.measureTextEx(str.c_str(), 25.f, 2.f);
+			//Engine::Vec2 textSize = defaultFont.measureTextEx(str.c_str(), 25.f, 2.f);
 
 			// write item count as text
 			// draw text using renderer
@@ -411,9 +413,25 @@ void Gameplay::drawInventorySlot(bool isDragged, const Engine::Rect& rect, const
 			//	1.f,
 			//	{ 255, 255, 255, 200 }
 			//);
+
+			Engine::Vec2 size = Engine::TextLayout::measureText(assetManager.defaultFont, str, 16.f, 0.f);
+
+			Engine::Text text
+			{
+				textPos,
+				Engine::TextLayout::getOrigin(size, Engine::TextLayout::Anchor::BottomCenter),
+				0.f,
+				Engine::White,
+				str,
+				16.f,
+				0.f,
+				&assetManager.defaultFont,
+				&assetManager.defaultShader
+			};
+
+			sceneRenderer.submitText(text);
 		}
 	}
-
 }
 
 Engine::Rect Gameplay::getInventorySlotRect(int index, const Engine::Rect& inventoryRectangle, const Inventory& inventory)
@@ -536,14 +554,14 @@ void Gameplay::drawDisplayNameUI(const Engine::AssetManager& assetManager, ItemI
 	//float paddingX = 6.f;
 	//float paddingY = 2.f;
 
-	Engine::Vec2 textSize = defaultFont.measureTextEx(selectedIngredient->displayName, fontSize, spacing);
+	//Engine::Vec2 textSize = defaultFont.measureTextEx(selectedIngredient->displayName, fontSize, spacing);
 
-	Engine::Rect rectPos{
-		parentRect.x + parentRect.width / 2 - (textSize.x + paddingX * 2) / 2, // center horizontally
-		parentRect.y - textSize.y - paddingY * 2 - 5,                   // above item slot
-		textSize.x + paddingX * 2,
-		textSize.y + paddingY * 2
-	};
+	//Engine::Rect rectPos{
+	//	parentRect.x + parentRect.width / 2 - (textSize.x + paddingX * 2) / 2, // center horizontally
+	//	parentRect.y - textSize.y - paddingY * 2 - 5,                   // above item slot
+	//	textSize.x + paddingX * 2,
+	//	textSize.y + paddingY * 2
+	//};
 
 	// draw rect using renderer
 	//DrawRectangleRounded(
@@ -554,17 +572,17 @@ void Gameplay::drawDisplayNameUI(const Engine::AssetManager& assetManager, ItemI
 	//	rectColor
 	//);
 
-	Engine::ColoredRect rect
-	{
-		rectPos,
-		{ 0.0f, 0.0f },
-		0.f,
-		Engine::Color4f{ 255,255,255,200 },
-		assetManager.whiteTexture,
-		assetManager.defaultShader
-	};
+	//Engine::ColoredRect rect
+	//{
+	//	rectPos,
+	//	{ 0.0f, 0.0f },
+	//	0.f,
+	//	Engine::Color4f{ 255,255,255,200 },
+	//	assetManager.whiteTexture,
+	//	assetManager.defaultShader
+	//};
 
-	sceneRenderer.submitRect(rect);
+	//sceneRenderer.submitRect(rect);
 
 	// draw text using renderer
 	//DrawTextPro(
@@ -737,7 +755,7 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	sceneRenderer.initialize();
 
 	// font init
-	defaultFont.loadDefault();
+	//defaultFont.loadDefault();
 
 	// lighting init
 	recalculateLight(gameMap);
@@ -1827,6 +1845,19 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 	float w = (float)Engine::getScreenWidth();
 	float h = (float)Engine::getScreenHeight();
 
+	//Engine::Sprite atlas
+	//{
+	//	Engine::Rect{0, 0, 512, 512},          // source
+	//	Engine::Rect{100, 100, 512, 512},      // destination
+	//	Engine::Vec2{0,0},
+	//	0,
+	//	Engine::White,
+	//	*assetManager.defaultFont.texture,
+	//	assetManager.defaultShader
+	//};
+
+	//sceneRenderer.submitSprite(atlas);
+
 #pragma region life ui
 
 	Engine::Rect heartRectangle{};
@@ -2231,7 +2262,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 					ri.x + ri.width * 0.5f,
 					ri.y + ri.height * 0.85f
 				};
-				Engine::Vec2 textSize = defaultFont.measureTextEx(str.c_str(), 10.f, 1.f);
+				//Engine::Vec2 textSize = defaultFont.measureTextEx(str.c_str(), 10.f, 1.f);
 
 				// draw text using renderer
 				//DrawTextPro(
