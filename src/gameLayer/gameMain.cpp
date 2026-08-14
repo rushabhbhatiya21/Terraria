@@ -18,7 +18,7 @@ Gameplay gameplay;
 UIEngine mainMenuButtons;
 DrawBackground backgroundForMenu;
 // set false for menu
-bool gameplayRunning = true;
+bool gameplayRunning = false;
 
 #pragma endregion
 
@@ -51,7 +51,7 @@ bool updateGame()
 		c.zoom = 20;
 		backgroundForMenu.draw(Engine::getFrameTime(), assetManager, c, {1000,1000}, Engine::White, gameplay.sceneRenderer);
 
-		mainMenuButtons.addTitle("Canvas Adventures");
+		mainMenuButtons.addTitle("Terraframe");
 
 		if (mainMenuButtons.addButton("Start Game"))
 		{
