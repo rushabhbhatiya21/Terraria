@@ -2,6 +2,12 @@
 #include <math/color.h>
 #include <input/input.h>
 #include <window/window.h>
+#include <raylib.h>
+
+static Color toRaylibColor(Engine::Color4f c)
+{
+	return Color{ c.r, c.g, c.b, c.a };
+}
 
 // top
 Engine::Rect placeRectangleTopLeft(Engine::Rect r)
@@ -132,20 +138,16 @@ void UIEngine::updateAndRender()
 	{
 		Engine::Rect smallerRect = shrinkRectanglePercentage(oneButtonRectangle, .01f, .1f);
 
-		//DrawRectangle(smallerRect.x, smallerRect.y, smallerRect.width, smallerRect.height, { 90,90,110,205 });
-
 		auto drawText = [&](Engine::Rect smallerRect, float yOffset = 0)
 			{
-				//int textWidth = font.measureText(w.text.c_str(), fontSize);
+				int textWidth = MeasureText(w.text.c_str(), fontSize);
 				int textHeight = fontSize; // in raylib font height = font size default
-
-				//float textX = smallerRect.x + (smallerRect.width - textWidth) / 2.f;
-				//float textY = smallerRect.y + (smallerRect.height - textHeight) / 2.f;
+				float textX = smallerRect.x + (smallerRect.width - textWidth) / 2.f;
+				float textY = smallerRect.y + (smallerRect.height - textHeight) / 2.f;
 
 				Engine::Color4f shadowColor = { 0,0,0,255 };
-				//DrawText(w.text.c_str(), textX - fontSize * .08f, textY + fontSize * .08f + yOffset, fontSize, shadowColor);
-
-				//DrawText(w.text.c_str(), textX, textY + yOffset, fontSize, Engine::White);
+				DrawText(w.text.c_str(), (int)(textX - fontSize * .08f), (int)(textY + fontSize * .08f + yOffset), fontSize, toRaylibColor(shadowColor));
+				DrawText(w.text.c_str(), (int)textX, (int)(textY + yOffset), fontSize, toRaylibColor(Engine::White));
 			};
 
 		w.isHovered = false;
@@ -177,37 +179,48 @@ void UIEngine::updateAndRender()
 
 				if (w.isBeingClicked)
 				{
-					//DrawRectangle(
-					//	smallerRect.x, 
-					//	smallerRect.y + smallerRect.height * clickOffset,
-					//	smallerRect.width,
-					//	smallerRect.height, 
-					//	clickColor
-					//);
+						DrawRectangle(
+							(int)smallerRect.x,
+							(int)(smallerRect.y + smallerRect.height * clickOffset),
+							(int)smallerRect.width,
+							(int)smallerRect.height,
+							toRaylibColor(clickColor)
+						);
 				}
 				else
 				{
 					if (w.isHovered)
 					{
-						//DrawRectangle(
-						//	smallerRect.x,
-						//	smallerRect.y,
-						//	smallerRect.width,
-						//	smallerRect.height,
-						//	clickColor
-						//);
+							DrawRectangle(
+								(int)smallerRect.x,
+								(int)smallerRect.y,
+								(int)smallerRect.width,
+								(int)smallerRect.height,
+								toRaylibColor(clickColor)
+							);
 					}
 
 					if (w.isReleased)
 					{
-						//DrawRectangle(
-						//	smallerRect.x,
-						//	smallerRect.y,
-						//	smallerRect.width,
-						//	smallerRect.height,
-						//	defaultColor
-						//);
+							DrawRectangle(
+								(int)smallerRect.x,
+								(int)smallerRect.y,
+								(int)smallerRect.width,
+								(int)smallerRect.height,
+								toRaylibColor(defaultColor)
+							);
 					}
+
+						if (!w.isHovered && !w.isReleased)
+						{
+							DrawRectangle(
+								(int)smallerRect.x,
+								(int)smallerRect.y,
+								(int)smallerRect.width,
+								(int)smallerRect.height,
+								toRaylibColor(defaultColor)
+							);
+						}
 				}
 
 				if (w.isBeingClicked)
