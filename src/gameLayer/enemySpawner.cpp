@@ -8,7 +8,7 @@ void spawnEnemy
 (
 	EntityHolder& entityHolder,
 	GameMap& gameMap,
-	std::ranlux24_base rng,
+	std::ranlux24_base& rng,
 	int startXView,
 	int endXView,
 	int startYView,
