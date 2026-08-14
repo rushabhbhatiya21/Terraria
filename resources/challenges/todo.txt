@@ -42,7 +42,7 @@ Engine Recommendations
 7. Add rectangle draw, text renderer, etc
 
 Bugs
-1. player keeps flickering - fixed
+1. player keeps flickering (left side only)- fixed
 2. throwing star does not trigger attack in itemUse.cpp - fixed
 3. swingAttack changes item based on facing left or right, check flipTextureX function in swingAttack.cpp - fixed
 4. hearts are empty, checkout player life and heart display logic - fixed

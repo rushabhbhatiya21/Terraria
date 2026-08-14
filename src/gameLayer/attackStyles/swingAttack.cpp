@@ -13,6 +13,7 @@
 #include <combat/combatSystem.h>
 #include <entities/enemies/enemy.h>
 #include <lighting.h>
+#include <audio.h>
 #include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
 
@@ -299,6 +300,8 @@ void SwingAttack::destroyBlock(const Engine::Vec2i& blockPos, Block& block, Game
 	DroppedItem* itemPtr = item.get();
 	entityHolder.entities[id] = std::move(item);
 	entityHolder.droppedItems.push_back(itemPtr);
+
+	Audio::playSound(Audio::breakBlock);
 
 	gameMap.removeBlock(blockPos.x, blockPos.y);
 	//recalculateLight(gameMap);

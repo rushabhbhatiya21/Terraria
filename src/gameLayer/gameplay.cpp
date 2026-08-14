@@ -1314,6 +1314,21 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 		background.setBackground(backgroundType);
 
+		int musicType = Audio::musicForest;
+		switch (backgroundType)
+		{
+		case DrawBackground::desert: musicType = Audio::musicDesert; break;
+		case DrawBackground::snow:   musicType = Audio::musicSnow;   break;
+		case DrawBackground::cave:   musicType = Audio::musicCave;   break;
+		case DrawBackground::forest:
+		case DrawBackground::night:
+		default:
+			musicType = Audio::musicForest;
+			break;
+		}
+
+		Audio::playMusic(musicType);
+
 		background.draw(
 			deltaTime,
 			assetManager,

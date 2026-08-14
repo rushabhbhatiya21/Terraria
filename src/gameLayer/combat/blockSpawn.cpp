@@ -1,6 +1,7 @@
 #include "blockSpawn.h"
 #include <gameMap.h>
 #include <inventory.h>
+#include <audio.h>
 
 std::vector<BlockSpawn> spawnBlocks;
 
@@ -48,6 +49,7 @@ void updateBlock(GameMap& gameMap, Inventory& inventory)
 				if (!gameMap.setBlock((int)block.position.x, (int)block.position.y, i.itemId)) continue;
 
 				i.count -= 1;
+				Audio::playSound(Audio::placeBlock);
 				block.used = true;
 				break;
 			}
