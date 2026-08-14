@@ -15,22 +15,25 @@ int main()
 	SetTraceLogLevel(LOG_NONE); //no log output to the console by raylib
 #endif
 
-	bool isProdTest = false;
-
+	bool isProdTest = true;
 	int flagScreenMode = FLAG_WINDOW_RESIZABLE;
 	int w = 1080, h = 720;
 
-	if (isProdTest) 
+#if PRODUCTION_BUILD == 1
+	w = 0, h = 0;
+	flagScreenMode = FLAG_FULLSCREEN_MODE;
+#endif
+
+	if (isProdTest)
 	{
 		w = 0, h = 0;
-		flagScreenMode = FLAG_FULLSCREEN_MODE; 
+		flagScreenMode = FLAG_FULLSCREEN_MODE;
 	}
 
 	SetConfigFlags(flagScreenMode);
 	InitWindow(w, h, "Terraria");
-	//MaximizeWindow();
-	//MaximizeWindow();
-	//SetExitKey(KEY_NULL);
+	// MaximizeWindow();
+	SetExitKey(KEY_NULL);
 	SetTargetFPS(240);
 
 #pragma region imgui config

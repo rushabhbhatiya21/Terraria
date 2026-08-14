@@ -3,6 +3,7 @@
 #include <math/cam.h>
 #include <window/window.h>
 #include <time/time.h>
+#include <input/input.h>
 
 #include <gameplay.h>
 #include <assets/assetManager.h>
@@ -20,11 +21,13 @@ UIEngine mainMenuButtons;
 DrawBackground backgroundForMenu;
 // set false for menu
 bool gameplayRunning = false;
+bool pausedFromGameplay = false;
 
 static void startNewGame()
 {
 	gameplay.init(assetManager);
 	gameplayRunning = true;
+	pausedFromGameplay = false;
 }
 
 #pragma endregion
@@ -48,6 +51,20 @@ bool updateGame()
 	Audio::update();
 	updateSettings();
 
+	if (!gameplayRunning && pausedFromGameplay && Engine::isKeyPressed(Engine::Key::Escape))
+	{
+		gameplayRunning = true;
+		pausedFromGameplay = false;
+		return true;
+	}
+
+	if (gameplayRunning && Engine::isKeyPressed(Engine::Key::Escape))
+	{
+		gameplayRunning = false;
+		pausedFromGameplay = true;
+		return true;
+	}
+
 	//ClearBackground({ 0,0,0,255 });
 
 	if (!gameplayRunning)
@@ -58,17 +75,24 @@ bool updateGame()
 		c.zoom = 20;
 		backgroundForMenu.draw(Engine::getFrameTime(), assetManager, c, {1000,1000}, Engine::White, gameplay.sceneRenderer);
 
-		mainMenuButtons.addTitle("Terraframe");
+		mainMenuButtons.addTitle(pausedFromGameplay ? "Paused" : "Terraframe");
 
 		if (mainMenuButtons.addButton("Resume Game"))
+		{
+			gameplayRunning = true;
+			pausedFromGameplay = false;
+		}
+
+		if (mainMenuButtons.addButton("Load Last Save"))
 		{
 			if (loadWorld(gameplay.gameMap, gameplay.entityHolder, gameplay.player))
 			{
 				gameplayRunning = true;
+				pausedFromGameplay = false;
 			}
 			else
 			{
-				Engine::traceLog(Engine::LogLevel::Warning, "Resume failed: no valid save found.");
+				Engine::traceLog(Engine::LogLevel::Warning, "Load failed: no valid save found.");
 			}
 		}
 
