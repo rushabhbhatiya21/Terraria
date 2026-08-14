@@ -13,6 +13,7 @@
 #include <entities/enemies/zombie.h>
 #include <entities/enemies/evilEye.h>
 #include <entities/enemies/evilEyeServant.h>
+#include <entities/projectile.h>
 
 struct BlockRepresentation1
 {
@@ -111,6 +112,7 @@ bool loadBlockDataFromFile(std::vector<Block>& blocks, int& w, int& h, const cha
 	switch (readVersion)
 	{
 		case 1:
+		case 2:
 		{
 			size_t blockCount = w * h;
 			blocks.resize(blockCount);
@@ -220,12 +222,66 @@ bool readEntireFile(const char* fileName, void* buffer, size_t bufferSize, size_
 
 using Json = nlohmann::json;
 
+static std::vector<Block> flattenMapData(GameMap& gameMap)
+{
+	std::vector<Block> blocks;
+	blocks.resize((size_t)gameMap.w * (size_t)gameMap.h);
+
+	for (int y = 0; y < gameMap.h; y++)
+	{
+		for (int x = 0; x < gameMap.w; x++)
+		{
+			blocks[x + y * gameMap.w] = gameMap.getBlockUnsafe(x, y);
+		}
+	}
+
+	return blocks;
+}
+
+static void buildMapFromFlatData(GameMap& gameMap, const std::vector<Block>& blocks, int w, int h)
+{
+	gameMap.create(w, h);
+
+	for (int y = 0; y < h; y++)
+	{
+		for (int x = 0; x < w; x++)
+		{
+			gameMap.getBlockUnsafe(x, y) = blocks[x + y * w];
+		}
+	}
+
+	gameMap.buildHeightMap();
+
+	for (int cy = 0; cy < gameMap.chunkGrid.CH; cy++)
+	{
+		for (int cx = 0; cx < gameMap.chunkGrid.CW; cx++)
+		{
+			Chunk& chunk = gameMap.chunkGrid.getChunkUnsafe(cx, cy);
+			chunk.renderDirty = true;
+			chunk.lightingDirty = true;
+		}
+	}
+
+	for (int x = 0; x < gameMap.w; x++)
+	{
+		gameMap.dirtyColumns[x] = true;
+	}
+
+	gameMap.textureNeedsRebuild = true;
+	gameMap.lightingNeedsRebuild = true;
+}
+
 void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 {
 	std::error_code errorCode;
 	std::filesystem::create_directory(RESOURCES_PATH "../saves/", errorCode);
 
-	//saveBlockDataToFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin.tmp");
+	auto blocks = flattenMapData(gameMap);
+
+	if (!saveBlockDataToFile(blocks, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin.tmp"))
+	{
+		return;
+	}
 
 	// id holder
 	{
@@ -263,22 +319,27 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 
 bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 {
-	gameMap = {};
-	entities.entities.clear();
-	player = {};
-	entities.idHolder = {};
+	GameMap loadedMap = {};
+	EntityHolder loadedEntities = {};
+	Player loadedPlayer = {};
 
-	//if (!loadBlockDataFromFile(gameMap.mapData, gameMap.w, gameMap.h, RESOURCES_PATH "../saves/map.bin"))
-	//{
-	//	return false;
-	//}
+	std::vector<Block> loadedBlocks = {};
+	int loadedW = 0;
+	int loadedH = 0;
+
+	if (!loadBlockDataFromFile(loadedBlocks, loadedW, loadedH, RESOURCES_PATH "../saves/map.bin"))
+	{
+		return false;
+	}
+
+	buildMapFromFlatData(loadedMap, loadedBlocks, loadedW, loadedH);
 
 	// id holder
 	{
 		std::ifstream f(RESOURCES_PATH "../saves/idHolder.txt");
 
 		if (!f.is_open()) { return false; }
-		f >> entities.idHolder.idCounter;
+		f >> loadedEntities.idHolder.idCounter;
 		if (!f) { return false; }
 		f.close();
 	}
@@ -290,17 +351,38 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 		if (!f.is_open()) { return false; }
 		Json j;
 		j = Json::parse(f, nullptr, false);
+		if (j.is_discarded()) { return false; }
 
-		if (!player.loadFromJson(j)) { return false; }
+		if (!loadedPlayer.loadFromJson(j)) { return false; }
 	}
 
 	// entites
 	{
-		std::ifstream f(RESOURCES_PATH "../saves/entites.txt");
+		std::ifstream f(RESOURCES_PATH "../saves/entities.txt");
 
 		if (!f.is_open()) { return false; }
 		Json j;
 		j = Json::parse(f, nullptr, false);
+		if (j.is_discarded()) { return false; }
+
+		auto pushEntityPointer = [&loadedEntities](Entity* entity)
+			{
+				switch (entity->getEntityType())
+				{
+				case EntityType::EntityType_Enemy:
+				case EntityType::EntityType_Boss:
+					loadedEntities.enemies.push_back(static_cast<Enemy*>(entity));
+					break;
+				case EntityType::EntityType_DroppedItem:
+					loadedEntities.droppedItems.push_back(static_cast<DroppedItem*>(entity));
+					break;
+				case EntityType::EntityType_Projectile:
+					loadedEntities.projectiles.push_back(static_cast<Projectile*>(entity));
+					break;
+				default:
+					break;
+				}
+			};
 
 		for (auto it = j.begin(); it != j.end(); ++it)
 		{
@@ -321,41 +403,101 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 			
 			int entityType = 0;
 
-			if (!entityJson["entityType"].is_number()) continue;
+			if (!entityJson.contains("entityType") || !entityJson["entityType"].is_number()) continue;
 
 			entityType = entityJson["entityType"];
 
-			// todo: also need to add them in enemies list
 			switch (entityType)
 			{
-				case EnemyType_Slime:
+				case EntityType::EntityType_Enemy:
 				{
-					Slime slime;
-					if (slime.loadFromJson(entityJson))
+					if (!entityJson.contains("enemyType") || !entityJson["enemyType"].is_number())
 					{
-						entities.entities[id] = std::make_unique<Slime>(slime);
+						break;
+					}
+
+					int enemyType = entityJson["enemyType"];
+
+					switch (enemyType)
+					{
+					case EnemyType_Slime:
+					{
+						Slime slime;
+						if (slime.loadFromJson(entityJson))
+						{
+							auto entity = std::make_unique<Slime>(slime);
+							Entity* entityPtr = entity.get();
+							loadedEntities.entities[id] = std::move(entity);
+							pushEntityPointer(entityPtr);
+						}
+						break;
+					}
+
+					case EnemyType_DesertSlime:
+					{
+						DesertSlime desertSlime;
+						if (desertSlime.loadFromJson(entityJson))
+						{
+							auto entity = std::make_unique<DesertSlime>(desertSlime);
+							Entity* entityPtr = entity.get();
+							loadedEntities.entities[id] = std::move(entity);
+							pushEntityPointer(entityPtr);
+						}
+						break;
+					}
+
+					case EnemyType_Zombie:
+					{
+						Zombie zombie;
+						if (zombie.loadFromJson(entityJson))
+						{
+							auto entity = std::make_unique<Zombie>(zombie);
+							Entity* entityPtr = entity.get();
+							loadedEntities.entities[id] = std::move(entity);
+							pushEntityPointer(entityPtr);
+						}
+						break;
+					}
+
+					case EnemyType::EnemyType_EvilEyeSpawn:
+					{
+						EvilEyeServant evilEyeServant;
+						if (evilEyeServant.loadFromJson(entityJson))
+						{
+							auto entity = std::make_unique<EvilEyeServant>(evilEyeServant);
+							Entity* entityPtr = entity.get();
+							loadedEntities.entities[id] = std::move(entity);
+							pushEntityPointer(entityPtr);
+						}
+						break;
+					}
+
+					default:
+						break;
 					}
 
 					break;
 				}
 
-				case EnemyType_DesertSlime:
+				case EntityType::EntityType_Boss:
 				{
-					DesertSlime desertSlime;
-					if (desertSlime.loadFromJson(entityJson))
+					if (!entityJson.contains("enemyType") || !entityJson["enemyType"].is_number())
 					{
-						entities.entities[id] = std::make_unique<DesertSlime>(desertSlime);
+						break;
 					}
 
-					break;
-				}
+					int enemyType = entityJson["enemyType"];
 
-				case EnemyType_Zombie:
-				{
-					Zombie zombie;
-					if (zombie.loadFromJson(entityJson))
+					if (enemyType == EnemyType::EnemyType_EvilEye)
 					{
-						entities.entities[id] = std::make_unique<Zombie>(zombie);
+						EvilEye evilEye;
+						if (evilEye.loadFromJson(entityJson))
+						{
+							auto entity = std::make_unique<EvilEye>(evilEye);
+							Entity* entityPtr = entity.get();
+							loadedEntities.entities[id] = std::move(entity);
+							pushEntityPointer(entityPtr);
+						}
 					}
 
 					break;
@@ -366,29 +508,24 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 					DroppedItem item;
 					if (item.loadFromJson(entityJson))
 					{
-						entities.entities[id] = std::make_unique<DroppedItem>(item);
+						auto entity = std::make_unique<DroppedItem>(item);
+						Entity* entityPtr = entity.get();
+						loadedEntities.entities[id] = std::move(entity);
+						pushEntityPointer(entityPtr);
 					}
 
 					break;
 				}
 
-				case EnemyType::EnemyType_EvilEye:
+				case EntityType::EntityType_Projectile:
 				{
-					EvilEye evilEye;
-					if (evilEye.loadFromJson(entityJson))
+					Projectile projectile;
+					if (projectile.loadFromJson(entityJson))
 					{
-						entities.entities[id] = std::make_unique<EvilEye>(evilEye);
-					}
-
-					break;
-				}
-
-				case EnemyType::EnemyType_EvilEyeSpawn:
-				{
-					EvilEyeServant evilEyeSerpant;
-					if (evilEyeSerpant.loadFromJson(entityJson))
-					{
-						entities.entities[id] = std::make_unique<EvilEyeServant>(evilEyeSerpant);
+						auto entity = std::make_unique<Projectile>(projectile);
+						Entity* entityPtr = entity.get();
+						loadedEntities.entities[id] = std::move(entity);
+						pushEntityPointer(entityPtr);
 					}
 
 					break;
@@ -399,6 +536,10 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 			}
 		}
 	}
+
+	gameMap = std::move(loadedMap);
+	entities = std::move(loadedEntities);
+	player = std::move(loadedPlayer);
 
 	return true;
 }
