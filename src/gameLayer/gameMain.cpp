@@ -56,9 +56,8 @@ bool updateGame()
 		if (mainMenuButtons.addButton("Start Game"))
 		{
 			gameplayRunning = true;
-			//gameplay = {};
-			// todo: implement gameplay.reset() and call here
-			gameplay.init(assetManager);
+			// Gameplay is already initialized in initGame(); calling init again
+			// duplicates starter inventory content and world state.
 		}
 
 		mainMenuButtons.addButton("Settings");
