@@ -738,6 +738,15 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 {
 	double loadStart = Engine::getTime();
 
+	// Reinitialize gameplay state for New Game without relying on Gameplay assignment.
+	player = Player{};
+	entityHolder = EntityHolder{};
+	enemySpawner = EnemySpawner{};
+	pendingHotbarSlot = -1;
+	selectedRecipeIndex = 0;
+	insideInventory = false;
+	insideCraft = false;
+
 	// items init
 	registerItems();
 

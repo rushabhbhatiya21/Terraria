@@ -1,4 +1,5 @@
 ﻿#include "player.h"
+#include <algorithm>
 #include <input/input.h>
 #include <helper.h>
 #include <assets/assetManager.h>
@@ -261,7 +262,57 @@ Json Player::formatToJson()
 	Json j;
 	addCommonEntityStuffToJson(j);
 
-	// add more data to save here
+	j["selectedHotbarSlot"] = selectedHotbarSlot;
+	j["heldItem"] = heldItem;
+
+	Json inventoryJson = Json::array();
+	for (const auto& slot : inventory.slots)
+	{
+		inventoryJson.push_back(
+			{
+				{ "itemId", slot.itemId },
+				{ "count", slot.count }
+			}
+		);
+	}
+	j["inventory"] = inventoryJson;
+
+	j["equipment"] =
+	{
+		{
+			"helmet",
+			{
+				{ "itemId", equipments.helmet.itemId },
+				{ "count", equipments.helmet.count }
+			}
+		},
+		{
+			"chest",
+			{
+				{ "itemId", equipments.chest.itemId },
+				{ "count", equipments.chest.count }
+			}
+		},
+		{
+			"boots",
+			{
+				{ "itemId", equipments.boots.itemId },
+				{ "count", equipments.boots.count }
+			}
+		}
+	};
+
+	Json accessoriesJson = Json::array();
+	for (const auto& accessory : equipments.accessories)
+	{
+		accessoriesJson.push_back(
+			{
+				{ "itemId", accessory.itemId },
+				{ "count", accessory.count }
+			}
+		);
+	}
+	j["equipment"]["accessories"] = accessoriesJson;
 
 	return j;
 }
@@ -271,8 +322,62 @@ bool Player::loadFromJson(Json& j)
 	*this = {};
 
 	bool rez = loadCommonEntityStuffFromJson(j);
+	if (!rez) { return false; }
+
+	auto loadStack = [](const Json& stackJson, ItemStack& out)
+		{
+			if (!stackJson.is_object()) { return; }
+			if (stackJson.contains("itemId") && stackJson["itemId"].is_number_integer())
+			{
+				out.itemId = stackJson["itemId"];
+			}
+			if (stackJson.contains("count") && stackJson["count"].is_number_integer())
+			{
+				out.count = stackJson["count"];
+			}
+		};
+
+	if (j.contains("selectedHotbarSlot") && j["selectedHotbarSlot"].is_number_integer())
+	{
+		selectedHotbarSlot = j["selectedHotbarSlot"];
+	}
+
+	if (j.contains("heldItem") && j["heldItem"].is_number_integer())
+	{
+		heldItem = j["heldItem"];
+	}
+
+	if (j.contains("inventory") && j["inventory"].is_array())
+	{
+		size_t maxSlots = std::min(inventory.slots.size(), j["inventory"].size());
+		for (size_t i = 0; i < maxSlots; i++)
+		{
+			loadStack(j["inventory"][i], inventory.slots[i]);
+		}
+	}
+
+	if (j.contains("equipment") && j["equipment"].is_object())
+	{
+		const Json& equipmentJson = j["equipment"];
+
+		if (equipmentJson.contains("helmet")) { loadStack(equipmentJson["helmet"], equipments.helmet); }
+		if (equipmentJson.contains("chest"))  { loadStack(equipmentJson["chest"], equipments.chest); }
+		if (equipmentJson.contains("boots"))  { loadStack(equipmentJson["boots"], equipments.boots); }
+
+		if (equipmentJson.contains("accessories") && equipmentJson["accessories"].is_array())
+		{
+			size_t maxAccessories = std::min(equipments.accessories.size(), equipmentJson["accessories"].size());
+			for (size_t i = 0; i < maxAccessories; i++)
+			{
+				loadStack(equipmentJson["accessories"][i], equipments.accessories[i]);
+			}
+		}
+	}
+
+	selectedHotbarSlot = std::clamp(selectedHotbarSlot, 0, inventory.columns - 1);
+	recalculateStats();
 
 	setColliderSize();
 
-	return rez;
+	return true;
 }
