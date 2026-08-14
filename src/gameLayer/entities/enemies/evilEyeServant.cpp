@@ -149,6 +149,7 @@ Json EvilEyeServant::formatToJson()
 {
 	Json j;
 	addCommonEntityStuffToJson(j);
+	j["enemyType"] = getEnemyType();
 	return j;
 }
 

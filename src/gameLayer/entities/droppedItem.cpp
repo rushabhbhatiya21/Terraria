@@ -87,13 +87,13 @@ bool DroppedItem::update(float deltaTime, EntityUpdateData& data)
 				}
 				else if (other->itemCounter + itemCounter <= otherMaxStackSize)
 				{
-					// Full merge fits — absorb all and destroy this entity
+					// Full merge fits ï¿½ absorb all and destroy this entity
 					other->itemCounter += itemCounter;
 					return false;
 				}
 				else
 				{
-					// Partial merge — fill nearby stack, keep remainder on this entity
+					// Partial merge ï¿½ fill nearby stack, keep remainder on this entity
 					int partialAdd = otherMaxStackSize - other->itemCounter;
 					other->itemCounter += partialAdd;
 					itemCounter -= partialAdd;
@@ -131,7 +131,7 @@ bool DroppedItem::loadFromJson(Json& j)
 
 	if (!j.contains("itemType")) { return false; }
 
-	if (j["itemType"].is_number()) { return false; }
+	if (!j["itemType"].is_number()) { return false; }
 
 	itemType = j["itemType"];
 
@@ -139,7 +139,7 @@ bool DroppedItem::loadFromJson(Json& j)
 
 	if (!j.contains("itemCounter")) { return false; }
 
-	if (j["itemCounter"].is_number()) { return false; }
+	if (!j["itemCounter"].is_number()) { return false; }
 
 	itemCounter = j["itemCounter"];
 
