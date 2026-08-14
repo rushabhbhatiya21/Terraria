@@ -30,8 +30,9 @@
 ## Lighting Model
 
 - Lighting recalculation algorithms exist (sunlight + local emission propagation).
-- Current gameplay composition does not apply full night/cave darkness to final scene output.
-- Practical meaning: time/background transitions are active, but lighting-driven darkness is currently a planned visual pass.
+- Day/night background transitions are active in runtime presentation.
+- Current gameplay composition still does not apply full night/cave darkness to final scene output.
+- Practical meaning: background mood and transitions are implemented, while lighting-driven full-scene darkness remains a planned visual pass.
 
 ## Entity and Combat Model
 

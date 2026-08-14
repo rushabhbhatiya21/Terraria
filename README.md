@@ -28,6 +28,7 @@ Recent implementation batch:
 - Enemy auto-spawner re-enabled.
 - Audio init/update lifecycle re-enabled.
 - Save/load consistency fixes for map and entity reconstruction paths.
+- Day/night background cycle is active, including tuned transitions and night sky overlays.
 
 Note: the code paths are implemented. A final manual runtime verification pass is recommended before release tagging.
 

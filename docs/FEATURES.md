@@ -17,7 +17,7 @@
 - Dirty-chunk rebuild workflow for render updates.
 - Pass-based scene rendering (background/world/UI).
 - Sprite batching path with custom collector/backend split.
-- Day/night world-time state with background transitions.
+- Day/night world-time state with active background cycle, tuned transitions, and sky overlays.
 - Lighting data/recalculation systems exist in code, but full night/cave darkness is not currently applied in final gameplay rendering.
 
 ## Content Systems

@@ -17,9 +17,9 @@ This list intentionally focuses on real, observed limitations instead of tempora
 ## Lighting and Visual Tuning
 
 4. Runtime lighting for night and caves is not currently active in final gameplay rendering.
-- Background switching to night is implemented.
+- Day/night background cycling is implemented and transitions are active.
 - World-time/phase updates are implemented.
-- Practical result: night state changes sky/background mood, but cave darkness and full scene darkening are not currently visible to the player.
+- Practical result: night visuals now transition correctly in background layers, but cave darkness and full scene darkening are still not visible in gameplay world rendering.
 
 ## Save/Load Scope
 
