@@ -274,7 +274,15 @@ static void buildMapFromFlatData(GameMap& gameMap, const std::vector<Block>& blo
 void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 {
 	std::error_code errorCode;
-	std::filesystem::create_directory(RESOURCES_PATH "../saves/", errorCode);
+	std::filesystem::create_directories(RESOURCES_PATH "../saves/", errorCode);
+
+	auto replaceFile = [&](const char* tempPath, const char* finalPath)
+		{
+			errorCode.clear();
+			std::filesystem::remove(finalPath, errorCode);
+			errorCode.clear();
+			std::filesystem::rename(tempPath, finalPath, errorCode);
+		};
 
 	auto blocks = flattenMapData(gameMap);
 
@@ -310,10 +318,10 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 		f << j.dump(2);
 		f.close();
 
-		std::filesystem::rename(RESOURCES_PATH "../saves/map.bin.tmp", RESOURCES_PATH "../saves/map.bin", errorCode);
-		std::filesystem::rename(RESOURCES_PATH "../saves/idHolder.txt.tmp", RESOURCES_PATH "../saves/idHolder.txt", errorCode);
-		std::filesystem::rename(RESOURCES_PATH "../saves/player.txt.tmp", RESOURCES_PATH "../saves/player.txt", errorCode);
-		std::filesystem::rename(RESOURCES_PATH "../saves/entities.txt.tmp", RESOURCES_PATH "../saves/entities.txt", errorCode);
+		replaceFile(RESOURCES_PATH "../saves/map.bin.tmp", RESOURCES_PATH "../saves/map.bin");
+		replaceFile(RESOURCES_PATH "../saves/idHolder.txt.tmp", RESOURCES_PATH "../saves/idHolder.txt");
+		replaceFile(RESOURCES_PATH "../saves/player.txt.tmp", RESOURCES_PATH "../saves/player.txt");
+		replaceFile(RESOURCES_PATH "../saves/entities.txt.tmp", RESOURCES_PATH "../saves/entities.txt");
 	}
 }
 
