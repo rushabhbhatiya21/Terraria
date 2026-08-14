@@ -48,8 +48,9 @@ int main()
 	}
 
 	Texture atlas = LoadTexture(RESOURCES_PATH "textures.png");
+	bool keepRunning = true;
 
-	while (!WindowShouldClose())
+	while (keepRunning && !WindowShouldClose())
 	{
 		BeginDrawing();
 		ClearBackground(BLACK);
@@ -117,16 +118,18 @@ int main()
 
 #pragma endregion
 
-		if (!updateGame())
-		{
-			CloseWindow();
-		}
+		bool shouldContinue = updateGame();
 
 #pragma region imgui end
 		rlImGuiEnd();
 #pragma endregion
 
 		EndDrawing();
+
+		if (!shouldContinue)
+		{
+			keepRunning = false;
+		}
 	}
 
 #pragma region imgui shutdown
