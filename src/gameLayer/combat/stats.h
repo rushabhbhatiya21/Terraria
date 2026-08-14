@@ -131,7 +131,7 @@ inline EntityStats makeEvilEyeStats()
 	evilEyeStats.offensive.damage = 15;
 
 	evilEyeStats.defensive.armor = 12;
-	evilEyeStats.defensive.maxHealth = 2800;
+	evilEyeStats.defensive.maxHealth = 1200;
 	evilEyeStats.defensive.knockbackResist = 100;
 
 	return evilEyeStats;
