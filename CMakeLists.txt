@@ -7,7 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 #basically this will change the RESOURCES_PATH to be the local path
 #! ! ! ! ! ! !
 #delete the out folder after changing if visual studio doesn recognize the change
-set(PRODUCTION_BUILD OFF CACHE BOOL "Make this a production build" FORCE)
+option(PRODUCTION_BUILD "Make this a production build" OFF)
 
 if(MSVC) 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
@@ -39,6 +39,7 @@ file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/
 add_executable("${CMAKE_PROJECT_NAME}")
 
 set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 17)
+set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES OUTPUT_NAME "Terraframe")
 
 
 
@@ -104,3 +105,23 @@ target_link_libraries("${CMAKE_PROJECT_NAME}"
         glad
 		"${CMAKE_CURRENT_SOURCE_DIR}/thirdParty/freetype/lib/freetype.lib"
 )
+
+# Production package (zip) for GitHub Releases.
+# Use this only with -DPRODUCTION_BUILD=ON so packaged resources resolve correctly.
+if(PRODUCTION_BUILD)
+	set(RELEASE_VERSION "0.1.0")
+	set(RELEASE_STAGE_DIR "${CMAKE_BINARY_DIR}/release/Terraframe")
+	set(RELEASE_ZIP_PATH "${CMAKE_BINARY_DIR}/Terraframe-${RELEASE_VERSION}-windows.zip")
+
+	add_custom_target(release_zip
+		COMMAND ${CMAKE_COMMAND} -E rm -rf "${RELEASE_STAGE_DIR}"
+		COMMAND ${CMAKE_COMMAND} -E make_directory "${RELEASE_STAGE_DIR}"
+		COMMAND ${CMAKE_COMMAND} -E copy "$<TARGET_FILE:${CMAKE_PROJECT_NAME}>" "${RELEASE_STAGE_DIR}/Terraframe.exe"
+		COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/resources" "${RELEASE_STAGE_DIR}/resources"
+		COMMAND ${CMAKE_COMMAND} -E rm -f "${RELEASE_ZIP_PATH}"
+		COMMAND ${CMAKE_COMMAND} -E tar cfv "${RELEASE_ZIP_PATH}" --format=zip Terraframe
+		WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/release"
+		DEPENDS "${CMAKE_PROJECT_NAME}"
+		COMMENT "Creating release zip: ${RELEASE_ZIP_PATH}"
+	)
+endif()

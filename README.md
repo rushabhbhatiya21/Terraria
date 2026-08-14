@@ -113,6 +113,21 @@ cmake --build build --config Release
 
 Executable location depends on your generator (Visual Studio, Ninja, etc.).
 
+## Build Release Zip (Ready for GitHub Releases)
+
+Quick commands:
+
+```bash
+cmake -S . -B out/build/prod -DPRODUCTION_BUILD:BOOL=ON
+cmake --build out/build/prod --config Release --target release_zip
+```
+
+This generates a zip (Terraframe.exe + resources/) at:
+
+out/build/prod/Terraframe-0.1.0-windows.zip
+
+For exact end-to-end steps (including cleanup, artifact location checks, and GitHub Release upload), see [Release Guide](docs/RELEASE.md).
+
 ## Controls (Current)
 
 - Movement: A / D or Left / Right
@@ -135,6 +150,7 @@ Executable location depends on your generator (Visual Studio, Ninja, etc.).
 - [Roadmap](docs/ROADMAP.md)
 - [Architecture Notes](docs/ARCHITECTURE.md)
 - [Media Capture Guide](docs/MEDIA_GUIDE.md)
+- [Release Guide](docs/RELEASE.md)
 
 ## Third-Party Libraries
 
