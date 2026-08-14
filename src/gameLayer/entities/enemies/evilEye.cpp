@@ -3,6 +3,7 @@
 #include <assets/assetManager.h>
 #include <player.h>
 #include "evilEyeServant.h"
+#include <entities/droppedItem.h>
 #include <combat/combatSystem.h>
 #include <rendering/types/sprite.h>
 #include <rendering/IRenderCollector.h>
@@ -65,6 +66,12 @@ void EvilEye::drawSprite(Engine::AssetManager& assetManager, Engine::IRenderColl
 bool EvilEye::update(float deltaTime, EntityUpdateData& data)
 {
 	if (stateChangeTimer > 0) stateChangeTimer -= deltaTime;
+
+	if (life <= 0 && currentState != EvilEyeState::DEAD)
+	{
+		currentPhase = EvilEyePhase::DEAD;
+		enterState(EvilEyeState::DEAD, data);
+	}
 
 	//switch (currentState)
 	//{
@@ -353,12 +360,45 @@ void EvilEye::spawnServant(EntityUpdateData& data)
 
 void EvilEye::dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHolder)
 {
+	auto spawnDrop = [&](ItemId itemType, int count, float vx)
+		{
+			auto id = entityHolder.idHolder.getEntityIdAndIncreament();
+			auto droppedItem = std::make_unique<DroppedItem>();
+			droppedItem->teleport(getPosition());
+			droppedItem->itemType = itemType;
+			droppedItem->itemCounter = count;
+			droppedItem->physics.velocity.x = vx;
+			droppedItem->physics.velocity.y = -3.f;
+
+			DroppedItem* droppedPtr = droppedItem.get();
+			entityHolder.entities[id] = std::move(droppedItem);
+			entityHolder.droppedItems.push_back(droppedPtr);
+		};
+
+	spawnDrop(Items::goldHelmet, 1, -2.0f);
+	spawnDrop(Items::goldChestPlate, 1, -1.2f);
+	spawnDrop(Items::goldBoots, 1, -0.4f);
+
+	spawnDrop(Items::goldSword, 1, 0.4f);
+	spawnDrop(Items::woodenBow, 1, 1.2f);
+	spawnDrop(Items::woodenArrow, 100, 2.0f);
+
+	if (getRandomChance(rng, 0.1f))
+	{
+		spawnDrop(Items::partyHat, 1, getRandomFloat(rng, -2.f, 2.f));
+	}
+
+	if (getRandomChance(rng, 0.1f))
+	{
+		spawnDrop(Items::sunGlasses, 1, getRandomFloat(rng, -2.f, 2.f));
+	}
 }
 
 Json EvilEye::formatToJson()
 {
 	Json j;
 	addCommonEntityStuffToJson(j);
+	j["enemyType"] = getEnemyType();
 	return j;
 }
 

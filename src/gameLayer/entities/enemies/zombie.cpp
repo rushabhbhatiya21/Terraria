@@ -291,20 +291,21 @@ void Zombie::dropLoot(int type, std::ranlux24_base& rng, EntityHolder& entityHol
 	bool isLeft = false;
 	for (int i = 0; i < dropsCount; i++)
 	{
-		DroppedItem droppedItem;
-		droppedItem.teleport(getPosition());
+		auto droppedItem = std::make_unique<DroppedItem>();
+		droppedItem->teleport(getPosition());
 
 		// make it drop rarer chests with low chance
-		droppedItem.itemType = Items::slime;
+		droppedItem->itemType = Items::slime;
 		float x = getRandomFloat(rng, -3.f, 3.f);
 		if ((isLeft && x < 0) || (!isLeft && x > 0)) x *= -1.f;
 		isLeft = !isLeft;
-		droppedItem.physics.velocity.x = x;
-		droppedItem.physics.velocity.y = -3.f;
+		droppedItem->physics.velocity.x = x;
+		droppedItem->physics.velocity.y = -3.f;
 
 		auto id = entityHolder.idHolder.getEntityIdAndIncreament();
-		entityHolder.droppedItems.push_back(&droppedItem);
-		entityHolder.entities[id] = std::make_unique<DroppedItem>(droppedItem);
+		DroppedItem* droppedPtr = droppedItem.get();
+		entityHolder.entities[id] = std::move(droppedItem);
+		entityHolder.droppedItems.push_back(droppedPtr);
 	}
 }
 
@@ -362,6 +363,7 @@ Json Zombie::formatToJson()
 {
 	Json j;
 	addCommonEntityStuffToJson(j);
+	j["enemyType"] = getEnemyType();
 
 	// todo zombie state
 
