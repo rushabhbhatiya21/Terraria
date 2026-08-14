@@ -50,6 +50,22 @@ namespace Engine
 		Texture caveBG = {};
 		Texture nightBG = {};
 
+		// Layered backgrounds (ordered back -> front to match texture-pointer sorting fallback).
+		Texture forestMountainsFar = {};
+		Texture forestMountainsClose = {};
+		Texture forestTrees = {};
+
+		Texture desertDunesBack = {};
+		Texture desertDunesFront = {};
+
+		Texture snowMountainsBack = {};
+		Texture snowMountainsFront = {};
+		Texture snowTrees = {};
+
+		Texture skyStars = {};
+		Texture skyMoon = {};
+		Texture skySun = {};
+
 		Texture fontTex = {};
 
 		Font defaultFont{};
@@ -86,7 +102,22 @@ namespace Engine
 			{&desertBG, "desertBG.png"},
 			{&snowBG, "snowBG.png"},
 			{&caveBG, "caveBG.png"},
-			{&nightBG, "backgroundsLayred/sky/nightSky.png"}
+			{&nightBG, "backgroundsLayred/sky/nightSky.png"},
+
+			{&forestMountainsFar, "backgroundsLayred/forest/mountainsFar.png"},
+			{&forestMountainsClose, "backgroundsLayred/forest/mountainsClose.png"},
+			{&forestTrees, "backgroundsLayred/forest/trees.png"},
+
+			{&desertDunesBack, "backgroundsLayred/desert/dunesBack.png"},
+			{&desertDunesFront, "backgroundsLayred/desert/dunesFront.png"},
+
+			{&snowMountainsBack, "backgroundsLayred/snow/mountainsBack.png"},
+			{&snowMountainsFront, "backgroundsLayred/snow/mountainsFront.png"},
+			{&snowTrees, "backgroundsLayred/snow/trees.png"},
+
+			{&skyStars, "backgroundsLayred/sky/stars.png"},
+			{&skyMoon, "backgroundsLayred/sky/moon.png"},
+			{&skySun, "backgroundsLayred/sky/sun.png"}
 		};
 
 		std::vector<ShaderEntry> shaderList = {
