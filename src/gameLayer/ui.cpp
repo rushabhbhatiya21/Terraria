@@ -2,13 +2,14 @@
 #include <math/color.h>
 #include <input/input.h>
 #include <window/window.h>
-#include <raylib.h>
 #include <algorithm>
-
-static Color toRaylibColor(Engine::Color4f c)
-{
-	return Color{ c.r, c.g, c.b, c.a };
-}
+#include <assets/assetManager.h>
+#include <rendering/IRenderCollector.h>
+#include <rendering/types/coloredRect.h>
+#include <rendering/types/circle.h>
+#include <rendering/types/roundedRect.h>
+#include <rendering/types/text.h>
+#include <ui/textLayout.h>
 
 // top
 Engine::Rect placeRectangleTopLeft(Engine::Rect r)
@@ -119,119 +120,138 @@ void UIEngine::init()
 	//font.loadDefault();
 }
 
-void UIEngine::updateAndRender()
+void UIEngine::updateAndRender(const Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
-	float w = Engine::getScreenWidth();
-	float h = Engine::getScreenHeight();
+	float screenW = Engine::getScreenWidth();
+	float screenH = Engine::getScreenHeight();
 
 	Engine::Rect oneButtonRectangle = {};
-	oneButtonRectangle.width = w * .8f;
-	oneButtonRectangle.height = h / (widgets.size() + 1);
+	oneButtonRectangle.width = screenW * .8f;
+	oneButtonRectangle.height = screenH / (widgets.size() + 1);
 
 	oneButtonRectangle.height = std::min(oneButtonRectangle.height, oneButtonRectangle.width / 8.f);
 
-	oneButtonRectangle = placeRectangleCenterTop(oneButtonRectangle, w);
+	oneButtonRectangle = placeRectangleCenterTop(oneButtonRectangle, screenW);
 	oneButtonRectangle.y += oneButtonRectangle.height / 2.f;
 
 	int fontSize = (int)(oneButtonRectangle.height * .5f);
 	int widgetIndex = 0;
 
-	for (auto& w : widgets)
+	auto submitTextWithShadow = [&](const std::string& text, float x, float y, float size, Engine::Color4f color)
+		{
+			Engine::Text shadow
+			{
+				{ x - size * 0.08f, y + size * 0.08f },
+				Engine::TextLayout::Anchor::TopLeft,
+				0.f,
+				Engine::Black,
+				text,
+				size,
+				1.f,
+				&assetManager.defaultFont,
+				&assetManager.defaultShader
+			};
+
+			Engine::Text main
+			{
+				{ x, y },
+				Engine::TextLayout::Anchor::TopLeft,
+				0.f,
+				color,
+				text,
+				size,
+				1.f,
+				&assetManager.defaultFont,
+				&assetManager.defaultShader
+			};
+
+			collector.submitText(shadow);
+			collector.submitText(main);
+		};
+
+	auto submitPanel = [&](const Engine::Rect& rect, Engine::Color4f color)
+		{
+			Engine::RoundedRect panel
+			{
+				rect,
+				{ 0,0 },
+				5.f,
+				0.f,
+				color,
+				assetManager.whiteTexture,
+				assetManager.defaultShader
+			};
+			collector.submitRoundedRect(panel);
+		};
+
+	for (auto& widget : widgets)
 	{
 		Engine::Rect smallerRect = shrinkRectanglePercentage(oneButtonRectangle, .01f, .1f);
 
-		auto drawText = [&](Engine::Rect smallerRect, float yOffset = 0)
+		auto drawCenteredText = [&](const std::string& text, Engine::Rect rect, float size, float yOffset = 0)
 			{
-				int textWidth = MeasureText(w.text.c_str(), fontSize);
-				int textHeight = fontSize; // in raylib font height = font size default
-				float textX = smallerRect.x + (smallerRect.width - textWidth) / 2.f;
-				float textY = smallerRect.y + (smallerRect.height - textHeight) / 2.f;
-
-				Engine::Color4f shadowColor = { 0,0,0,255 };
-				DrawText(w.text.c_str(), (int)(textX - fontSize * .08f), (int)(textY + fontSize * .08f + yOffset), fontSize, toRaylibColor(shadowColor));
-				DrawText(w.text.c_str(), (int)textX, (int)(textY + yOffset), fontSize, toRaylibColor(Engine::White));
+				Engine::TextMetrics metrics = Engine::TextLayout::measureText(assetManager.defaultFont, text, size, 1.f);
+				float textX = rect.x + (rect.width - metrics.size.x) / 2.f;
+				float textY = rect.y + (rect.height - metrics.size.y) / 2.f + yOffset;
+				submitTextWithShadow(text, textX, textY, size, Engine::White);
 			};
 
-		w.isHovered = false;
-		w.isBeingClicked = false;
-		w.isReleased = false;
+		widget.isHovered = false;
+		widget.isBeingClicked = false;
+		widget.isReleased = false;
 
 		if (Engine::checkCollisionPointRec(Engine::getMousePosition(), smallerRect))
 		{
-			w.isHovered = true;
+			widget.isHovered = true;
 
 			if (Engine::isMouseButtonDown(Engine::MouseButton::Left))
 			{
-				w.isBeingClicked = true;
+				widget.isBeingClicked = true;
 			}
 
 			if (Engine::isMouseButtonReleased(Engine::MouseButton::Left))
 			{
-				w.isReleased = true;
+				widget.isReleased = true;
 			}
 		}
 
-		switch (w.type)
+		switch (widget.type)
 		{
 			case button:
 			{
 				const float clickOffset = .05f;
 				Engine::Color4f clickColor = { 120,120,135,205 };
 				Engine::Color4f defaultColor = { 90,90,110,205 };
+				Engine::Rect buttonRect = smallerRect;
 
-				if (w.isBeingClicked)
+				if (widget.isBeingClicked)
 				{
-						DrawRectangle(
-							(int)smallerRect.x,
-							(int)(smallerRect.y + smallerRect.height * clickOffset),
-							(int)smallerRect.width,
-							(int)smallerRect.height,
-							toRaylibColor(clickColor)
-						);
+					buttonRect.y += buttonRect.height * clickOffset;
+					submitPanel(buttonRect, clickColor);
 				}
 				else
 				{
-					if (w.isHovered)
+					if (widget.isHovered)
 					{
-							DrawRectangle(
-								(int)smallerRect.x,
-								(int)smallerRect.y,
-								(int)smallerRect.width,
-								(int)smallerRect.height,
-								toRaylibColor(clickColor)
-							);
+						submitPanel(buttonRect, clickColor);
 					}
-
-					if (w.isReleased)
+					else if (widget.isReleased)
 					{
-							DrawRectangle(
-								(int)smallerRect.x,
-								(int)smallerRect.y,
-								(int)smallerRect.width,
-								(int)smallerRect.height,
-								toRaylibColor(defaultColor)
-							);
+						submitPanel(buttonRect, defaultColor);
 					}
-
-						if (!w.isHovered && !w.isReleased)
-						{
-							DrawRectangle(
-								(int)smallerRect.x,
-								(int)smallerRect.y,
-								(int)smallerRect.width,
-								(int)smallerRect.height,
-								toRaylibColor(defaultColor)
-							);
-						}
+					else
+					{
+						submitPanel(buttonRect, defaultColor);
+					}
 				}
 
-				if (w.isBeingClicked)
+				if (widget.isBeingClicked)
 				{
-					drawText(smallerRect, smallerRect.height * clickOffset);
+					drawCenteredText(widget.text, smallerRect, (float)fontSize, smallerRect.height * clickOffset);
 				}
 				else
 				{
-					drawText(smallerRect);
+					drawCenteredText(widget.text, smallerRect, (float)fontSize);
 				}
 
 				break;
@@ -242,15 +262,9 @@ void UIEngine::updateAndRender()
 				Engine::Color4f panelColor = { 90,90,110,205 };
 				Engine::Color4f railColor = { 55,55,70,255 };
 				Engine::Color4f fillColor = { 110,175,255,255 };
-				Engine::Color4f knobColor = w.isHovered ? Engine::White : Engine::Color4f{ 225,225,225,255 };
+				Engine::Color4f knobColor = widget.isHovered ? Engine::White : Engine::Color4f{ 225,225,225,255 };
 
-				DrawRectangle(
-					(int)smallerRect.x,
-					(int)smallerRect.y,
-					(int)smallerRect.width,
-					(int)smallerRect.height,
-					toRaylibColor(panelColor)
-				);
+				submitPanel(smallerRect, panelColor);
 
 				float sliderLeft = smallerRect.x + smallerRect.width * 0.08f;
 				float sliderRight = smallerRect.x + smallerRect.width * 0.92f;
@@ -259,22 +273,22 @@ void UIEngine::updateAndRender()
 				float railH = std::max(4.0f, smallerRect.height * 0.10f);
 
 				float value01 = 0.f;
-				if (w.sliderValue && w.sliderMax > w.sliderMin)
+				if (widget.sliderValue && widget.sliderMax > widget.sliderMin)
 				{
-					value01 = (*w.sliderValue - w.sliderMin) / (w.sliderMax - w.sliderMin);
+					value01 = (*widget.sliderValue - widget.sliderMin) / (widget.sliderMax - widget.sliderMin);
 					value01 = std::clamp(value01, 0.0f, 1.0f);
 				}
 
-				if (Engine::isMouseButtonPressed(Engine::MouseButton::Left) && w.isHovered)
+				if (Engine::isMouseButtonPressed(Engine::MouseButton::Left) && widget.isHovered)
 				{
 					activeSlider = widgetIndex;
 				}
 
-				if (activeSlider == widgetIndex && Engine::isMouseButtonDown(Engine::MouseButton::Left) && w.sliderValue)
+				if (activeSlider == widgetIndex && Engine::isMouseButtonDown(Engine::MouseButton::Left) && widget.sliderValue)
 				{
 					float t = (Engine::getMousePosition().x - sliderLeft) / sliderWidth;
 					t = std::clamp(t, 0.0f, 1.0f);
-					*w.sliderValue = w.sliderMin + t * (w.sliderMax - w.sliderMin);
+					*widget.sliderValue = widget.sliderMin + t * (widget.sliderMax - widget.sliderMin);
 					value01 = t;
 				}
 
@@ -283,43 +297,58 @@ void UIEngine::updateAndRender()
 					activeSlider = -1;
 				}
 
-				DrawRectangle(
-					(int)sliderLeft,
-					(int)(sliderY - railH * 0.5f),
-					(int)sliderWidth,
-					(int)railH,
-					toRaylibColor(railColor)
-				);
+				Engine::ColoredRect rail
+				{
+					{ sliderLeft, sliderY - railH * 0.5f, sliderWidth, railH },
+					{ 0,0 },
+					0.f,
+					railColor,
+					assetManager.whiteTexture,
+					assetManager.defaultShader
+				};
+				collector.submitRect(rail);
 
-				DrawRectangle(
-					(int)sliderLeft,
-					(int)(sliderY - railH * 0.5f),
-					(int)(sliderWidth * value01),
-					(int)railH,
-					toRaylibColor(fillColor)
-				);
+				Engine::ColoredRect fill
+				{
+					{ sliderLeft, sliderY - railH * 0.5f, sliderWidth * value01, railH },
+					{ 0,0 },
+					0.f,
+					fillColor,
+					assetManager.whiteTexture,
+					assetManager.defaultShader
+				};
+				collector.submitRect(fill);
 
 				float knobX = sliderLeft + sliderWidth * value01;
 				float knobRadius = std::max(5.0f, smallerRect.height * 0.14f);
-				DrawCircle((int)knobX, (int)sliderY, knobRadius, toRaylibColor(knobColor));
+				Engine::Circle knob
+				{
+					{ knobX, sliderY },
+					knobRadius,
+					{ 0,0 },
+					0.f,
+					knobColor,
+					assetManager.whiteTexture,
+					assetManager.defaultShader
+				};
+				collector.submitCircle(knob);
 
 				int valuePct = (int)std::round(value01 * 100.0f);
-				std::string label = w.text + "  " + std::to_string(valuePct) + "%";
+				std::string label = widget.text + "  " + std::to_string(valuePct) + "%";
 
-				int labelSize = std::max(14, (int)(fontSize * 0.75f));
-				int textWidth = MeasureText(label.c_str(), labelSize);
-				float textX = smallerRect.x + (smallerRect.width - textWidth) / 2.f;
+				float labelSize = (float)std::max(14, (int)(fontSize * 0.75f));
+				Engine::TextMetrics labelMetrics = Engine::TextLayout::measureText(assetManager.defaultFont, label, labelSize, 1.f);
+				float textX = smallerRect.x + (smallerRect.width - labelMetrics.size.x) / 2.f;
 				float textY = smallerRect.y + smallerRect.height * 0.18f;
 
-				DrawText(label.c_str(), (int)(textX - labelSize * .08f), (int)(textY + labelSize * .08f), labelSize, toRaylibColor(Engine::Black));
-				DrawText(label.c_str(), (int)textX, (int)textY, labelSize, toRaylibColor(Engine::White));
+				submitTextWithShadow(label, textX, textY, labelSize, Engine::White);
 
 				break;
 			}
 
 			case title:
 			{
-				drawText(smallerRect);
+				drawCenteredText(widget.text, smallerRect, (float)fontSize);
 				break;
 			}
 

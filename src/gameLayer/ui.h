@@ -4,6 +4,12 @@
 #include <math/rect.h>
 #include <assets/font.h>
 
+namespace Engine
+{
+	struct AssetManager;
+	class IRenderCollector;
+}
+
 // top
 Engine::Rect placeRectangleTopLeft(Engine::Rect r);
 Engine::Rect placeRectangleCenterTop(Engine::Rect r, float w);
@@ -103,5 +109,5 @@ struct UIEngine
 		widgets.push_back(w);
 	}
 
-	void updateAndRender();
+	void updateAndRender(const Engine::AssetManager& assetManager, Engine::IRenderCollector& collector);
 };

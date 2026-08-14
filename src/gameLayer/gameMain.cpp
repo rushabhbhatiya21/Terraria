@@ -84,7 +84,14 @@ bool updateGame()
 		c.offset = { Engine::getScreenWidth() / 2.f, Engine::getScreenHeight() / 2.f };
 		c.target = Engine::Vec2{ 500,500 };
 		c.zoom = 20;
+
+		gameplay.sceneRenderer.beginFrame();
+
+		gameplay.sceneRenderer.beginPass(Engine::RenderPass::Background, c);
 		backgroundForMenu.draw(Engine::getFrameTime(), assetManager, c, {1000,1000}, Engine::White, gameplay.sceneRenderer);
+		gameplay.sceneRenderer.endPass();
+
+		gameplay.sceneRenderer.beginPass(Engine::RenderPass::UI, c);
 
 		if (menuPage == MenuPage::Main)
 		{
@@ -144,7 +151,10 @@ bool updateGame()
 			}
 		}
 
-		mainMenuButtons.updateAndRender();
+		mainMenuButtons.updateAndRender(assetManager, gameplay.sceneRenderer);
+
+		gameplay.sceneRenderer.endPass();
+		gameplay.sceneRenderer.endFrame();
 		return true;
 	}
 	else
