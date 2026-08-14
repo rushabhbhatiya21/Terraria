@@ -10,6 +10,7 @@
 #include <settings.h>
 #include <ui.h>
 #include <drawBackground.h>
+#include <saveMap.h>
 
 #pragma region global variables
 
@@ -19,6 +20,12 @@ UIEngine mainMenuButtons;
 DrawBackground backgroundForMenu;
 // set false for menu
 bool gameplayRunning = false;
+
+static void startNewGame()
+{
+	gameplay.init(assetManager);
+	gameplayRunning = true;
+}
 
 #pragma endregion
 
@@ -53,11 +60,21 @@ bool updateGame()
 
 		mainMenuButtons.addTitle("Terraframe");
 
-		if (mainMenuButtons.addButton("Start Game"))
+		if (mainMenuButtons.addButton("Resume Game"))
 		{
-			gameplayRunning = true;
-			// Gameplay is already initialized in initGame(); calling init again
-			// duplicates starter inventory content and world state.
+			if (loadWorld(gameplay.gameMap, gameplay.entityHolder, gameplay.player))
+			{
+				gameplayRunning = true;
+			}
+			else
+			{
+				Engine::traceLog(Engine::LogLevel::Warning, "Resume failed: no valid save found.");
+			}
+		}
+
+		if (mainMenuButtons.addButton("New Game"))
+		{
+			startNewGame();
 		}
 
 		mainMenuButtons.addButton("Settings");
