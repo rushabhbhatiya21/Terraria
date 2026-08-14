@@ -41,8 +41,8 @@ namespace Engine
 		Texture evilEyePieces = {};
 		Texture evilEyeServant = {};
 		Texture zombie = {};
-		Texture health = {};
 		Texture healthBar = {};
+		Texture health = {};
 
 		Texture forestBG = {};
 		Texture desertBG = {};
@@ -80,8 +80,8 @@ namespace Engine
 			{&evilEyePieces, "eyeOfCthulhuPieces.png"},
 			{&evilEyeServant, "servantOfCthulhu.png"},
 			{&zombie, "zombie.png"},
-			{&health, "health.png"},
 			{&healthBar, "healthBar.png"},
+			{&health, "health.png"},
 			{&forestBG, "forestBG.png"},
 			{&desertBG, "desertBG.png"},
 			{&snowBG, "snowBG.png"},

@@ -73,22 +73,9 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 	};
 	collector.submitSprite(healthBarSprite);
 
-	healthBarPos.width = life * healthWidth / stats.defensive.maxHealth;
-
-	Engine::Color4f color = Engine::White;
-
-	if (life > stats.defensive.maxHealth * .7f)
-	{
-		color = Engine::Lime;
-	}
-	else if (life > stats.defensive.maxHealth * .3f && life <= stats.defensive.maxHealth * .7f)
-	{
-		color = { 255, 200, 120, 255 };;
-	}
-	else
-	{
-		color = Engine::Red;
-	}
+	float healthRatio = std::clamp(life / (float)stats.defensive.maxHealth, 0.f, 1.f);
+	float filledWidth = healthWidth * healthRatio;
+	healthBarPos.width = filledWidth;
 
 	//DrawTexturePro(
 	//	assetManager.health,
@@ -138,7 +125,7 @@ void Enemy::renderHealthBar(Engine::AssetManager& assetManager, Engine::IRenderC
 			r,
 			{ 0,0 },
 			0.f,
-			Engine::Color4f{ 255,255,255,80 },
+			Engine::Color4f{ 255,255,255,110 },
 			assetManager.health,
 			assetManager.defaultShader
 		};
