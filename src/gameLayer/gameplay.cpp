@@ -807,25 +807,24 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 	//spawnEnemyHelper<Slime>({ 32,60 });
 	//spawnEnemyHelper<Zombie>({ 25,60 });
 	//spawnDroppedItem({ 25, 60 }, Items::goldHelmet);
-	maxEnemyCount = 10;
 
 	// start item in inventory
-	player.inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
 	player.inventory.storeItem(ItemStack{ Items::woodAxe, 1 });
-	//player.inventory.storeItem(ItemStack{ Items::woodLog, 20 });
+	player.inventory.storeItem(ItemStack{ Items::woodenSword, 1 });
 	player.inventory.storeItem(ItemStack{ Items::shuriken, 100 });
 	player.inventory.storeItem(ItemStack{ Items::woodenBow, 1 });
 	player.inventory.storeItem(ItemStack{ Items::woodenArrow, 100 });
-	player.inventory.storeItem(ItemStack{ Items::platform, 100 });
+	//player.inventory.storeItem(ItemStack{ Items::woodLog, 20 });
+	//player.inventory.storeItem(ItemStack{ Items::platform, 100 });
 	//player.inventory.storeItem(ItemStack{ Items::woodLog, 100 });
 	//player.inventory.storeItem(ItemStack{ Items::leaves, 100 });
-	player.inventory.storeItem(ItemStack{ Items::furnace, 10 });
+	//player.inventory.storeItem(ItemStack{ Items::furnace, 10 });
 	//player.inventory.storeItem(ItemStack{ Items::workBench, 1 });
 	//player.inventory.storeItem(ItemStack{ Items::copperIngot, 20 });
 
 	// start day at random time
 	std::ranlux24_base rng(std::random_device{}());
-	float randStartTime = getRandomFloat(rng, 0.4f, 0.6f);
+	float randStartTime = getRandomFloat(rng, 0.8f, 0.9f);
 	worldTime = randStartTime * FULL_DAY_LENGTH;
 
 	//// chunk grid testing
@@ -1706,7 +1705,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 #pragma region render popup text
 
-	drawPopuptext();
+	drawPopuptext(assetManager, sceneRenderer);
 
 #pragma endregion
 
@@ -2400,25 +2399,33 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 		minute = "0" + minute;
 
 	std::string strClock = hour + " : " + minute;
+	Engine::Text worldClock
+	{
+		{ w * 0.5f, 12.f },
+		Engine::TextLayout::Anchor::TopCenter,
+		0.f,
+		Engine::Color4f{ 190, 255, 190, 255 },
+		strClock,
+		20.f,
+		1.f,
+		&assetManager.defaultFont,
+		&assetManager.defaultShader
+	};
+	sceneRenderer.submitText(worldClock);
 
-	// draw using renderer
-	//DrawTextEx(
-	//	GetFontDefault(),
-	//	strClock.c_str(),
-	//	{ 20,40 },
-	//	20,
-	//	5,
-	//	GREEN
-	//);
-
-	//DrawTextEx(
-	//	GetFontDefault(),
-	//	phase_to_str(skyData.phase),
-	//	{ 120, 40 },
-	//	20,
-	//	5,
-	//	GREEN
-	//);
+	Engine::Text worldPhase
+	{
+		{ w * 0.5f, 34.f },
+		Engine::TextLayout::Anchor::TopCenter,
+		0.f,
+		Engine::Color4f{ 170, 220, 255, 245 },
+		phase_to_str(skyData.phase),
+		14.f,
+		1.f,
+		&assetManager.defaultFont,
+		&assetManager.defaultShader
+	};
+	sceneRenderer.submitText(worldPhase);
 
 #pragma endregion
 
@@ -2584,11 +2591,31 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 #pragma endregion
 
 
-#pragma region display fps
+	int fps = Engine::getFPS();
+	Engine::Color4f fpsColor = Engine::Lime;
 
-	Engine::drawFPS(20, 20);
+	if (fps < 30 && fps >= 15)
+	{
+		fpsColor = Engine::Orange;
+	}
+	else if (fps < 15)
+	{
+		fpsColor = Engine::Red;
+	}
 
-#pragma endregion
+	Engine::Text fpsText
+	{
+		{ 16.f, 12.f },
+		Engine::TextLayout::Anchor::TopLeft,
+		0.f,
+		fpsColor,
+		"FPS: " + std::to_string(fps),
+		18.f,
+		1.f,
+		&assetManager.defaultFont,
+		&assetManager.defaultShader
+	};
+	sceneRenderer.submitText(fpsText);
 
 	sceneRenderer.endPass();
 

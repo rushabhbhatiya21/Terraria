@@ -15,6 +15,11 @@ namespace Engine
         return ::GetScreenHeight();
     }
 
+    int getFPS()
+    {
+        return ::GetFPS();
+    }
+
     void Engine::drawFPS(int x, int y)
     {
         ::DrawFPS(x, y);

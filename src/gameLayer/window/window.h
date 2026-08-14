@@ -17,6 +17,7 @@ namespace Engine
 
     int getScreenWidth();
     int getScreenHeight();
+    int getFPS();
     void drawFPS(int, int);
     void traceLog(LogLevel level, const char* fmt, ...);
 }

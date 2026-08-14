@@ -1,4 +1,10 @@
 #include "popupText.h"
+#include <algorithm>
+#include <cmath>
+#include <assets/assetManager.h>
+#include <rendering/IRenderCollector.h>
+#include <rendering/types/text.h>
+#include <ui/textLayout.h>
 
 std::vector<PopupText> popupTexts;
 //static std::string critText = "CRITICAL";
@@ -113,44 +119,42 @@ void DrawTextOutlined(
 	//);
 }
 
-void drawPopuptext()
+void drawPopuptext(const Engine::AssetManager& assetManager, Engine::IRenderCollector& collector)
 {
 	for (int i = (int)popupTexts.size() - 1; i >= 0; --i)
 	{
 		PopupText& popup = popupTexts[i];
-		if (popup.crit)
+
+		float size = popup.crit ? popup.size * 2.f : popup.size;
+		Engine::Color4f mainColor = popup.crit ? Engine::Color4f{ 255, 80, 80, popup.color.a } : popup.color;
+
+		Engine::Text shadow
 		{
-			//DrawTextOutlined(
-			//	GetFontDefault(),
-			//	popup.text.c_str(),
-			//	popup.position,
-			//	popup.size * 2,
-			//	0.05f,
-			//	Color{ 255, 80, 80, 255 },
-			//	Color{ 0,0,0,160 },
-			//	.03f
-			//);
-		}
-		else
+			{ popup.position.x - size * 0.06f, popup.position.y + size * 0.06f },
+			Engine::TextLayout::Anchor::TopLeft,
+			0.f,
+			Engine::Color4f{ 0, 0, 0, (unsigned char)std::min(200, (int)popup.color.a) },
+			popup.text,
+			size,
+			0.02f,
+			&assetManager.defaultFont,
+			&assetManager.defaultShader
+		};
+
+		Engine::Text main
 		{
-			//DrawTextOutlined(
-			//	GetFontDefault(),
-			//	popup.text.c_str(),
-			//	popup.position,
-			//	popup.size,
-			//	0.05f,
-			//	popup.color,
-			//	Color{ 0,0,0,160 },
-			//	.03f
-			//);
-		}
-		//DrawTextEx(
-		//	GetFontDefault(),
-		//	popup.text.c_str(),
-		//	popup.position,
-		//	popup.size,
-		//	.02f,
-		//	popup.color
-		//);
+			popup.position,
+			Engine::TextLayout::Anchor::TopLeft,
+			0.f,
+			mainColor,
+			popup.text,
+			size,
+			0.02f,
+			&assetManager.defaultFont,
+			&assetManager.defaultShader
+		};
+
+		collector.submitText(shadow);
+		collector.submitText(main);
 	}
 }

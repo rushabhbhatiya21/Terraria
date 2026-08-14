@@ -5,6 +5,12 @@
 #include <math/color.h>
 #include <assets/font.h>
 
+namespace Engine
+{
+	struct AssetManager;
+	class IRenderCollector;
+}
+
 struct PopupText
 {
 	Engine::Vec2 position = {};
@@ -49,4 +55,4 @@ void updatePopupText(
 	float deltaTime
 );
 
-void drawPopuptext();
+void drawPopuptext(const Engine::AssetManager& assetManager, Engine::IRenderCollector& collector);
