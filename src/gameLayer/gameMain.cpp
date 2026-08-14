@@ -25,7 +25,7 @@ bool gameplayRunning = true;
 
 bool initGame()
 {
-	//Audio::init();
+	Audio::init();
 	assetManager.loadAll();
 	assetManager.loadTexturePack("hdtextures");
 	mainMenuButtons.init();
@@ -38,7 +38,7 @@ bool initGame()
 
 bool updateGame()
 {
-	//Audio::update();
+	Audio::update();
 	updateSettings();
 
 	//ClearBackground({ 0,0,0,255 });
