@@ -26,6 +26,7 @@ struct DrawBackground
 
 	int currentTransitionType = 0;
 	float transitionTime = 0.f;
+	float transitionDuration = 0.9f;
 
 	void draw(float deltaTime, Engine::AssetManager& assetManager, Engine::Cam& camera, Engine::Vec2 mapSize, Engine::Color4f skyColor, Engine::IRenderCollector& collector);
 
