@@ -135,6 +135,9 @@ void UIEngine::updateAndRender(const Engine::AssetManager& assetManager, Engine:
 	oneButtonRectangle.y += oneButtonRectangle.height / 2.f;
 
 	int fontSize = (int)(oneButtonRectangle.height * .5f);
+	const float titleFontSize = std::max(22.0f, fontSize * 1.15f);
+	const float buttonFontSize = std::max(18.0f, fontSize * 0.82f);
+	const float subMenuFontSize = std::max(14.0f, fontSize * 0.64f);
 	int widgetIndex = 0;
 
 	auto submitTextWithShadow = [&](const std::string& text, float x, float y, float size, Engine::Color4f color)
@@ -220,8 +223,8 @@ void UIEngine::updateAndRender(const Engine::AssetManager& assetManager, Engine:
 			case button:
 			{
 				const float clickOffset = .05f;
-				Engine::Color4f clickColor = { 120,120,135,205 };
-				Engine::Color4f defaultColor = { 90,90,110,205 };
+					Engine::Color4f clickColor = { 126,146,180,230 };
+					Engine::Color4f defaultColor = { 88,100,126,218 };
 				Engine::Rect buttonRect = smallerRect;
 
 				if (widget.isBeingClicked)
@@ -247,11 +250,11 @@ void UIEngine::updateAndRender(const Engine::AssetManager& assetManager, Engine:
 
 				if (widget.isBeingClicked)
 				{
-					drawCenteredText(widget.text, smallerRect, (float)fontSize, smallerRect.height * clickOffset);
+					drawCenteredText(widget.text, smallerRect, buttonFontSize, smallerRect.height * clickOffset);
 				}
 				else
 				{
-					drawCenteredText(widget.text, smallerRect, (float)fontSize);
+					drawCenteredText(widget.text, smallerRect, buttonFontSize);
 				}
 
 				break;
@@ -259,18 +262,22 @@ void UIEngine::updateAndRender(const Engine::AssetManager& assetManager, Engine:
 
 			case slider:
 			{
-				Engine::Color4f panelColor = { 90,90,110,205 };
-				Engine::Color4f railColor = { 55,55,70,255 };
-				Engine::Color4f fillColor = { 110,175,255,255 };
-				Engine::Color4f knobColor = widget.isHovered ? Engine::White : Engine::Color4f{ 225,225,225,255 };
+					Engine::Color4f panelColor = widget.isHovered
+						? Engine::Color4f{ 80, 96, 126, 232 }
+						: Engine::Color4f{ 68, 80, 106, 220 };
+
+					Engine::Color4f railColor = { 38, 46, 62, 255 };
+					Engine::Color4f fillColor = { 112, 182, 255, 255 };
+					Engine::Color4f knobOuterColor = { 24, 28, 38, 255 };
+					Engine::Color4f knobInnerColor = widget.isHovered ? Engine::White : Engine::Color4f{ 228,236,250,255 };
 
 				submitPanel(smallerRect, panelColor);
 
 				float sliderLeft = smallerRect.x + smallerRect.width * 0.08f;
 				float sliderRight = smallerRect.x + smallerRect.width * 0.92f;
 				float sliderWidth = std::max(1.0f, sliderRight - sliderLeft);
-				float sliderY = smallerRect.y + smallerRect.height * 0.62f;
-				float railH = std::max(4.0f, smallerRect.height * 0.10f);
+					float sliderY = smallerRect.y + smallerRect.height * 0.68f;
+					float railH = std::max(5.0f, smallerRect.height * 0.12f);
 
 				float value01 = 0.f;
 				if (widget.sliderValue && widget.sliderMax > widget.sliderMin)
@@ -297,58 +304,98 @@ void UIEngine::updateAndRender(const Engine::AssetManager& assetManager, Engine:
 					activeSlider = -1;
 				}
 
-				Engine::ColoredRect rail
+				float visual01 = value01;
+				if (widget.sliderValue)
+				{
+					auto it = sliderVisual01.find(widget.sliderValue);
+
+					if (it == sliderVisual01.end())
+					{
+						sliderVisual01[widget.sliderValue] = value01;
+						visual01 = value01;
+					}
+					else
+					{
+						// Smooth visual state so slider movement feels less abrupt.
+						it->second += (value01 - it->second) * 0.22f;
+						it->second = std::clamp(it->second, 0.0f, 1.0f);
+						visual01 = it->second;
+					}
+				}
+
+					Engine::RoundedRect rail
 				{
 					{ sliderLeft, sliderY - railH * 0.5f, sliderWidth, railH },
 					{ 0,0 },
-					0.f,
+						railH * 0.5f,
+						0.f,
 					railColor,
 					assetManager.whiteTexture,
 					assetManager.defaultShader
 				};
-				collector.submitRect(rail);
+					collector.submitRoundedRect(rail);
 
-				Engine::ColoredRect fill
+					Engine::RoundedRect fill
 				{
-					{ sliderLeft, sliderY - railH * 0.5f, sliderWidth * value01, railH },
+						{ sliderLeft, sliderY - railH * 0.5f, sliderWidth * visual01, railH },
 					{ 0,0 },
-					0.f,
+						railH * 0.5f,
+						0.f,
 					fillColor,
 					assetManager.whiteTexture,
 					assetManager.defaultShader
 				};
-				collector.submitRect(fill);
+					collector.submitRoundedRect(fill);
 
-				float knobX = sliderLeft + sliderWidth * value01;
-				float knobRadius = std::max(5.0f, smallerRect.height * 0.14f);
-				Engine::Circle knob
+				float knobX = sliderLeft + sliderWidth * visual01;
+					float knobOuterRadius = std::max(7.0f, smallerRect.height * 0.17f);
+					float knobInnerRadius = knobOuterRadius * 0.62f;
+
+					Engine::Circle knobOuter
 				{
 					{ knobX, sliderY },
-					knobRadius,
+						knobOuterRadius,
 					{ 0,0 },
 					0.f,
-					knobColor,
+						knobOuterColor,
 					assetManager.whiteTexture,
 					assetManager.defaultShader
 				};
-				collector.submitCircle(knob);
+					collector.submitCircle(knobOuter);
+
+					Engine::Circle knobInner
+					{
+						{ knobX, sliderY },
+						knobInnerRadius,
+						{ 0,0 },
+						0.f,
+						knobInnerColor,
+						assetManager.whiteTexture,
+						assetManager.defaultShader
+					};
+					collector.submitCircle(knobInner);
 
 				int valuePct = (int)std::round(value01 * 100.0f);
-				std::string label = widget.text + "  " + std::to_string(valuePct) + "%";
+					std::string label = widget.text;
+					std::string valueText = std::to_string(valuePct) + "%";
 
-				float labelSize = (float)std::max(14, (int)(fontSize * 0.75f));
-				Engine::TextMetrics labelMetrics = Engine::TextLayout::measureText(assetManager.defaultFont, label, labelSize, 1.f);
-				float textX = smallerRect.x + (smallerRect.width - labelMetrics.size.x) / 2.f;
-				float textY = smallerRect.y + smallerRect.height * 0.18f;
+					float labelSize = subMenuFontSize;
+					Engine::TextMetrics labelMetrics = Engine::TextLayout::measureText(assetManager.defaultFont, label, labelSize, 1.f);
+					Engine::TextMetrics valueMetrics = Engine::TextLayout::measureText(assetManager.defaultFont, valueText, labelSize, 1.f);
 
-				submitTextWithShadow(label, textX, textY, labelSize, Engine::White);
+					float textY = smallerRect.y + smallerRect.height * 0.18f;
+					float labelX = smallerRect.x + smallerRect.width * 0.08f;
+					float valueX = smallerRect.x + smallerRect.width * 0.92f - valueMetrics.size.x;
+
+					submitTextWithShadow(label, labelX, textY, labelSize, Engine::White);
+					submitTextWithShadow(valueText, valueX, textY, labelSize, Engine::Color4f{ 200,230,255,255 });
 
 				break;
 			}
 
 			case title:
 			{
-				drawCenteredText(widget.text, smallerRect, (float)fontSize);
+					drawCenteredText(widget.text, smallerRect, titleFontSize);
 				break;
 			}
 

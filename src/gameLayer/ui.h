@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <unordered_map>
 #include <math/rect.h>
 #include <assets/font.h>
 
@@ -62,6 +63,7 @@ struct UIEngine
 	std::vector<Widget> widgets;
 
 	std::vector<Widget> lastFrameWidgets;
+	std::unordered_map<const float*, float> sliderVisual01;
 
 	int activeSlider = -1;
 
