@@ -100,11 +100,20 @@ namespace Engine
 
 	void SpriteBatch::sortByTextures()
 	{
-		std::sort(drawCommands.begin(), drawCommands.end(),
+		std::stable_sort(drawCommands.begin(), drawCommands.end(),
 			[](const DrawCommand& a, const DrawCommand& b)
 			{
-				return a.renderState.texture <
-					b.renderState.texture;
+				if (a.renderState.texture != b.renderState.texture)
+				{
+					return a.renderState.texture < b.renderState.texture;
+				}
+
+				if (a.renderState.shader != b.renderState.shader)
+				{
+					return a.renderState.shader < b.renderState.shader;
+				}
+
+				return a.firstIndex < b.firstIndex;
 			});
 	}
 
