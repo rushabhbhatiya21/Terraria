@@ -3,6 +3,7 @@
 #include <input/input.h>
 #include <window/window.h>
 #include <raylib.h>
+#include <algorithm>
 
 static Color toRaylibColor(Engine::Color4f c)
 {
@@ -133,6 +134,7 @@ void UIEngine::updateAndRender()
 	oneButtonRectangle.y += oneButtonRectangle.height / 2.f;
 
 	int fontSize = (int)(oneButtonRectangle.height * .5f);
+	int widgetIndex = 0;
 
 	for (auto& w : widgets)
 	{
@@ -235,6 +237,86 @@ void UIEngine::updateAndRender()
 				break;
 			}
 
+			case slider:
+			{
+				Engine::Color4f panelColor = { 90,90,110,205 };
+				Engine::Color4f railColor = { 55,55,70,255 };
+				Engine::Color4f fillColor = { 110,175,255,255 };
+				Engine::Color4f knobColor = w.isHovered ? Engine::White : Engine::Color4f{ 225,225,225,255 };
+
+				DrawRectangle(
+					(int)smallerRect.x,
+					(int)smallerRect.y,
+					(int)smallerRect.width,
+					(int)smallerRect.height,
+					toRaylibColor(panelColor)
+				);
+
+				float sliderLeft = smallerRect.x + smallerRect.width * 0.08f;
+				float sliderRight = smallerRect.x + smallerRect.width * 0.92f;
+				float sliderWidth = std::max(1.0f, sliderRight - sliderLeft);
+				float sliderY = smallerRect.y + smallerRect.height * 0.62f;
+				float railH = std::max(4.0f, smallerRect.height * 0.10f);
+
+				float value01 = 0.f;
+				if (w.sliderValue && w.sliderMax > w.sliderMin)
+				{
+					value01 = (*w.sliderValue - w.sliderMin) / (w.sliderMax - w.sliderMin);
+					value01 = std::clamp(value01, 0.0f, 1.0f);
+				}
+
+				if (Engine::isMouseButtonPressed(Engine::MouseButton::Left) && w.isHovered)
+				{
+					activeSlider = widgetIndex;
+				}
+
+				if (activeSlider == widgetIndex && Engine::isMouseButtonDown(Engine::MouseButton::Left) && w.sliderValue)
+				{
+					float t = (Engine::getMousePosition().x - sliderLeft) / sliderWidth;
+					t = std::clamp(t, 0.0f, 1.0f);
+					*w.sliderValue = w.sliderMin + t * (w.sliderMax - w.sliderMin);
+					value01 = t;
+				}
+
+				if (activeSlider == widgetIndex && Engine::isMouseButtonReleased(Engine::MouseButton::Left))
+				{
+					activeSlider = -1;
+				}
+
+				DrawRectangle(
+					(int)sliderLeft,
+					(int)(sliderY - railH * 0.5f),
+					(int)sliderWidth,
+					(int)railH,
+					toRaylibColor(railColor)
+				);
+
+				DrawRectangle(
+					(int)sliderLeft,
+					(int)(sliderY - railH * 0.5f),
+					(int)(sliderWidth * value01),
+					(int)railH,
+					toRaylibColor(fillColor)
+				);
+
+				float knobX = sliderLeft + sliderWidth * value01;
+				float knobRadius = std::max(5.0f, smallerRect.height * 0.14f);
+				DrawCircle((int)knobX, (int)sliderY, knobRadius, toRaylibColor(knobColor));
+
+				int valuePct = (int)std::round(value01 * 100.0f);
+				std::string label = w.text + "  " + std::to_string(valuePct) + "%";
+
+				int labelSize = std::max(14, (int)(fontSize * 0.75f));
+				int textWidth = MeasureText(label.c_str(), labelSize);
+				float textX = smallerRect.x + (smallerRect.width - textWidth) / 2.f;
+				float textY = smallerRect.y + smallerRect.height * 0.18f;
+
+				DrawText(label.c_str(), (int)(textX - labelSize * .08f), (int)(textY + labelSize * .08f), labelSize, toRaylibColor(Engine::Black));
+				DrawText(label.c_str(), (int)textX, (int)textY, labelSize, toRaylibColor(Engine::White));
+
+				break;
+			}
+
 			case title:
 			{
 				drawText(smallerRect);
@@ -246,6 +328,12 @@ void UIEngine::updateAndRender()
 		}
 
 		oneButtonRectangle.y += oneButtonRectangle.height;
+		widgetIndex++;
+	}
+
+	if (!Engine::isMouseButtonDown(Engine::MouseButton::Left))
+	{
+		activeSlider = -1;
 	}
 
 	bool disableInputThisFrame = false;

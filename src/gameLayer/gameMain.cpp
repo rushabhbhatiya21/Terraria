@@ -23,11 +23,20 @@ DrawBackground backgroundForMenu;
 bool gameplayRunning = false;
 bool pausedFromGameplay = false;
 
+enum class MenuPage
+{
+	Main,
+	Settings
+};
+
+MenuPage menuPage = MenuPage::Main;
+
 static void startNewGame()
 {
 	gameplay.init(assetManager);
 	gameplayRunning = true;
 	pausedFromGameplay = false;
+	menuPage = MenuPage::Main;
 }
 
 #pragma endregion
@@ -55,6 +64,7 @@ bool updateGame()
 	{
 		gameplayRunning = true;
 		pausedFromGameplay = false;
+		menuPage = MenuPage::Main;
 		return true;
 	}
 
@@ -62,6 +72,7 @@ bool updateGame()
 	{
 		gameplayRunning = false;
 		pausedFromGameplay = true;
+		menuPage = MenuPage::Main;
 		return true;
 	}
 
@@ -75,37 +86,62 @@ bool updateGame()
 		c.zoom = 20;
 		backgroundForMenu.draw(Engine::getFrameTime(), assetManager, c, {1000,1000}, Engine::White, gameplay.sceneRenderer);
 
-		mainMenuButtons.addTitle(pausedFromGameplay ? "Paused" : "Terraframe");
-
-		if (mainMenuButtons.addButton("Resume Game"))
+		if (menuPage == MenuPage::Main)
 		{
-			gameplayRunning = true;
-			pausedFromGameplay = false;
-		}
+			mainMenuButtons.addTitle(pausedFromGameplay ? "Paused" : "Terraframe");
 
-		if (mainMenuButtons.addButton("Load Last Save"))
-		{
-			if (loadWorld(gameplay.gameMap, gameplay.entityHolder, gameplay.player))
+			if (mainMenuButtons.addButton("Resume Game"))
 			{
 				gameplayRunning = true;
 				pausedFromGameplay = false;
 			}
-			else
+
+			if (mainMenuButtons.addButton("Load Last Save"))
 			{
-				Engine::traceLog(Engine::LogLevel::Warning, "Load failed: no valid save found.");
+				if (loadWorld(gameplay.gameMap, gameplay.entityHolder, gameplay.player))
+				{
+					gameplayRunning = true;
+					pausedFromGameplay = false;
+				}
+				else
+				{
+					Engine::traceLog(Engine::LogLevel::Warning, "Load failed: no valid save found.");
+				}
+			}
+
+			if (mainMenuButtons.addButton("New Game"))
+			{
+				startNewGame();
+			}
+
+			if (mainMenuButtons.addButton("Settings"))
+			{
+				menuPage = MenuPage::Settings;
+			}
+
+			if (mainMenuButtons.addButton("Exit"))
+			{
+				return false;
 			}
 		}
-
-		if (mainMenuButtons.addButton("New Game"))
+		else
 		{
-			startNewGame();
-		}
+			mainMenuButtons.addTitle("Settings");
 
-		mainMenuButtons.addButton("Settings");
+			mainMenuButtons.addSlider("Master Volume", &getSettings().masterVolume, 0.f, 1.f);
+			mainMenuButtons.addSlider("Music Volume", &getSettings().musicVolume, 0.f, 1.f);
+			mainMenuButtons.addSlider("Sounds Volume", &getSettings().soundsVolume, 0.f, 1.f);
 
-		if (mainMenuButtons.addButton("Exit"))
-		{
-			return false;
+			if (mainMenuButtons.addButton("Reset To Defaults"))
+			{
+				getSettings() = Settings{};
+				getSettings().sanitize();
+			}
+
+			if (mainMenuButtons.addButton("Back"))
+			{
+				menuPage = MenuPage::Main;
+			}
 		}
 
 		mainMenuButtons.updateAndRender();

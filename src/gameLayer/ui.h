@@ -33,7 +33,8 @@ struct UIEngine
 	{
 		none,
 		title,
-		button
+		button,
+		slider
 	};
 
 	struct Widget
@@ -44,6 +45,10 @@ struct UIEngine
 		bool isHovered = false;
 		bool isBeingClicked = false;
 		bool isReleased = false;
+
+		float* sliderValue = nullptr;
+		float sliderMin = 0.f;
+		float sliderMax = 1.f;
 	};
 
 	Engine::Font font;
@@ -51,6 +56,8 @@ struct UIEngine
 	std::vector<Widget> widgets;
 
 	std::vector<Widget> lastFrameWidgets;
+
+	int activeSlider = -1;
 
 	void init();
 
@@ -80,6 +87,18 @@ struct UIEngine
 		Widget w;
 		w.type = title;
 		w.text = text;
+
+		widgets.push_back(w);
+	}
+
+	void addSlider(std::string text, float* value, float min = 0.f, float max = 1.f)
+	{
+		Widget w;
+		w.type = slider;
+		w.text = text;
+		w.sliderValue = value;
+		w.sliderMin = min;
+		w.sliderMax = max;
 
 		widgets.push_back(w);
 	}
