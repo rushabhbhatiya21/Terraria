@@ -16,9 +16,30 @@ namespace Engine
 
 	void OpenGLRenderBackend::initialize()
 	{
-		// bind vao
+		// Reinitialize safely: replace previous VAO to avoid stale/missing attribute state.
+		if (m_vertexArrayHandle != 0)
+		{
+			glDeleteVertexArrays(1, &m_vertexArrayHandle);
+			m_vertexArrayHandle = 0;
+		}
+
 		glGenVertexArrays(1, &m_vertexArrayHandle);
 		glBindVertexArray(m_vertexArrayHandle);
+
+		if (m_vertexBufferHandle != 0)
+		{
+			glBindBuffer(GL_ARRAY_BUFFER, m_vertexBufferHandle);
+		}
+
+		if (m_indexBufferHandle != 0)
+		{
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_indexBufferHandle);
+		}
+
+		if (m_vertexBufferHandle != 0 && m_indexBufferHandle != 0)
+		{
+			configureVertexAttributes();
+		}
 
 		// unbind vao
 		glBindVertexArray(0);
@@ -213,7 +234,7 @@ namespace Engine
 				m_projectionDirty = false;
 			}
 
-			// draw — indices are already absolute, no baseVertex needed
+			// draw ï¿½ indices are already absolute, no baseVertex needed
 			size_t indexOffset = cmd.firstIndex * sizeof(Index);
 			glDrawElements(GL_TRIANGLES, cmd.indexCount, GL_UNSIGNED_SHORT, reinterpret_cast<const void*>(indexOffset));
 		}

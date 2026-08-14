@@ -58,6 +58,9 @@ Bugs
 14. player inventory/equipment lost after load, because player json only saved common entity data and not inventory/equipment fields - fixed
 15. ESC pause flow was wrong (resume loaded last save instead of current live state), now ESC toggles pause/resume and resume keeps live state - fixed
 16. text shadow sometimes drawn in front of white text, because batch sort reordered same-texture commands non-deterministically - fixed
+17. new sounds break and spawn sound, gameplay sound not working - fixed
+18. enemy HP fill looked invisible, because the health fill was getting drawn underneath the dark health bar after batching/sorting; fixed by forcing health bar texture to be registered before health fill texture so fill renders on top and width change is visible - fixed
+19. after loading save then pressing ESC and starting New Game, screen became black; fixed renderer re-init so it safely rebuilds VAO state and rebinds vertex/index attributes instead of leaving stale GPU state - fixed
 
 
 - copy/paste tree into structures, old tree.bin removed 
