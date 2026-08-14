@@ -17,10 +17,8 @@
 - Dirty-chunk rebuild workflow for render updates.
 - Pass-based scene rendering (background/world/UI).
 - Sprite batching path with custom collector/backend split.
-- Day/night cycle with background transitions.
-- Lighting propagation model:
-  - Sunlight from height map.
-  - Local block-emission flood propagation.
+- Day/night world-time state with background transitions.
+- Lighting data/recalculation systems exist in code, but full night/cave darkness is not currently applied in final gameplay rendering.
 
 ## Content Systems
 

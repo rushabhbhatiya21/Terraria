@@ -29,10 +29,9 @@
 
 ## Lighting Model
 
-- Initialization clears/re-seeds light sources.
-- Sunlight propagates by column from surface down.
-- Block light propagates through BFS queue.
-- Dirty regions/columns are cleared after recalc.
+- Lighting recalculation algorithms exist (sunlight + local emission propagation).
+- Current gameplay composition does not apply full night/cave darkness to final scene output.
+- Practical meaning: time/background transitions are active, but lighting-driven darkness is currently a planned visual pass.
 
 ## Entity and Combat Model
 

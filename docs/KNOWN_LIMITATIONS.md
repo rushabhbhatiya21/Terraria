@@ -16,10 +16,10 @@ This list intentionally focuses on real, observed limitations instead of tempora
 
 ## Lighting and Visual Tuning
 
-4. Night-time world shading is currently incomplete.
+4. Runtime lighting for night and caves is not currently active in final gameplay rendering.
 - Background switching to night is implemented.
-- Full-screen darkness composition for night/cave shading is currently disabled in gameplay rendering path.
-- Practical result: nighttime mood is present, but world tile darkness does not yet match intended final look.
+- World-time/phase updates are implemented.
+- Practical result: night state changes sky/background mood, but cave darkness and full scene darkening are not currently visible to the player.
 
 ## Save/Load Scope
 

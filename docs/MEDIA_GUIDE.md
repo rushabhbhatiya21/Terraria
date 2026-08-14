@@ -54,7 +54,7 @@ Store media in docs/media using the exact filenames below:
 
 - Capture same location and camera framing
 - One image in day state, one in night state
-- Goal: show environmental mood shift and readability
+- Goal: show background/time-state mood shift (not full world darkness lighting)
 
 ### 7) Texture Pack Comparison Pair
 

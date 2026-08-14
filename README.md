@@ -2,7 +2,7 @@
 
 Terraria-inspired 2D sandbox action game built in C++ with custom rendering systems on top of Raylib.
 
-This project combines gameplay systems (mining, combat, crafting, enemies, boss encounters) with engine-oriented architecture work (chunked world rendering, render passes, batching, lighting propagation, and texture-pack workflows).
+This project combines gameplay systems (mining, combat, crafting, enemies, boss encounters) with engine-oriented architecture work (chunked world rendering, render passes, batching, and texture-pack workflows).
 
 Intended profile use: systems-heavy game development project demonstrating practical C++ gameplay and rendering architecture.
 
@@ -10,8 +10,8 @@ Intended profile use: systems-heavy game development project demonstrating pract
 
 - Procedural world generation with caves, ore distribution, and biome logic.
 - Chunk-based world data and chunk-cached rendering.
-- Dynamic lighting model (sunlight + block-emitted light).
-- Day/night world-time system and contextual background switching.
+- World-time system and contextual background switching.
+- Note: gameplay does not currently apply full night/cave darkness lighting in the final composed scene.
 - Player movement/combat with multiple weapon categories.
 - Inventory + hotbar + drag/drop UI.
 - Crafting with station requirements (workbench/furnace).
@@ -72,10 +72,10 @@ Expected content:
 
 ![Boss Encounter GIF Placeholder](docs/media/05-boss-encounter.gif)
 
-### 6) Day/Night Visual Comparison (PNG pair)
+### 6) Day/Night Background Comparison (PNG pair)
 
 Expected content:
-- same location captured at day and night for visual readability comparison
+- same location captured at day and night to show background/state change (not full world lighting)
 
 ![Day Screenshot Placeholder](docs/media/06-day.png)
 ![Night Screenshot Placeholder](docs/media/07-night.png)
