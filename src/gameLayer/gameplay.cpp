@@ -2035,7 +2035,7 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	 //equip item from hotbar
 	{
-		player.selectedHotbarSlot = std::clamp(player.selectedHotbarSlot, 0, 8);
+		player.selectedHotbarSlot = std::clamp(player.selectedHotbarSlot, 0, player.inventory.columns - 1);
 		ItemStack& selectedStack = player.inventory.slots[player.selectedHotbarSlot];
 
 		ItemDefinition* item = getItem(selectedStack.itemId);
