@@ -909,11 +909,14 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	if (Engine::isKeyPressed(Engine::Key::C)) { insideCraft = !insideCraft; }
 
-	if (Engine::isKeyDown(Engine::Key::LeftControl) && Engine::isKeyPressed(Engine::Key::S)) { saveWorld(gameMap, entityHolder, player); }
+	if (Engine::isKeyDown(Engine::Key::LeftControl) && Engine::isKeyPressed(Engine::Key::S)) 
+	{
+		saveWorld(gameMap, entityHolder, player, worldTime, FULL_DAY_LENGTH); 
+	}
 
 	if (Engine::isKeyDown(Engine::Key::LeftControl) && Engine::isKeyPressed(Engine::Key::L))
 	{
-		if (!loadWorld(gameMap, entityHolder, player))
+		if (!loadWorld(gameMap, entityHolder, player, worldTime, FULL_DAY_LENGTH))
 		{
 			Engine::traceLog(Engine::LogLevel::Warning, "Load failed: save files are missing or corrupted.");
 		}

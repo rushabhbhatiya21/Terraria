@@ -19,5 +19,5 @@ struct Player;
 struct GameMap;
 struct EntityHolder;
 
-void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player);
-bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player);
+void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player, float worldTime, float fullDayLength);
+bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player, float& worldTime, float& fullDayLength);

@@ -105,7 +105,7 @@ bool updateGame()
 
 			if (mainMenuButtons.addButton("Load Last Save"))
 			{
-				if (loadWorld(gameplay.gameMap, gameplay.entityHolder, gameplay.player))
+				if (loadWorld(gameplay.gameMap, gameplay.entityHolder, gameplay.player, gameplay.worldTime, gameplay.FULL_DAY_LENGTH))
 				{
 					gameplayRunning = true;
 					pausedFromGameplay = false;

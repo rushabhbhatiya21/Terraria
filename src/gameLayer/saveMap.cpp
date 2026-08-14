@@ -271,7 +271,7 @@ static void buildMapFromFlatData(GameMap& gameMap, const std::vector<Block>& blo
 	gameMap.lightingNeedsRebuild = true;
 }
 
-void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
+void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player, float worldTime, float fullDayLength)
 {
 	std::error_code errorCode;
 	std::filesystem::create_directories(RESOURCES_PATH "../saves/", errorCode);
@@ -305,6 +305,20 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 		f << j.dump(2);
 	}
 
+	// world metadata
+	{
+		Json j;
+		j["metadataVersion"] = 1;
+		j["worldTime"] = worldTime;
+		j["fullDayLength"] = fullDayLength;
+		j["desertStart"] = gameMap.desertStart;
+		j["desertEnd"] = gameMap.desertEnd;
+
+		std::ofstream f(RESOURCES_PATH "../saves/world.txt.tmp");
+		f << j.dump(2);
+		f.close();
+	}
+
 	// entities
 	{
 		Json j;
@@ -321,15 +335,18 @@ void saveWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 		replaceFile(RESOURCES_PATH "../saves/map.bin.tmp", RESOURCES_PATH "../saves/map.bin");
 		replaceFile(RESOURCES_PATH "../saves/idHolder.txt.tmp", RESOURCES_PATH "../saves/idHolder.txt");
 		replaceFile(RESOURCES_PATH "../saves/player.txt.tmp", RESOURCES_PATH "../saves/player.txt");
+		replaceFile(RESOURCES_PATH "../saves/world.txt.tmp", RESOURCES_PATH "../saves/world.txt");
 		replaceFile(RESOURCES_PATH "../saves/entities.txt.tmp", RESOURCES_PATH "../saves/entities.txt");
 	}
 }
 
-bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
+bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player, float& worldTime, float& fullDayLength)
 {
 	GameMap loadedMap = {};
 	EntityHolder loadedEntities = {};
 	Player loadedPlayer = {};
+	float loadedWorldTime = worldTime;
+	float loadedFullDayLength = fullDayLength;
 
 	std::vector<Block> loadedBlocks = {};
 	int loadedW = 0;
@@ -545,9 +562,45 @@ bool loadWorld(GameMap& gameMap, EntityHolder& entities, Player& player)
 		}
 	}
 
+	// world metadata (optional for backward compatibility with older saves)
+	{
+		std::ifstream f(RESOURCES_PATH "../saves/world.txt");
+
+		if (f.is_open())
+		{
+			Json j;
+			j = Json::parse(f, nullptr, false);
+
+			if (!j.is_discarded())
+			{
+				if (j.contains("worldTime") && j["worldTime"].is_number())
+				{
+					loadedWorldTime = j["worldTime"];
+				}
+
+				if (j.contains("fullDayLength") && j["fullDayLength"].is_number())
+				{
+					loadedFullDayLength = j["fullDayLength"];
+				}
+
+				if (j.contains("desertStart") && j["desertStart"].is_number_integer())
+				{
+					loadedMap.desertStart = j["desertStart"];
+				}
+
+				if (j.contains("desertEnd") && j["desertEnd"].is_number_integer())
+				{
+					loadedMap.desertEnd = j["desertEnd"];
+				}
+			}
+		}
+	}
+
 	gameMap = std::move(loadedMap);
 	entities = std::move(loadedEntities);
 	player = std::move(loadedPlayer);
+	worldTime = loadedWorldTime;
+	fullDayLength = loadedFullDayLength;
 
 	return true;
 }
