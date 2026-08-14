@@ -903,14 +903,39 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	if (Engine::isKeyPressed(Engine::Key::LeftControl) && Engine::isKeyPressed(Engine::Key::S)) { saveWorld(gameMap, entityHolder, player); }
 
-	if (Engine::isKeyPressed(Engine::Key::LeftControl) && Engine::isKeyPressed(Engine::Key::L)) { loadWorld(gameMap, entityHolder, player); }
+	if (Engine::isKeyPressed(Engine::Key::LeftControl) && Engine::isKeyPressed(Engine::Key::L))
+	{
+		if (!loadWorld(gameMap, entityHolder, player))
+		{
+			Engine::traceLog(Engine::LogLevel::Warning, "Load failed: save files are missing or corrupted.");
+		}
+	}
+
+	if (Engine::isKeyPressed(Engine::Key::F9))
+	{
+		bool eyeExists = false;
+
+		for (Enemy* enemy : entityHolder.enemies)
+		{
+			if (enemy && enemy->getEnemyType() == EnemyType::EnemyType_EvilEye)
+			{
+				eyeExists = true;
+				break;
+			}
+		}
+
+		if (!eyeExists)
+		{
+			spawnEnemyHelper<EvilEye>({ player.getPosition().x + 12.f, player.getPosition().y - 4.f });
+		}
+	}
 
 #pragma endregion
 
 
 #pragma region creative mode
 
-	std::ranlux24_base rng(std::random_device{}());
+	static std::ranlux24_base rng(std::random_device{}());
 
 	static bool creative = false;
 
@@ -1246,11 +1271,11 @@ bool Gameplay::update(Engine::AssetManager& assetManager)
 
 	//maxEnemyCount = 5;
 
-	//if (enemySpawner.enemySpawnTimer <= 0 && enemyCount < maxEnemyCount)
-	//{
-	//	spawnEnemy(entityHolder, gameMap, rng, startXView, endXView, startYView, endYView);
-	//	enemySpawner.enemySpawnTimer = 2;
-	//}
+	if (enemySpawner.enemySpawnTimer <= 0 && enemyCount < maxEnemyCount)
+	{
+		spawnEnemy(entityHolder, gameMap, rng, startXView, endXView, startYView, endYView);
+		enemySpawner.enemySpawnTimer = 2;
+	}
 
 #pragma endregion
 
