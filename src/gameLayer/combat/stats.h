@@ -108,7 +108,7 @@ inline EntityStats makeSlimeStats()
 	EntityStats slimeStats;
 	slimeStats.offensive.damage = 5;
 
-	slimeStats.defensive.maxHealth = 100;
+	slimeStats.defensive.maxHealth = 30;
 	slimeStats.defensive.armor = 5;
 	slimeStats.defensive.knockbackResist = 5;
 	return slimeStats;
@@ -142,7 +142,7 @@ inline EntityStats makeServantEvilEyeStats()
 	EntityStats servantEvilEyeStats;
 
 	servantEvilEyeStats.offensive.damage = 5;
-	servantEvilEyeStats.defensive.maxHealth = 10;
+	servantEvilEyeStats.defensive.maxHealth = 5;
 
 	return servantEvilEyeStats;
 }

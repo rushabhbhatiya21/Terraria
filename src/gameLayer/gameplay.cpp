@@ -824,7 +824,7 @@ bool Gameplay::init(Engine::AssetManager& assetManager)
 
 	// start day at random time
 	std::ranlux24_base rng(std::random_device{}());
-	float randStartTime = getRandomFloat(rng, 0.8f, 0.9f);
+	float randStartTime = getRandomFloat(rng, 0.7f, 0.8f);
 	worldTime = randStartTime * FULL_DAY_LENGTH;
 
 	//// chunk grid testing

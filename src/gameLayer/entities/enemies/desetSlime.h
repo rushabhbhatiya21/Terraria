@@ -5,6 +5,9 @@ struct DesertSlime: public Enemy
 {
 	DesertSlime()
 	{
+		baseStats = makeSlimeStats();
+		stats = baseStats;
+		life = (float)stats.defensive.maxHealth;
 		setColliderSize();
 	}
 
