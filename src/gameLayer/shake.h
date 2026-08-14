@@ -21,7 +21,7 @@ struct ShakeData
 // =========================
 // Storage
 // =========================
-static std::unordered_map<long long, ShakeData> shakeMap;
+extern std::unordered_map<long long, ShakeData> shakeMap;
 
 // =========================
 // Key generator (x,y → unique key)

@@ -173,9 +173,10 @@ void SwingAttack::updateSwings(float deltaTime, GameMap& gameMap, EntityHolder& 
 	};
 
 	auto* b = gameMap.getBlockSafe(blockPos.x, blockPos.y);
-	auto* bDef = getItem(b->type);
+	if (!b) return;
 
-	if (!b || !bDef || !bDef->block.isCollidable()) return;
+	auto* bDef = getItem(b->type);
+	if (!bDef || !bDef->block.isCollidable()) return;
 
 	float dist = Engine::Vec2Distance(blockPos.toVec2(), owner->getPosition());
 	int toolRange = item->tool.tool.range;

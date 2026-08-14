@@ -1,5 +1,7 @@
 #include "shake.h"
 
+std::unordered_map<long long, ShakeData> shakeMap;
+
 CameraShake camShake;
 
 void CameraShake::triggerCameraShake(float duration, float strength)
