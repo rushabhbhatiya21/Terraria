@@ -301,7 +301,7 @@ void SwingAttack::destroyBlock(const Engine::Vec2i& blockPos, Block& block, Game
 	entityHolder.entities[id] = std::move(item);
 	entityHolder.droppedItems.push_back(itemPtr);
 
-	Audio::playSound(Audio::breakBlock);
+	Audio::playBlockBreakForType(block.type);
 
 	gameMap.removeBlock(blockPos.x, blockPos.y);
 	//recalculateLight(gameMap);

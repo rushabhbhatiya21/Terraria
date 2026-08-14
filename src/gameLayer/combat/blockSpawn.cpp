@@ -49,7 +49,7 @@ void updateBlock(GameMap& gameMap, Inventory& inventory)
 				if (!gameMap.setBlock((int)block.position.x, (int)block.position.y, i.itemId)) continue;
 
 				i.count -= 1;
-				Audio::playSound(Audio::placeBlock);
+				Audio::playBlockPlaceForType(i.itemId);
 				block.used = true;
 				break;
 			}

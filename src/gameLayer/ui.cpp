@@ -4,11 +4,13 @@
 #include <window/window.h>
 #include <algorithm>
 #include <assets/assetManager.h>
+#include <audio.h>
 #include <rendering/IRenderCollector.h>
 #include <rendering/types/coloredRect.h>
 #include <rendering/types/circle.h>
 #include <rendering/types/roundedRect.h>
 #include <rendering/types/text.h>
+#include <time/time.h>
 #include <ui/textLayout.h>
 
 // top
@@ -257,6 +259,12 @@ void UIEngine::updateAndRender(const Engine::AssetManager& assetManager, Engine:
 					drawCenteredText(widget.text, smallerRect, buttonFontSize);
 				}
 
+				if (widget.isReleased)
+				{
+					bool isBackButton = (widget.text == "Back");
+					Audio::playUiButton(isBackButton);
+				}
+
 				break;
 			}
 
@@ -320,6 +328,20 @@ void UIEngine::updateAndRender(const Engine::AssetManager& assetManager, Engine:
 						it->second += (value01 - it->second) * 0.22f;
 						it->second = std::clamp(it->second, 0.0f, 1.0f);
 						visual01 = it->second;
+					}
+				}
+
+				if (widget.sliderValue)
+				{
+					float& lastValue = sliderLastSfxValue[widget.sliderValue];
+					double& lastTime = sliderLastSfxTime[widget.sliderValue];
+					double now = Engine::getTime();
+
+					if (std::abs(value01 - lastValue) >= 0.03f && (now - lastTime) >= 0.06)
+					{
+						Audio::playUiSlider(0.4f);
+						lastValue = value01;
+						lastTime = now;
 					}
 				}
 

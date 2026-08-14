@@ -64,6 +64,8 @@ struct UIEngine
 
 	std::vector<Widget> lastFrameWidgets;
 	std::unordered_map<const float*, float> sliderVisual01;
+	std::unordered_map<const float*, float> sliderLastSfxValue;
+	std::unordered_map<const float*, double> sliderLastSfxTime;
 
 	int activeSlider = -1;
 

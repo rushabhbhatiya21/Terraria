@@ -4,6 +4,7 @@
 #include "randomStuff.h"
 #include "ui/popupText.h"
 #include "shake.h"
+#include <audio.h>
 
 static std::ranlux24_base rng(std::random_device{}());
 
@@ -59,6 +60,19 @@ DamageResult CombatSystem::applyDamage(Entity* target, DamageInfo& info)
 	target->damageTaken = result.finalDamage;
 	target->onHit();
 	target->knockback(info.hitDirection, finalKnockback);
+
+	if (target->life <= 0.f)
+	{
+		Audio::playRandomFinalHit(0.95f);
+	}
+	else if (result.crit)
+	{
+		Audio::playRandomImpact(0.9f);
+	}
+	else
+	{
+		Audio::playRandomHit(0.8f);
+	}
 
 	spawnPopupText(
 		target->getPosition(),
